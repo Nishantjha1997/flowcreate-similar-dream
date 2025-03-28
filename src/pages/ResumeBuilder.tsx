@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -9,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { CustomizationPanel } from '@/components/CustomizationPanel';
 import { 
   Download, 
   FileText, 
@@ -76,7 +78,13 @@ const exampleResumes: Record<string, ResumeData> = {
         description: "Dean's List, Marketing Club Member"
       }
     ],
-    skills: ["Digital Marketing", "Campaign Management", "Social Media Strategy", "Market Research", "SEO/SEM", "Content Creation", "Google Analytics", "Adobe Creative Suite", "Project Management"]
+    skills: ["Digital Marketing", "Campaign Management", "Social Media Strategy", "Market Research", "SEO/SEM", "Content Creation", "Google Analytics", "Adobe Creative Suite", "Project Management"],
+    customization: {
+      primaryColor: "#2563eb",
+      fontFamily: "'Roboto', sans-serif",
+      fontSize: "medium",
+      spacing: "normal"
+    }
   },
   "2": {
     personal: {
@@ -136,7 +144,203 @@ const exampleResumes: Record<string, ResumeData> = {
         link: "github.com/jordantaylor/ecommerce-api",
         technologies: ["Node.js", "Express", "MongoDB", "JWT"]
       }
-    ]
+    ],
+    customization: {
+      primaryColor: "#003366",
+      secondaryColor: "#555555",
+      fontFamily: "'Montserrat', sans-serif",
+      fontSize: "medium",
+      spacing: "normal"
+    }
+  },
+  "3": {
+    personal: {
+      name: "Taylor Rodriguez",
+      email: "taylor.rodriguez@example.com",
+      phone: "(555) 456-7890",
+      address: "Austin, TX",
+      summary: "Creative designer with a passion for crafting visually stunning and intuitive user experiences. Specializing in UI/UX design, brand identity, and digital media.",
+      website: "taylor-design.co"
+    },
+    experience: [
+      {
+        id: 1,
+        title: "Senior UX Designer",
+        company: "CreativeSpace Agency",
+        location: "Austin, TX",
+        startDate: "Mar 2022",
+        endDate: "",
+        current: true,
+        description: "• Led the redesign of client's flagship product, increasing user engagement by 40%\n• Created wireframes, prototypes, and high-fidelity mockups using Figma\n• Conducted user interviews and usability testing to inform design decisions\n• Collaborated with development team to ensure design implementation"
+      },
+      {
+        id: 2,
+        title: "UI Designer",
+        company: "Digital Innovations",
+        location: "Houston, TX",
+        startDate: "Jun 2019",
+        endDate: "Feb 2022",
+        current: false,
+        description: "• Designed user interfaces for web and mobile applications\n• Created and maintained design systems for consistency across products\n• Developed interactive prototypes for client presentations\n• Produced visual assets including icons, illustrations, and marketing materials"
+      }
+    ],
+    education: [
+      {
+        id: 1,
+        school: "Rhode Island School of Design",
+        degree: "Bachelor's",
+        field: "Graphic Design",
+        startDate: "2015",
+        endDate: "2019",
+        description: "Design Excellence Award, Student Design Association"
+      }
+    ],
+    skills: ["UI/UX Design", "Figma", "Adobe Creative Suite", "Wireframing", "Prototyping", "User Research", "Interaction Design", "Typography", "Color Theory", "Brand Identity", "Web Design", "Mobile Design"],
+    projects: [
+      {
+        id: 1,
+        title: "Fitness App Redesign",
+        description: "Complete redesign of a fitness tracking application focusing on improved usability and visual appeal.",
+        link: "behance.net/taylor-rodriguez/fitness-app",
+        technologies: ["Figma", "Photoshop", "Illustrator"]
+      }
+    ],
+    customization: {
+      primaryColor: "#FF6B6B",
+      secondaryColor: "#333333",
+      fontFamily: "'Poppins', sans-serif",
+      fontSize: "medium",
+      spacing: "spacious"
+    }
+  },
+  "4": {
+    personal: {
+      name: "Morgan Zhang",
+      email: "morgan.zhang@example.com",
+      phone: "(555) 789-0123",
+      address: "Boston, MA",
+      summary: "Data scientist with expertise in machine learning, statistical analysis, and data visualization. Experienced in translating complex business problems into data-driven solutions.",
+      linkedin: "linkedin.com/in/morganzhang"
+    },
+    experience: [
+      {
+        id: 1,
+        title: "Lead Data Scientist",
+        company: "AnalyticsPro",
+        location: "Boston, MA",
+        startDate: "Aug 2021",
+        endDate: "",
+        current: true,
+        description: "• Developed machine learning models that increased prediction accuracy by 25%\n• Led a team of 3 data scientists working on customer segmentation projects\n• Created automated reporting dashboards using Python and Tableau\n• Collaborated with product and engineering teams to implement data-driven features"
+      },
+      {
+        id: 2,
+        title: "Data Analyst",
+        company: "TechMetrics",
+        location: "Cambridge, MA",
+        startDate: "May 2019",
+        endDate: "Jul 2021",
+        current: false,
+        description: "• Performed statistical analysis on large datasets to identify trends and patterns\n• Built predictive models using Python and scikit-learn\n• Created interactive data visualizations using Tableau\n• Produced regular reports and presentations for executive team"
+      }
+    ],
+    education: [
+      {
+        id: 1,
+        school: "Massachusetts Institute of Technology",
+        degree: "Master's",
+        field: "Data Science",
+        startDate: "2017",
+        endDate: "2019",
+        description: "GPA: 3.9/4.0, Research Assistant in ML Lab"
+      },
+      {
+        id: 2,
+        school: "University of Michigan",
+        degree: "Bachelor's",
+        field: "Computer Science",
+        startDate: "2013",
+        endDate: "2017",
+        description: "Minor in Statistics, Dean's List"
+      }
+    ],
+    skills: ["Python", "R", "SQL", "Machine Learning", "Statistical Analysis", "Data Visualization", "Tableau", "Pandas", "TensorFlow", "scikit-learn", "A/B Testing", "Big Data"],
+    projects: [
+      {
+        id: 1,
+        title: "Customer Churn Prediction",
+        description: "Built a machine learning model to predict customer churn with 87% accuracy.",
+        link: "github.com/morganzhang/churn-prediction",
+        technologies: ["Python", "scikit-learn", "Pandas"]
+      }
+    ],
+    customization: {
+      primaryColor: "#4CAF50",
+      secondaryColor: "#555555",
+      fontFamily: "'Roboto Mono', monospace",
+      fontSize: "small",
+      spacing: "compact"
+    }
+  },
+  "5": {
+    personal: {
+      name: "Riley Johnson",
+      email: "riley.johnson@example.com",
+      phone: "(555) 234-5678",
+      address: "Chicago, IL",
+      summary: "Versatile project manager with 8+ years of experience in leading cross-functional teams and delivering high-impact projects on time and within budget.",
+      linkedin: "linkedin.com/in/rileyjohnson"
+    },
+    experience: [
+      {
+        id: 1,
+        title: "Senior Project Manager",
+        company: "Enterprise Solutions Inc.",
+        location: "Chicago, IL",
+        startDate: "Feb 2019",
+        endDate: "",
+        current: true,
+        description: "• Led enterprise-wide digital transformation projects with budgets exceeding $2M\n• Managed cross-functional teams of up to 15 members across different departments\n• Implemented agile methodologies that improved project delivery time by 30%\n• Developed comprehensive project plans, risk assessments, and status reports"
+      },
+      {
+        id: 2,
+        title: "Project Coordinator",
+        company: "Innovative Systems",
+        location: "Detroit, MI",
+        startDate: "Jul 2015",
+        endDate: "Jan 2019",
+        current: false,
+        description: "• Assisted in planning and executing multiple simultaneous projects\n• Coordinated communication between stakeholders, vendors, and team members\n• Tracked project milestones, deliverables, and budget allocations\n• Prepared and maintained project documentation and reports"
+      }
+    ],
+    education: [
+      {
+        id: 1,
+        school: "Northwestern University",
+        degree: "MBA",
+        field: "Project Management",
+        startDate: "2013",
+        endDate: "2015",
+        description: "Leadership Excellence Award"
+      },
+      {
+        id: 2,
+        school: "University of Illinois",
+        degree: "Bachelor's",
+        field: "Business Administration",
+        startDate: "2009",
+        endDate: "2013",
+        description: "Minor in Information Systems"
+      }
+    ],
+    skills: ["Project Management", "Agile Methodologies", "Budgeting", "Risk Management", "Stakeholder Communication", "Microsoft Project", "JIRA", "Scrum", "Team Leadership", "Strategic Planning", "Process Improvement", "Change Management"],
+    customization: {
+      primaryColor: "#003366",
+      secondaryColor: "#666666",
+      fontFamily: "'Montserrat', sans-serif",
+      fontSize: "medium",
+      spacing: "normal"
+    }
   }
 };
 
@@ -208,6 +412,12 @@ const ResumeBuilder = () => {
       },
     ],
     skills: [],
+    customization: {
+      primaryColor: '#2563eb',
+      secondaryColor: '#6b7280',
+      fontSize: 'medium',
+      spacing: 'normal'
+    }
   });
 
   useEffect(() => {
@@ -216,6 +426,43 @@ const ResumeBuilder = () => {
       if (exampleResumes[exampleId]) {
         setResume(exampleResumes[exampleId]);
       }
+    } else {
+      // Set template-specific colors when changing templates
+      const templateKey = templateNames[templateId];
+      let primaryColor = '#2563eb';
+      let secondaryColor = '#6b7280';
+      
+      switch(templateKey) {
+        case 'modern':
+          primaryColor = '#2563eb';
+          secondaryColor = '#6b7280';
+          break;
+        case 'classic':
+          primaryColor = '#000000';
+          secondaryColor = '#333333';
+          break;
+        case 'creative':
+          primaryColor = '#FF6B6B';
+          secondaryColor = '#FFE66D';
+          break;
+        case 'technical':
+          primaryColor = '#4CAF50';
+          secondaryColor = '#333333';
+          break;
+        case 'professional':
+          primaryColor = '#003366';
+          secondaryColor = '#555555';
+          break;
+      }
+      
+      setResume(prev => ({
+        ...prev,
+        customization: {
+          ...prev.customization,
+          primaryColor,
+          secondaryColor
+        }
+      }));
     }
   }, [templateId, isExample]);
 
@@ -334,6 +581,13 @@ const ResumeBuilder = () => {
   const getSkillsString = () => {
     return resume.skills.join(', ');
   };
+  
+  const handleCustomizationChange = (customization: ResumeData['customization']) => {
+    setResume(prev => ({
+      ...prev,
+      customization
+    }));
+  };
 
   const handleDownload = () => {
     toast({
@@ -437,6 +691,13 @@ const ResumeBuilder = () => {
                             className={`cursor-pointer border rounded-md overflow-hidden ${
                               templateId === id.toString() ? 'ring-2 ring-primary' : ''
                             }`}
+                            onClick={() => {
+                              // Navigate to the same page with different template ID
+                              const url = new URL(window.location.href);
+                              url.searchParams.set('template', id.toString());
+                              window.history.pushState({}, '', url.toString());
+                              window.location.reload();
+                            }}
                           >
                             <img 
                               src={`https://images.unsplash.com/photo-1461749280684-dccba630e2f6`} 
@@ -830,29 +1091,180 @@ const ResumeBuilder = () => {
                   {activeSection === 'projects' && (
                     <div className="space-y-4">
                       <h2 className="text-xl font-semibold">Projects</h2>
-                      <p className="text-muted-foreground">Coming Soon: Add your personal or professional projects to showcase your work.</p>
-                      <div className="p-6 border border-dashed rounded-md text-center">
-                        <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
-                        <h3 className="text-lg font-medium">Project Section</h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          This feature is currently under development. Please check back soon!
-                        </p>
-                      </div>
+                      <p className="text-muted-foreground">Add your personal or professional projects to showcase your work.</p>
+                      
+                      {!resume.projects || resume.projects.length === 0 ? (
+                        <div className="p-6 border border-dashed rounded-md text-center">
+                          <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                          <h3 className="text-lg font-medium">Add Your First Project</h3>
+                          <p className="text-sm text-muted-foreground mt-1 mb-4">
+                            Showcase your work by adding details about projects you've worked on.
+                          </p>
+                          <Button
+                            onClick={() => {
+                              setResume(prev => ({
+                                ...prev,
+                                projects: [
+                                  {
+                                    id: 1,
+                                    title: '',
+                                    description: '',
+                                    technologies: []
+                                  }
+                                ]
+                              }));
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Project
+                          </Button>
+                        </div>
+                      ) : (
+                        <>
+                          {resume.projects.map((project, index) => (
+                            <div key={project.id} className="p-4 border rounded-md space-y-4 relative">
+                              {resume.projects && resume.projects.length > 0 && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    setResume(prev => ({
+                                      ...prev,
+                                      projects: prev.projects?.filter(p => p.id !== project.id)
+                                    }));
+                                  }}
+                                  className="absolute right-2 top-2 h-8 w-8 text-destructive"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              )}
+                              
+                              <div>
+                                <Label htmlFor={`projectTitle-${index}`} className="block text-sm font-medium mb-1">
+                                  Project Title
+                                </Label>
+                                <Input
+                                  id={`projectTitle-${index}`}
+                                  value={project.title}
+                                  onChange={(e) => {
+                                    setResume(prev => {
+                                      const updatedProjects = [...(prev.projects || [])];
+                                      updatedProjects[index] = {
+                                        ...updatedProjects[index],
+                                        title: e.target.value
+                                      };
+                                      return { ...prev, projects: updatedProjects };
+                                    });
+                                  }}
+                                  placeholder="E-commerce Website"
+                                />
+                              </div>
+                              
+                              <div>
+                                <Label htmlFor={`projectDescription-${index}`} className="block text-sm font-medium mb-1">
+                                  Description
+                                </Label>
+                                <Textarea
+                                  id={`projectDescription-${index}`}
+                                  value={project.description}
+                                  onChange={(e) => {
+                                    setResume(prev => {
+                                      const updatedProjects = [...(prev.projects || [])];
+                                      updatedProjects[index] = {
+                                        ...updatedProjects[index],
+                                        description: e.target.value
+                                      };
+                                      return { ...prev, projects: updatedProjects };
+                                    });
+                                  }}
+                                  rows={3}
+                                  placeholder="Describe your project, its purpose, and your role..."
+                                />
+                              </div>
+                              
+                              <div>
+                                <Label htmlFor={`projectLink-${index}`} className="block text-sm font-medium mb-1">
+                                  Link (Optional)
+                                </Label>
+                                <Input
+                                  id={`projectLink-${index}`}
+                                  value={project.link || ''}
+                                  onChange={(e) => {
+                                    setResume(prev => {
+                                      const updatedProjects = [...(prev.projects || [])];
+                                      updatedProjects[index] = {
+                                        ...updatedProjects[index],
+                                        link: e.target.value
+                                      };
+                                      return { ...prev, projects: updatedProjects };
+                                    });
+                                  }}
+                                  placeholder="https://github.com/yourusername/project"
+                                />
+                              </div>
+                              
+                              <div>
+                                <Label htmlFor={`projectTech-${index}`} className="block text-sm font-medium mb-1">
+                                  Technologies Used (comma separated)
+                                </Label>
+                                <Input
+                                  id={`projectTech-${index}`}
+                                  value={(project.technologies || []).join(', ')}
+                                  onChange={(e) => {
+                                    const techs = e.target.value.split(',').map(t => t.trim()).filter(Boolean);
+                                    setResume(prev => {
+                                      const updatedProjects = [...(prev.projects || [])];
+                                      updatedProjects[index] = {
+                                        ...updatedProjects[index],
+                                        technologies: techs
+                                      };
+                                      return { ...prev, projects: updatedProjects };
+                                    });
+                                  }}
+                                  placeholder="React, Node.js, MongoDB"
+                                />
+                              </div>
+                            </div>
+                          ))}
+                          
+                          <Button 
+                            variant="outline" 
+                            className="w-full"
+                            onClick={() => {
+                              setResume(prev => {
+                                const projects = prev.projects || [];
+                                const newId = projects.length > 0 
+                                  ? Math.max(...projects.map(p => p.id)) + 1 
+                                  : 1;
+                                
+                                return {
+                                  ...prev,
+                                  projects: [
+                                    ...projects,
+                                    {
+                                      id: newId,
+                                      title: '',
+                                      description: '',
+                                      technologies: []
+                                    }
+                                  ]
+                                };
+                              });
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Project
+                          </Button>
+                        </>
+                      )}
                     </div>
                   )}
 
                   {activeSection === 'customize' && (
-                    <div className="space-y-4">
-                      <h2 className="text-xl font-semibold">Customize</h2>
-                      <p className="text-muted-foreground">Coming Soon: Customize the design of your resume.</p>
-                      <div className="p-6 border border-dashed rounded-md text-center">
-                        <Settings className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
-                        <h3 className="text-lg font-medium">Customization Options</h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          This feature is currently under development. Please check back soon!
-                        </p>
-                      </div>
-                    </div>
+                    <CustomizationPanel
+                      customization={resume.customization || {}}
+                      onCustomizationChange={handleCustomizationChange}
+                    />
                   )}
                 </CardContent>
               </Card>
@@ -870,7 +1282,10 @@ const ResumeBuilder = () => {
                 <CardContent className="flex-1 p-0 relative overflow-auto">
                   {(resume.personal.name || resume.experience.some(e => e.title || e.company)) ? (
                     <div className="absolute inset-0 overflow-auto" style={{ zoom: 0.65 }}>
-                      <ResumeTemplate data={resume} templateName={templateNames[templateId]} />
+                      <ResumeTemplate 
+                        data={resume} 
+                        templateName={templateNames[templateId]} 
+                      />
                     </div>
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-background border-dashed border-2 m-4 rounded-md">

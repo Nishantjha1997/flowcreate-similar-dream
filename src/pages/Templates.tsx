@@ -12,53 +12,40 @@ const templates = [
     id: 1,
     name: "Modern",
     image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
-    category: "Professional"
+    category: "Professional",
+    templateKey: "modern"
   },
   {
     id: 2,
     name: "Classic",
     image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
-    category: "Traditional"
+    category: "Traditional",
+    templateKey: "classic"
   },
   {
     id: 3,
     name: "Creative",
     image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6", 
-    category: "Design"
+    category: "Design",
+    templateKey: "creative"
   },
   {
     id: 4,
-    name: "Minimal",
+    name: "Technical",
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
-    category: "Simple"
+    category: "Simple",
+    templateKey: "technical"
   },
   {
     id: 5,
-    name: "Executive",
+    name: "Professional",
     image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
-    category: "Professional"
-  },
-  {
-    id: 6,
-    name: "Contemporary",
-    image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
-    category: "Modern"
-  },
-  {
-    id: 7,
-    name: "Technical",
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
-    category: "Professional"
-  },
-  {
-    id: 8,
-    name: "Elegant",
-    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
-    category: "Traditional"
+    category: "Professional",
+    templateKey: "professional"
   },
 ];
 
-const categories = ["All", "Professional", "Traditional", "Modern", "Design", "Simple"];
+const categories = ["All", "Professional", "Traditional", "Design", "Simple"];
 
 const Templates = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");

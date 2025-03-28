@@ -38,6 +38,15 @@ export type ResumeData = {
     link?: string;
     technologies?: string[];
   }>;
+  customization?: {
+    primaryColor?: string;
+    secondaryColor?: string;
+    fontSize?: string;
+    fontFamily?: string;
+    spacing?: string;
+    showPhoto?: boolean;
+    layoutType?: 'standard' | 'compact' | 'minimal' | 'creative';
+  };
 };
 
 export type TemplateStyles = {
@@ -55,6 +64,55 @@ export type TemplateStyles = {
   itemDescription: CSSProperties;
   skillsList: CSSProperties;
   skill: CSSProperties;
+};
+
+// Helper function to apply customization options to template styles
+const applyCustomization = (
+  baseStyles: TemplateStyles, 
+  customization?: ResumeData['customization']
+): TemplateStyles => {
+  if (!customization) return baseStyles;
+
+  const styles = {...baseStyles};
+  
+  // Apply primary color
+  if (customization.primaryColor) {
+    styles.name = {...styles.name, color: customization.primaryColor};
+    styles.sectionTitle = {...styles.sectionTitle, color: customization.primaryColor};
+    styles.skill = {...styles.skill, backgroundColor: customization.primaryColor, color: '#fff'};
+  }
+  
+  // Apply secondary color
+  if (customization.secondaryColor) {
+    styles.itemSubtitle = {...styles.itemSubtitle, color: customization.secondaryColor};
+  }
+  
+  // Apply font size
+  if (customization.fontSize) {
+    const fontSizeMultiplier = customization.fontSize === 'small' ? 0.9 : 
+                               customization.fontSize === 'large' ? 1.1 : 1;
+    
+    styles.name = {...styles.name, fontSize: `${parseInt(styles.name.fontSize as string) * fontSizeMultiplier}px`};
+    styles.itemTitle = {...styles.itemTitle, fontSize: `${parseInt(styles.itemTitle.fontSize as string) * fontSizeMultiplier}px`};
+    styles.itemSubtitle = {...styles.itemSubtitle, fontSize: `${parseInt(styles.itemSubtitle.fontSize as string) * fontSizeMultiplier}px`};
+    styles.itemDescription = {...styles.itemDescription, fontSize: `${parseInt(styles.itemDescription.fontSize as string) * fontSizeMultiplier}px`};
+  }
+  
+  // Apply font family
+  if (customization.fontFamily) {
+    styles.container = {...styles.container, fontFamily: customization.fontFamily};
+  }
+  
+  // Apply spacing
+  if (customization.spacing) {
+    const spacingMultiplier = customization.spacing === 'compact' ? 0.8 : 
+                              customization.spacing === 'spacious' ? 1.2 : 1;
+    
+    styles.section = {...styles.section, marginBottom: `${parseInt(styles.section.marginBottom as string) * spacingMultiplier}px`};
+    styles.item = {...styles.item, marginBottom: `${parseInt(styles.item.marginBottom as string) * spacingMultiplier}px`};
+  }
+  
+  return styles;
 };
 
 // Define template styles
@@ -392,7 +450,7 @@ const templateStyles: Record<string, TemplateStyles> = {
       letterSpacing: '1.5px',
       color: '#4CAF50',
       marginBottom: '18px',
-      fontFamily: "'Orbitron', sans-serif",
+      fontFamily: "'Roboto Mono', sans-serif",
     },
     sectionContent: {
       marginTop: '18px',
@@ -407,7 +465,7 @@ const templateStyles: Record<string, TemplateStyles> = {
       fontWeight: 600,
       color: '#333',
       marginBottom: '5px',
-      fontFamily: "'Orbitron', sans-serif",
+      fontFamily: "'Roboto Mono', sans-serif",
     },
     itemSubtitle: {
       fontSize: '15px',
@@ -441,7 +499,7 @@ const templateStyles: Record<string, TemplateStyles> = {
       backgroundColor: '#4CAF50',
       color: '#fff',
       borderRadius: '3px',
-      fontFamily: "'Orbitron', sans-serif",
+      fontFamily: "'Roboto Mono', sans-serif",
       letterSpacing: '0.5px',
     },
   },
@@ -547,7 +605,8 @@ const ResumeTemplate = ({
   data: ResumeData; 
   templateName?: string;
 }) => {
-  const styles = templateStyles[templateName] || templateStyles.modern;
+  const baseStyles = templateStyles[templateName] || templateStyles.modern;
+  const styles = applyCustomization(baseStyles, data.customization);
 
   return (
     <div style={styles.container}>
