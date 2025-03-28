@@ -1,20 +1,183 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Download, FileText, Share2, User, Briefcase, GraduationCap, Award, Settings } from 'lucide-react';
+import { 
+  Download, 
+  FileText, 
+  Share2, 
+  User, 
+  Briefcase, 
+  GraduationCap, 
+  Award, 
+  Settings,
+  Trash2,
+  Plus,
+  BookOpen
+} from 'lucide-react';
+import ResumeTemplate, { ResumeData } from '@/utils/resumeTemplates';
+
+const exampleResumes: Record<string, ResumeData> = {
+  "1": {
+    personal: {
+      name: "Alex Morgan",
+      email: "alex.morgan@example.com",
+      phone: "(555) 123-4567",
+      address: "San Francisco, CA",
+      summary: "Experienced marketing manager with 7 years of expertise in digital marketing, campaign management, and team leadership. Proven track record of increasing brand visibility and driving engagement across multiple platforms.",
+      linkedin: "linkedin.com/in/alexmorgan"
+    },
+    experience: [
+      {
+        id: 1,
+        title: "Senior Marketing Manager",
+        company: "TechVision Inc.",
+        location: "San Francisco, CA",
+        startDate: "Jan 2020",
+        endDate: "",
+        current: true,
+        description: "• Led rebranding initiative resulting in 40% increase in brand recognition\n• Managed a team of 5 marketing specialists and a $1.2M annual budget\n• Developed and executed comprehensive marketing campaigns across digital and traditional channels\n• Increased social media engagement by 65% and email open rates by 32%"
+      },
+      {
+        id: 2,
+        title: "Marketing Specialist",
+        company: "InnovateTech",
+        location: "Oakland, CA",
+        startDate: "Mar 2017",
+        endDate: "Dec 2019",
+        current: false,
+        description: "• Coordinated marketing campaigns across multiple channels\n• Created content for website, social media, and email newsletters\n• Analyzed campaign metrics and prepared monthly performance reports\n• Collaborated with sales team to align marketing strategies with sales goals"
+      }
+    ],
+    education: [
+      {
+        id: 1,
+        school: "University of California, Berkeley",
+        degree: "Master's",
+        field: "Marketing and Communications",
+        startDate: "2015",
+        endDate: "2017",
+        description: "GPA: 3.8/4.0, Marketing Society President"
+      },
+      {
+        id: 2,
+        school: "San Francisco State University",
+        degree: "Bachelor's",
+        field: "Business Administration",
+        startDate: "2011",
+        endDate: "2015",
+        description: "Dean's List, Marketing Club Member"
+      }
+    ],
+    skills: ["Digital Marketing", "Campaign Management", "Social Media Strategy", "Market Research", "SEO/SEM", "Content Creation", "Google Analytics", "Adobe Creative Suite", "Project Management"]
+  },
+  "2": {
+    personal: {
+      name: "Jordan Taylor",
+      email: "jordan.taylor@example.com",
+      phone: "(555) 987-6543",
+      address: "Seattle, WA",
+      summary: "Software engineer with 5+ years of experience building scalable applications and APIs. Expertise in JavaScript, TypeScript, React, and Node.js. Passionate about clean code and delivering exceptional user experiences.",
+      website: "jordantaylor.dev"
+    },
+    experience: [
+      {
+        id: 1,
+        title: "Senior Frontend Engineer",
+        company: "CloudTech Solutions",
+        location: "Seattle, WA",
+        startDate: "Jun 2021",
+        endDate: "",
+        current: true,
+        description: "• Developed and maintained core features for the company's flagship SaaS platform using React and TypeScript\n• Improved application performance by 35% through code optimization and implementing lazy loading\n• Implemented CI/CD pipelines that reduced deployment time by 40%\n• Mentored junior developers and led frontend architecture discussions"
+      },
+      {
+        id: 2,
+        title: "Full Stack Developer",
+        company: "InnoSoft Systems",
+        location: "Portland, OR",
+        startDate: "Aug 2018",
+        endDate: "May 2021",
+        current: false,
+        description: "• Built RESTful APIs using Node.js and Express\n• Developed responsive web applications with React and Redux\n• Implemented authentication and authorization systems\n• Worked in an agile environment with two-week sprint cycles"
+      }
+    ],
+    education: [
+      {
+        id: 1,
+        school: "University of Washington",
+        degree: "Bachelor's",
+        field: "Computer Science",
+        startDate: "2014",
+        endDate: "2018",
+        description: "Minor in Mathematics, Coding Club Member"
+      }
+    ],
+    skills: ["JavaScript", "TypeScript", "React", "Node.js", "Express", "MongoDB", "SQL", "Git", "AWS", "Docker", "REST APIs", "GraphQL"],
+    projects: [
+      {
+        id: 1,
+        title: "Weather Dashboard",
+        description: "A React application that displays weather forecasts using the OpenWeatherMap API.",
+        link: "github.com/jordantaylor/weather-dashboard",
+        technologies: ["React", "CSS", "RESTful APIs"]
+      },
+      {
+        id: 2,
+        title: "E-commerce Backend",
+        description: "A Node.js backend for an e-commerce platform with product, user, and order management.",
+        link: "github.com/jordantaylor/ecommerce-api",
+        technologies: ["Node.js", "Express", "MongoDB", "JWT"]
+      }
+    ]
+  }
+};
+
+const templateNames: Record<string, string> = {
+  "1": "modern",
+  "2": "classic",
+  "3": "creative",
+  "4": "technical",
+  "5": "professional"
+};
+
+const emptyExperience = {
+  id: 0,
+  title: '',
+  company: '',
+  location: '',
+  startDate: '',
+  endDate: '',
+  current: false,
+  description: '',
+};
+
+const emptyEducation = {
+  id: 0,
+  school: '',
+  degree: '',
+  field: '',
+  startDate: '',
+  endDate: '',
+  description: '',
+};
 
 const ResumeBuilder = () => {
   const [searchParams] = useSearchParams();
   const templateId = searchParams.get('template') || '1';
+  const isExample = searchParams.get('example') === 'true';
   const { toast } = useToast();
   
   const [activeSection, setActiveSection] = useState('personal');
-  const [resume, setResume] = useState({
+  const [resume, setResume] = useState<ResumeData>({
     personal: {
       name: '',
       email: '',
@@ -48,6 +211,16 @@ const ResumeBuilder = () => {
     skills: [],
   });
 
+  useEffect(() => {
+    // Load example data if example parameter is true
+    if (isExample) {
+      const exampleId = templateId;
+      if (exampleResumes[exampleId]) {
+        setResume(exampleResumes[exampleId]);
+      }
+    }
+  }, [templateId, isExample]);
+
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setResume((prev) => ({
@@ -59,10 +232,122 @@ const ResumeBuilder = () => {
     }));
   };
 
+  const handleExperienceChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => {
+    const { name, value } = e.target;
+    setResume((prev) => {
+      const updatedExperience = [...prev.experience];
+      updatedExperience[index] = {
+        ...updatedExperience[index],
+        [name]: value,
+      };
+      return {
+        ...prev,
+        experience: updatedExperience,
+      };
+    });
+  };
+
+  const handleCurrentJobToggle = (checked: boolean, index: number) => {
+    setResume((prev) => {
+      const updatedExperience = [...prev.experience];
+      updatedExperience[index] = {
+        ...updatedExperience[index],
+        current: checked,
+        endDate: checked ? '' : updatedExperience[index].endDate,
+      };
+      return {
+        ...prev,
+        experience: updatedExperience,
+      };
+    });
+  };
+
+  const addExperience = () => {
+    setResume((prev) => {
+      const newId = prev.experience.length > 0 
+        ? Math.max(...prev.experience.map(e => e.id)) + 1 
+        : 1;
+        
+      return {
+        ...prev,
+        experience: [
+          ...prev.experience,
+          { ...emptyExperience, id: newId },
+        ],
+      };
+    });
+  };
+
+  const removeExperience = (id: number) => {
+    setResume((prev) => ({
+      ...prev,
+      experience: prev.experience.filter(exp => exp.id !== id),
+    }));
+  };
+
+  const handleEducationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => {
+    const { name, value } = e.target;
+    setResume((prev) => {
+      const updatedEducation = [...prev.education];
+      updatedEducation[index] = {
+        ...updatedEducation[index],
+        [name]: value,
+      };
+      return {
+        ...prev,
+        education: updatedEducation,
+      };
+    });
+  };
+
+  const addEducation = () => {
+    setResume((prev) => {
+      const newId = prev.education.length > 0 
+        ? Math.max(...prev.education.map(e => e.id)) + 1 
+        : 1;
+        
+      return {
+        ...prev,
+        education: [
+          ...prev.education,
+          { ...emptyEducation, id: newId },
+        ],
+      };
+    });
+  };
+
+  const removeEducation = (id: number) => {
+    setResume((prev) => ({
+      ...prev,
+      education: prev.education.filter(edu => edu.id !== id),
+    }));
+  };
+
+  const handleSkillsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const skillsString = e.target.value;
+    const skillsArray = skillsString.split(',').map(skill => skill.trim()).filter(Boolean);
+    
+    setResume((prev) => ({
+      ...prev,
+      skills: skillsArray,
+    }));
+  };
+
+  const getSkillsString = () => {
+    return resume.skills.join(', ');
+  };
+
   const handleDownload = () => {
     toast({
       title: "Resume Downloaded",
       description: "Your resume has been downloaded as a PDF.",
+    });
+  };
+
+  const handleShare = () => {
+    toast({
+      title: "Resume Shared",
+      description: "A shareable link has been copied to your clipboard.",
     });
   };
 
@@ -78,7 +363,7 @@ const ResumeBuilder = () => {
                 <Download className="h-4 w-4 mr-2" />
                 Download
               </Button>
-              <Button size="sm">
+              <Button size="sm" onClick={handleShare}>
                 <Share2 className="h-4 w-4 mr-2" />
                 Share
               </Button>
@@ -130,6 +415,14 @@ const ResumeBuilder = () => {
                           Skills
                         </Button>
                         <Button 
+                          variant={activeSection === 'projects' ? 'default' : 'ghost'} 
+                          className="w-full justify-start"
+                          onClick={() => setActiveSection('projects')}
+                        >
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          Projects
+                        </Button>
+                        <Button 
                           variant={activeSection === 'customize' ? 'default' : 'ghost'} 
                           className="w-full justify-start"
                           onClick={() => setActiveSection('customize')}
@@ -141,7 +434,7 @@ const ResumeBuilder = () => {
                     </TabsContent>
                     <TabsContent value="templates">
                       <div className="p-4 grid grid-cols-2 gap-2">
-                        {[1, 2, 3, 4].map((id) => (
+                        {[1, 2, 3, 4, 5].map((id) => (
                           <div 
                             key={id}
                             className={`cursor-pointer border rounded-md overflow-hidden ${
@@ -153,6 +446,13 @@ const ResumeBuilder = () => {
                               alt={`Template ${id}`} 
                               className="w-full aspect-[3/4] object-cover"
                             />
+                            <div className="p-2 text-xs font-medium text-center">
+                              {id === 1 && "Modern"}
+                              {id === 2 && "Classic"}
+                              {id === 3 && "Creative"}
+                              {id === 4 && "Technical"}
+                              {id === 5 && "Professional"}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -171,72 +471,92 @@ const ResumeBuilder = () => {
                       <h2 className="text-xl font-semibold">Personal Information</h2>
                       <div className="grid grid-cols-1 gap-4">
                         <div>
-                          <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">
+                          <Label htmlFor="name" className="block text-sm font-medium mb-1">
                             Full Name
-                          </label>
-                          <input
-                            type="text"
+                          </Label>
+                          <Input
                             id="name"
                             name="name"
                             value={resume.personal.name}
                             onChange={handlePersonalInfoChange}
-                            className="w-full p-2 border border-border rounded-md"
                             placeholder="John Doe"
                           />
                         </div>
                         <div>
-                          <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1">
+                          <Label htmlFor="email" className="block text-sm font-medium mb-1">
                             Email
-                          </label>
-                          <input
+                          </Label>
+                          <Input
                             type="email"
                             id="email"
                             name="email"
                             value={resume.personal.email}
                             onChange={handlePersonalInfoChange}
-                            className="w-full p-2 border border-border rounded-md"
                             placeholder="john@example.com"
                           />
                         </div>
                         <div>
-                          <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-1">
+                          <Label htmlFor="phone" className="block text-sm font-medium mb-1">
                             Phone
-                          </label>
-                          <input
+                          </Label>
+                          <Input
                             type="tel"
                             id="phone"
                             name="phone"
                             value={resume.personal.phone}
                             onChange={handlePersonalInfoChange}
-                            className="w-full p-2 border border-border rounded-md"
                             placeholder="(123) 456-7890"
                           />
                         </div>
                         <div>
-                          <label htmlFor="address" className="block text-sm font-medium text-foreground mb-1">
+                          <Label htmlFor="address" className="block text-sm font-medium mb-1">
                             Location
-                          </label>
-                          <input
+                          </Label>
+                          <Input
                             type="text"
                             id="address"
                             name="address"
                             value={resume.personal.address}
                             onChange={handlePersonalInfoChange}
-                            className="w-full p-2 border border-border rounded-md"
                             placeholder="City, Country"
                           />
                         </div>
                         <div>
-                          <label htmlFor="summary" className="block text-sm font-medium text-foreground mb-1">
+                          <Label htmlFor="website" className="block text-sm font-medium mb-1">
+                            Website (Optional)
+                          </Label>
+                          <Input
+                            type="text"
+                            id="website"
+                            name="website"
+                            value={resume.personal.website || ''}
+                            onChange={handlePersonalInfoChange}
+                            placeholder="yourwebsite.com"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="linkedin" className="block text-sm font-medium mb-1">
+                            LinkedIn (Optional)
+                          </Label>
+                          <Input
+                            type="text"
+                            id="linkedin"
+                            name="linkedin"
+                            value={resume.personal.linkedin || ''}
+                            onChange={handlePersonalInfoChange}
+                            placeholder="linkedin.com/in/username"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="summary" className="block text-sm font-medium mb-1">
                             Professional Summary
-                          </label>
-                          <textarea
+                          </Label>
+                          <Textarea
                             id="summary"
                             name="summary"
                             value={resume.personal.summary}
                             onChange={handlePersonalInfoChange}
                             rows={4}
-                            className="w-full p-2 border border-border rounded-md"
                             placeholder="Write a professional summary..."
                           />
                         </div>
@@ -247,10 +567,120 @@ const ResumeBuilder = () => {
                   {activeSection === 'experience' && (
                     <div className="space-y-4">
                       <h2 className="text-xl font-semibold">Work Experience</h2>
-                      <p className="text-muted-foreground">Add your work experience details here.</p>
-                      {/* Experience form fields would go here */}
-                      <Button variant="outline" className="w-full mt-4">
-                        + Add Experience
+                      <p className="text-muted-foreground">Add your professional experience, starting with the most recent.</p>
+                      
+                      {resume.experience.map((exp, index) => (
+                        <div key={exp.id} className="p-4 border rounded-md space-y-4 relative">
+                          {resume.experience.length > 1 && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeExperience(exp.id)}
+                              className="absolute right-2 top-2 h-8 w-8 text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                          
+                          <div>
+                            <Label htmlFor={`title-${index}`} className="block text-sm font-medium mb-1">
+                              Job Title
+                            </Label>
+                            <Input
+                              id={`title-${index}`}
+                              name="title"
+                              value={exp.title}
+                              onChange={(e) => handleExperienceChange(e, index)}
+                              placeholder="Marketing Manager"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor={`company-${index}`} className="block text-sm font-medium mb-1">
+                              Company
+                            </Label>
+                            <Input
+                              id={`company-${index}`}
+                              name="company"
+                              value={exp.company}
+                              onChange={(e) => handleExperienceChange(e, index)}
+                              placeholder="Company Name"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor={`location-${index}`} className="block text-sm font-medium mb-1">
+                              Location (Optional)
+                            </Label>
+                            <Input
+                              id={`location-${index}`}
+                              name="location"
+                              value={exp.location}
+                              onChange={(e) => handleExperienceChange(e, index)}
+                              placeholder="City, Country"
+                            />
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor={`startDate-${index}`} className="block text-sm font-medium mb-1">
+                                Start Date
+                              </Label>
+                              <Input
+                                id={`startDate-${index}`}
+                                name="startDate"
+                                value={exp.startDate}
+                                onChange={(e) => handleExperienceChange(e, index)}
+                                placeholder="Jan 2020"
+                              />
+                            </div>
+                            
+                            <div>
+                              <Label htmlFor={`endDate-${index}`} className="block text-sm font-medium mb-1">
+                                End Date
+                              </Label>
+                              <Input
+                                id={`endDate-${index}`}
+                                name="endDate"
+                                value={exp.endDate}
+                                onChange={(e) => handleExperienceChange(e, index)}
+                                placeholder="Dec 2022"
+                                disabled={exp.current}
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center space-x-2">
+                            <Switch 
+                              id={`current-${index}`}
+                              checked={exp.current}
+                              onCheckedChange={(checked) => handleCurrentJobToggle(checked, index)}
+                            />
+                            <Label htmlFor={`current-${index}`}>I currently work here</Label>
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor={`description-${index}`} className="block text-sm font-medium mb-1">
+                              Description
+                            </Label>
+                            <Textarea
+                              id={`description-${index}`}
+                              name="description"
+                              value={exp.description}
+                              onChange={(e) => handleExperienceChange(e, index)}
+                              rows={4}
+                              placeholder="Describe your responsibilities and achievements..."
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Tip: Use bullet points (•) to format your description.
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      <Button variant="outline" className="w-full" onClick={addExperience}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Experience
                       </Button>
                     </div>
                   )}
@@ -258,10 +688,107 @@ const ResumeBuilder = () => {
                   {activeSection === 'education' && (
                     <div className="space-y-4">
                       <h2 className="text-xl font-semibold">Education</h2>
-                      <p className="text-muted-foreground">Add your educational background here.</p>
-                      {/* Education form fields would go here */}
-                      <Button variant="outline" className="w-full mt-4">
-                        + Add Education
+                      <p className="text-muted-foreground">Add your educational background, starting with the most recent.</p>
+                      
+                      {resume.education.map((edu, index) => (
+                        <div key={edu.id} className="p-4 border rounded-md space-y-4 relative">
+                          {resume.education.length > 1 && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeEducation(edu.id)}
+                              className="absolute right-2 top-2 h-8 w-8 text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                          
+                          <div>
+                            <Label htmlFor={`school-${index}`} className="block text-sm font-medium mb-1">
+                              School/University
+                            </Label>
+                            <Input
+                              id={`school-${index}`}
+                              name="school"
+                              value={edu.school}
+                              onChange={(e) => handleEducationChange(e, index)}
+                              placeholder="University Name"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor={`degree-${index}`} className="block text-sm font-medium mb-1">
+                              Degree
+                            </Label>
+                            <Input
+                              id={`degree-${index}`}
+                              name="degree"
+                              value={edu.degree}
+                              onChange={(e) => handleEducationChange(e, index)}
+                              placeholder="Bachelor's, Master's, etc."
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor={`field-${index}`} className="block text-sm font-medium mb-1">
+                              Field of Study
+                            </Label>
+                            <Input
+                              id={`field-${index}`}
+                              name="field"
+                              value={edu.field}
+                              onChange={(e) => handleEducationChange(e, index)}
+                              placeholder="Computer Science, Business, etc."
+                            />
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor={`eduStartDate-${index}`} className="block text-sm font-medium mb-1">
+                                Start Date
+                              </Label>
+                              <Input
+                                id={`eduStartDate-${index}`}
+                                name="startDate"
+                                value={edu.startDate}
+                                onChange={(e) => handleEducationChange(e, index)}
+                                placeholder="2018"
+                              />
+                            </div>
+                            
+                            <div>
+                              <Label htmlFor={`eduEndDate-${index}`} className="block text-sm font-medium mb-1">
+                                End Date (or Expected)
+                              </Label>
+                              <Input
+                                id={`eduEndDate-${index}`}
+                                name="endDate"
+                                value={edu.endDate}
+                                onChange={(e) => handleEducationChange(e, index)}
+                                placeholder="2022"
+                              />
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor={`eduDescription-${index}`} className="block text-sm font-medium mb-1">
+                              Description (Optional)
+                            </Label>
+                            <Textarea
+                              id={`eduDescription-${index}`}
+                              name="description"
+                              value={edu.description}
+                              onChange={(e) => handleEducationChange(e, index)}
+                              rows={2}
+                              placeholder="GPA, honors, relevant coursework, etc."
+                            />
+                          </div>
+                        </div>
+                      ))}
+                      
+                      <Button variant="outline" className="w-full" onClick={addEducation}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Education
                       </Button>
                     </div>
                   )}
@@ -269,19 +796,66 @@ const ResumeBuilder = () => {
                   {activeSection === 'skills' && (
                     <div className="space-y-4">
                       <h2 className="text-xl font-semibold">Skills</h2>
-                      <p className="text-muted-foreground">Add your key skills and competencies.</p>
-                      {/* Skills form fields would go here */}
-                      <Button variant="outline" className="w-full mt-4">
-                        + Add Skill
-                      </Button>
+                      <p className="text-muted-foreground">Add your key skills, separated by commas.</p>
+                      
+                      <div>
+                        <Label htmlFor="skills" className="block text-sm font-medium mb-1">
+                          Skills
+                        </Label>
+                        <Textarea
+                          id="skills"
+                          value={getSkillsString()}
+                          onChange={handleSkillsChange}
+                          rows={4}
+                          placeholder="JavaScript, React, Project Management, Leadership"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Example: JavaScript, React, Customer Service, Team Leadership
+                        </p>
+                      </div>
+                      
+                      {resume.skills.length > 0 && (
+                        <div>
+                          <Label className="block text-sm font-medium mb-2">
+                            Your Skills
+                          </Label>
+                          <div className="flex flex-wrap gap-2">
+                            {resume.skills.map((skill, index) => (
+                              <div key={index} className="bg-muted px-3 py-1 rounded-md text-sm">
+                                {skill}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {activeSection === 'projects' && (
+                    <div className="space-y-4">
+                      <h2 className="text-xl font-semibold">Projects</h2>
+                      <p className="text-muted-foreground">Coming Soon: Add your personal or professional projects to showcase your work.</p>
+                      <div className="p-6 border border-dashed rounded-md text-center">
+                        <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                        <h3 className="text-lg font-medium">Project Section</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          This feature is currently under development. Please check back soon!
+                        </p>
+                      </div>
                     </div>
                   )}
 
                   {activeSection === 'customize' && (
                     <div className="space-y-4">
                       <h2 className="text-xl font-semibold">Customize</h2>
-                      <p className="text-muted-foreground">Customize your resume design and layout.</p>
-                      {/* Customization options would go here */}
+                      <p className="text-muted-foreground">Coming Soon: Customize the design of your resume.</p>
+                      <div className="p-6 border border-dashed rounded-md text-center">
+                        <Settings className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                        <h3 className="text-lg font-medium">Customization Options</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          This feature is currently under development. Please check back soon!
+                        </p>
+                      </div>
                     </div>
                   )}
                 </CardContent>
@@ -295,19 +869,25 @@ const ResumeBuilder = () => {
                   <h3 className="font-medium">Preview</h3>
                   <Button variant="outline" size="sm">
                     <FileText className="h-4 w-4 mr-2" />
-                    Preview
+                    Full Preview
                   </Button>
                 </div>
-                <CardContent className="flex-1 p-0 relative">
-                  <div className="absolute inset-0 flex items-center justify-center bg-background border-dashed border-2 m-4 rounded-md">
-                    <div className="text-center p-4">
-                      <FileText className="h-12 w-12 mx-auto text-muted-foreground" />
-                      <h3 className="text-lg font-medium mt-2">Resume Preview</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Start filling in your information to see your resume take shape.
-                      </p>
+                <CardContent className="flex-1 p-0 relative overflow-auto">
+                  {(resume.personal.name || resume.experience.some(e => e.title || e.company)) ? (
+                    <div className="absolute inset-0 overflow-auto" style={{ zoom: 0.65 }}>
+                      <ResumeTemplate data={resume} templateName={templateNames[templateId]} />
                     </div>
-                  </div>
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-background border-dashed border-2 m-4 rounded-md">
+                      <div className="text-center p-4">
+                        <FileText className="h-12 w-12 mx-auto text-muted-foreground" />
+                        <h3 className="text-lg font-medium mt-2">Resume Preview</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Start filling in your information to see your resume take shape.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

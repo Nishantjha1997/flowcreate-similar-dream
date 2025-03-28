@@ -93,4 +93,35 @@
   .template-overlay {
     @apply absolute inset-0 bg-black/50 opacity-0 transition-opacity flex items-center justify-center;
   }
+
+  /* Added for resume templates */
+  .resume-template {
+    font-family: 'Roboto', 'Arial', sans-serif;
+    color: #333;
+    line-height: 1.5;
+  }
+
+  .resume-template-modern {
+    font-family: 'Roboto', 'Arial', sans-serif;
+  }
+  
+  .resume-template-classic {
+    font-family: 'Georgia', 'Times New Roman', serif;
+  }
+  
+  .resume-template-creative {
+    font-family: 'Poppins', 'Arial', sans-serif;
+  }
+  
+  .resume-template-technical {
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+  }
+  
+  .resume-template-professional {
+    font-family: 'Montserrat', 'Arial', sans-serif;
+  }
 }
+
+/* Add Google Fonts for resume templates */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Georgia&family=Poppins:wght@400;500;600;700&family=Roboto+Mono&family=Montserrat:wght@400;500;600;700&display=swap');
+

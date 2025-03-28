@@ -22,14 +22,17 @@ const Header = () => {
             <Link to="/templates" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
               Templates
             </Link>
+            <Link to="/examples" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
+              Examples
+            </Link>
             <Link to="/features" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
               Features
             </Link>
             <Link to="/pricing" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
               Pricing
             </Link>
-            <Link to="/blog" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
-              Blog
+            <Link to="/about" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
+              About
             </Link>
           </nav>
 
@@ -89,6 +92,13 @@ const Header = () => {
                   Templates
                 </Link>
                 <Link
+                  to="/examples"
+                  className="block text-base font-medium text-foreground/70 hover:text-foreground"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Examples
+                </Link>
+                <Link
                   to="/features"
                   className="block text-base font-medium text-foreground/70 hover:text-foreground"
                   onClick={() => setMobileMenuOpen(false)}
@@ -103,11 +113,11 @@ const Header = () => {
                   Pricing
                 </Link>
                 <Link
-                  to="/blog"
+                  to="/about"
                   className="block text-base font-medium text-foreground/70 hover:text-foreground"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Blog
+                  About
                 </Link>
               </div>
               <div className="mt-6 space-y-2">

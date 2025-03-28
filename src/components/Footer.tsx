@@ -26,6 +26,11 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/examples" className="text-sm text-muted-foreground hover:text-foreground">
+                  Example Resumes
+                </Link>
+              </li>
+              <li>
                 <Link to="/features" className="text-sm text-muted-foreground hover:text-foreground">
                   Features
                 </Link>
@@ -52,8 +57,8 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/examples" className="text-sm text-muted-foreground hover:text-foreground">
-                  Example Resumes
+                <Link to="/career-advice" className="text-sm text-muted-foreground hover:text-foreground">
+                  Career Advice
                 </Link>
               </li>
             </ul>
@@ -77,13 +82,23 @@ const Footer = () => {
                   Terms
                 </Link>
               </li>
+              <li>
+                <a 
+                  href="https://github.com/flowcreate/resume-builder" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                >
+                  GitHub
+                </a>
+              </li>
             </ul>
           </div>
         </div>
         
         <div className="mt-12 border-t border-border pt-8">
           <p className="text-sm text-center text-muted-foreground">
-            &copy; {new Date().getFullYear()} FlowCreate. All rights reserved.
+            &copy; {new Date().getFullYear()} FlowCreate. All rights reserved. Open-source software.
           </p>
         </div>
       </div>
