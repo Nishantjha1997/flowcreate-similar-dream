@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -17,7 +16,7 @@ import {
   User, 
   Briefcase, 
   GraduationCap, 
-  Award, 
+  Award,
   Settings,
   Trash2,
   Plus,
@@ -212,7 +211,6 @@ const ResumeBuilder = () => {
   });
 
   useEffect(() => {
-    // Load example data if example parameter is true
     if (isExample) {
       const exampleId = templateId;
       if (exampleResumes[exampleId]) {
@@ -323,7 +321,7 @@ const ResumeBuilder = () => {
     }));
   };
 
-  const handleSkillsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSkillsChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const skillsString = e.target.value;
     const skillsArray = skillsString.split(',').map(skill => skill.trim()).filter(Boolean);
     
@@ -371,7 +369,6 @@ const ResumeBuilder = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Sidebar */}
             <div className="lg:col-span-3">
               <Card>
                 <CardContent className="p-0">
@@ -462,7 +459,6 @@ const ResumeBuilder = () => {
               </Card>
             </div>
 
-            {/* Content */}
             <div className="lg:col-span-5">
               <Card>
                 <CardContent className="p-6">
@@ -862,7 +858,6 @@ const ResumeBuilder = () => {
               </Card>
             </div>
 
-            {/* Preview */}
             <div className="lg:col-span-4">
               <Card className="h-full flex flex-col">
                 <div className="p-4 bg-muted flex items-center justify-between border-b">
