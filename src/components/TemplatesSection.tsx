@@ -9,35 +9,40 @@ const templates = [
     name: "Modern",
     image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
     category: "Professional",
-    templateKey: "modern"
+    templateKey: "modern",
+    description: "Clean, sleek design with contemporary elements"
   },
   {
     id: 2,
     name: "Classic",
     image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
     category: "Traditional",
-    templateKey: "classic"
+    templateKey: "classic",
+    description: "Traditional layout that stands the test of time"
   },
   {
     id: 3,
     name: "Creative",
     image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6", 
     category: "Design",
-    templateKey: "creative"
+    templateKey: "creative",
+    description: "Eye-catching design for creative professionals"
   },
   {
     id: 4,
     name: "Technical",
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
     category: "Simple",
-    templateKey: "technical"
+    templateKey: "technical",
+    description: "Perfect for tech and engineering fields"
   },
   {
     id: 5,
     name: "Professional",
     image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
     category: "Professional",
-    templateKey: "professional"
+    templateKey: "professional",
+    description: "Polished and refined for executive positions"
   },
 ];
 
@@ -54,21 +59,24 @@ const TemplatesSection = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {templates.map((template) => (
-            <div key={template.id} className="template-card group">
-              <img 
-                src={template.image} 
-                alt={template.name} 
-                className="w-full aspect-[3/4] object-cover"
-              />
+            <div key={template.id} className="group relative overflow-hidden rounded-lg border bg-background shadow-md transition-all duration-300 hover:shadow-lg">
+              <div className="aspect-[3/4] overflow-hidden">
+                <img 
+                  src={template.image} 
+                  alt={template.name} 
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
               <div className="p-4">
                 <h3 className="text-lg font-medium text-foreground">{template.name}</h3>
-                <p className="text-sm text-muted-foreground">{template.category}</p>
+                <p className="text-sm text-muted-foreground mb-1">{template.category}</p>
+                <p className="text-xs text-muted-foreground">{template.description}</p>
               </div>
-              <div className="template-overlay">
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <Link to={`/resume-builder?template=${template.id}`}>
-                  <Button>
+                  <Button variant="secondary" className="font-medium">
                     Use this template
                   </Button>
                 </Link>

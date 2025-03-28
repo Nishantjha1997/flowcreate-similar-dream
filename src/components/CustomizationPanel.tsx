@@ -6,6 +6,13 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ColorPicker } from './ColorPicker';
 import { ResumeData } from '@/utils/resumeTemplates';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CustomizationPanelProps {
   customization: ResumeData['customization'];
@@ -112,36 +119,28 @@ export const CustomizationPanel = ({
               <div className="space-y-6">
                 <div>
                   <Label className="block mb-2">Font Family</Label>
-                  <RadioGroup 
+                  <Select
                     value={customization.fontFamily || 'default'}
                     onValueChange={handleFontFamilyChange}
-                    className="grid grid-cols-1 gap-2"
                   >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="default" id="font-default" />
-                      <Label htmlFor="font-default" className="font-normal">Template Default</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="'Roboto', sans-serif" id="font-roboto" />
-                      <Label htmlFor="font-roboto" className="font-['Roboto']">Roboto</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="'Montserrat', sans-serif" id="font-montserrat" />
-                      <Label htmlFor="font-montserrat" className="font-['Montserrat']">Montserrat</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="'Georgia', serif" id="font-georgia" />
-                      <Label htmlFor="font-georgia" className="font-['Georgia']">Georgia</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="'Poppins', sans-serif" id="font-poppins" />
-                      <Label htmlFor="font-poppins" className="font-['Poppins']">Poppins</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="'Roboto Mono', monospace" id="font-mono" />
-                      <Label htmlFor="font-mono" className="font-['Roboto_Mono']">Roboto Mono</Label>
-                    </div>
-                  </RadioGroup>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select font" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="default" className="font-normal">Template Default</SelectItem>
+                      <SelectItem value="'Roboto', sans-serif" className="font-['Roboto']">Roboto</SelectItem>
+                      <SelectItem value="'Montserrat', sans-serif" className="font-['Montserrat']">Montserrat</SelectItem>
+                      <SelectItem value="'Georgia', serif" className="font-['Georgia']">Georgia</SelectItem>
+                      <SelectItem value="'Poppins', sans-serif" className="font-['Poppins']">Poppins</SelectItem>
+                      <SelectItem value="'Roboto Mono', monospace" className="font-['Roboto_Mono']">Roboto Mono</SelectItem>
+                      <SelectItem value="'Playfair Display', serif" className="font-['Playfair_Display']">Playfair Display</SelectItem>
+                      <SelectItem value="'Merriweather', serif" className="font-['Merriweather']">Merriweather</SelectItem>
+                      <SelectItem value="'Open Sans', sans-serif" className="font-['Open_Sans']">Open Sans</SelectItem>
+                      <SelectItem value="'Lato', sans-serif" className="font-['Lato']">Lato</SelectItem>
+                      <SelectItem value="'Source Sans Pro', sans-serif" className="font-['Source_Sans_Pro']">Source Sans Pro</SelectItem>
+                      <SelectItem value="'Ubuntu', sans-serif" className="font-['Ubuntu']">Ubuntu</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div>
