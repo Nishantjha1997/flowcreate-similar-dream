@@ -1,15 +1,12 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { 
   Upload, 
   XCircle, 
-  CropIcon, 
   ZoomIn, 
-  CircleIcon, 
-  SquareIcon,
   Circle,
   Square
 } from 'lucide-react';
@@ -43,6 +40,13 @@ export const AvatarUploader = ({
   const [shape, setShape] = useState<'circle' | 'square' | 'rounded'>(currentImage.shape);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Update component state when props change
+  useEffect(() => {
+    setImage(currentImage.src);
+    setSize(currentImage.size);
+    setShape(currentImage.shape);
+  }, [currentImage.src, currentImage.size, currentImage.shape]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

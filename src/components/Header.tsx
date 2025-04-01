@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { MenuIcon, X } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -37,6 +38,7 @@ const Header = () => {
           </nav>
 
           <div className="hidden md:flex md:items-center md:space-x-3">
+            <ThemeToggle />
             <Link to="/login">
               <Button variant="outline" size="sm">
                 Sign in
@@ -50,9 +52,10 @@ const Header = () => {
           </div>
 
           <div className="flex md:hidden">
+            <ThemeToggle />
             <button
               type="button"
-              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-foreground"
+              className="ml-2 -m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-foreground"
               onClick={() => setMobileMenuOpen(true)}
             >
               <span className="sr-only">Open main menu</span>
@@ -73,14 +76,17 @@ const Header = () => {
                   <span className="text-2xl font-bold text-foreground">Create</span>
                 </Link>
               </div>
-              <button
-                type="button"
-                className="-m-2.5 rounded-md p-2.5 text-foreground"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <span className="sr-only">Close menu</span>
-                <X className="h-6 w-6" aria-hidden="true" />
-              </button>
+              <div className="flex items-center space-x-2">
+                <ThemeToggle />
+                <button
+                  type="button"
+                  className="-m-2.5 rounded-md p-2.5 text-foreground"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <span className="sr-only">Close menu</span>
+                  <X className="h-6 w-6" aria-hidden="true" />
+                </button>
+              </div>
             </div>
             <div className="mt-6 flow-root">
               <div className="space-y-6 py-6">
