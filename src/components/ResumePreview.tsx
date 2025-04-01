@@ -2,41 +2,75 @@
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { ResumeData } from '@/utils/resumeTemplates';
-import { Download, Eye, Printer } from 'lucide-react';
+import { ResumeData } from '@/utils/types';
+import { Download, Eye, Printer, Share2, Mail, Link, Smartphone } from 'lucide-react';
 import { toast } from 'sonner';
+import html2pdf from 'html2pdf.js';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ResumePreviewProps {
   resumeData: ResumeData;
   previewComponent: React.ReactNode;
 }
 
+/**
+ * ResumePreview component for displaying, downloading, printing and sharing resumes
+ * @param {ResumePreviewProps} props - Component props
+ * @returns {JSX.Element} The resume preview component
+ */
 export const ResumePreview = ({ resumeData, previewComponent }: ResumePreviewProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const resumeRef = useRef<HTMLDivElement>(null);
   
+  /**
+   * Generates and downloads the resume as a PDF
+   */
   const handleDownload = () => {
+    if (!resumeRef.current) {
+      toast.error("Could not generate PDF. Please try again.");
+      return;
+    }
+
     setIsGenerating(true);
-    // Simulating a delay for PDF generation
+    
+    const element = resumeRef.current;
+    const filename = `${resumeData.personal?.name || 'resume'}.pdf`;
+    
+    const options = {
+      margin: [10, 10, 10, 10],
+      filename: filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Use setTimeout to allow the toast to show before the potentially heavy PDF operation
     setTimeout(() => {
-      setIsGenerating(false);
-      // In a real implementation, we would use a library like jsPDF or html2pdf
-      // to generate and download the PDF
-      
-      toast.success("Resume downloaded successfully!");
-      
-      // This is a placeholder - in a real implementation we would 
-      // trigger the actual download here
-      const dummyLink = document.createElement('a');
-      dummyLink.href = 'data:application/pdf;charset=utf-8,';
-      dummyLink.download = `${resumeData.personal?.name || 'resume'}.pdf`;
-      document.body.appendChild(dummyLink);
-      dummyLink.click();
-      document.body.removeChild(dummyLink);
-    }, 1500);
+      html2pdf()
+        .from(element)
+        .set(options)
+        .save()
+        .then(() => {
+          setIsGenerating(false);
+          toast.success("Resume downloaded successfully!");
+        })
+        .catch((error) => {
+          console.error("Error generating PDF:", error);
+          setIsGenerating(false);
+          toast.error("Error generating PDF. Please try again.");
+        });
+    }, 100);
   };
 
+  /**
+   * Prepares and initiates the print dialog for the resume
+   */
   const handlePrint = () => {
     setIsPrinting(true);
     setTimeout(() => {
@@ -88,6 +122,39 @@ export const ResumePreview = ({ resumeData, previewComponent }: ResumePreviewPro
       toast.success("Resume sent to printer!");
     }, 500);
   };
+
+  /**
+   * Shares the resume via different methods
+   * @param {string} method - The sharing method to use
+   */
+  const handleShare = (method: 'email' | 'link' | 'phone') => {
+    switch (method) {
+      case 'email':
+        const emailSubject = `Resume: ${resumeData.personal?.name || 'My Resume'}`;
+        const emailBody = "Please find my resume attached.";
+        window.location.href = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+        toast.success("Email client opened");
+        break;
+        
+      case 'link':
+        // In a real app, this would generate a shareable link to the resume
+        // For now, we'll just copy the current page URL
+        navigator.clipboard.writeText(window.location.href);
+        toast.success("Link copied to clipboard!");
+        break;
+        
+      case 'phone':
+        // Open SMS if on mobile or prompt to enter phone number
+        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          window.location.href = `sms:?body=Check out my resume: ${window.location.href}`;
+          toast.success("SMS app opened");
+        } else {
+          toast.info("Send to phone feature works best on mobile devices");
+          // In a real app, you might add a modal to input a phone number
+        }
+        break;
+    }
+  };
   
   return (
     <Dialog>
@@ -111,6 +178,7 @@ export const ResumePreview = ({ resumeData, previewComponent }: ResumePreviewPro
               <Download className="h-4 w-4" />
               {isGenerating ? "Generating PDF..." : "Download PDF"}
             </Button>
+            
             <Button 
               onClick={handlePrint} 
               disabled={isPrinting}
@@ -120,6 +188,32 @@ export const ResumePreview = ({ resumeData, previewComponent }: ResumePreviewPro
               <Printer className="h-4 w-4" />
               {isPrinting ? "Preparing..." : "Print Resume"}
             </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center gap-2"
+                >
+                  <Share2 className="h-4 w-4" />
+                  Share
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleShare('email')} className="cursor-pointer">
+                  <Mail className="mr-2 h-4 w-4" />
+                  <span>Share via Email</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleShare('link')} className="cursor-pointer">
+                  <Link className="mr-2 h-4 w-4" />
+                  <span>Copy Link</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleShare('phone')} className="cursor-pointer">
+                  <Smartphone className="mr-2 h-4 w-4" />
+                  <span>Send to Phone</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </DialogContent>
