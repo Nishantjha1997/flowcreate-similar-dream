@@ -28,7 +28,7 @@ export const ResumePreview = ({ resumeData, previewComponent }: ResumePreviewPro
       // trigger the actual download here
       const dummyLink = document.createElement('a');
       dummyLink.href = 'data:application/pdf;charset=utf-8,';
-      dummyLink.download = `${resumeData.personalInfo?.name || 'resume'}.pdf`;
+      dummyLink.download = `${resumeData.personal?.name || 'resume'}.pdf`;
       document.body.appendChild(dummyLink);
       dummyLink.click();
       document.body.removeChild(dummyLink);
