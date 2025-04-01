@@ -1,44 +1,46 @@
 
 # Frontend Application Guidelines
 
-## Project Setup
-- The project uses Vite for faster development and building
-- TypeScript is configured for type safety
-- ESLint is set up for code quality
-- Prettier for code formatting
-
-## Code Organization
-- Organize code by feature or domain
+## Project Structure
+- Organize by feature rather than by type
 - Keep related files close to each other
-- Use clear, descriptive naming
-- Follow established project structure
+- Use consistent naming conventions
+- Follow the established directory structure:
+  - `/src/components`: Reusable UI components
+  - `/src/pages`: Page components
+  - `/src/hooks`: Custom React hooks
+  - `/src/utils`: Utility functions
+  - `/src/lib`: Third-party library integrations
+  - `/src/assets`: Static assets
 
-## UI/UX Standards
-- Consistent design language across components
-- Responsive design for all screen sizes
-- Accessible to keyboard navigation and screen readers
-- Support for light and dark themes
+## State Management
+- Choose the right tool for the job:
+  - Component state for local concerns
+  - Context API for shared state
+  - React Query for server state
+- Document state management decisions
 
-## Performance Optimization
-- Minimize bundle size
-- Lazy load components and routes
-- Optimize image loading and rendering
-- Monitor and address performance bottlenecks
+## Routing
+- Use React Router for navigation
+- Implement lazy loading for routes
+- Use route protection where needed
+- Keep route definitions centralized
 
-## Testing
-- Unit tests for utility functions
-- Component tests for UI elements
-- Integration tests for user flows
-- Use testing-library/react for component testing
+## Performance
+- Implement code splitting
+- Optimize asset loading
+- Use React.memo and useMemo appropriately
+- Monitor and improve Lighthouse scores
+
+## Accessibility
+- Follow WCAG 2.1 guidelines
+- Use semantic HTML elements
+- Implement proper keyboard navigation
+- Provide appropriate ARIA attributes
+- Test with screen readers
 
 ## Deployment
-- Production builds are minified and optimized
-- Assets are properly hashed for cache busting
-- Environment variables are handled securely
-- Hosting can be done via Netlify or custom domain
-
-## Documentation
-- Code should be self-documenting when possible
-- Complex logic should have explanatory comments
-- README should be kept up to date
-- Include usage examples for reusable components
+- Set up CI/CD pipelines
+- Use environment variables for configuration
+- Implement proper error logging
+- Configure caching correctly

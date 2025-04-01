@@ -33,3 +33,8 @@
 - Keep bundle size minimal
 - Use code splitting where appropriate
 - Optimize image loading
+
+## Resume Builder Specific
+- Follow the template pattern for new resume templates
+- Use the customization panel structure for new customization options
+- Implement live preview updates for all changes
