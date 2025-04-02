@@ -1,9 +1,7 @@
 
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/components/ui/use-toast';
+import { Link } from 'react-router-dom';
 
 const templates = [
   {
@@ -49,24 +47,6 @@ const templates = [
 ];
 
 const TemplatesSection = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const handleTemplateSelection = (templateId: number) => {
-    if (user) {
-      navigate(`/resume-builder?template=${templateId}`);
-    } else {
-      // Store the intended destination
-      sessionStorage.setItem('returnPath', `/resume-builder?template=${templateId}`);
-      toast({
-        title: "Authentication Required",
-        description: "Please log in or create an account to use this template.",
-      });
-      navigate('/login');
-    }
-  };
-
   return (
     <section className="py-16 md:py-24">
       <div className="container mx-auto px-4">
@@ -95,13 +75,11 @@ const TemplatesSection = () => {
                 <p className="text-xs text-muted-foreground">{template.description}</p>
               </div>
               <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                <Button 
-                  variant="secondary" 
-                  className="font-medium"
-                  onClick={() => handleTemplateSelection(template.id)}
-                >
-                  Use this template
-                </Button>
+                <Link to={`/resume-builder?template=${template.id}`}>
+                  <Button variant="secondary" className="font-medium">
+                    Use this template
+                  </Button>
+                </Link>
               </div>
             </div>
           ))}

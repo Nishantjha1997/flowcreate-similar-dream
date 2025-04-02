@@ -1,6 +1,5 @@
-
-import { useState, useEffect } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,22 +16,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
   const { toast } = useToast();
-  const { signIn, user } = useAuth();
-
-  // Check for redirect path from session storage
-  useEffect(() => {
-    if (user) {
-      const returnPath = sessionStorage.getItem('returnPath');
-      if (returnPath) {
-        sessionStorage.removeItem('returnPath');
-        navigate(returnPath);
-      } else {
-        navigate('/resume-builder');
-      }
-    }
-  }, [user, navigate]);
+  const { signIn } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +43,7 @@ const Login = () => {
         description: "You have successfully logged in",
       });
       
-      // Redirect will be handled by the useEffect above
+      navigate('/resume-builder');
     } catch (error: any) {
       toast({
         title: "Login Failed",

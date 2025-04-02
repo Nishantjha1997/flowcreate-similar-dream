@@ -3,10 +3,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { AuthProvider } from "./hooks/useAuth";
-import RequireAuth from "./components/RequireAuth";
 import Index from "./pages/Index";
 import Templates from "./pages/Templates";
 import ResumeBuilder from "./pages/ResumeBuilder";
@@ -32,11 +31,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/templates" element={<Templates />} />
-              <Route path="/resume-builder" element={
-                <RequireAuth>
-                  <ResumeBuilder />
-                </RequireAuth>
-              } />
+              <Route path="/resume-builder" element={<ResumeBuilder />} />
               <Route path="/examples" element={<Examples />} />
               <Route path="/features" element={<Features />} />
               <Route path="/pricing" element={<Pricing />} />
