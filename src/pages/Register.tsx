@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { createClient } from '@supabase/supabase-js';
+import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -18,11 +18,7 @@ const Register = () => {
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Initialize Supabase client - these would typically come from environment variables
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const { signUp } = useAuth();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,14 +44,8 @@ const Register = () => {
     setIsLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
-        },
+      const { error } = await signUp(email, password, {
+        full_name: fullName,
       });
       
       if (error) throw error;
@@ -211,7 +201,7 @@ const Register = () => {
               onClick={async () => {
                 setIsLoading(true);
                 try {
-                  const { error } = await supabase.auth.signInWithOAuth({
+                  const { data, error } = await supabase.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
                       redirectTo: `${window.location.origin}/resume-builder`,
