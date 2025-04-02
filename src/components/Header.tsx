@@ -2,11 +2,31 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { MenuIcon, X } from 'lucide-react';
+import { MenuIcon, X, User, Settings, LogOut } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { useAuth } from '@/hooks/useAuth';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  // Get user initials for avatar fallback
+  const getUserInitials = () => {
+    if (!user || !user.email) return 'U';
+    return user.email.charAt(0).toUpperCase();
+  };
 
   return (
     <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
@@ -39,28 +59,104 @@ const Header = () => {
 
           <div className="hidden md:flex md:items-center md:space-x-3">
             <ThemeToggle />
-            <Link to="/login">
-              <Button variant="outline" size="sm">
-                Sign in
-              </Button>
-            </Link>
-            <Link to="/register">
-              <Button size="sm">
-                Sign up
-              </Button>
-            </Link>
+            
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium">{user.email}</p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/account" className="flex cursor-pointer items-center">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>My Account</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/account/settings" className="flex cursor-pointer items-center">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="outline" size="sm">
+                    Sign in
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button size="sm">
+                    Sign up
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           <div className="flex md:hidden">
             <ThemeToggle />
-            <button
-              type="button"
-              className="ml-2 -m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-foreground"
-              onClick={() => setMobileMenuOpen(true)}
-            >
-              <span className="sr-only">Open main menu</span>
-              <MenuIcon className="h-6 w-6" aria-hidden="true" />
-            </button>
+            
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="ml-2 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium">{user.email}</p>
+                    </div>
+                  </div>
+                  <DropdownMenuItem asChild>
+                    <Link to="/account" className="flex cursor-pointer items-center" onClick={() => setMobileMenuOpen(false)}>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>My Account</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/account/settings" className="flex cursor-pointer items-center" onClick={() => setMobileMenuOpen(false)}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <button
+                type="button"
+                className="ml-2 -m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-foreground"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <span className="sr-only">Open main menu</span>
+                <MenuIcon className="h-6 w-6" aria-hidden="true" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -127,24 +223,32 @@ const Header = () => {
                 </Link>
               </div>
               <div className="mt-6 space-y-2">
-                <Link
-                  to="/login"
-                  className="block w-full"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <Button variant="outline" className="w-full">
-                    Sign in
+                {user ? (
+                  <Button onClick={handleSignOut} className="w-full">
+                    Sign out
                   </Button>
-                </Link>
-                <Link
-                  to="/register"
-                  className="block w-full"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <Button className="w-full">
-                    Sign up
-                  </Button>
-                </Link>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      className="block w-full"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Button variant="outline" className="w-full">
+                        Sign in
+                      </Button>
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="block w-full"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Button className="w-full">
+                        Sign up
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
