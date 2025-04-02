@@ -17,13 +17,20 @@ const HeroSection = () => {
               that gets you noticed and lands you interviews.
             </p>
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-2">
-              <Link to="/resume-builder">
-                <Button size="lg" className="bg-white text-primary hover:bg-blue-50">
-                  Create My Resume <ArrowRight className="ml-2 h-5 w-5" />
+              <Link to="/resume-builder" className="w-full sm:w-auto">
+                <Button 
+                  size="lg" 
+                  className="w-full bg-white text-primary hover:bg-blue-50 hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg"
+                >
+                  Create My Resume <ArrowRight className="ml-2 h-5 w-5 animate-pulse" />
                 </Button>
               </Link>
-              <Link to="/templates">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              <Link to="/templates" className="w-full sm:w-auto">
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="w-full border-white text-white hover:bg-white hover:text-primary hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg"
+                >
                   Browse Templates
                 </Button>
               </Link>
