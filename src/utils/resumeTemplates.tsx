@@ -1,3 +1,4 @@
+
 import { CSSProperties } from 'react';
 
 export type ResumeData = {
@@ -136,7 +137,14 @@ const applyCustomization = (
   }
   
   if (customization.sectionMargins) {
-    styles.section = {...styles.section, marginTop: `${parseInt(styles.section.marginTop as string) * customization.sectionMargins}px`};
+    // Convert sectionMargins to a number for the calculation
+    const sectionMarginsValue = parseFloat(customization.sectionMargins);
+    if (!isNaN(sectionMarginsValue)) {
+      styles.section = {
+        ...styles.section, 
+        marginTop: `${parseInt(styles.section.marginTop as string) * sectionMarginsValue}px`
+      };
+    }
   }
   
   if (customization.lineHeight) {
