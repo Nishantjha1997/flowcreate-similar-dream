@@ -1,4 +1,3 @@
-
 import { CSSProperties } from 'react';
 
 export type ResumeData = {
@@ -41,11 +40,25 @@ export type ResumeData = {
   customization?: {
     primaryColor?: string;
     secondaryColor?: string;
+    accentColor?: string;
+    textColor?: string;
+    backgroundColor?: string;
     fontSize?: string;
     fontFamily?: string;
     spacing?: string;
+    headingStyle?: string;
+    sectionMargins?: string;
+    lineHeight?: string;
     showPhoto?: boolean;
     layoutType?: 'standard' | 'compact' | 'minimal' | 'creative';
+    profileImage?: any;
+    sectionTitles?: {
+      skills?: string;
+      education?: string;
+      experience?: string;
+      projects?: string;
+      [key: string]: string | undefined;
+    };
   };
 };
 
@@ -66,7 +79,6 @@ export type TemplateStyles = {
   skill: CSSProperties;
 };
 
-// Helper function to apply customization options to template styles
 const applyCustomization = (
   baseStyles: TemplateStyles, 
   customization?: ResumeData['customization']
@@ -75,19 +87,28 @@ const applyCustomization = (
 
   const styles = {...baseStyles};
   
-  // Apply primary color
   if (customization.primaryColor) {
     styles.name = {...styles.name, color: customization.primaryColor};
     styles.sectionTitle = {...styles.sectionTitle, color: customization.primaryColor};
     styles.skill = {...styles.skill, backgroundColor: customization.primaryColor, color: '#fff'};
   }
   
-  // Apply secondary color
   if (customization.secondaryColor) {
     styles.itemSubtitle = {...styles.itemSubtitle, color: customization.secondaryColor};
   }
   
-  // Apply font size
+  if (customization.accentColor) {
+    styles.itemTitle = {...styles.itemTitle, color: customization.accentColor};
+  }
+  
+  if (customization.textColor) {
+    styles.itemDescription = {...styles.itemDescription, color: customization.textColor};
+  }
+  
+  if (customization.backgroundColor) {
+    styles.container = {...styles.container, backgroundColor: customization.backgroundColor};
+  }
+  
   if (customization.fontSize) {
     const fontSizeMultiplier = customization.fontSize === 'small' ? 0.9 : 
                                customization.fontSize === 'large' ? 1.1 : 1;
@@ -98,12 +119,10 @@ const applyCustomization = (
     styles.itemDescription = {...styles.itemDescription, fontSize: `${parseInt(styles.itemDescription.fontSize as string) * fontSizeMultiplier}px`};
   }
   
-  // Apply font family
   if (customization.fontFamily) {
     styles.container = {...styles.container, fontFamily: customization.fontFamily};
   }
   
-  // Apply spacing
   if (customization.spacing) {
     const spacingMultiplier = customization.spacing === 'compact' ? 0.8 : 
                               customization.spacing === 'spacious' ? 1.2 : 1;
@@ -112,12 +131,24 @@ const applyCustomization = (
     styles.item = {...styles.item, marginBottom: `${parseInt(styles.item.marginBottom as string) * spacingMultiplier}px`};
   }
   
+  if (customization.headingStyle) {
+    styles.sectionTitle = {...styles.sectionTitle, fontWeight: customization.headingStyle === 'bold' ? 700 : 600};
+  }
+  
+  if (customization.sectionMargins) {
+    styles.section = {...styles.section, marginTop: `${parseInt(styles.section.marginTop as string) * customization.sectionMargins}px`};
+  }
+  
+  if (customization.lineHeight) {
+    styles.itemTitle = {...styles.itemTitle, lineHeight: customization.lineHeight};
+    styles.itemSubtitle = {...styles.itemSubtitle, lineHeight: customization.lineHeight};
+    styles.itemDescription = {...styles.itemDescription, lineHeight: customization.lineHeight};
+  }
+  
   return styles;
 };
 
-// Define template styles
 const templateStyles: Record<string, TemplateStyles> = {
-  // 1. Modern Minimalist
   modern: {
     container: {
       fontFamily: "'Roboto', sans-serif",
@@ -206,7 +237,6 @@ const templateStyles: Record<string, TemplateStyles> = {
     },
   },
   
-  // 2. Classic Elegance
   classic: {
     container: {
       fontFamily: "'Georgia', serif",
@@ -302,7 +332,6 @@ const templateStyles: Record<string, TemplateStyles> = {
     },
   },
 
-  // 3. Creative Spark
   creative: {
     container: {
       fontFamily: "'Poppins', sans-serif",
@@ -402,7 +431,6 @@ const templateStyles: Record<string, TemplateStyles> = {
     },
   },
 
-  // 4. Tech Innovator
   technical: {
     container: {
       fontFamily: "'Roboto Mono', monospace",
@@ -504,7 +532,6 @@ const templateStyles: Record<string, TemplateStyles> = {
     },
   },
 
-  // 5. Bold Professional
   professional: {
     container: {
       fontFamily: "'Montserrat', sans-serif",
@@ -597,7 +624,6 @@ const templateStyles: Record<string, TemplateStyles> = {
   },
 };
 
-// Resume Template Component
 const ResumeTemplate = ({ 
   data, 
   templateName = 'modern' 
@@ -610,7 +636,6 @@ const ResumeTemplate = ({
 
   return (
     <div style={styles.container}>
-      {/* Header */}
       <div style={styles.header}>
         <div style={styles.name}>{data.personal.name || 'Your Name'}</div>
         <div style={styles.contact}>
@@ -632,7 +657,6 @@ const ResumeTemplate = ({
         </div>
       </div>
       
-      {/* Summary */}
       {data.personal.summary && (
         <div style={styles.section}>
           <div style={styles.sectionTitle}>Summary</div>
@@ -640,7 +664,6 @@ const ResumeTemplate = ({
         </div>
       )}
       
-      {/* Experience */}
       {data.experience && data.experience.length > 0 && (
         <div style={styles.section}>
           <div style={styles.sectionTitle}>Experience</div>
@@ -657,7 +680,6 @@ const ResumeTemplate = ({
         </div>
       )}
       
-      {/* Education */}
       {data.education && data.education.length > 0 && (
         <div style={styles.section}>
           <div style={styles.sectionTitle}>Education</div>
@@ -674,7 +696,6 @@ const ResumeTemplate = ({
         </div>
       )}
       
-      {/* Skills */}
       {data.skills && data.skills.length > 0 && (
         <div style={styles.section}>
           <div style={styles.sectionTitle}>Skills</div>
@@ -686,7 +707,6 @@ const ResumeTemplate = ({
         </div>
       )}
       
-      {/* Projects */}
       {data.projects && data.projects.length > 0 && (
         <div style={styles.section}>
           <div style={styles.sectionTitle}>Projects</div>

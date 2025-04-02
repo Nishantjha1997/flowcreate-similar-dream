@@ -426,7 +426,6 @@ const ResumeBuilder = () => {
         setResume(exampleResumes[exampleId]);
       }
     } else {
-      // Set template-specific colors when changing templates
       const templateKey = templateNames[templateId];
       let primaryColor = '#2563eb';
       let secondaryColor = '#6b7280';
@@ -691,7 +690,6 @@ const ResumeBuilder = () => {
                               templateId === id.toString() ? 'ring-2 ring-primary' : ''
                             }`}
                             onClick={() => {
-                              // Navigate to the same page with different template ID
                               const url = new URL(window.location.href);
                               url.searchParams.set('template', id.toString());
                               window.history.pushState({}, '', url.toString());
