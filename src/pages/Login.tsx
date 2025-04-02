@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -50,6 +52,26 @@ const Login = () => {
         variant: "destructive",
       });
     } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/resume-builder`,
+        },
+      });
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        title: "Google Login Failed",
+        description: error.message,
+        variant: "destructive",
+      });
       setIsLoading(false);
     }
   };
@@ -166,25 +188,8 @@ const Login = () => {
               variant="outline"
               type="button"
               className="w-full"
-              onClick={async () => {
-                setIsLoading(true);
-                try {
-                  const { data, error } = await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                      redirectTo: `${window.location.origin}/resume-builder`,
-                    },
-                  });
-                  if (error) throw error;
-                } catch (error: any) {
-                  toast({
-                    title: "Google Login Failed",
-                    description: error.message,
-                    variant: "destructive",
-                  });
-                  setIsLoading(false);
-                }
-              }}
+              onClick={handleGoogleLogin}
+              disabled={isLoading}
             >
               <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
                 <path
