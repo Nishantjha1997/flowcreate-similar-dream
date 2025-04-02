@@ -29,7 +29,7 @@ const HeroSection = () => {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="w-full border-white text-white hover:bg-white hover:text-primary hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg"
+                  className="w-full bg-white text-primary hover:bg-blue-50 hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   Browse Templates
                 </Button>
