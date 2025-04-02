@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -1261,9 +1260,10 @@ const ResumeBuilder = () => {
                   )}
 
                   {activeSection === 'customize' && (
-                    <CustomizationPanel
-                      customization={resume.customization || {}}
+                    <CustomizationPanel 
+                      customization={resume.customization} 
                       onCustomizationChange={handleCustomizationChange}
+                      resumeData={resume}
                     />
                   )}
                 </CardContent>

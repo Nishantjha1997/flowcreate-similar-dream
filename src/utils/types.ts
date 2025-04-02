@@ -45,12 +45,13 @@ export interface ResumeData {
     lineHeight?: string;
     showPhoto?: boolean;
     layoutType?: "creative" | "compact" | "standard" | "minimal";
-    profileImage?: string;
+    profileImage?: any; // Using any for now, but ideally this should be properly typed
     sectionTitles?: {
       skills?: string;
       education?: string;
       experience?: string;
       projects?: string;
+      [key: string]: string | undefined;
     };
   };
   selectedTemplate?: string;
@@ -60,4 +61,6 @@ export interface CustomizationPanelProps {
   customization: ResumeData["customization"];
   onCustomizationChange: (customization: ResumeData["customization"]) => void;
   resumeData: ResumeData;
+  onSectionOrderChange?: (newOrder: string[]) => void;
+  onSectionTitleChange?: (sectionId: string, newTitle: string) => void;
 }
