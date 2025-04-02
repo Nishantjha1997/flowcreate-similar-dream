@@ -5,7 +5,9 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/components/ui/use-toast';
 
 const exampleResumes = [
   {
@@ -71,6 +73,23 @@ const categories = ["All", "Technology", "Marketing", "Design", "Finance", "Mana
 const Examples = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleExampleSelection = (resumeId: number) => {
+    if (user) {
+      navigate(`/resume-builder?template=${resumeId}&example=true`);
+    } else {
+      // Store the intended destination
+      sessionStorage.setItem('returnPath', `/resume-builder?template=${resumeId}&example=true`);
+      toast({
+        title: "Authentication Required",
+        description: "Please log in or create an account to use this example.",
+      });
+      navigate('/login');
+    }
+  };
 
   const filteredResumes = exampleResumes.filter((resume) => {
     const matchesCategory = selectedCategory === "All" || resume.category === selectedCategory;
@@ -138,11 +157,9 @@ const Examples = () => {
                   <p className="text-sm text-muted-foreground">{resume.category}</p>
                 </div>
                 <div className="template-overlay">
-                  <Link to={`/resume-builder?template=${resume.id}&example=true`}>
-                    <Button>
-                      Use this example
-                    </Button>
-                  </Link>
+                  <Button onClick={() => handleExampleSelection(resume.id)}>
+                    Use this example
+                  </Button>
                 </div>
               </div>
             ))}

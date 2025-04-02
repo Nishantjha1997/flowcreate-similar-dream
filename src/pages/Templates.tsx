@@ -3,13 +3,14 @@ import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Search, Star, CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { ResumeData } from '@/utils/resumeTemplates';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/components/ui/use-toast';
 
 const templates = [
   {
@@ -100,6 +101,39 @@ const Templates = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleTemplateSelection = (templateId: number, isPreview: boolean = false) => {
+    if (isPreview) {
+      // For preview, we'll still navigate to the builder but with a preview flag
+      if (user) {
+        navigate(`/resume-builder?template=${templateId}`);
+      } else {
+        // Store the intended destination
+        sessionStorage.setItem('returnPath', `/resume-builder?template=${templateId}`);
+        toast({
+          title: "Authentication Required",
+          description: "Please log in or create an account to preview this template.",
+        });
+        navigate('/login');
+      }
+      return;
+    }
+
+    if (user) {
+      navigate(`/resume-builder?template=${templateId}&example=true`);
+    } else {
+      // Store the intended destination
+      sessionStorage.setItem('returnPath', `/resume-builder?template=${templateId}&example=true`);
+      toast({
+        title: "Authentication Required",
+        description: "Please log in or create an account to use this template.",
+      });
+      navigate('/login');
+    }
+  };
 
   const filteredTemplates = templates.filter((template) => {
     // Filter by tab
@@ -194,12 +228,19 @@ const Templates = () => {
                   <p className="text-sm mb-4 text-muted-foreground">{template.description}</p>
                   
                   <div className="grid grid-cols-2 gap-2">
-                    <Link to={`/resume-builder?template=${template.id}`}>
-                      <Button variant="outline" className="w-full">Preview</Button>
-                    </Link>
-                    <Link to={`/resume-builder?template=${template.id}&example=true`}>
-                      <Button className="w-full">Use Template</Button>
-                    </Link>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => handleTemplateSelection(template.id, true)}
+                    >
+                      Preview
+                    </Button>
+                    <Button 
+                      className="w-full"
+                      onClick={() => handleTemplateSelection(template.id)}
+                    >
+                      Use Template
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

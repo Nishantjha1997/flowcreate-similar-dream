@@ -3,7 +3,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Github, Heart, Code, Users, Coffee, ArrowRight } from 'lucide-react';
+import { Github, Heart, Code, Users, Coffee, ArrowRight, Mail, Instagram } from 'lucide-react';
 
 const About = () => {
   return (
@@ -58,6 +58,26 @@ const About = () => {
                     </div>
                     <h4 className="font-semibold text-lg mb-2">Quality</h4>
                     <p className="text-muted-foreground">Professional designs and user-friendly experience</p>
+                  </div>
+                </div>
+              </div>
+
+              <h2 className="text-3xl font-bold mt-12 mb-6">The Creator</h2>
+              <div className="bg-card border rounded-lg p-8 my-10">
+                <div className="flex flex-col items-center text-center mb-6">
+                  <h3 className="text-2xl font-semibold mb-2">Nishant Jha</h3>
+                  <p className="text-lg mb-6">
+                    FlowCreate was created by Nishant Jha, a passionate developer dedicated to making professional tools accessible to everyone.
+                  </p>
+                  <div className="flex items-center space-x-4 mt-4">
+                    <a href="mailto:nishantjha31@gmail.com" className="flex items-center text-primary hover:text-primary/80 transition-colors">
+                      <Mail className="h-5 w-5 mr-2" />
+                      nishantjha31@gmail.com
+                    </a>
+                    <a href="https://instagram.com/iamnishantjha" target="_blank" rel="noopener noreferrer" className="flex items-center text-primary hover:text-primary/80 transition-colors">
+                      <Instagram className="h-5 w-5 mr-2" />
+                      @iamnishantjha
+                    </a>
                   </div>
                 </div>
               </div>
