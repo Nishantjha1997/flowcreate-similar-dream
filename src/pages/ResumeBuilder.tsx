@@ -1,22 +1,13 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
-import { toast } from 'sonner';
-import { CustomizationPanel } from '@/components/CustomizationPanel';
-import { Download, Share2 } from 'lucide-react';
-import html2pdf from 'html2pdf.js';
+import { ResumeHeaderSection } from '@/components/resume/ResumeHeaderSection';
+import { ResumeNavigation } from '@/components/resume/ResumeNavigation';
+import { ResumeFormSection } from '@/components/resume/ResumeFormSection';
+import { ResumePreviewSection } from '@/components/resume/ResumePreviewSection';
+import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 
-import { PersonalInfoSection } from '@/components/resume/PersonalInfoSection';
-import { ExperienceSection } from '@/components/resume/ExperienceSection';
-import { EducationSection } from '@/components/resume/EducationSection';
-import { SkillsSection } from '@/components/resume/SkillsSection';
-import { ProjectsSection } from '@/components/resume/ProjectsSection';
-import { SectionNav } from '@/components/resume/SectionNav';
-import { TemplateSelector } from '@/components/resume/TemplateSelector';
-import { ResumeVisualPreview, EnhancedResumePreview } from '@/components/resume/ResumeVisualPreview';
 import { ResumeData } from '@/utils/resumeAdapterUtils';
 import { emptyEducation, emptyExperience, emptyProject, exampleResumes, templateNames } from '@/components/resume/ResumeData';
 
@@ -25,8 +16,8 @@ const ResumeBuilder = () => {
   const navigate = useNavigate();
   const templateId = searchParams.get('template') || '1';
   const isExample = searchParams.get('example') === 'true';
-  const [isGenerating, setIsGenerating] = useState(false);
   const [activeSection, setActiveSection] = useState('personal');
+  const resumeElementRef = useRef<HTMLDivElement>(null);
   
   const [resume, setResume] = useState<ResumeData>({
     personal: {
@@ -67,6 +58,9 @@ const ResumeBuilder = () => {
       spacing: 'normal'
     }
   });
+
+  const resumeName = resume.personal?.name || 'resume';
+  const { isGenerating, generatePDF } = usePDFGenerator(`${resumeName}.pdf`);
 
   useEffect(() => {
     const savedResume = localStorage.getItem('resumeData');
@@ -312,53 +306,23 @@ const ResumeBuilder = () => {
   };
 
   const handleDownload = () => {
-    setIsGenerating(true);
-    
-    const filename = `${resume.personal?.name || 'resume'}.pdf`;
-    
-    const options = {
-      margin: [10, 10, 10, 10],
-      filename: filename,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    const tempDiv = document.createElement('div');
-    tempDiv.style.width = '8.5in';
-    tempDiv.style.padding = '0.5in';
-    tempDiv.style.backgroundColor = 'white';
-    
     const resumeElement = document.querySelector('.resume-container');
     if (resumeElement) {
+      const tempDiv = document.createElement('div');
+      tempDiv.style.width = '8.5in';
+      tempDiv.style.padding = '0.5in';
+      tempDiv.style.backgroundColor = 'white';
       tempDiv.innerHTML = resumeElement.innerHTML;
       document.body.appendChild(tempDiv);
-    }
-
-    setTimeout(() => {
-      html2pdf()
-        .from(tempDiv)
-        .set(options)
-        .save()
-        .then(() => {
-          setIsGenerating(false);
+      
+      generatePDF(tempDiv);
+      
+      setTimeout(() => {
+        if (tempDiv.parentNode) {
           document.body.removeChild(tempDiv);
-          toast.success("Resume downloaded successfully!");
-        })
-        .catch((error) => {
-          console.error("Error generating PDF:", error);
-          setIsGenerating(false);
-          if (tempDiv.parentNode) {
-            document.body.removeChild(tempDiv);
-          }
-          toast.error("Error generating PDF. Please try again.");
-        });
-    }, 100);
-  };
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast.success("Link copied to clipboard!");
+        }
+      }, 500);
+    }
   };
 
   return (
@@ -366,133 +330,47 @@ const ResumeBuilder = () => {
       <Header />
       <main className="py-8">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Resume Builder</h1>
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleDownload}
-                disabled={isGenerating}
-                className="flex items-center gap-2"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                {isGenerating ? "Generating PDF..." : "Download PDF"}
-              </Button>
-              <Button size="sm" onClick={handleShare}>
-                <Share2 className="h-4 w-4 mr-2" />
-                Share
-              </Button>
-            </div>
-          </div>
+          <ResumeHeaderSection 
+            handleDownload={handleDownload} 
+            isGenerating={isGenerating} 
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-3">
-              <Card>
-                <CardContent className="p-0">
-                  <Tabs defaultValue="sections" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="sections">Sections</TabsTrigger>
-                      <TabsTrigger value="templates">Templates</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="sections">
-                      <SectionNav 
-                        activeSection={activeSection} 
-                        onSectionChange={handleSectionChange} 
-                      />
-                    </TabsContent>
-                    <TabsContent value="templates">
-                      <TemplateSelector 
-                        currentTemplateId={templateId} 
-                        onTemplateChange={handleTemplateChange}
-                      />
-                    </TabsContent>
-                  </Tabs>
-                </CardContent>
-              </Card>
+              <ResumeNavigation
+                activeSection={activeSection}
+                onSectionChange={handleSectionChange}
+                currentTemplateId={templateId}
+                onTemplateChange={handleTemplateChange}
+              />
             </div>
 
             <div className="lg:col-span-5">
-              <Card>
-                <CardContent className="p-6">
-                  {activeSection === 'personal' && (
-                    <PersonalInfoSection 
-                      personal={resume.personal}
-                      onChange={handlePersonalInfoChange}
-                    />
-                  )}
-
-                  {activeSection === 'experience' && (
-                    <ExperienceSection 
-                      experience={resume.experience}
-                      onExperienceChange={handleExperienceChange}
-                      onCurrentJobToggle={handleCurrentJobToggle}
-                      addExperience={addExperience}
-                      removeExperience={removeExperience}
-                    />
-                  )}
-
-                  {activeSection === 'education' && (
-                    <EducationSection
-                      education={resume.education}
-                      onEducationChange={handleEducationChange}
-                      addEducation={addEducation}
-                      removeEducation={removeEducation}
-                    />
-                  )}
-
-                  {activeSection === 'skills' && (
-                    <SkillsSection 
-                      skills={resume.skills}
-                      onSkillsChange={handleSkillsChange}
-                    />
-                  )}
-
-                  {activeSection === 'projects' && (
-                    <ProjectsSection 
-                      projects={resume.projects}
-                      onProjectChange={handleProjectChange}
-                      addProject={addProject}
-                      removeProject={removeProject}
-                    />
-                  )}
-
-                  {activeSection === 'customize' && (
-                    <CustomizationPanel 
-                      customization={resume.customization} 
-                      onCustomizationChange={handleCustomizationChange}
-                      resumeData={resume}
-                    />
-                  )}
-                </CardContent>
-              </Card>
+              <ResumeFormSection
+                activeSection={activeSection}
+                resume={resume}
+                handlePersonalInfoChange={handlePersonalInfoChange}
+                handleExperienceChange={handleExperienceChange}
+                handleCurrentJobToggle={handleCurrentJobToggle}
+                addExperience={addExperience}
+                removeExperience={removeExperience}
+                handleEducationChange={handleEducationChange}
+                addEducation={addEducation}
+                removeEducation={removeEducation}
+                handleSkillsChange={handleSkillsChange}
+                handleProjectChange={handleProjectChange}
+                addProject={addProject}
+                removeProject={removeProject}
+                handleCustomizationChange={handleCustomizationChange}
+              />
             </div>
 
             <div className="lg:col-span-4">
-              <Card className="h-full flex flex-col">
-                <div className="p-4 bg-muted flex items-center justify-between border-b">
-                  <h3 className="font-medium">Preview</h3>
-                  <EnhancedResumePreview 
-                    resume={resume}
-                    templateId={templateId}
-                    templateNames={templateNames}
-                  />
-                </div>
-                <CardContent className="flex-1 p-0 relative overflow-auto">
-                  <div className="resume-container" style={{ display: 'none' }}>
-                    <ResumeVisualPreview 
-                      resume={resume}
-                      templateId={templateId}
-                      templateNames={templateNames}
-                    />
-                  </div>
-                  <ResumeVisualPreview 
-                    resume={resume}
-                    templateId={templateId}
-                    templateNames={templateNames}
-                  />
-                </CardContent>
-              </Card>
+              <ResumePreviewSection
+                resume={resume}
+                templateId={templateId}
+                templateNames={templateNames}
+              />
             </div>
           </div>
         </div>
