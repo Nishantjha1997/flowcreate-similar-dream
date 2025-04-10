@@ -1,4 +1,3 @@
-
 import { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -8,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input'; 
 import { ColorPicker } from './ColorPicker';
-import { ResumeData } from '@/utils/resumeTemplates';
+import { ResumeData } from '@/utils/resumeAdapterUtils';
 import { EditableHeading } from './EditableHeading';
 import { AvatarUploader } from './AvatarUploader';
 import { 
@@ -51,7 +50,6 @@ interface CustomizationPanelProps {
   onSectionTitleChange?: (sectionId: string, newTitle: string) => void;
 }
 
-// List of Google Fonts
 const fontOptions = [
   { value: "default", label: "Template Default" },
   { value: "'Roboto', sans-serif", label: "Roboto" },
@@ -174,7 +172,6 @@ export const CustomizationPanel = ({
     }
   };
 
-  // Color theme presets
   const colorPresets = [
     {
       name: "Professional Blue",
