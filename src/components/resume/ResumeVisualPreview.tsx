@@ -18,14 +18,16 @@ export const ResumeVisualPreview = ({ resume, templateId, templateNames }: Resum
   const hasContent = resume.personal.name || resume.experience.some(e => e.title || e.company);
   
   return (
-    <div className="flex-1 p-0 relative overflow-auto">
+    <div className="h-full w-full relative">
       {hasContent ? (
-        <div className="absolute inset-0 overflow-auto" style={{ zoom: 0.65 }}>
-          <div ref={resumeRef}>
-            <ResumeTemplate 
-              data={resume} 
-              templateName={templateNames[templateId] || 'modern'} 
-            />
+        <div className="absolute inset-0 overflow-auto p-4">
+          <div style={{ transform: "scale(0.65)", transformOrigin: "top left" }}>
+            <div ref={resumeRef}>
+              <ResumeTemplate 
+                data={resume} 
+                templateName={templateNames[templateId] || 'modern'} 
+              />
+            </div>
           </div>
         </div>
       ) : (
