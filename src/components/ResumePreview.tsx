@@ -159,8 +159,8 @@ export const ResumePreview = ({ resumeData, previewComponent }: ResumePreviewPro
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="w-full flex items-center gap-2 mb-4">
-          <Eye className="h-4 w-4" /> Preview Resume
+        <Button className="flex items-center gap-2 text-sm">
+          <Eye className="h-4 w-4" /> Full Preview
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">

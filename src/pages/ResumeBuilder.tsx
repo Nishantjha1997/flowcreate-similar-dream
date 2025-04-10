@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { CustomizationPanel } from '@/components/CustomizationPanel';
+import { ResumePreview } from '@/components/ResumePreview';
 import { 
   Download, 
   FileText, 
@@ -24,6 +26,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import ResumeTemplate, { ResumeData } from '@/utils/resumeTemplates';
+import html2pdf from 'html2pdf.js';
 
 const exampleResumes: Record<string, ResumeData> = {
   "1": {
@@ -379,7 +382,9 @@ const ResumeBuilder = () => {
   const navigate = useNavigate();
   const templateId = searchParams.get('template') || '1';
   const isExample = searchParams.get('example') === 'true';
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
+  const resumeRef = useRef<HTMLDivElement>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   
   const [activeSection, setActiveSection] = useState('personal');
   const [resume, setResume] = useState<ResumeData>({
@@ -614,17 +619,44 @@ const ResumeBuilder = () => {
   };
 
   const handleDownload = () => {
-    toast({
-      title: "Resume Downloaded",
-      description: "Your resume has been downloaded as a PDF.",
-    });
+    if (!resumeRef.current) {
+      toast.error("Could not generate PDF. Please try again.");
+      return;
+    }
+
+    setIsGenerating(true);
+    
+    const element = resumeRef.current;
+    const filename = `${resume.personal?.name || 'resume'}.pdf`;
+    
+    const options = {
+      margin: [10, 10, 10, 10],
+      filename: filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    setTimeout(() => {
+      html2pdf()
+        .from(element)
+        .set(options)
+        .save()
+        .then(() => {
+          setIsGenerating(false);
+          toast.success("Resume downloaded successfully!");
+        })
+        .catch((error) => {
+          console.error("Error generating PDF:", error);
+          setIsGenerating(false);
+          toast.error("Error generating PDF. Please try again.");
+        });
+    }, 100);
   };
 
   const handleShare = () => {
-    toast({
-      title: "Resume Shared",
-      description: "A shareable link has been copied to your clipboard.",
-    });
+    navigator.clipboard.writeText(window.location.href);
+    toast.success("Link copied to clipboard!");
   };
 
   return (
@@ -635,9 +667,15 @@ const ResumeBuilder = () => {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Resume Builder</h1>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleDownload}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleDownload}
+                disabled={isGenerating}
+                className="flex items-center gap-2"
+              >
                 <Download className="h-4 w-4 mr-2" />
-                Download
+                {isGenerating ? "Generating PDF..." : "Download PDF"}
               </Button>
               <Button size="sm" onClick={handleShare}>
                 <Share2 className="h-4 w-4 mr-2" />
@@ -1305,18 +1343,25 @@ const ResumeBuilder = () => {
               <Card className="h-full flex flex-col">
                 <div className="p-4 bg-muted flex items-center justify-between border-b">
                   <h3 className="font-medium">Preview</h3>
-                  <Button variant="outline" size="sm">
-                    <FileText className="h-4 w-4 mr-2" />
-                    Full Preview
-                  </Button>
-                </div>
-                <CardContent className="flex-1 p-0 relative overflow-auto">
-                  {(resume.personal.name || resume.experience.some(e => e.title || e.company)) ? (
-                    <div className="absolute inset-0 overflow-auto" style={{ zoom: 0.65 }}>
+                  <ResumePreview 
+                    resumeData={resume} 
+                    previewComponent={
                       <ResumeTemplate 
                         data={resume} 
                         templateName={templateNames[templateId] || 'modern'} 
                       />
+                    } 
+                  />
+                </div>
+                <CardContent className="flex-1 p-0 relative overflow-auto">
+                  {(resume.personal.name || resume.experience.some(e => e.title || e.company)) ? (
+                    <div className="absolute inset-0 overflow-auto" style={{ zoom: 0.65 }}>
+                      <div ref={resumeRef}>
+                        <ResumeTemplate 
+                          data={resume} 
+                          templateName={templateNames[templateId] || 'modern'} 
+                        />
+                      </div>
                     </div>
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-background border-dashed border-2 m-4 rounded-md">
