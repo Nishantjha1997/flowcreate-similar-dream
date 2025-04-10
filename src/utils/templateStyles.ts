@@ -1,4 +1,3 @@
-
 export const templateStyles = {
   modern: {
     container: "font-sans max-w-4xl mx-auto bg-white shadow-lg",
@@ -74,6 +73,48 @@ export const templateStyles = {
     subsectionContent: "mt-2 text-gray-700",
     skillsContainer: "flex flex-wrap gap-2",
     skillBadge: "bg-blue-50 text-blue-700 px-3 py-1 rounded text-sm border border-blue-200",
+  },
+  minimalist: {
+    container: "font-sans max-w-[800px] mx-auto p-10 bg-white text-gray-800 shadow-lg min-h-[1100px]",
+    header: "mb-6",
+    name: "text-2xl font-light text-center",
+    contactInfo: "text-sm text-center text-gray-600 mt-1 space-x-2",
+    contactItem: "inline-flex items-center",
+    summary: "text-sm leading-relaxed border-b pb-4 text-center",
+    sectionContainer: "mt-4",
+    sectionTitle: "text-sm uppercase tracking-widest mb-3 font-medium",
+    experienceItem: "mb-3",
+    experienceTitle: "text-base font-medium",
+    experienceCompany: "text-sm",
+    experienceDates: "text-xs text-gray-600",
+    experienceDescription: "text-sm mt-1 whitespace-pre-line",
+    educationItem: "mb-3",
+    educationSchool: "text-base font-medium",
+    educationDegree: "text-sm",
+    educationDates: "text-xs text-gray-600",
+    skillsContainer: "flex flex-wrap gap-2",
+    skill: "text-xs px-2 py-1 bg-gray-100 rounded-sm"
+  },
+  executive: {
+    container: "font-serif max-w-[800px] mx-auto p-10 bg-white text-gray-800 shadow-lg min-h-[1100px] border-t-8 border-gray-700",
+    header: "mb-8",
+    name: "text-3xl font-bold text-gray-800 border-b-2 pb-2",
+    contactInfo: "text-sm text-gray-600 mt-3 flex flex-wrap gap-x-4 gap-y-1",
+    contactItem: "inline-flex items-center",
+    summary: "text-base leading-relaxed my-4",
+    sectionContainer: "mt-6",
+    sectionTitle: "text-lg font-bold mb-3 text-gray-800 border-b pb-1",
+    experienceItem: "mb-4",
+    experienceTitle: "text-base font-bold",
+    experienceCompany: "text-base italic",
+    experienceDates: "text-sm text-gray-600",
+    experienceDescription: "text-sm mt-2 whitespace-pre-line",
+    educationItem: "mb-4",
+    educationSchool: "text-base font-bold",
+    educationDegree: "text-base",
+    educationDates: "text-sm text-gray-600",
+    skillsContainer: "flex flex-wrap gap-2",
+    skill: "text-sm px-3 py-1 bg-gray-200 rounded"
   }
 };
 
@@ -140,4 +181,14 @@ export const applyCustomization = (
   }
   
   return customizedStyles;
+};
+
+export const templateNameMap = {
+  modern: "modern",
+  classic: "classic", 
+  creative: "creative",
+  technical: "technical",
+  professional: "professional",
+  minimalist: "minimalist",
+  executive: "executive"
 };

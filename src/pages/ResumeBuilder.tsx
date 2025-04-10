@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -348,7 +348,9 @@ const templateNames: Record<string, string> = {
   "2": "classic",
   "3": "creative",
   "4": "technical",
-  "5": "professional"
+  "5": "professional",
+  "6": "minimalist",
+  "7": "executive"
 };
 
 const emptyExperience = {
@@ -374,6 +376,7 @@ const emptyEducation = {
 
 const ResumeBuilder = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const templateId = searchParams.get('template') || '1';
   const isExample = searchParams.get('example') === 'true';
   const { toast } = useToast();
@@ -420,6 +423,11 @@ const ResumeBuilder = () => {
   });
 
   useEffect(() => {
+    const savedResume = localStorage.getItem('resumeData');
+    if (savedResume) {
+      setResume(JSON.parse(savedResume));
+    }
+    
     if (isExample) {
       const exampleId = templateId;
       if (exampleResumes[exampleId]) {
@@ -451,6 +459,14 @@ const ResumeBuilder = () => {
           primaryColor = '#003366';
           secondaryColor = '#555555';
           break;
+        case 'minimalist':
+          primaryColor = '#FFD700';
+          secondaryColor = '#8B4513';
+          break;
+        case 'executive':
+          primaryColor = '#00008B';
+          secondaryColor = '#B03060';
+          break;
       }
       
       setResume(prev => ({
@@ -463,6 +479,12 @@ const ResumeBuilder = () => {
       }));
     }
   }, [templateId, isExample]);
+
+  useEffect(() => {
+    if (!isExample) {
+      localStorage.setItem('resumeData', JSON.stringify(resume));
+    }
+  }, [resume, isExample]);
 
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -587,6 +609,10 @@ const ResumeBuilder = () => {
     }));
   };
 
+  const handleTemplateChange = (newTemplateId: string) => {
+    navigate(`/resume-builder?template=${newTemplateId}${isExample ? '&example=true' : ''}`);
+  };
+
   const handleDownload = () => {
     toast({
       title: "Resume Downloaded",
@@ -682,34 +708,41 @@ const ResumeBuilder = () => {
                       </div>
                     </TabsContent>
                     <TabsContent value="templates">
-                      <div className="p-4 grid grid-cols-2 gap-2">
-                        {[1, 2, 3, 4, 5].map((id) => (
-                          <div 
-                            key={id}
-                            className={`cursor-pointer border rounded-md overflow-hidden ${
-                              templateId === id.toString() ? 'ring-2 ring-primary' : ''
-                            }`}
-                            onClick={() => {
-                              const url = new URL(window.location.href);
-                              url.searchParams.set('template', id.toString());
-                              window.history.pushState({}, '', url.toString());
-                              window.location.reload();
-                            }}
-                          >
-                            <img 
-                              src={`https://images.unsplash.com/photo-1461749280684-dccba630e2f6`} 
-                              alt={`Template ${id}`} 
-                              className="w-full aspect-[3/4] object-cover"
-                            />
-                            <div className="p-2 text-xs font-medium text-center">
-                              {id === 1 && "Modern"}
-                              {id === 2 && "Classic"}
-                              {id === 3 && "Creative"}
-                              {id === 4 && "Technical"}
-                              {id === 5 && "Professional"}
+                      <div className="p-4">
+                        <p className="text-sm text-muted-foreground mb-3">Choose a template style. Your data will be preserved when switching templates.</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          {[1, 2, 3, 4, 5, 6, 7].map((id) => (
+                            <div 
+                              key={id}
+                              className={`cursor-pointer border rounded-md overflow-hidden transition-all hover:shadow-md ${
+                                templateId === id.toString() ? 'ring-2 ring-primary' : ''
+                              }`}
+                              onClick={() => handleTemplateChange(id.toString())}
+                            >
+                              <div className="relative">
+                                <img 
+                                  src={`https://images.unsplash.com/photo-${id <= 5 ? '1461749280684-dccba630e2f6' : '1586281380117-5a60ae2050cc'}`} 
+                                  alt={`Template ${id}`} 
+                                  className="w-full aspect-[3/4] object-cover"
+                                />
+                                {templateId === id.toString() && (
+                                  <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                                    <span className="px-2 py-1 bg-primary text-primary-foreground text-xs rounded-sm">Current</span>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="p-2 text-xs font-medium text-center">
+                                {id === 1 && "Modern"}
+                                {id === 2 && "Classic"}
+                                {id === 3 && "Creative"}
+                                {id === 4 && "Technical"}
+                                {id === 5 && "Professional"}
+                                {id === 6 && "Minimalist"}
+                                {id === 7 && "Executive"}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
                     </TabsContent>
                   </Tabs>
@@ -1282,7 +1315,7 @@ const ResumeBuilder = () => {
                     <div className="absolute inset-0 overflow-auto" style={{ zoom: 0.65 }}>
                       <ResumeTemplate 
                         data={resume} 
-                        templateName={templateNames[templateId]} 
+                        templateName={templateNames[templateId] || 'modern'} 
                       />
                     </div>
                   ) : (
