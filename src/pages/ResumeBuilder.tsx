@@ -9,7 +9,6 @@ import { CustomizationPanel } from '@/components/CustomizationPanel';
 import { Download, Share2 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
-// Import new component files
 import { PersonalInfoSection } from '@/components/resume/PersonalInfoSection';
 import { ExperienceSection } from '@/components/resume/ExperienceSection';
 import { EducationSection } from '@/components/resume/EducationSection';
