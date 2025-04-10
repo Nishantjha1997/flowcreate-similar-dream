@@ -659,6 +659,34 @@ const ResumeBuilder = () => {
     toast.success("Link copied to clipboard!");
   };
 
+  const adaptResumeData = (resume: ResumeData) => {
+    return {
+      ...resume,
+      personal: {
+        ...resume.personal,
+        summary: resume.personal.summary || '',
+        website: resume.personal.website || '',
+        linkedin: resume.personal.linkedin || ''
+      },
+      experience: resume.experience.map(exp => ({
+        ...exp,
+        description: exp.description || ''
+      })),
+      education: resume.education.map(edu => ({
+        ...edu,
+        description: edu.description || ''
+      })),
+      skills: resume.skills || [],
+      customization: {
+        ...resume.customization,
+        primaryColor: resume.customization.primaryColor || '#2563eb',
+        secondaryColor: resume.customization.secondaryColor || '#6b7280',
+        fontSize: resume.customization.fontSize || 'medium',
+        spacing: resume.customization.spacing || 'normal'
+      }
+    };
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -1344,10 +1372,10 @@ const ResumeBuilder = () => {
                 <div className="p-4 bg-muted flex items-center justify-between border-b">
                   <h3 className="font-medium">Preview</h3>
                   <ResumePreview 
-                    resumeData={resume} 
+                    resumeData={adaptResumeData(resume)} 
                     previewComponent={
                       <ResumeTemplate 
-                        data={resume as import('../utils/resumeTemplates').ResumeData} 
+                        data={resume} 
                         templateName={templateNames[templateId] || 'modern'} 
                       />
                     } 
@@ -1358,7 +1386,7 @@ const ResumeBuilder = () => {
                     <div className="absolute inset-0 overflow-auto" style={{ zoom: 0.65 }}>
                       <div ref={resumeRef}>
                         <ResumeTemplate 
-                          data={resume as import('../utils/resumeTemplates').ResumeData} 
+                          data={resume} 
                           templateName={templateNames[templateId] || 'modern'} 
                         />
                       </div>

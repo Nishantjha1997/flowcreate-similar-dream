@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { adaptResumeData } from '@/utils/resumeTemplates';
 
 interface ResumePreviewProps {
   resumeData: ResumeData;

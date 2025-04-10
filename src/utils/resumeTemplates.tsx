@@ -20,7 +20,48 @@ export const adaptResumeData = (data: ResumeData): TypesResumeData => {
       description: exp.description,
       highlights: exp.description?.split('\n').filter(line => line.trim().startsWith('•')) || []
     })),
-    projects: data.projects,
+    projects: data.projects?.map(project => ({
+      name: project.title,
+      description: project.description,
+      link: project.link,
+      technologies: project.technologies
+    })),
+    customization: data.customization,
+    selectedTemplate: data.customization?.layoutType
+  };
+};
+
+// Also provide a function to convert back if needed
+export const reverseAdaptResumeData = (data: TypesResumeData): Partial<ResumeData> => {
+  return {
+    personal: data.personal,
+    skills: data.skills,
+    experience: data.experience?.map((exp, index) => ({
+      id: index + 1,
+      title: exp.position,
+      company: exp.company,
+      location: '',
+      startDate: exp.date.split(' - ')[0],
+      endDate: exp.date.split(' - ')[1] === 'Present' ? '' : exp.date.split(' - ')[1],
+      current: exp.date.split(' - ')[1] === 'Present',
+      description: exp.description || ''
+    })) || [],
+    education: data.education?.map((edu, index) => ({
+      id: index + 1,
+      school: edu.institution,
+      degree: edu.degree.split(' in ')[0],
+      field: edu.degree.split(' in ')[1] || '',
+      startDate: edu.date.split(' - ')[0],
+      endDate: edu.date.split(' - ')[1],
+      description: edu.description || ''
+    })) || [],
+    projects: data.projects?.map((project, index) => ({
+      id: index + 1,
+      title: project.name,
+      description: project.description,
+      link: project.link,
+      technologies: project.technologies
+    })),
     customization: data.customization
   };
 };
@@ -663,8 +704,12 @@ const ResumeTemplate = ({
   data: ResumeData | TypesResumeData; 
   templateName?: string;
 }) => {
+  // Check if data is from types.ts or resumeTemplates.tsx and convert if needed
+  const isTypesResumeData = 'education' in data && Array.isArray(data.education) && 
+    data.education.length > 0 && 'institution' in data.education[0];
+  
   // Cast data to appropriate type to handle both types
-  const resumeData = data as ResumeData;
+  const resumeData = isTypesResumeData ? reverseAdaptResumeData(data as TypesResumeData) as ResumeData : data as ResumeData;
   const baseStyles = templateStyles[templateName] || templateStyles.modern;
   const styles = applyCustomization(baseStyles, resumeData.customization);
 
