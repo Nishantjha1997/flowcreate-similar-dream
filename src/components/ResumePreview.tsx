@@ -11,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { adaptResumeData } from '@/utils/resumeTemplates';
 
 interface ResumePreviewProps {
   resumeData: ResumeData;
@@ -127,7 +126,7 @@ export const ResumePreview = ({ resumeData, previewComponent }: ResumePreviewPro
    * Shares the resume via different methods
    * @param {string} method - The sharing method to use
    */
-  const handleShare = (method: 'email' | 'link' | 'phone') => {
+  function handleShare(method: 'email' | 'link' | 'phone') {
     switch (method) {
       case 'email':
         const emailSubject = `Resume: ${resumeData.personal?.name || 'My Resume'}`;
@@ -155,7 +154,7 @@ export const ResumePreview = ({ resumeData, previewComponent }: ResumePreviewPro
         break;
     }
   };
-  
+
   return (
     <Dialog>
       <DialogTrigger asChild>

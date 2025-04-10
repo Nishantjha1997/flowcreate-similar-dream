@@ -5,27 +5,35 @@ import { ResumeData as TypesResumeData } from './types';
 // Create adapter function to convert between the two resume data formats
 export const adaptResumeData = (data: ResumeData): TypesResumeData => {
   return {
-    personal: data.personal,
-    skills: data.skills,
-    education: data.education.map(edu => ({
+    personal: {
+      name: data.personal?.name || '',
+      title: data.personal?.name || '',
+      email: data.personal?.email || '',
+      phone: data.personal?.phone || '',
+      website: data.personal?.website || '',
+      location: data.personal?.address || '',
+      summary: data.personal?.summary || '',
+    },
+    skills: data.skills || [],
+    education: data.education?.map(edu => ({
       institution: edu.school,
       degree: `${edu.degree} ${edu.field ? `in ${edu.field}` : ''}`,
       date: `${edu.startDate} - ${edu.endDate}`,
       description: edu.description
-    })),
-    experience: data.experience.map(exp => ({
+    })) || [],
+    experience: data.experience?.map(exp => ({
       company: exp.company,
       position: exp.title,
       date: `${exp.startDate} - ${exp.current ? 'Present' : exp.endDate}`,
       description: exp.description,
       highlights: exp.description?.split('\n').filter(line => line.trim().startsWith('•')) || []
-    })),
+    })) || [],
     projects: data.projects?.map(project => ({
       name: project.title,
       description: project.description,
       link: project.link,
       technologies: project.technologies
-    })),
+    })) || [],
     customization: data.customization,
     selectedTemplate: data.customization?.layoutType
   };
@@ -34,8 +42,15 @@ export const adaptResumeData = (data: ResumeData): TypesResumeData => {
 // Also provide a function to convert back if needed
 export const reverseAdaptResumeData = (data: TypesResumeData): Partial<ResumeData> => {
   return {
-    personal: data.personal,
-    skills: data.skills,
+    personal: {
+      name: data.personal?.name || '',
+      email: data.personal?.email || '',
+      phone: data.personal?.phone || '',
+      address: data.personal?.location || '',
+      summary: data.personal?.summary || '',
+      website: data.personal?.website || '',
+      linkedin: data.personal?.website || ''
+    },
     experience: data.experience?.map((exp, index) => ({
       id: index + 1,
       title: exp.position,
@@ -61,7 +76,7 @@ export const reverseAdaptResumeData = (data: TypesResumeData): Partial<ResumeDat
       description: project.description,
       link: project.link,
       technologies: project.technologies
-    })),
+    })) || [],
     customization: data.customization
   };
 };
