@@ -17,7 +17,7 @@ import { ProjectsSection } from '@/components/resume/ProjectsSection';
 import { SectionNav } from '@/components/resume/SectionNav';
 import { TemplateSelector } from '@/components/resume/TemplateSelector';
 import { ResumeVisualPreview, EnhancedResumePreview } from '@/components/resume/ResumeVisualPreview';
-import { ResumeData, adaptResumeData } from '@/utils/resumeAdapterUtils';
+import { ResumeData } from '@/utils/resumeAdapterUtils';
 import { emptyEducation, emptyExperience, emptyProject, exampleResumes, templateNames } from '@/components/resume/ResumeData';
 
 const ResumeBuilder = () => {
@@ -461,7 +461,7 @@ const ResumeBuilder = () => {
                     <CustomizationPanel 
                       customization={resume.customization} 
                       onCustomizationChange={handleCustomizationChange}
-                      resumeData={adaptResumeData(resume)}
+                      resumeData={resume}
                     />
                   )}
                 </CardContent>

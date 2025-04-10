@@ -7,7 +7,7 @@ export interface ResumeData {
     name: string;
     email: string;
     phone: string;
-    address: string;
+    address?: string; // Make address optional to match with TypesResumeData
     summary: string;
     website?: string;
     linkedin?: string;
