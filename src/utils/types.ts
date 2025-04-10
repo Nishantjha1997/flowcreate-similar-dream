@@ -8,8 +8,9 @@ export interface ResumeData {
     email?: string;
     phone?: string;
     website?: string;
-    location?: string;
+    location?: string; // This maps to address in the adapter
     summary?: string;
+    linkedin?: string; // Added to match the adapter type
   };
   skills?: string[];
   education?: {
@@ -32,7 +33,7 @@ export interface ResumeData {
     technologies?: string[];
   }[];
   customization: {
-    primaryColor?: string;
+    primaryColor: string; // Making this required to match adapter type
     secondaryColor?: string;
     accentColor?: string;
     textColor?: string;

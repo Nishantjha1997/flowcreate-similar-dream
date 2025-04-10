@@ -70,7 +70,8 @@ export const adaptResumeData = (data: ResumeData): TypesResumeData => {
       email: data.personal?.email || '',
       phone: data.personal?.phone || '',
       website: data.personal?.website || '',
-      location: data.personal?.address || '',
+      location: data.personal?.address || '', // Map address to location
+      linkedin: data.personal?.linkedin || '',
       summary: data.personal?.summary || '',
     },
     skills: data.skills || [],
@@ -94,7 +95,7 @@ export const adaptResumeData = (data: ResumeData): TypesResumeData => {
       technologies: project.technologies
     })) || [],
     customization: {
-      primaryColor: data.customization?.primaryColor,
+      primaryColor: data.customization?.primaryColor || '#2563eb', // Provide default value
       secondaryColor: data.customization?.secondaryColor,
       accentColor: data.customization?.accentColor,
       textColor: data.customization?.textColor,
@@ -121,10 +122,10 @@ export const reverseAdaptResumeData = (data: TypesResumeData): Partial<ResumeDat
       name: data.personal?.name || '',
       email: data.personal?.email || '',
       phone: data.personal?.phone || '',
-      address: data.personal?.location || '',
+      address: data.personal?.location || '', // Map location to address
       summary: data.personal?.summary || '',
       website: data.personal?.website || '',
-      linkedin: data.personal?.website || ''
+      linkedin: data.personal?.linkedin || ''
     },
     skills: data.skills || [],
     experience: data.experience?.map((exp, index) => ({
@@ -154,7 +155,7 @@ export const reverseAdaptResumeData = (data: TypesResumeData): Partial<ResumeDat
       technologies: project.technologies
     })) || [],
     customization: {
-      primaryColor: data.customization?.primaryColor || '#2563eb',
+      primaryColor: data.customization?.primaryColor || '#2563eb', // Ensure primaryColor always has a value
       secondaryColor: data.customization?.secondaryColor,
       accentColor: data.customization?.accentColor,
       textColor: data.customization?.textColor,

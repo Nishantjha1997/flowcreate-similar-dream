@@ -1,3 +1,4 @@
+
 import { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -43,8 +44,8 @@ import {
 } from 'lucide-react';
 
 interface CustomizationPanelProps {
-  customization: ResumeData['customization'];
-  onCustomizationChange: (customization: ResumeData['customization']) => void;
+  customization: ResumeData["customization"];
+  onCustomizationChange: (customization: ResumeData["customization"]) => void;
   resumeData: ResumeData;
   onSectionOrderChange?: (newOrder: string[]) => void;
   onSectionTitleChange?: (sectionId: string, newTitle: string) => void;
@@ -87,7 +88,7 @@ const sectionIcons = {
 };
 
 export const CustomizationPanel = ({ 
-  customization = {}, 
+  customization = { primaryColor: '#2563eb' }, // Provide a default primaryColor 
   onCustomizationChange,
   resumeData,
   onSectionOrderChange,
