@@ -1,5 +1,29 @@
 
 import { CSSProperties } from 'react';
+import { ResumeData as TypesResumeData } from './types';
+
+// Create adapter function to convert between the two resume data formats
+export const adaptResumeData = (data: ResumeData): TypesResumeData => {
+  return {
+    personal: data.personal,
+    skills: data.skills,
+    education: data.education.map(edu => ({
+      institution: edu.school,
+      degree: `${edu.degree} ${edu.field ? `in ${edu.field}` : ''}`,
+      date: `${edu.startDate} - ${edu.endDate}`,
+      description: edu.description
+    })),
+    experience: data.experience.map(exp => ({
+      company: exp.company,
+      position: exp.title,
+      date: `${exp.startDate} - ${exp.current ? 'Present' : exp.endDate}`,
+      description: exp.description,
+      highlights: exp.description?.split('\n').filter(line => line.trim().startsWith('•')) || []
+    })),
+    projects: data.projects,
+    customization: data.customization
+  };
+};
 
 export type ResumeData = {
   personal: {
@@ -636,47 +660,49 @@ const ResumeTemplate = ({
   data, 
   templateName = 'modern' 
 }: { 
-  data: ResumeData; 
+  data: ResumeData | TypesResumeData; 
   templateName?: string;
 }) => {
+  // Cast data to appropriate type to handle both types
+  const resumeData = data as ResumeData;
   const baseStyles = templateStyles[templateName] || templateStyles.modern;
-  const styles = applyCustomization(baseStyles, data.customization);
+  const styles = applyCustomization(baseStyles, resumeData.customization);
 
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <div style={styles.name}>{data.personal.name || 'Your Name'}</div>
+        <div style={styles.name}>{resumeData.personal.name || 'Your Name'}</div>
         <div style={styles.contact}>
-          {data.personal.email && (
-            <span>{data.personal.email}</span>
+          {resumeData.personal.email && (
+            <span>{resumeData.personal.email}</span>
           )}
-          {data.personal.phone && (
-            <span>{data.personal.phone}</span>
+          {resumeData.personal.phone && (
+            <span>{resumeData.personal.phone}</span>
           )}
-          {data.personal.address && (
-            <span>{data.personal.address}</span>
+          {resumeData.personal.address && (
+            <span>{resumeData.personal.address}</span>
           )}
-          {data.personal.website && (
-            <span>{data.personal.website}</span>
+          {resumeData.personal.website && (
+            <span>{resumeData.personal.website}</span>
           )}
-          {data.personal.linkedin && (
-            <span>{data.personal.linkedin}</span>
+          {resumeData.personal.linkedin && (
+            <span>{resumeData.personal.linkedin}</span>
           )}
         </div>
       </div>
       
-      {data.personal.summary && (
+      {resumeData.personal.summary && (
         <div style={styles.section}>
           <div style={styles.sectionTitle}>Summary</div>
-          <div style={styles.itemDescription}>{data.personal.summary}</div>
+          <div style={styles.itemDescription}>{resumeData.personal.summary}</div>
         </div>
       )}
       
-      {data.experience && data.experience.length > 0 && (
+      {resumeData.experience && resumeData.experience.length > 0 && (
         <div style={styles.section}>
           <div style={styles.sectionTitle}>Experience</div>
           <div style={styles.sectionContent}>
-            {data.experience.map((exp) => (
+            {resumeData.experience.map((exp) => (
               <div key={exp.id} style={styles.item}>
                 <div style={styles.itemTitle}>{exp.title}</div>
                 <div style={styles.itemSubtitle}>{exp.company}{exp.location ? ` | ${exp.location}` : ''}</div>
@@ -688,11 +714,11 @@ const ResumeTemplate = ({
         </div>
       )}
       
-      {data.education && data.education.length > 0 && (
+      {resumeData.education && resumeData.education.length > 0 && (
         <div style={styles.section}>
           <div style={styles.sectionTitle}>Education</div>
           <div style={styles.sectionContent}>
-            {data.education.map((edu) => (
+            {resumeData.education.map((edu) => (
               <div key={edu.id} style={styles.item}>
                 <div style={styles.itemTitle}>{edu.degree} {edu.field ? `in ${edu.field}` : ''}</div>
                 <div style={styles.itemSubtitle}>{edu.school}</div>
@@ -704,22 +730,22 @@ const ResumeTemplate = ({
         </div>
       )}
       
-      {data.skills && data.skills.length > 0 && (
+      {resumeData.skills && resumeData.skills.length > 0 && (
         <div style={styles.section}>
           <div style={styles.sectionTitle}>Skills</div>
           <div style={styles.skillsList}>
-            {data.skills.map((skill, index) => (
+            {resumeData.skills.map((skill, index) => (
               <div key={index} style={styles.skill}>{skill}</div>
             ))}
           </div>
         </div>
       )}
       
-      {data.projects && data.projects.length > 0 && (
+      {resumeData.projects && resumeData.projects.length > 0 && (
         <div style={styles.section}>
           <div style={styles.sectionTitle}>Projects</div>
           <div style={styles.sectionContent}>
-            {data.projects.map((project) => (
+            {resumeData.projects.map((project) => (
               <div key={project.id} style={styles.item}>
                 <div style={styles.itemTitle}>
                   {project.title}

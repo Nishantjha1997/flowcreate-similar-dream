@@ -1347,7 +1347,7 @@ const ResumeBuilder = () => {
                     resumeData={resume} 
                     previewComponent={
                       <ResumeTemplate 
-                        data={resume} 
+                        data={resume as import('../utils/resumeTemplates').ResumeData} 
                         templateName={templateNames[templateId] || 'modern'} 
                       />
                     } 
@@ -1358,7 +1358,7 @@ const ResumeBuilder = () => {
                     <div className="absolute inset-0 overflow-auto" style={{ zoom: 0.65 }}>
                       <div ref={resumeRef}>
                         <ResumeTemplate 
-                          data={resume} 
+                          data={resume as import('../utils/resumeTemplates').ResumeData} 
                           templateName={templateNames[templateId] || 'modern'} 
                         />
                       </div>
