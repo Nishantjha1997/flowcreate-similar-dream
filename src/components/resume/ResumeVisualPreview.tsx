@@ -44,9 +44,11 @@ export const ResumeVisualPreview = ({ resume, templateId, templateNames }: Resum
 };
 
 export const EnhancedResumePreview = ({ resume, templateId, templateNames }: ResumeVisualPreviewProps) => {
+  const adaptedData = adaptResumeData(resume);
+  
   return (
     <ResumePreview
-      resumeData={adaptResumeData(resume)}
+      resumeData={adaptedData}
       previewComponent={
         <ResumeTemplate 
           data={resume} 

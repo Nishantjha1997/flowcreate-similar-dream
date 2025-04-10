@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -30,7 +29,6 @@ const ResumeBuilder = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeSection, setActiveSection] = useState('personal');
   
-  // Initialize resume state with default values
   const [resume, setResume] = useState<ResumeData>({
     personal: {
       name: '',
@@ -71,7 +69,6 @@ const ResumeBuilder = () => {
     }
   });
 
-  // Load saved resume or example resume on component mount
   useEffect(() => {
     const savedResume = localStorage.getItem('resumeData');
     if (savedResume) {
@@ -130,14 +127,12 @@ const ResumeBuilder = () => {
     }
   }, [templateId, isExample]);
 
-  // Save resume to localStorage when it changes
   useEffect(() => {
     if (!isExample) {
       localStorage.setItem('resumeData', JSON.stringify(resume));
     }
   }, [resume, isExample]);
 
-  // Handler functions for form inputs
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setResume((prev) => ({
@@ -249,7 +244,7 @@ const ResumeBuilder = () => {
       skills: skillsArray,
     }));
   };
-  
+
   const handleCustomizationChange = (customization: ResumeData['customization']) => {
     setResume(prev => ({
       ...prev,
@@ -260,7 +255,7 @@ const ResumeBuilder = () => {
   const handleTemplateChange = (newTemplateId: string) => {
     navigate(`/resume-builder?template=${newTemplateId}${isExample ? '&example=true' : ''}`);
   };
-  
+
   const handleProjectChange = (field: string, value: string, index: number) => {
     setResume((prev) => {
       const updatedProjects = [...(prev.projects || [])];
@@ -288,7 +283,7 @@ const ResumeBuilder = () => {
       };
     });
   };
-  
+
   const addProject = () => {
     setResume((prev) => {
       const projects = prev.projects || [];
@@ -305,7 +300,7 @@ const ResumeBuilder = () => {
       };
     });
   };
-  
+
   const removeProject = (id: number) => {
     setResume((prev) => ({
       ...prev,
@@ -330,13 +325,11 @@ const ResumeBuilder = () => {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    // Create a temporary div with the correct resume content
     const tempDiv = document.createElement('div');
     tempDiv.style.width = '8.5in';
     tempDiv.style.padding = '0.5in';
     tempDiv.style.backgroundColor = 'white';
     
-    // Find the element with the rendered resume
     const resumeElement = document.querySelector('.resume-container');
     if (resumeElement) {
       tempDiv.innerHTML = resumeElement.innerHTML;

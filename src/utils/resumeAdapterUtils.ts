@@ -42,12 +42,21 @@ export interface ResumeData {
   customization: {
     primaryColor: string;
     secondaryColor?: string;
+    accentColor?: string;
+    textColor?: string;
+    backgroundColor?: string;
     fontSize?: string;
-    spacing?: string;
     fontFamily?: string;
-    layoutType?: string;
+    spacing?: string;
+    headingStyle?: string;
+    sectionMargins?: string;
+    lineHeight?: string;
     showPhoto?: boolean;
+    layoutType?: "creative" | "compact" | "standard" | "minimal";
     profileImage?: any;
+    sectionTitles?: {
+      [key: string]: string | undefined;
+    };
   };
   selectedTemplate?: string;
 }
@@ -84,8 +93,24 @@ export const adaptResumeData = (data: ResumeData): TypesResumeData => {
       link: project.link,
       technologies: project.technologies
     })) || [],
-    customization: data.customization,
-    selectedTemplate: data.customization?.layoutType
+    customization: {
+      primaryColor: data.customization?.primaryColor,
+      secondaryColor: data.customization?.secondaryColor,
+      accentColor: data.customization?.accentColor,
+      textColor: data.customization?.textColor,
+      backgroundColor: data.customization?.backgroundColor,
+      fontSize: data.customization?.fontSize,
+      fontFamily: data.customization?.fontFamily,
+      spacing: data.customization?.spacing,
+      headingStyle: data.customization?.headingStyle,
+      sectionMargins: data.customization?.sectionMargins,
+      lineHeight: data.customization?.lineHeight,
+      showPhoto: data.customization?.showPhoto,
+      layoutType: data.customization?.layoutType,
+      profileImage: data.customization?.profileImage,
+      sectionTitles: data.customization?.sectionTitles
+    },
+    selectedTemplate: data.selectedTemplate
   };
 };
 
@@ -128,11 +153,22 @@ export const reverseAdaptResumeData = (data: TypesResumeData): Partial<ResumeDat
       link: project.link,
       technologies: project.technologies
     })) || [],
-    customization: data.customization || {
-      primaryColor: '#2563eb',
-      secondaryColor: '#6b7280',
-      fontSize: 'medium',
-      spacing: 'normal'
+    customization: {
+      primaryColor: data.customization?.primaryColor || '#2563eb',
+      secondaryColor: data.customization?.secondaryColor,
+      accentColor: data.customization?.accentColor,
+      textColor: data.customization?.textColor,
+      backgroundColor: data.customization?.backgroundColor,
+      fontSize: data.customization?.fontSize,
+      fontFamily: data.customization?.fontFamily,
+      spacing: data.customization?.spacing,
+      headingStyle: data.customization?.headingStyle,
+      sectionMargins: data.customization?.sectionMargins,
+      lineHeight: data.customization?.lineHeight,
+      showPhoto: data.customization?.showPhoto,
+      layoutType: data.customization?.layoutType,
+      profileImage: data.customization?.profileImage,
+      sectionTitles: data.customization?.sectionTitles
     }
   };
 };
