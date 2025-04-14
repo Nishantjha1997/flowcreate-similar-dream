@@ -17,6 +17,7 @@ export type TemplateStyles = {
   itemDescription: CSSProperties;
   skillsList: CSSProperties;
   skill: CSSProperties;
+  profilePhoto?: CSSProperties;
 };
 
 const applyCustomization = (
@@ -110,6 +111,16 @@ const templateStyles: Record<string, TemplateStyles> = {
       marginBottom: '30px',
       paddingBottom: '20px',
       borderBottom: '2px solid #eaeaea',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '20px',
+    },
+    profilePhoto: {
+      width: '100px',
+      height: '100px',
+      borderRadius: '50%',
+      objectFit: 'cover',
+      border: '2px solid #2563eb',
     },
     name: {
       fontSize: '28px',
@@ -199,6 +210,17 @@ const templateStyles: Record<string, TemplateStyles> = {
       marginBottom: '25px',
       borderBottom: '1px solid #ccc',
       paddingBottom: '20px',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+    profilePhoto: {
+      width: '120px',
+      height: '120px',
+      borderRadius: '50%',
+      objectFit: 'cover',
+      marginBottom: '15px',
+      border: '3px solid #000',
     },
     name: {
       fontSize: '30px',
@@ -296,6 +318,17 @@ const templateStyles: Record<string, TemplateStyles> = {
       borderRadius: '12px',
       color: '#fff',
       boxShadow: '0 4px 15px rgba(255, 107, 107, 0.2)',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '25px',
+    },
+    profilePhoto: {
+      width: '110px',
+      height: '110px',
+      borderRadius: '12px',
+      objectFit: 'cover',
+      border: '4px solid #fff',
+      boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
     },
     name: {
       fontSize: '32px',
@@ -395,6 +428,16 @@ const templateStyles: Record<string, TemplateStyles> = {
       padding: '25px',
       color: '#fff',
       borderRadius: '5px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '20px',
+    },
+    profilePhoto: {
+      width: '100px',
+      height: '100px',
+      borderRadius: '5px',
+      objectFit: 'cover',
+      border: '2px solid #4CAF50',
     },
     name: {
       fontSize: '28px',
@@ -494,6 +537,17 @@ const templateStyles: Record<string, TemplateStyles> = {
       marginBottom: '30px',
       borderBottom: '2px solid #003366',
       paddingBottom: '25px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '25px',
+    },
+    profilePhoto: {
+      width: '120px',
+      height: '120px',
+      borderRadius: '8px',
+      objectFit: 'cover',
+      border: '2px solid #003366',
+      boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
     },
     name: {
       fontSize: '32px',
@@ -568,6 +622,299 @@ const templateStyles: Record<string, TemplateStyles> = {
       letterSpacing: '0.5px',
     },
   },
+
+  minimalist: {
+    container: {
+      fontFamily: "'Roboto', sans-serif",
+      color: '#333',
+      lineHeight: '1.5',
+      maxWidth: '100%',
+      height: '100%',
+      padding: '30px',
+      backgroundColor: '#fff',
+      boxSizing: 'border-box',
+    },
+    header: {
+      marginBottom: '25px',
+      borderBottom: '1px solid #ddd',
+      paddingBottom: '20px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '20px',
+    },
+    profilePhoto: {
+      width: '80px',
+      height: '80px',
+      borderRadius: '50%',
+      objectFit: 'cover',
+      border: '1px solid #eaeaea',
+    },
+    name: {
+      fontSize: '24px',
+      fontWeight: 600,
+      marginBottom: '5px',
+      color: '#333',
+    },
+    contact: {
+      fontSize: '13px',
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '10px',
+      marginTop: '8px',
+      color: '#666',
+    },
+    section: {
+      marginBottom: '20px',
+    },
+    sectionTitle: {
+      fontSize: '15px',
+      fontWeight: 600,
+      textTransform: 'uppercase',
+      letterSpacing: '1px',
+      color: '#333',
+      marginBottom: '12px',
+      paddingBottom: '5px',
+      borderBottom: '1px solid #eee',
+    },
+    sectionContent: {
+      marginTop: '14px',
+    },
+    item: {
+      marginBottom: '18px',
+    },
+    itemTitle: {
+      fontSize: '16px',
+      fontWeight: 600,
+      color: '#333',
+      marginBottom: '3px',
+    },
+    itemSubtitle: {
+      fontSize: '14px',
+      fontWeight: 500,
+      color: '#666',
+    },
+    itemDate: {
+      fontSize: '13px',
+      color: '#777',
+      marginBottom: '6px',
+    },
+    itemDescription: {
+      fontSize: '14px',
+      whiteSpace: 'pre-line',
+      lineHeight: '1.6',
+      color: '#555',
+    },
+    skillsList: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '8px',
+      marginTop: '10px',
+    },
+    skill: {
+      padding: '4px 10px',
+      fontSize: '12px',
+      backgroundColor: '#f5f5f5',
+      color: '#555',
+      borderRadius: '3px',
+    }
+  },
+
+  executive: {
+    container: {
+      fontFamily: "'Times New Roman', serif",
+      color: '#222',
+      lineHeight: '1.5',
+      maxWidth: '100%',
+      height: '100%',
+      padding: '30px',
+      backgroundColor: '#fff',
+      boxSizing: 'border-box',
+      borderTop: '4px solid #00008B',
+    },
+    header: {
+      marginBottom: '30px',
+      borderBottom: '2px solid #00008B',
+      paddingBottom: '20px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '25px',
+    },
+    profilePhoto: {
+      width: '130px',
+      height: '130px',
+      borderRadius: '0',
+      objectFit: 'cover',
+      border: '2px solid #00008B',
+    },
+    name: {
+      fontSize: '32px',
+      fontWeight: 700,
+      marginBottom: '8px',
+      color: '#00008B',
+    },
+    contact: {
+      fontSize: '14px',
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '15px',
+      marginTop: '10px',
+      color: '#444',
+    },
+    section: {
+      marginBottom: '28px',
+    },
+    sectionTitle: {
+      fontSize: '20px',
+      fontWeight: 700,
+      color: '#00008B',
+      marginBottom: '15px',
+      borderBottom: '1px solid #ccc',
+      paddingBottom: '8px',
+    },
+    sectionContent: {
+      marginTop: '16px',
+    },
+    item: {
+      marginBottom: '22px',
+    },
+    itemTitle: {
+      fontSize: '18px',
+      fontWeight: 700,
+      color: '#222',
+      marginBottom: '4px',
+    },
+    itemSubtitle: {
+      fontSize: '16px',
+      fontWeight: 600,
+      color: '#444',
+    },
+    itemDate: {
+      fontSize: '14px',
+      color: '#555',
+      fontStyle: 'italic',
+      marginBottom: '8px',
+    },
+    itemDescription: {
+      fontSize: '15px',
+      whiteSpace: 'pre-line',
+      lineHeight: '1.7',
+      color: '#333',
+    },
+    skillsList: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '12px',
+      marginTop: '12px',
+    },
+    skill: {
+      padding: '5px 12px',
+      fontSize: '14px',
+      backgroundColor: '#00008B',
+      color: '#fff',
+      borderRadius: '0',
+    }
+  },
+
+  elegant: {
+    container: {
+      fontFamily: "'Cormorant Garamond', serif",
+      color: '#333',
+      lineHeight: '1.6',
+      maxWidth: '100%',
+      height: '100%',
+      padding: '35px',
+      backgroundColor: '#fff',
+      boxSizing: 'border-box',
+    },
+    header: {
+      marginBottom: '30px',
+      borderBottom: '1px solid #ccc',
+      paddingBottom: '25px',
+      textAlign: 'center',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+    profilePhoto: {
+      width: '120px',
+      height: '120px',
+      borderRadius: '50%',
+      objectFit: 'cover',
+      border: '3px solid #f3f3f3',
+      marginBottom: '15px',
+    },
+    name: {
+      fontSize: '34px',
+      fontWeight: 600,
+      marginBottom: '8px',
+      color: '#333',
+      letterSpacing: '1px',
+    },
+    contact: {
+      fontSize: '15px',
+      display: 'flex',
+      justifyContent: 'center',
+      flexWrap: 'wrap',
+      gap: '15px',
+      marginTop: '12px',
+      color: '#555',
+    },
+    section: {
+      marginBottom: '28px',
+    },
+    sectionTitle: {
+      fontSize: '20px',
+      fontWeight: 600,
+      textAlign: 'center',
+      color: '#333',
+      marginBottom: '18px',
+      position: 'relative',
+      paddingBottom: '10px',
+    },
+    sectionContent: {
+      marginTop: '18px',
+    },
+    item: {
+      marginBottom: '22px',
+    },
+    itemTitle: {
+      fontSize: '18px',
+      fontWeight: 600,
+      color: '#333',
+      marginBottom: '4px',
+    },
+    itemSubtitle: {
+      fontSize: '16px',
+      fontWeight: 500,
+      color: '#555',
+      fontStyle: 'italic',
+    },
+    itemDate: {
+      fontSize: '15px',
+      color: '#666',
+      marginBottom: '8px',
+    },
+    itemDescription: {
+      fontSize: '16px',
+      whiteSpace: 'pre-line',
+      lineHeight: '1.7',
+      color: '#444',
+    },
+    skillsList: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '12px',
+      justifyContent: 'center',
+      marginTop: '15px',
+    },
+    skill: {
+      padding: '5px 15px',
+      fontSize: '14px',
+      border: '1px solid #ccc',
+      borderRadius: '20px',
+      color: '#555',
+    }
+  },
 };
 
 const ResumeTemplate = ({ 
@@ -584,9 +931,16 @@ const ResumeTemplate = ({
   const baseStyles = templateStyles[templateName] || templateStyles.modern;
   const styles = applyCustomization(baseStyles, resumeData.customization);
 
-  return (
-    <div style={styles.container}>
-      <div style={styles.header}>
+  const headerContent = (
+    <>
+      {resumeData.personal.profileImage && styles.profilePhoto && (
+        <img 
+          src={resumeData.personal.profileImage} 
+          alt={`${resumeData.personal.name || 'Profile'}`}
+          style={styles.profilePhoto}
+        />
+      )}
+      <div>
         <div style={styles.name}>{resumeData.personal.name || 'Your Name'}</div>
         <div style={styles.contact}>
           {resumeData.personal.email && (
@@ -605,6 +959,14 @@ const ResumeTemplate = ({
             <span>{resumeData.personal.linkedin}</span>
           )}
         </div>
+      </div>
+    </>
+  );
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.header}>
+        {headerContent}
       </div>
       
       {resumeData.personal.summary && (

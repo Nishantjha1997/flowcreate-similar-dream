@@ -11,6 +11,7 @@ export interface ResumeData {
     summary: string;
     website?: string;
     linkedin?: string;
+    profileImage?: string; // Add profile image field
   };
   experience: {
     id: number;
@@ -73,6 +74,7 @@ export const adaptResumeData = (data: ResumeData): TypesResumeData => {
       location: data.personal?.address || '', // Map address to location
       linkedin: data.personal?.linkedin || '',
       summary: data.personal?.summary || '',
+      profileImage: data.personal?.profileImage || '', // Add profile image
     },
     skills: data.skills || [],
     education: data.education?.map(edu => ({
@@ -108,7 +110,7 @@ export const adaptResumeData = (data: ResumeData): TypesResumeData => {
       lineHeight: data.customization?.lineHeight,
       showPhoto: data.customization?.showPhoto,
       layoutType: data.customization?.layoutType,
-      profileImage: data.customization?.profileImage,
+      profileImage: data.personal?.profileImage, // Use profile image from personal data
       sectionTitles: data.customization?.sectionTitles
     },
     selectedTemplate: data.selectedTemplate
@@ -125,7 +127,8 @@ export const reverseAdaptResumeData = (data: TypesResumeData): Partial<ResumeDat
       address: data.personal?.location || '', // Map location to address
       summary: data.personal?.summary || '',
       website: data.personal?.website || '',
-      linkedin: data.personal?.linkedin || ''
+      linkedin: data.personal?.linkedin || '',
+      profileImage: data.personal?.profileImage || '' // Add profile image
     },
     skills: data.skills || [],
     experience: data.experience?.map((exp, index) => ({
@@ -166,7 +169,7 @@ export const reverseAdaptResumeData = (data: TypesResumeData): Partial<ResumeDat
       headingStyle: data.customization?.headingStyle,
       sectionMargins: data.customization?.sectionMargins,
       lineHeight: data.customization?.lineHeight,
-      showPhoto: data.customization?.showPhoto,
+      showPhoto: data.customization?.showPhoto || true, // Default to showing photo if available
       layoutType: data.customization?.layoutType,
       profileImage: data.customization?.profileImage,
       sectionTitles: data.customization?.sectionTitles

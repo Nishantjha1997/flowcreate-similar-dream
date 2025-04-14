@@ -1,19 +1,85 @@
-
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ResumeData } from '@/utils/resumeAdapterUtils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Upload, X } from 'lucide-react';
 
 interface PersonalInfoSectionProps {
   personal: ResumeData['personal'];
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onProfileImageChange?: (profileImage: string) => void;
 }
 
-export const PersonalInfoSection = ({ personal, onChange }: PersonalInfoSectionProps) => {
+export const PersonalInfoSection = ({ personal, onChange, onProfileImageChange }: PersonalInfoSectionProps) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        if (e.target?.result && onProfileImageChange) {
+          onProfileImageChange(e.target.result as string);
+        }
+      };
+      
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  const removeProfileImage = () => {
+    if (onProfileImageChange) {
+      onProfileImageChange('');
+    }
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Personal Information</h2>
+      
+      <div className="flex flex-col items-center gap-4 mb-6">
+        <Avatar className="w-24 h-24 border-2">
+          {personal.profileImage ? (
+            <AvatarImage src={personal.profileImage} alt="Profile" />
+          ) : (
+            <AvatarFallback className="text-lg">
+              {personal.name ? personal.name.charAt(0).toUpperCase() : 'U'}
+            </AvatarFallback>
+          )}
+        </Avatar>
+        
+        <div className="flex gap-2">
+          <Label htmlFor="profile-image" className="cursor-pointer">
+            <div className="flex items-center gap-1 text-sm bg-primary text-primary-foreground px-3 py-1.5 rounded-md hover:bg-primary/90">
+              <Upload size={14} />
+              <span>Upload Photo</span>
+            </div>
+            <Input 
+              id="profile-image" 
+              type="file" 
+              accept="image/*" 
+              className="hidden" 
+              onChange={handleImageUpload} 
+            />
+          </Label>
+          
+          {personal.profileImage && (
+            <Button 
+              variant="destructive" 
+              size="sm" 
+              onClick={removeProfileImage}
+              className="text-xs flex items-center gap-1"
+            >
+              <X size={14} />
+              <span>Remove</span>
+            </Button>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground">Upload a professional photo for your resume</p>
+      </div>
+      
       <div className="grid grid-cols-1 gap-4">
         <div>
           <Label htmlFor="name" className="block text-sm font-medium mb-1">

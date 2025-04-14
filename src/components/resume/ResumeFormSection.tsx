@@ -44,58 +44,73 @@ export const ResumeFormSection = ({
   removeProject,
   handleCustomizationChange
 }: ResumeFormSectionProps) => {
+  
+  const handleProfileImageChange = (profileImage: string) => {
+    const event = {
+      target: {
+        name: 'profileImage',
+        value: profileImage
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    
+    handlePersonalInfoChange(event);
+  };
+  
   return (
-    <Card>
-      <CardContent className="p-6">
-        {activeSection === 'personal' && (
-          <PersonalInfoSection 
-            personal={resume.personal}
-            onChange={handlePersonalInfoChange}
-          />
-        )}
-
-        {activeSection === 'experience' && (
-          <ExperienceSection 
-            experience={resume.experience}
-            onExperienceChange={handleExperienceChange}
-            onCurrentJobToggle={handleCurrentJobToggle}
-            addExperience={addExperience}
-            removeExperience={removeExperience}
-          />
-        )}
-
-        {activeSection === 'education' && (
-          <EducationSection
-            education={resume.education}
-            onEducationChange={handleEducationChange}
-            addEducation={addEducation}
-            removeEducation={removeEducation}
-          />
-        )}
-
-        {activeSection === 'skills' && (
-          <SkillsSection 
-            skills={resume.skills}
-            onSkillsChange={handleSkillsChange}
-          />
-        )}
-
-        {activeSection === 'projects' && (
-          <ProjectsSection 
-            projects={resume.projects}
-            onProjectChange={handleProjectChange}
-            addProject={addProject}
-            removeProject={removeProject}
-          />
-        )}
-
-        {activeSection === 'customize' && (
-          <CustomizationPanel 
-            customization={resume.customization} 
-            onCustomizationChange={handleCustomizationChange}
-            resumeData={resume}
-          />
-        )}
+    <Card className="h-full overflow-hidden flex flex-col">
+      <CardContent className="flex-1 p-0 overflow-auto">
+        <div className="p-5">
+          {activeSection === 'personal' && (
+            <PersonalInfoSection 
+              personal={resume.personal} 
+              onChange={handlePersonalInfoChange}
+              onProfileImageChange={handleProfileImageChange}
+            />
+          )}
+          
+          {activeSection === 'experience' && (
+            <ExperienceSection 
+              experience={resume.experience}
+              onChange={handleExperienceChange}
+              onToggleCurrent={handleCurrentJobToggle}
+              onAdd={addExperience}
+              onRemove={removeExperience}
+            />
+          )}
+          
+          {activeSection === 'education' && (
+            <EducationSection 
+              education={resume.education}
+              onChange={handleEducationChange}
+              onAdd={addEducation}
+              onRemove={removeEducation}
+            />
+          )}
+          
+          {activeSection === 'skills' && (
+            <SkillsSection 
+              skills={resume.skills}
+              onChange={handleSkillsChange}
+            />
+          )}
+          
+          {activeSection === 'projects' && (
+            <ProjectsSection
+              projects={resume.projects || []}
+              onChange={handleProjectChange}
+              onAdd={addProject}
+              onRemove={removeProject}
+            />
+          )}
+          
+          {activeSection === 'customize' && (
+            <CustomizationPanel
+              customization={resume.customization}
+              onCustomizationChange={handleCustomizationChange}
+              resumeData={resume}
+            />
+          )}
+        </div>
       </CardContent>
     </Card>
   );

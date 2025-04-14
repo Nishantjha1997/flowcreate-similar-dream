@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner'; 
@@ -27,6 +26,8 @@ const ResumeBuilder = () => {
       phone: '',
       address: '',
       summary: '',
+      website: '',
+      linkedin: '',
     },
     experience: [
       {

@@ -11,6 +11,7 @@ export interface ResumeData {
     location?: string; // This maps to address in the adapter
     summary?: string;
     linkedin?: string; // Added to match the adapter type
+    profileImage?: string; // Add profile image field
   };
   skills?: string[];
   education?: {

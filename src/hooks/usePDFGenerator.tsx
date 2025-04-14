@@ -13,6 +13,7 @@ export const usePDFGenerator = (fileName: string = 'document') => {
     }
 
     setIsGenerating(true);
+    toast.info("Generating PDF...", { duration: 3000 });
     
     // Ultra high quality PDF options
     const options = {
@@ -43,6 +44,13 @@ export const usePDFGenerator = (fileName: string = 'document') => {
     const resumeContent = element.querySelector('.resume-content') || 
                           element.querySelector('.resume-container') || 
                           element;
+    
+    // Make sure we're getting the actual content
+    if (!resumeContent) {
+      toast.error("Could not find resume content to download.");
+      setIsGenerating(false);
+      return;
+    }
     
     container.innerHTML = resumeContent.innerHTML;
     container.style.width = '8.5in';
