@@ -6,10 +6,10 @@ interface TemplateSelectorProps {
   onTemplateChange: (templateId: string) => void;
 }
 
-// Template data synced with the Templates page
+// Updated templates synced with the Templates page
 const templates = [
   {
-    id: 1,
+    id: "1",
     name: "Modern",
     image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
     category: "Professional",
@@ -17,7 +17,7 @@ const templates = [
     featured: true
   },
   {
-    id: 2,
+    id: "2",
     name: "Classic",
     image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
     category: "Traditional",
@@ -25,7 +25,7 @@ const templates = [
     featured: false
   },
   {
-    id: 3,
+    id: "3",
     name: "Creative",
     image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6", 
     category: "Design",
@@ -33,7 +33,7 @@ const templates = [
     featured: true
   },
   {
-    id: 4,
+    id: "4",
     name: "Technical",
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
     category: "Simple",
@@ -41,7 +41,7 @@ const templates = [
     featured: false
   },
   {
-    id: 5,
+    id: "5",
     name: "Professional",
     image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
     category: "Professional",
@@ -49,7 +49,7 @@ const templates = [
     featured: false
   },
   {
-    id: 6,
+    id: "6",
     name: "Minimalist",
     image: "https://images.unsplash.com/photo-1586281380117-5a60ae2050cc",
     category: "Simple",
@@ -57,7 +57,7 @@ const templates = [
     featured: false
   },
   {
-    id: 7,
+    id: "7",
     name: "Executive",
     image: "https://images.unsplash.com/photo-1586281380117-5a60ae2050cc",
     category: "Executive",
@@ -65,13 +65,45 @@ const templates = [
     featured: true
   },
   {
-    id: 8,
+    id: "8",
     name: "Elegant",
     image: "https://images.unsplash.com/photo-1434494878577-86c23bcb06b9",
     category: "Design",
     templateKey: "elegant",
     featured: false
   },
+  {
+    id: "9",
+    name: "Academic",
+    image: "https://images.unsplash.com/photo-1568667256549-094345857637",
+    category: "Education",
+    templateKey: "academic",
+    featured: false
+  },
+  {
+    id: "10",
+    name: "Developer",
+    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
+    category: "Technical",
+    templateKey: "developer",
+    featured: true
+  },
+  {
+    id: "11",
+    name: "Startup",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
+    category: "Creative",
+    templateKey: "startup",
+    featured: false
+  },
+  {
+    id: "12",
+    name: "Corporate",
+    image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf",
+    category: "Professional",
+    templateKey: "corporate",
+    featured: true
+  }
 ];
 
 export const TemplateSelector = ({ currentTemplateId, onTemplateChange }: TemplateSelectorProps) => {
@@ -83,9 +115,9 @@ export const TemplateSelector = ({ currentTemplateId, onTemplateChange }: Templa
           <div 
             key={template.id}
             className={`cursor-pointer border rounded-md overflow-hidden transition-all hover:shadow-md ${
-              currentTemplateId === template.id.toString() ? 'ring-2 ring-primary' : ''
+              currentTemplateId === template.id ? 'ring-2 ring-primary' : ''
             }`}
-            onClick={() => onTemplateChange(template.id.toString())}
+            onClick={() => onTemplateChange(template.id)}
           >
             <div className="relative">
               <img 
@@ -93,7 +125,7 @@ export const TemplateSelector = ({ currentTemplateId, onTemplateChange }: Templa
                 alt={`Template ${template.name}`} 
                 className="w-full aspect-[3/4] object-cover"
               />
-              {currentTemplateId === template.id.toString() && (
+              {currentTemplateId === template.id && (
                 <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
                   <span className="px-2 py-1 bg-primary text-primary-foreground text-xs rounded-sm">Current</span>
                 </div>
