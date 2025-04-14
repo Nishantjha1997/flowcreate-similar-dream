@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -306,22 +305,12 @@ const ResumeBuilder = () => {
   };
 
   const handleDownload = () => {
-    const resumeElement = document.querySelector('.resume-container');
-    if (resumeElement) {
-      const tempDiv = document.createElement('div');
-      tempDiv.style.width = '8.5in';
-      tempDiv.style.padding = '0.5in';
-      tempDiv.style.backgroundColor = 'white';
-      tempDiv.innerHTML = resumeElement.innerHTML;
-      document.body.appendChild(tempDiv);
-      
-      generatePDF(tempDiv);
-      
-      setTimeout(() => {
-        if (tempDiv.parentNode) {
-          document.body.removeChild(tempDiv);
-        }
-      }, 500);
+    const resumeContainer = document.getElementById('resume-preview-container');
+    
+    if (resumeContainer) {
+      generatePDF(resumeContainer);
+    } else {
+      toast.error("Could not find resume content to download.");
     }
   };
 

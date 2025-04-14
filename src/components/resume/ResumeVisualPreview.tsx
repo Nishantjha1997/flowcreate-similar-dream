@@ -21,8 +21,8 @@ export const ResumeVisualPreview = ({ resume, templateId, templateNames }: Resum
     <div className="h-full w-full relative">
       {hasContent ? (
         <div className="absolute inset-0 overflow-auto p-4">
-          <div style={{ transform: "scale(0.65)", transformOrigin: "top left" }}>
-            <div ref={resumeRef}>
+          <div style={{ transform: "scale(0.7)", transformOrigin: "top left" }}>
+            <div ref={resumeRef} className="bg-white shadow-sm">
               <ResumeTemplate 
                 data={resume} 
                 templateName={templateNames[templateId] || 'modern'} 

@@ -14,37 +14,55 @@ export const usePDFGenerator = (fileName: string = 'document') => {
 
     setIsGenerating(true);
     
-    // Enhanced PDF options for higher quality
+    // Max quality PDF options
     const options = {
       margin: [10, 10, 10, 10],
       filename: fileName,
-      image: { type: 'jpeg', quality: 0.99 },
+      image: { type: 'jpeg', quality: 1.0 },
       html2canvas: { 
-        scale: 3, // Increase scale for higher resolution
+        scale: 4, // Higher scale for maximum resolution
         useCORS: true,
         logging: false,
         letterRendering: true,
+        dpi: 300, // Higher DPI for print quality
+        removeContainer: false
       },
       jsPDF: { 
         unit: 'mm', 
         format: 'a4', 
         orientation: 'portrait',
-        compress: false // Better quality with no compression
+        compress: false, // Better quality with no compression
+        precision: 16 // Higher precision for better text rendering
       }
     };
 
-    // Clone the element to avoid manipulating the visible DOM
-    const clonedElement = element.cloneNode(true) as HTMLElement;
+    // Extract the actual resume content to avoid scaling issues
+    const resumeContent = element.querySelector('.resume-container') || element;
     
-    // Create a temporary container with proper styling
+    // Create a proper clone with full styling for PDF generation
     const container = document.createElement('div');
-    container.appendChild(clonedElement);
+    container.innerHTML = resumeContent.innerHTML;
     container.style.width = '8.5in';
-    container.style.padding = '0.5in';
+    container.style.height = 'auto';
+    container.style.padding = '0';
     container.style.backgroundColor = 'white';
     container.style.position = 'absolute';
     container.style.left = '-9999px';
     container.style.top = '-9999px';
+    
+    // Apply styling to ensure proper rendering
+    const resumeElement = container.firstElementChild as HTMLElement;
+    if (resumeElement) {
+      resumeElement.style.transform = 'none'; // Remove any scaling
+      resumeElement.style.width = '100%';
+      resumeElement.style.height = 'auto';
+      resumeElement.style.margin = '0';
+      resumeElement.style.padding = '0.5in';
+      resumeElement.style.boxSizing = 'border-box';
+      resumeElement.style.backgroundColor = 'white';
+      resumeElement.style.overflow = 'visible';
+    }
+    
     document.body.appendChild(container);
 
     setTimeout(() => {
