@@ -1,4 +1,3 @@
-
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
@@ -42,12 +41,25 @@ export const ResumePreview = ({ resumeData, previewComponent }: ResumePreviewPro
     const element = resumeRef.current;
     const filename = `${resumeData.personal?.name || 'resume'}.pdf`;
     
+    // Ultra high quality PDF options
     const options = {
       margin: [10, 10, 10, 10],
       filename: filename,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      image: { type: 'jpeg', quality: 1.0 },
+      html2canvas: { 
+        scale: 5, 
+        useCORS: true,
+        logging: false,
+        letterRendering: true,
+        dpi: 600
+      },
+      jsPDF: { 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait',
+        compress: false, 
+        precision: 32
+      }
     };
 
     // Use setTimeout to allow the toast to show before the potentially heavy PDF operation
@@ -65,7 +77,7 @@ export const ResumePreview = ({ resumeData, previewComponent }: ResumePreviewPro
           setIsGenerating(false);
           toast.error("Error generating PDF. Please try again.");
         });
-    }, 100);
+    }, 300);
   };
 
   /**
@@ -165,7 +177,7 @@ export const ResumePreview = ({ resumeData, previewComponent }: ResumePreviewPro
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
         <div className="p-2">
-          <div ref={resumeRef} className="bg-white rounded-md shadow-md p-6 mb-4">
+          <div ref={resumeRef} className="bg-white rounded-md shadow-md p-6 mb-4 resume-content">
             {previewComponent}
           </div>
           

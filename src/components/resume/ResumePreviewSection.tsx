@@ -28,7 +28,7 @@ export const ResumePreviewSection = ({
         />
       </div>
       <CardContent className="flex-1 p-0 relative overflow-auto">
-        <div className="resume-container" id="resume-preview-container" ref={resumeRef}>
+        <div className="resume-container h-full" id="resume-preview-container" ref={resumeRef}>
           <ResumeVisualPreview 
             resume={resume}
             templateId={templateId}

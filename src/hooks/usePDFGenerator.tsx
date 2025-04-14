@@ -14,17 +14,17 @@ export const usePDFGenerator = (fileName: string = 'document') => {
 
     setIsGenerating(true);
     
-    // Max quality PDF options
+    // Ultra high quality PDF options
     const options = {
       margin: [10, 10, 10, 10],
       filename: fileName,
       image: { type: 'jpeg', quality: 1.0 },
       html2canvas: { 
-        scale: 4, // Higher scale for maximum resolution
+        scale: 5, // Higher scale for maximum resolution
         useCORS: true,
         logging: false,
         letterRendering: true,
-        dpi: 300, // Higher DPI for print quality
+        dpi: 600, // Higher DPI for print quality
         removeContainer: false
       },
       jsPDF: { 
@@ -32,15 +32,18 @@ export const usePDFGenerator = (fileName: string = 'document') => {
         format: 'a4', 
         orientation: 'portrait',
         compress: false, // Better quality with no compression
-        precision: 16 // Higher precision for better text rendering
+        precision: 32 // Higher precision for better text rendering
       }
     };
 
-    // Extract the actual resume content to avoid scaling issues
-    const resumeContent = element.querySelector('.resume-container') || element;
-    
-    // Create a proper clone with full styling for PDF generation
+    // Create a clone of the resume content for PDF generation
     const container = document.createElement('div');
+    
+    // Find the proper resume content
+    const resumeContent = element.querySelector('.resume-content') || 
+                          element.querySelector('.resume-container') || 
+                          element;
+    
     container.innerHTML = resumeContent.innerHTML;
     container.style.width = '8.5in';
     container.style.height = 'auto';
@@ -65,6 +68,7 @@ export const usePDFGenerator = (fileName: string = 'document') => {
     
     document.body.appendChild(container);
 
+    // Add a slight delay to ensure container is rendered
     setTimeout(() => {
       html2pdf()
         .from(container)
@@ -87,7 +91,7 @@ export const usePDFGenerator = (fileName: string = 'document') => {
             document.body.removeChild(container);
           }
         });
-    }, 100);
+    }, 300);
   };
 
   return { isGenerating, generatePDF };
