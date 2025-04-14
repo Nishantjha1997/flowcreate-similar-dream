@@ -1,16 +1,13 @@
-
 import { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input'; 
 import { ColorPicker } from './ColorPicker';
 import { ResumeData } from '@/utils/resumeAdapterUtils';
-import { EditableHeading } from './EditableHeading';
 import { AvatarUploader } from './AvatarUploader';
+import { SectionDragDropCustomizer } from '@/components/resume/SectionDragDropCustomizer';
 import { 
   Select,
   SelectContent,
@@ -19,27 +16,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  User,
-  Briefcase,
-  GraduationCap,
-  Award,
-  Settings,
-  BookOpen,
-  Phone,
-  Mail,
-  Globe,
-  MapPin,
-  Plus,
   Palette,
   Type,
-  Smartphone,
-  MoveVertical,
-  LayoutGrid,
   MoveHorizontal,
-  Languages,
-  Lightbulb,
-  Medal,
-  HandHeart,
+  LayoutGrid,
   ArrowDownUp,
 } from 'lucide-react';
 
@@ -95,9 +75,12 @@ export const CustomizationPanel = ({
   onSectionTitleChange
 }: CustomizationPanelProps) => {
   const [activeTab, setActiveTab] = useState('colors');
-  const [sectionsOrder, setSectionsOrder] = useState<string[]>([
-    'personal', 'experience', 'education', 'skills', 'projects'
-  ]);
+  const [sectionsOrder, setSectionsOrder] = useState<string[]>(
+    customization.sectionsOrder || ['personal', 'experience', 'education', 'skills', 'projects']
+  );
+  const [hiddenSections, setHiddenSections] = useState<string[]>(
+    customization.hiddenSections || []
+  );
   
   const handleColorChange = (colorType: 'primaryColor' | 'secondaryColor' | 'accentColor' | 'textColor' | 'backgroundColor', color: string) => {
     onCustomizationChange({
@@ -167,7 +150,32 @@ export const CustomizationPanel = ({
     }
   };
 
+  const handleSectionsChange = (activeSections: string[], hiddenSections: string[]) => {
+    setSectionsOrder(activeSections);
+    setHiddenSections(hiddenSections);
+    
+    onCustomizationChange({
+      ...customization,
+      sectionsOrder: activeSections,
+      hiddenSections: hiddenSections
+    });
+    
+    if (onSectionOrderChange) {
+      onSectionOrderChange(activeSections);
+    }
+  };
+
   const handleSectionTitleChange = (sectionId: string, newTitle: string) => {
+    const updatedTitles = {
+      ...(customization.sectionTitles || {}),
+      [sectionId]: newTitle
+    };
+    
+    onCustomizationChange({
+      ...customization,
+      sectionTitles: updatedTitles
+    });
+    
     if (onSectionTitleChange) {
       onSectionTitleChange(sectionId, newTitle);
     }
@@ -619,44 +627,13 @@ export const CustomizationPanel = ({
                 </p>
                 
                 <div className="space-y-2">
-                  {sectionsOrder.map((sectionId, index) => (
-                    <EditableHeading
-                      key={sectionId}
-                      id={sectionId}
-                      title={customization.sectionTitles?.[sectionId] || sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}
-                      onTitleChange={handleSectionTitleChange}
-                      icon={sectionIcons[sectionId as keyof typeof sectionIcons] || null}
-                      onMoveUp={index > 0 ? () => handleSectionMove(sectionId, 'up') : undefined}
-                      onMoveDown={index < sectionsOrder.length - 1 ? () => handleSectionMove(sectionId, 'down') : undefined}
-                    />
-                  ))}
-                </div>
-                
-                <div className="border-t pt-4 mt-4">
-                  <Label className="block mb-2">Add Sections</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {['languages', 'interests', 'certifications', 'volunteer'].map(section => (
-                      <Button
-                        key={section}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          if (!sectionsOrder.includes(section)) {
-                            const newOrder = [...sectionsOrder, section];
-                            setSectionsOrder(newOrder);
-                            if (onSectionOrderChange) {
-                              onSectionOrderChange(newOrder);
-                            }
-                          }
-                        }}
-                        disabled={sectionsOrder.includes(section)}
-                        className="justify-start"
-                      >
-                        {sectionIcons[section as keyof typeof sectionIcons]}
-                        <span className="ml-2">{section.charAt(0).toUpperCase() + section.slice(1)}</span>
-                      </Button>
-                    ))}
-                  </div>
+                  <SectionDragDropCustomizer 
+                    activeSections={sectionsOrder}
+                    hiddenSections={hiddenSections}
+                    sectionTitles={customization.sectionTitles || {}}
+                    onSectionsChange={handleSectionsChange}
+                    onSectionTitleChange={handleSectionTitleChange}
+                  />
                 </div>
               </div>
             </CardContent>

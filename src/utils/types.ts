@@ -1,68 +1,79 @@
-
-// Define the ResumeData interface to include all necessary properties for the resume builder
-
 export interface ResumeData {
-  personal?: {
-    name?: string;
-    title?: string;
-    email?: string;
-    phone?: string;
-    website?: string;
-    location?: string; // This maps to address in the adapter
-    summary?: string;
-    linkedin?: string; // Added to match the adapter type
-    profileImage?: string; // Add profile image field
-  };
-  skills?: string[];
-  education?: {
-    institution: string;
-    degree: string;
-    date: string;
-    description?: string;
-  }[];
-  experience?: {
-    company: string;
-    position: string;
-    date: string;
-    description?: string;
-    highlights?: string[];
-  }[];
-  projects?: {
+  personal: {
     name: string;
+    email: string;
+    phone: string;
+    address: string;
+    summary: string;
+    website?: string;
+    linkedin?: string;
+    profileImage?: string;
+  };
+  experience: {
+    id: number;
+    title: string;
+    company: string;
+    location: string;
+    startDate: string;
+    endDate: string;
+    current: boolean;
+    description: string;
+  }[];
+  education: {
+    id: number;
+    school: string;
+    degree: string;
+    field: string;
+    startDate: string;
+    endDate: string;
+    description: string;
+  }[];
+  skills: string[];
+  projects?: {
+    id: number;
+    title: string;
     description: string;
     link?: string;
     technologies?: string[];
   }[];
+  languages?: {
+    language: string;
+    proficiency: string;
+  }[];
+  interests?: string[];
+  certifications?: {
+    name: string;
+    issuer: string;
+    date: string;
+    url?: string;
+  }[];
+  volunteer?: {
+    organization: string;
+    role: string;
+    startDate: string;
+    endDate: string;
+    description: string;
+  }[];
   customization: {
-    primaryColor: string; // Making this required to match adapter type
+    primaryColor: string;
     secondaryColor?: string;
     accentColor?: string;
     textColor?: string;
     backgroundColor?: string;
-    fontSize?: string;
     fontFamily?: string;
-    spacing?: string;
-    headingStyle?: string;
-    sectionMargins?: string;
-    lineHeight?: string;
-    showPhoto?: boolean;
-    layoutType?: "creative" | "compact" | "standard" | "minimal";
-    profileImage?: any; // Using any for now, but ideally this should be properly typed
-    sectionTitles?: {
-      skills?: string;
-      education?: string;
-      experience?: string;
-      projects?: string;
-      [key: string]: string | undefined;
+    fontSize?: 'small' | 'medium' | 'large';
+    spacing?: 'compact' | 'normal' | 'spacious';
+    sectionMargins?: 'small' | 'medium' | 'large';
+    lineHeight?: 'tight' | 'normal' | 'relaxed';
+    layoutType?: 'standard' | 'compact' | 'minimal' | 'creative';
+    headingStyle?: 'bold' | 'underlined' | 'capitalized' | 'minimal';
+    profileImage?: {
+      src: string | null;
+      size: number;
+      shape: 'circle' | 'square' | 'rounded';
     };
+    sectionTitles?: Record<string, string>;
+    sectionsOrder?: string[];
+    hiddenSections?: string[];
   };
-  selectedTemplate?: string;
-}
-
-export interface CustomizationPanelProps {
-  customization: ResumeData["customization"];
-  onCustomizationChange: (customization: ResumeData["customization"]) => void;
-  resumeData: ResumeData;
-  onSectionOrderChange?: (newOrder: string[]) => void;
-  onSectionTitleChange?: (sectionId: string, newTitle: string) => void;
 }

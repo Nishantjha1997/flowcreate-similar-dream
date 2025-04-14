@@ -6,7 +6,6 @@ import { ResumeHeaderSection } from '@/components/resume/ResumeHeaderSection';
 import { ResumeNavigation } from '@/components/resume/ResumeNavigation';
 import { ResumeFormSection } from '@/components/resume/ResumeFormSection';
 import { ResumePreviewSection } from '@/components/resume/ResumePreviewSection';
-import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 
 import { ResumeData } from '@/utils/resumeAdapterUtils';
 import { emptyEducation, emptyExperience, emptyProject, exampleResumes, templateNames } from '@/components/resume/ResumeData';
@@ -303,6 +302,11 @@ const ResumeBuilder = () => {
     }));
   };
 
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast.success("Link copied to clipboard!");
+  };
+
   const handleSectionChange = (section: string) => {
     setActiveSection(section);
   };
@@ -323,8 +327,9 @@ const ResumeBuilder = () => {
       <main className="py-8">
         <div className="container mx-auto px-4">
           <ResumeHeaderSection 
-            handleDownload={handleDownload} 
-            isGenerating={isGenerating} 
+            resumeElementRef={resumeElementRef}
+            resumeName={resumeName}
+            handleShare={handleShare}
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -362,6 +367,7 @@ const ResumeBuilder = () => {
                 resume={resume}
                 templateId={templateId}
                 templateNames={templateNames}
+                resumeRef={resumeElementRef}
               />
             </div>
           </div>

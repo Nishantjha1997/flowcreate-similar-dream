@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ResumeVisualPreview, EnhancedResumePreview } from '@/components/resume/ResumeVisualPreview';
 import { ResumeData } from '@/utils/resumeAdapterUtils';
@@ -8,14 +8,15 @@ interface ResumePreviewSectionProps {
   resume: ResumeData;
   templateId: string;
   templateNames: Record<string, string>;
+  resumeRef: React.RefObject<HTMLDivElement>;
 }
 
 export const ResumePreviewSection = ({ 
   resume, 
   templateId, 
-  templateNames 
+  templateNames,
+  resumeRef
 }: ResumePreviewSectionProps) => {
-  const resumeRef = useRef<HTMLDivElement>(null);
   
   return (
     <Card className="h-full flex flex-col">

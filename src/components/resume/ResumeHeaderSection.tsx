@@ -1,18 +1,31 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 
 interface ResumeHeaderSectionProps {
-  handleDownload: () => void;
-  isGenerating: boolean;
+  resumeElementRef: React.RefObject<HTMLDivElement>;
+  resumeName: string;
+  handleShare: () => void;
 }
 
-export const ResumeHeaderSection = ({ handleDownload, isGenerating }: ResumeHeaderSectionProps) => {
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast.success("Link copied to clipboard!");
+export const ResumeHeaderSection = ({ 
+  resumeElementRef,
+  resumeName,
+  handleShare 
+}: ResumeHeaderSectionProps) => {
+  const { isGenerating, generatePDF } = usePDFGenerator(`${resumeName}.pdf`);
+
+  const handleDownload = () => {
+    if (!resumeElementRef.current) {
+      toast.error("Could not find resume content to download.");
+      return;
+    }
+    
+    // Use the same generator function as the preview
+    generatePDF(resumeElementRef.current);
   };
 
   return (
