@@ -5,10 +5,10 @@ import { Textarea } from '@/components/ui/textarea';
 
 interface SkillsSectionProps {
   skills: string[];
-  onSkillsChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-export const SkillsSection = ({ skills, onSkillsChange }: SkillsSectionProps) => {
+export const SkillsSection = ({ skills, onChange }: SkillsSectionProps) => {
   const getSkillsString = () => {
     return skills.join(', ');
   };
@@ -25,7 +25,7 @@ export const SkillsSection = ({ skills, onSkillsChange }: SkillsSectionProps) =>
         <Textarea
           id="skills"
           value={getSkillsString()}
-          onChange={onSkillsChange}
+          onChange={onChange}
           rows={4}
           placeholder="JavaScript, React, Project Management, Leadership"
         />

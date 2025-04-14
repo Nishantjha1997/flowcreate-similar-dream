@@ -10,18 +10,18 @@ import { ResumeData } from '@/utils/resumeAdapterUtils';
 
 interface ExperienceSectionProps {
   experience: ResumeData['experience'];
-  onExperienceChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => void;
-  onCurrentJobToggle: (checked: boolean, index: number) => void;
-  addExperience: () => void;
-  removeExperience: (id: number) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => void;
+  onToggleCurrent: (checked: boolean, index: number) => void;
+  onAdd: () => void;
+  onRemove: (id: number) => void;
 }
 
 export const ExperienceSection = ({
   experience,
-  onExperienceChange,
-  onCurrentJobToggle,
-  addExperience,
-  removeExperience
+  onChange,
+  onToggleCurrent,
+  onAdd,
+  onRemove
 }: ExperienceSectionProps) => {
   return (
     <div className="space-y-4">
@@ -34,7 +34,7 @@ export const ExperienceSection = ({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => removeExperience(exp.id)}
+              onClick={() => onRemove(exp.id)}
               className="absolute right-2 top-2 h-8 w-8 text-destructive"
             >
               <Trash2 className="h-4 w-4" />
@@ -49,7 +49,7 @@ export const ExperienceSection = ({
               id={`title-${index}`}
               name="title"
               value={exp.title}
-              onChange={(e) => onExperienceChange(e, index)}
+              onChange={(e) => onChange(e, index)}
               placeholder="Marketing Manager"
             />
           </div>
@@ -62,7 +62,7 @@ export const ExperienceSection = ({
               id={`company-${index}`}
               name="company"
               value={exp.company}
-              onChange={(e) => onExperienceChange(e, index)}
+              onChange={(e) => onChange(e, index)}
               placeholder="Company Name"
             />
           </div>
@@ -75,7 +75,7 @@ export const ExperienceSection = ({
               id={`location-${index}`}
               name="location"
               value={exp.location}
-              onChange={(e) => onExperienceChange(e, index)}
+              onChange={(e) => onChange(e, index)}
               placeholder="City, Country"
             />
           </div>
@@ -89,7 +89,7 @@ export const ExperienceSection = ({
                 id={`startDate-${index}`}
                 name="startDate"
                 value={exp.startDate}
-                onChange={(e) => onExperienceChange(e, index)}
+                onChange={(e) => onChange(e, index)}
                 placeholder="Jan 2020"
               />
             </div>
@@ -102,7 +102,7 @@ export const ExperienceSection = ({
                 id={`endDate-${index}`}
                 name="endDate"
                 value={exp.endDate}
-                onChange={(e) => onExperienceChange(e, index)}
+                onChange={(e) => onChange(e, index)}
                 placeholder="Dec 2022"
                 disabled={exp.current}
               />
@@ -113,7 +113,7 @@ export const ExperienceSection = ({
             <Switch 
               id={`current-${index}`}
               checked={exp.current}
-              onCheckedChange={(checked) => onCurrentJobToggle(checked, index)}
+              onCheckedChange={(checked) => onToggleCurrent(checked, index)}
             />
             <Label htmlFor={`current-${index}`}>I currently work here</Label>
           </div>
@@ -126,7 +126,7 @@ export const ExperienceSection = ({
               id={`description-${index}`}
               name="description"
               value={exp.description}
-              onChange={(e) => onExperienceChange(e, index)}
+              onChange={(e) => onChange(e, index)}
               rows={4}
               placeholder="Describe your responsibilities and achievements..."
             />
@@ -137,7 +137,7 @@ export const ExperienceSection = ({
         </div>
       ))}
       
-      <Button variant="outline" className="w-full" onClick={addExperience}>
+      <Button variant="outline" className="w-full" onClick={onAdd}>
         <Plus className="h-4 w-4 mr-2" />
         Add Experience
       </Button>

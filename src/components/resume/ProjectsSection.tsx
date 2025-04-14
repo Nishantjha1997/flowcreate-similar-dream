@@ -9,16 +9,16 @@ import { ResumeData } from '@/utils/resumeAdapterUtils';
 
 interface ProjectsSectionProps {
   projects: ResumeData['projects'];
-  onProjectChange: (field: string, value: string, index: number) => void;
-  addProject: () => void;
-  removeProject: (id: number) => void;
+  onChange: (field: string, value: string, index: number) => void;
+  onAdd: () => void;
+  onRemove: (id: number) => void;
 }
 
 export const ProjectsSection = ({
   projects,
-  onProjectChange,
-  addProject,
-  removeProject
+  onChange,
+  onAdd,
+  onRemove
 }: ProjectsSectionProps) => {
   if (!projects || projects.length === 0) {
     return (
@@ -32,7 +32,7 @@ export const ProjectsSection = ({
           <p className="text-sm text-muted-foreground mt-1 mb-4">
             Showcase your work by adding details about projects you've worked on.
           </p>
-          <Button onClick={addProject}>
+          <Button onClick={onAdd}>
             <Plus className="h-4 w-4 mr-2" />
             Add Project
           </Button>
@@ -51,7 +51,7 @@ export const ProjectsSection = ({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => removeProject(project.id)}
+            onClick={() => onRemove(project.id)}
             className="absolute right-2 top-2 h-8 w-8 text-destructive"
           >
             <Trash2 className="h-4 w-4" />
@@ -64,7 +64,7 @@ export const ProjectsSection = ({
             <Input
               id={`projectTitle-${index}`}
               value={project.title}
-              onChange={(e) => onProjectChange('title', e.target.value, index)}
+              onChange={(e) => onChange('title', e.target.value, index)}
               placeholder="E-commerce Website"
             />
           </div>
@@ -76,7 +76,7 @@ export const ProjectsSection = ({
             <Textarea
               id={`projectDescription-${index}`}
               value={project.description}
-              onChange={(e) => onProjectChange('description', e.target.value, index)}
+              onChange={(e) => onChange('description', e.target.value, index)}
               rows={3}
               placeholder="Describe your project, its purpose, and your role..."
             />
@@ -89,7 +89,7 @@ export const ProjectsSection = ({
             <Input
               id={`projectLink-${index}`}
               value={project.link || ''}
-              onChange={(e) => onProjectChange('link', e.target.value, index)}
+              onChange={(e) => onChange('link', e.target.value, index)}
               placeholder="https://github.com/yourusername/project"
             />
           </div>
@@ -103,7 +103,7 @@ export const ProjectsSection = ({
               value={(project.technologies || []).join(', ')}
               onChange={(e) => {
                 const techs = e.target.value.split(',').map(t => t.trim()).filter(Boolean);
-                onProjectChange('technologies', JSON.stringify(techs), index);
+                onChange('technologies', JSON.stringify(techs), index);
               }}
               placeholder="React, Node.js, MongoDB"
             />
@@ -111,7 +111,7 @@ export const ProjectsSection = ({
         </div>
       ))}
       
-      <Button variant="outline" className="w-full" onClick={addProject}>
+      <Button variant="outline" className="w-full" onClick={onAdd}>
         <Plus className="h-4 w-4 mr-2" />
         Add Project
       </Button>

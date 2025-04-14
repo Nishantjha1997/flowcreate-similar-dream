@@ -9,16 +9,16 @@ import { ResumeData } from '@/utils/resumeAdapterUtils';
 
 interface EducationSectionProps {
   education: ResumeData['education'];
-  onEducationChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => void;
-  addEducation: () => void;
-  removeEducation: (id: number) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => void;
+  onAdd: () => void;
+  onRemove: (id: number) => void;
 }
 
 export const EducationSection = ({
   education,
-  onEducationChange,
-  addEducation,
-  removeEducation
+  onChange,
+  onAdd,
+  onRemove
 }: EducationSectionProps) => {
   return (
     <div className="space-y-4">
@@ -31,7 +31,7 @@ export const EducationSection = ({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => removeEducation(edu.id)}
+              onClick={() => onRemove(edu.id)}
               className="absolute right-2 top-2 h-8 w-8 text-destructive"
             >
               <Trash2 className="h-4 w-4" />
@@ -46,7 +46,7 @@ export const EducationSection = ({
               id={`school-${index}`}
               name="school"
               value={edu.school}
-              onChange={(e) => onEducationChange(e, index)}
+              onChange={(e) => onChange(e, index)}
               placeholder="University Name"
             />
           </div>
@@ -59,7 +59,7 @@ export const EducationSection = ({
               id={`degree-${index}`}
               name="degree"
               value={edu.degree}
-              onChange={(e) => onEducationChange(e, index)}
+              onChange={(e) => onChange(e, index)}
               placeholder="Bachelor's, Master's, etc."
             />
           </div>
@@ -72,7 +72,7 @@ export const EducationSection = ({
               id={`field-${index}`}
               name="field"
               value={edu.field}
-              onChange={(e) => onEducationChange(e, index)}
+              onChange={(e) => onChange(e, index)}
               placeholder="Computer Science, Business, etc."
             />
           </div>
@@ -86,7 +86,7 @@ export const EducationSection = ({
                 id={`eduStartDate-${index}`}
                 name="startDate"
                 value={edu.startDate}
-                onChange={(e) => onEducationChange(e, index)}
+                onChange={(e) => onChange(e, index)}
                 placeholder="2018"
               />
             </div>
@@ -99,7 +99,7 @@ export const EducationSection = ({
                 id={`eduEndDate-${index}`}
                 name="endDate"
                 value={edu.endDate}
-                onChange={(e) => onEducationChange(e, index)}
+                onChange={(e) => onChange(e, index)}
                 placeholder="2022"
               />
             </div>
@@ -113,7 +113,7 @@ export const EducationSection = ({
               id={`eduDescription-${index}`}
               name="description"
               value={edu.description}
-              onChange={(e) => onEducationChange(e, index)}
+              onChange={(e) => onChange(e, index)}
               rows={2}
               placeholder="GPA, honors, relevant coursework, etc."
             />
@@ -121,7 +121,7 @@ export const EducationSection = ({
         </div>
       ))}
       
-      <Button variant="outline" className="w-full" onClick={addEducation}>
+      <Button variant="outline" className="w-full" onClick={onAdd}>
         <Plus className="h-4 w-4 mr-2" />
         Add Education
       </Button>
