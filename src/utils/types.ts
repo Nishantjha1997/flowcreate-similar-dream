@@ -69,6 +69,8 @@ export interface ResumeData {
     layoutType?: 'standard' | 'compact' | 'minimal' | 'creative';
     headingStyle?: 'bold' | 'underlined' | 'capitalized' | 'minimal';
     showPhoto?: boolean;
+    paperType?: 'standard' | 'textured' | 'minimal';
+    textDensity?: number;
     profileImage?: {
       src: string | null;
       size: number;

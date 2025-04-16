@@ -9,7 +9,7 @@ import { ResumeFormSection } from '@/components/resume/ResumeFormSection';
 import { ResumePreviewSection } from '@/components/resume/ResumePreviewSection';
 import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 
-import { ResumeData } from '@/utils/resumeAdapterUtils';
+import { ResumeData } from '@/utils/types';
 import { emptyEducation, emptyExperience, emptyProject, exampleResumes, templateNames } from '@/components/resume/ResumeData';
 
 const ResumeBuilder = () => {
@@ -332,6 +332,8 @@ const ResumeBuilder = () => {
             resumeElementRef={resumeElementRef}
             resumeName={resumeName}
             handleShare={handleShare}
+            handleDownload={handleDownload}
+            isGenerating={isGenerating}
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -370,6 +372,8 @@ const ResumeBuilder = () => {
                 templateId={templateId}
                 templateNames={templateNames}
                 resumeRef={resumeElementRef}
+                handleDownload={handleDownload}
+                isGenerating={isGenerating}
               />
             </div>
           </div>

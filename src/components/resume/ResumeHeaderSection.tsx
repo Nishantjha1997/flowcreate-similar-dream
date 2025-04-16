@@ -1,50 +1,37 @@
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Share2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 
 interface ResumeHeaderSectionProps {
   resumeElementRef: React.RefObject<HTMLDivElement>;
   resumeName: string;
   handleShare: () => void;
+  handleDownload: () => void;
+  isGenerating: boolean;
 }
 
-export const ResumeHeaderSection = ({ 
+export const ResumeHeaderSection = ({
   resumeElementRef,
   resumeName,
-  handleShare 
+  handleShare,
+  handleDownload,
+  isGenerating
 }: ResumeHeaderSectionProps) => {
-  const { isGenerating, generatePDF } = usePDFGenerator(`${resumeName}.pdf`);
-
-  const handleDownload = () => {
-    if (!resumeElementRef.current) {
-      toast.error("Could not find resume content to download.");
-      return;
-    }
-    
-    // Use the same generator function as the preview
-    generatePDF(resumeElementRef.current);
-  };
-
   return (
-    <div className="flex justify-between items-center mb-6">
-      <h1 className="text-2xl font-bold">Resume Builder</h1>
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Resume Builder</h1>
+        <p className="text-muted-foreground">Create a professional resume in minutes</p>
+      </div>
       <div className="flex gap-2">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleDownload}
-          disabled={isGenerating}
-          className="flex items-center gap-2"
-        >
-          <Download className="h-4 w-4 mr-2" />
-          {isGenerating ? "Generating PDF..." : "Download PDF"}
-        </Button>
-        <Button size="sm" onClick={handleShare}>
-          <Share2 className="h-4 w-4 mr-2" />
+        <Button onClick={handleShare} variant="outline" size="sm" className="flex items-center gap-2">
+          <Share2 className="h-4 w-4" />
           Share
+        </Button>
+        <Button onClick={handleDownload} size="sm" disabled={isGenerating} className="flex items-center gap-2">
+          <Download className="h-4 w-4" />
+          {isGenerating ? 'Generating...' : 'Download PDF'}
         </Button>
       </div>
     </div>
