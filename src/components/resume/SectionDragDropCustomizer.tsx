@@ -5,13 +5,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { EditableHeading } from '@/components/EditableHeading';
-import { Plus, GripVertical, Eye, EyeOff } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
-
-// Icons for different section types
-import {
-  User, Briefcase, GraduationCap, Award, BookOpen,
-  Languages, Lightbulb, Medal, HandHeart
+import { 
+  Plus, 
+  GripVertical, 
+  Eye, 
+  EyeOff,
+  User, 
+  Briefcase, 
+  GraduationCap, 
+  Award, 
+  BookOpen,
+  Languages, 
+  Lightbulb, 
+  Medal, 
+  HandHeart 
 } from 'lucide-react';
 
 interface SectionDragDropCustomizerProps {

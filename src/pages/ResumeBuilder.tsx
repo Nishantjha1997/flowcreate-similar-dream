@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner'; 
@@ -6,6 +7,7 @@ import { ResumeHeaderSection } from '@/components/resume/ResumeHeaderSection';
 import { ResumeNavigation } from '@/components/resume/ResumeNavigation';
 import { ResumeFormSection } from '@/components/resume/ResumeFormSection';
 import { ResumePreviewSection } from '@/components/resume/ResumePreviewSection';
+import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 
 import { ResumeData } from '@/utils/resumeAdapterUtils';
 import { emptyEducation, emptyExperience, emptyProject, exampleResumes, templateNames } from '@/components/resume/ResumeData';

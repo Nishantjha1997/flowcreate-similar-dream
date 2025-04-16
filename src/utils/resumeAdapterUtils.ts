@@ -46,18 +46,22 @@ export interface ResumeData {
     accentColor?: string;
     textColor?: string;
     backgroundColor?: string;
-    fontSize?: string;
+    fontSize?: 'small' | 'medium' | 'large';
     fontFamily?: string;
-    spacing?: string;
-    headingStyle?: string;
-    sectionMargins?: string;
-    lineHeight?: string;
+    spacing?: 'compact' | 'normal' | 'spacious';
+    headingStyle?: 'bold' | 'underlined' | 'capitalized' | 'minimal';
+    sectionMargins?: 'small' | 'medium' | 'large';
+    lineHeight?: 'tight' | 'normal' | 'relaxed';
+    layoutType?: 'standard' | 'compact' | 'minimal' | 'creative';
     showPhoto?: boolean;
-    layoutType?: "creative" | "compact" | "standard" | "minimal";
-    profileImage?: any;
-    sectionTitles?: {
-      [key: string]: string | undefined;
+    profileImage?: {
+      src: string | null;
+      size: number;
+      shape: 'circle' | 'square' | 'rounded';
     };
+    sectionTitles?: Record<string, string>;
+    sectionsOrder?: string[];
+    hiddenSections?: string[];
   };
   selectedTemplate?: string;
 }
@@ -67,31 +71,37 @@ export const adaptResumeData = (data: ResumeData): TypesResumeData => {
   return {
     personal: {
       name: data.personal?.name || '',
-      title: data.personal?.name || '',
       email: data.personal?.email || '',
       phone: data.personal?.phone || '',
+      address: data.personal?.address || '',
       website: data.personal?.website || '',
-      location: data.personal?.address || '', // Map address to location
       linkedin: data.personal?.linkedin || '',
       summary: data.personal?.summary || '',
-      profileImage: data.personal?.profileImage || '', // Add profile image
+      profileImage: data.personal?.profileImage || '',
     },
     skills: data.skills || [],
     education: data.education?.map(edu => ({
-      institution: edu.school,
-      degree: `${edu.degree} ${edu.field ? `in ${edu.field}` : ''}`,
-      date: `${edu.startDate} - ${edu.endDate}`,
+      id: edu.id,
+      school: edu.school,
+      degree: edu.degree,
+      field: edu.field,
+      startDate: edu.startDate,
+      endDate: edu.endDate,
       description: edu.description
     })) || [],
     experience: data.experience?.map(exp => ({
+      id: exp.id,
+      title: exp.title,
       company: exp.company,
-      position: exp.title,
-      date: `${exp.startDate} - ${exp.current ? 'Present' : exp.endDate}`,
-      description: exp.description,
-      highlights: exp.description?.split('\n').filter(line => line.trim().startsWith('•')) || []
+      location: exp.location,
+      startDate: exp.startDate,
+      endDate: exp.endDate,
+      current: exp.current,
+      description: exp.description
     })) || [],
     projects: data.projects?.map(project => ({
-      name: project.title,
+      id: project.id,
+      title: project.title,
       description: project.description,
       link: project.link,
       technologies: project.technologies
@@ -108,10 +118,12 @@ export const adaptResumeData = (data: ResumeData): TypesResumeData => {
       headingStyle: data.customization?.headingStyle,
       sectionMargins: data.customization?.sectionMargins,
       lineHeight: data.customization?.lineHeight,
-      showPhoto: data.customization?.showPhoto,
       layoutType: data.customization?.layoutType,
-      profileImage: data.personal?.profileImage, // Use profile image from personal data
-      sectionTitles: data.customization?.sectionTitles
+      showPhoto: data.customization?.showPhoto,
+      profileImage: data.customization?.profileImage,
+      sectionTitles: data.customization?.sectionTitles,
+      sectionsOrder: data.customization?.sectionsOrder,
+      hiddenSections: data.customization?.hiddenSections
     },
     selectedTemplate: data.selectedTemplate
   };
@@ -124,36 +136,36 @@ export const reverseAdaptResumeData = (data: TypesResumeData): Partial<ResumeDat
       name: data.personal?.name || '',
       email: data.personal?.email || '',
       phone: data.personal?.phone || '',
-      address: data.personal?.location || '', // Map location to address
+      address: data.personal?.address || '',
       summary: data.personal?.summary || '',
       website: data.personal?.website || '',
       linkedin: data.personal?.linkedin || '',
-      profileImage: data.personal?.profileImage || '' // Add profile image
+      profileImage: data.personal?.profileImage || ''
     },
     skills: data.skills || [],
     experience: data.experience?.map((exp, index) => ({
-      id: index + 1,
-      title: exp.position || '',
+      id: exp.id || index + 1,
+      title: exp.title || '',
       company: exp.company || '',
-      location: '',
-      startDate: exp.date?.split('-')[0]?.trim() || '',
-      endDate: exp.date?.includes('Present') ? '' : exp.date?.split('-')[1]?.trim() || '',
-      current: exp.date?.includes('Present') || false,
+      location: exp.location || '',
+      startDate: exp.startDate || '',
+      endDate: exp.endDate || '',
+      current: exp.current || false,
       description: exp.description || '',
     })) || [],
     education: data.education?.map((edu, index) => ({
-      id: index + 1,
-      school: edu.institution || '',
-      degree: edu.degree?.split('in')[0]?.trim() || '',
-      field: edu.degree?.includes('in') ? edu.degree?.split('in')[1]?.trim() || '' : '',
-      startDate: edu.date?.split('-')[0]?.trim() || '',
-      endDate: edu.date?.split('-')[1]?.trim() || '',
+      id: edu.id || index + 1,
+      school: edu.school || '',
+      degree: edu.degree || '',
+      field: edu.field || '',
+      startDate: edu.startDate || '',
+      endDate: edu.endDate || '',
       description: edu.description || '',
     })) || [],
     projects: data.projects?.map((project, index) => ({
-      id: index + 1,
-      title: project.name,
-      description: project.description,
+      id: project.id || index + 1,
+      title: project.title || '',
+      description: project.description || '',
       link: project.link,
       technologies: project.technologies
     })) || [],
@@ -169,10 +181,12 @@ export const reverseAdaptResumeData = (data: TypesResumeData): Partial<ResumeDat
       headingStyle: data.customization?.headingStyle,
       sectionMargins: data.customization?.sectionMargins,
       lineHeight: data.customization?.lineHeight,
-      showPhoto: data.customization?.showPhoto || true, // Default to showing photo if available
+      showPhoto: data.customization?.showPhoto,
       layoutType: data.customization?.layoutType,
       profileImage: data.customization?.profileImage,
-      sectionTitles: data.customization?.sectionTitles
+      sectionTitles: data.customization?.sectionTitles,
+      sectionsOrder: data.customization?.sectionsOrder,
+      hiddenSections: data.customization?.hiddenSections
     }
   };
 };

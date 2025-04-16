@@ -1,3 +1,4 @@
+
 import { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -21,6 +22,16 @@ import {
   MoveHorizontal,
   LayoutGrid,
   ArrowDownUp,
+  User,
+  Phone,
+  Briefcase,
+  GraduationCap,
+  Award,
+  BookOpen,
+  Languages,
+  Lightbulb,
+  Medal,
+  HandHeart,
 } from 'lucide-react';
 
 interface CustomizationPanelProps {

@@ -1,3 +1,4 @@
+
 export interface ResumeData {
   personal: {
     name: string;
@@ -67,6 +68,7 @@ export interface ResumeData {
     lineHeight?: 'tight' | 'normal' | 'relaxed';
     layoutType?: 'standard' | 'compact' | 'minimal' | 'creative';
     headingStyle?: 'bold' | 'underlined' | 'capitalized' | 'minimal';
+    showPhoto?: boolean;
     profileImage?: {
       src: string | null;
       size: number;
@@ -76,4 +78,5 @@ export interface ResumeData {
     sectionsOrder?: string[];
     hiddenSections?: string[];
   };
+  selectedTemplate?: string;
 }
