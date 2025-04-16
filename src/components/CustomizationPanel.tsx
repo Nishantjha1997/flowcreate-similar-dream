@@ -107,14 +107,14 @@ export const CustomizationPanel = ({
     });
   };
   
-  const handleFontSizeChange = (value: string) => {
+  const handleFontSizeChange = (value: 'small' | 'medium' | 'large') => {
     onCustomizationChange({
       ...customization,
       fontSize: value
     });
   };
   
-  const handleSpacingChange = (value: string) => {
+  const handleSpacingChange = (value: 'compact' | 'normal' | 'spacious') => {
     onCustomizationChange({
       ...customization,
       spacing: value
@@ -397,7 +397,7 @@ export const CustomizationPanel = ({
                   <Label className="block mb-2">Font Size</Label>
                   <RadioGroup 
                     value={customization.fontSize || 'medium'}
-                    onValueChange={handleFontSizeChange}
+                    onValueChange={(value) => handleFontSizeChange(value as 'small' | 'medium' | 'large')}
                     className="grid grid-cols-3 gap-2"
                   >
                     <div className="flex items-center space-x-2">
@@ -453,7 +453,7 @@ export const CustomizationPanel = ({
                   <Label className="block mb-2">Content Spacing</Label>
                   <RadioGroup 
                     value={customization.spacing || 'normal'}
-                    onValueChange={handleSpacingChange}
+                    onValueChange={(value) => handleSpacingChange(value as 'compact' | 'normal' | 'spacious')}
                     className="grid grid-cols-3 gap-2"
                   >
                     <div className="flex items-center space-x-2">
@@ -475,7 +475,7 @@ export const CustomizationPanel = ({
                   <Label className="block mb-2">Section Margins</Label>
                   <RadioGroup 
                     value={customization.sectionMargins || 'medium'}
-                    onValueChange={(value) => onCustomizationChange({...customization, sectionMargins: value})}
+                    onValueChange={(value) => onCustomizationChange({...customization, sectionMargins: value as 'small' | 'medium' | 'large'})}
                     className="grid grid-cols-3 gap-2"
                   >
                     <div className="flex items-center space-x-2">
@@ -497,7 +497,7 @@ export const CustomizationPanel = ({
                   <Label className="block mb-2">Line Spacing</Label>
                   <RadioGroup 
                     value={customization.lineHeight || 'normal'}
-                    onValueChange={(value) => onCustomizationChange({...customization, lineHeight: value})}
+                    onValueChange={(value) => onCustomizationChange({...customization, lineHeight: value as 'tight' | 'normal' | 'relaxed'})}
                     className="grid grid-cols-3 gap-2"
                   >
                     <div className="flex items-center space-x-2">
