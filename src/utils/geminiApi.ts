@@ -14,8 +14,9 @@ export async function enhanceWithGemini(
   apiKey: string = DEFAULT_API_KEY
 ): Promise<GeminiResponse> {
   try {
+    // Updated API endpoint to use correct version
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" + apiKey,
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=" + apiKey,
       {
         method: "POST",
         headers: {
@@ -42,14 +43,17 @@ export async function enhanceWithGemini(
     const data = await response.json();
     
     if (data.error) {
+      console.error("Gemini API error:", data.error);
       return {
         text: "",
         error: data.error.message || "Error generating content"
       };
     }
 
-    // Extract the generated text from the response
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    // Updated response parsing for beta API structure
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 
+                 data.candidates?.[0]?.output || "";
+    
     return { text };
   } catch (error) {
     console.error("Error calling Gemini API:", error);
@@ -60,10 +64,10 @@ export async function enhanceWithGemini(
   }
 }
 
-// Available Gemini models
+// Available Gemini models - updated to correct model versions
 export const availableModels = [
-  { id: "gemini-pro", name: "Gemini Pro", description: "Best for text generation and creative content" },
-  { id: "gemini-pro-vision", name: "Gemini Pro Vision", description: "Best for image and text analysis (not used in this app)" }
+  { id: "gemini-1.0-pro", name: "Gemini Pro", description: "Best for text generation and creative content" },
+  { id: "gemini-1.0-pro-vision", name: "Gemini Pro Vision", description: "Best for image and text analysis (not used in this app)" }
 ];
 
 // Predefined AI enhancement prompts

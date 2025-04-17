@@ -59,10 +59,17 @@ export function AIEnhanceModal({
         toast.error("AI enhancement failed", {
           description: result.error
         });
+      } else if (!result.text.trim()) {
+        setError("The AI returned an empty response. Please try again.");
+        toast.error("AI enhancement failed", {
+          description: "Empty response received"
+        });
       } else {
         setEnhancedText(result.text);
+        toast.success("AI enhancement generated successfully");
       }
     } catch (err) {
+      console.error("AI enhancement error:", err);
       setError("Failed to connect to AI service");
       toast.error("AI enhancement failed");
     } finally {
@@ -97,7 +104,7 @@ export function AIEnhanceModal({
               onChange={(e) => setApiKey(e.target.value)}
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Using Gemini Pro model. Custom key can be obtained from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-primary hover:underline">Google AI Studio</a>
+              Using Gemini 1.0 Pro model. Custom key can be obtained from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-primary hover:underline">Google AI Studio</a>
             </p>
           </div>
           
