@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -7,7 +6,6 @@ import { ResumeData } from '@/utils/resumeAdapterUtils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Upload, X } from 'lucide-react';
-import { AIEnhanceButton } from './AIEnhanceButton';
 
 interface PersonalInfoSectionProps {
   personal: ResumeData['personal'];
@@ -35,17 +33,6 @@ export const PersonalInfoSection = ({ personal, onChange, onProfileImageChange }
     if (onProfileImageChange) {
       onProfileImageChange('');
     }
-  };
-
-  const handleAIEnhanceSummary = (enhancedSummary: string) => {
-    const event = {
-      target: {
-        name: 'summary',
-        value: enhancedSummary
-      }
-    } as React.ChangeEvent<HTMLTextAreaElement>;
-    
-    onChange(event);
   };
 
   return (
@@ -172,16 +159,9 @@ export const PersonalInfoSection = ({ personal, onChange, onProfileImageChange }
           />
         </div>
         <div>
-          <div className="flex justify-between items-center mb-1">
-            <Label htmlFor="summary" className="block text-sm font-medium">
-              Professional Summary
-            </Label>
-            <AIEnhanceButton 
-              section="summary"
-              currentText={personal.summary}
-              onApply={handleAIEnhanceSummary}
-            />
-          </div>
+          <Label htmlFor="summary" className="block text-sm font-medium mb-1">
+            Professional Summary
+          </Label>
           <Textarea
             id="summary"
             name="summary"

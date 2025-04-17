@@ -1,104 +1,53 @@
 
+import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { ResumeData } from '@/utils/types';
-import { AIEnhanceButton } from './AIEnhanceButton';
 
 interface SkillsSectionProps {
-  skills: ResumeData['skills'];
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  skills: string[];
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-export function SkillsSection({ skills, onChange }: SkillsSectionProps) {
-  const skillsString = skills.join(', ');
-  
-  const handleAIGeneratedSkills = (generatedSkills: string) => {
-    const event = {
-      target: {
-        value: generatedSkills
-      }
-    } as React.ChangeEvent<HTMLTextAreaElement>;
-    
-    onChange(event);
-  };
-  
-  // Get the first job title from resume data if available
-  const getJobTitleFromLocalStorage = () => {
-    const resumeData = localStorage.getItem('resumeData');
-    if (resumeData) {
-      try {
-        const parsed = JSON.parse(resumeData);
-        return parsed?.experience?.[0]?.title || '';
-      } catch (e) {
-        return '';
-      }
-    }
-    return '';
-  };
-  
-  // Get the first job description from resume data if available
-  const getJobDescriptionFromLocalStorage = () => {
-    const resumeData = localStorage.getItem('resumeData');
-    if (resumeData) {
-      try {
-        const parsed = JSON.parse(resumeData);
-        return parsed?.experience?.[0]?.description || '';
-      } catch (e) {
-        return '';
-      }
-    }
-    return '';
+export const SkillsSection = ({ skills, onChange }: SkillsSectionProps) => {
+  const getSkillsString = () => {
+    return skills.join(', ');
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <h2 className="text-xl font-semibold">Skills</h2>
+      <p className="text-muted-foreground">Add your key skills, separated by commas.</p>
       
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <Label htmlFor="skills" className="text-sm font-medium mb-1">
-            Enter your skills (separated by commas)
-          </Label>
-          <AIEnhanceButton 
-            section="skills"
-            currentText={getJobDescriptionFromLocalStorage()}
-            jobTitle={getJobTitleFromLocalStorage()}
-            onApply={handleAIGeneratedSkills}
-          />
-        </div>
+      <div>
+        <Label htmlFor="skills" className="block text-sm font-medium mb-1">
+          Skills
+        </Label>
         <Textarea
           id="skills"
-          value={skillsString}
+          value={getSkillsString()}
           onChange={onChange}
           rows={4}
-          placeholder="e.g. JavaScript, React, Project Management, Team Leadership"
+          placeholder="JavaScript, React, Project Management, Leadership"
         />
-        <p className="text-xs text-muted-foreground">
-          Enter your skills separated by commas. These will be displayed as badges on your resume.
+        <p className="text-xs text-muted-foreground mt-1">
+          Example: JavaScript, React, Customer Service, Team Leadership
         </p>
       </div>
       
       {skills.length > 0 && (
         <div>
-          <Label className="text-sm font-medium block mb-2">Preview</Label>
-          <div className="flex flex-wrap gap-2 p-4 bg-muted rounded-md">
+          <Label className="block text-sm font-medium mb-2">
+            Your Skills
+          </Label>
+          <div className="flex flex-wrap gap-2">
             {skills.map((skill, index) => (
-              <Badge key={index} variant="secondary">{skill.trim()}</Badge>
+              <div key={index} className="bg-muted px-3 py-1 rounded-md text-sm">
+                {skill}
+              </div>
             ))}
           </div>
         </div>
       )}
-      
-      <div className="mt-6 p-4 border rounded-md bg-muted/30">
-        <h3 className="font-medium mb-2">Tips for showcasing skills</h3>
-        <ul className="text-sm text-muted-foreground space-y-1 list-disc pl-5">
-          <li>Include a mix of hard skills (technical abilities) and soft skills (interpersonal traits)</li>
-          <li>Tailor your skills to match the job descriptions you're targeting</li>
-          <li>Be specific rather than general (e.g., "React Testing Library" vs just "Testing")</li>
-          <li>Include proficiency levels for language skills</li>
-        </ul>
-      </div>
     </div>
   );
-}
+};

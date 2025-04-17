@@ -1,5 +1,5 @@
 
-import { Users, FileCheck, Building, Award, Sparkles } from 'lucide-react';
+import { Users, FileCheck, Building, Award } from 'lucide-react';
 
 const stats = [
   { 
@@ -21,10 +21,10 @@ const stats = [
     description: 'Recognize our templates' 
   },
   { 
-    label: 'AI Enhancements', 
-    value: '10M+', 
-    icon: Sparkles,
-    description: 'Resume improvements' 
+    label: 'Success Rate', 
+    value: '85%', 
+    icon: Award,
+    description: 'Higher interview chances' 
   }
 ];
 
@@ -37,7 +37,7 @@ const StatsSection = () => {
             Trusted by Job Seekers Worldwide
           </h2>
           <p className="mt-4 text-xl text-muted-foreground">
-            Our AI-powered platform has helped millions of professionals advance their careers
+            Our platform has helped millions of professionals advance their careers
           </p>
         </div>
         
