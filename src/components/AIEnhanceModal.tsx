@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Sparkles, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { enhanceWithGemini } from "@/utils/geminiApi";
+import { enhanceWithGemini, availableModels } from "@/utils/geminiApi";
 
 interface AIEnhanceModalProps {
   isOpen: boolean;
@@ -34,25 +34,25 @@ export function AIEnhanceModal({
   currentText,
   onApply
 }: AIEnhanceModalProps) {
-  const [apiKey, setApiKey] = useState<string>(localStorage.getItem("gemini_api_key") || "");
+  // Use the provided API key by default, or get from localStorage if available
+  const savedApiKey = localStorage.getItem("gemini_api_key");
+  const [apiKey, setApiKey] = useState<string>(savedApiKey || "");
   const [enhancedText, setEnhancedText] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   
   const handleEnhance = async () => {
-    if (!apiKey) {
-      setError("Please enter a Gemini API key");
-      return;
-    }
-    
     setIsGenerating(true);
     setError("");
     
     try {
-      // Store API key in localStorage for future use
-      localStorage.setItem("gemini_api_key", apiKey);
+      // If user entered a custom API key, store it for future use
+      if (apiKey && apiKey.trim() !== "") {
+        localStorage.setItem("gemini_api_key", apiKey);
+      }
       
-      const result = await enhanceWithGemini(prompt, apiKey);
+      // Use provided API key or default one from the utility
+      const result = await enhanceWithGemini(prompt, apiKey || undefined);
       
       if (result.error) {
         setError(result.error);
@@ -89,15 +89,15 @@ export function AIEnhanceModal({
         
         <div className="grid gap-4 py-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">Gemini API Key</label>
+            <label className="text-sm font-medium mb-2 block">Gemini API Key (Optional)</label>
             <Input 
               type="password" 
-              placeholder="Enter your Gemini API Key" 
+              placeholder="Enter custom Gemini API Key (or leave blank to use default)" 
               value={apiKey} 
               onChange={(e) => setApiKey(e.target.value)}
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Get your API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-primary hover:underline">Google AI Studio</a>
+              Using Gemini Pro model. Custom key can be obtained from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-primary hover:underline">Google AI Studio</a>
             </p>
           </div>
           
@@ -142,7 +142,7 @@ export function AIEnhanceModal({
           <Button
             variant="default"
             onClick={handleEnhance}
-            disabled={isGenerating || !apiKey}
+            disabled={isGenerating}
             className="gap-2"
           >
             {isGenerating && <Loader2 className="h-4 w-4 animate-spin" />}

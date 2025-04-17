@@ -6,9 +6,12 @@ interface GeminiResponse {
   error?: string;
 }
 
+// Default API key - typically would be stored more securely
+const DEFAULT_API_KEY = "AIzaSyCSerNeKYTcl6cnQOrCX30HZVlfg5sqYMc";
+
 export async function enhanceWithGemini(
   prompt: string, 
-  apiKey: string
+  apiKey: string = DEFAULT_API_KEY
 ): Promise<GeminiResponse> {
   try {
     const response = await fetch(
@@ -56,6 +59,12 @@ export async function enhanceWithGemini(
     };
   }
 }
+
+// Available Gemini models
+export const availableModels = [
+  { id: "gemini-pro", name: "Gemini Pro", description: "Best for text generation and creative content" },
+  { id: "gemini-pro-vision", name: "Gemini Pro Vision", description: "Best for image and text analysis (not used in this app)" }
+];
 
 // Predefined AI enhancement prompts
 export const aiPrompts = {
