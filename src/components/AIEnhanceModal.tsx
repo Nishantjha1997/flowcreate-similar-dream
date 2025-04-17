@@ -34,9 +34,8 @@ export function AIEnhanceModal({
   currentText,
   onApply
 }: AIEnhanceModalProps) {
-  // Use the provided API key by default, or get from localStorage if available
-  const savedApiKey = localStorage.getItem("gemini_api_key");
-  const [apiKey, setApiKey] = useState<string>(savedApiKey || "");
+  // Always use the provided API key by default
+  const [apiKey, setApiKey] = useState<string>("");
   const [enhancedText, setEnhancedText] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -46,11 +45,6 @@ export function AIEnhanceModal({
     setError("");
     
     try {
-      // If user entered a custom API key, store it for future use
-      if (apiKey && apiKey.trim() !== "") {
-        localStorage.setItem("gemini_api_key", apiKey);
-      }
-      
       // Use provided API key or default one from the utility
       const result = await enhanceWithGemini(prompt, apiKey || undefined);
       
@@ -96,15 +90,15 @@ export function AIEnhanceModal({
         
         <div className="grid gap-4 py-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">Gemini API Key (Optional)</label>
+            <label className="text-sm font-medium mb-2 block">Custom API Key (Optional)</label>
             <Input 
               type="password" 
-              placeholder="Enter custom Gemini API Key (or leave blank to use default)" 
+              placeholder="The default API key will be used if left blank" 
               value={apiKey} 
               onChange={(e) => setApiKey(e.target.value)}
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Using Gemini 1.0 Pro model. Custom key can be obtained from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-primary hover:underline">Google AI Studio</a>
+              Using Gemini Pro model. Custom key can be obtained from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-primary hover:underline">Google AI Studio</a>
             </p>
           </div>
           
