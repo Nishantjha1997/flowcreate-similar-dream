@@ -1,4 +1,3 @@
-
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -36,7 +35,7 @@ const HeroSection = () => {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="w-full text-white border-white hover:bg-white/10 hover:text-white hover:scale-105 transition-all duration-300"
+                  className="w-full border-white text-primary hover:bg-white/10 hover:scale-105 transition-all duration-300"
                 >
                   Browse Templates
                 </Button>
