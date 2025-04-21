@@ -1,16 +1,8 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  Download, 
-  Edit3, 
-  Eye, 
-  FileText, 
-  Grid, 
-  List, 
-  PaintBucket 
-} from 'lucide-react';
+import { Download, Edit3, Eye, Grid, List } from 'lucide-react';
 
 const templateCategories = [
   'Modern', 
@@ -21,66 +13,152 @@ const templateCategories = [
   'Minimal'
 ];
 
+const templates = [
+  {
+    id: 1,
+    title: "Modern Professional",
+    description: "Clean and contemporary design perfect for tech and business roles",
+    category: "Modern",
+    image: "https://images.unsplash.com/photo-1586281380117-5a60ae2050cc?w=400",
+    popular: true
+  },
+  {
+    id: 2,
+    title: "Classic Executive",
+    description: "Traditional layout trusted by senior professionals",
+    category: "Classic",
+    image: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=400",
+    popular: true
+  },
+  {
+    id: 3,
+    title: "Creative Portfolio",
+    description: "Stand out with a unique design for creative industries",
+    category: "Creative",
+    image: "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400",
+    popular: false
+  },
+  {
+    id: 4,
+    title: "Technical Specialist",
+    description: "Optimized for technical roles and skill highlighting",
+    category: "Technical",
+    image: "https://images.unsplash.com/photo-1512626120412-faf41adb4874?w=400",
+    popular: false
+  },
+  {
+    id: 5,
+    title: "Minimal Clean",
+    description: "Simple and elegant design that lets your content shine",
+    category: "Minimal",
+    image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=400",
+    popular: true
+  },
+  {
+    id: 6,
+    title: "Professional Impact",
+    description: "Make a strong first impression with this balanced layout",
+    category: "Professional",
+    image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400",
+    popular: false
+  }
+];
+
 const TemplateGallery: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
+  const filteredTemplates = selectedCategory
+    ? templates.filter(template => template.category === selectedCategory)
+    : templates;
+
   return (
     <div className="container mx-auto px-4 py-12">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Resume Templates</h1>
-        <div className="flex space-x-2">
-          <Button 
-            variant={viewMode === 'grid' ? 'default' : 'outline'}
-            size="icon" 
-            onClick={() => setViewMode('grid')}
+      <div className="flex flex-col space-y-6 mb-12">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold">Resume Templates</h1>
+            <p className="text-muted-foreground mt-2">
+              Choose from our professionally designed templates
+            </p>
+          </div>
+          <div className="flex space-x-2">
+            <Button 
+              variant={viewMode === 'grid' ? 'default' : 'outline'}
+              size="icon" 
+              onClick={() => setViewMode('grid')}
+            >
+              <Grid className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant={viewMode === 'list' ? 'default' : 'outline'}
+              size="icon" 
+              onClick={() => setViewMode('list')}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant={!selectedCategory ? 'default' : 'outline'}
+            onClick={() => setSelectedCategory(null)}
           >
-            <Grid />
+            All Templates
           </Button>
-          <Button 
-            variant={viewMode === 'list' ? 'default' : 'outline'}
-            size="icon" 
-            onClick={() => setViewMode('list')}
-          >
-            <List />
-          </Button>
+          {templateCategories.map((category) => (
+            <Button
+              key={category}
+              variant={selectedCategory === category ? 'default' : 'outline'}
+              onClick={() => setSelectedCategory(category === selectedCategory ? null : category)}
+            >
+              {category}
+            </Button>
+          ))}
         </div>
       </div>
 
-      <div className="flex space-x-2 mb-8">
-        {templateCategories.map((category) => (
-          <Button
-            key={category}
-            variant={selectedCategory === category ? 'default' : 'outline'}
-            onClick={() => setSelectedCategory(category === selectedCategory ? null : category)}
-          >
-            {category}
-          </Button>
-        ))}
-      </div>
-
-      <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
-        {[1, 2, 3, 4, 5, 6].map((template) => (
+      <div className={`grid gap-6 ${
+        viewMode === 'grid' 
+          ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+          : 'grid-cols-1'
+      }`}>
+        {filteredTemplates.map((template) => (
           <Card 
-            key={template} 
-            className="hover:shadow-lg transition-shadow duration-300"
+            key={template.id} 
+            className="group hover:shadow-lg transition-all duration-300"
           >
             <CardHeader>
-              <CardTitle>Template {template}</CardTitle>
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle>{template.title}</CardTitle>
+                  <CardDescription className="mt-1">
+                    {template.description}
+                  </CardDescription>
+                </div>
+                {template.popular && (
+                  <span className="bg-primary/10 text-primary text-xs font-medium px-2 py-1 rounded-full">
+                    Popular
+                  </span>
+                )}
+              </div>
             </CardHeader>
-            <CardContent className="flex flex-col space-y-4">
-              <div className="bg-muted rounded-lg h-48 flex items-center justify-center">
-                Placeholder Image
+            <CardContent className="space-y-4">
+              <div className="relative aspect-[3/4] rounded-lg overflow-hidden">
+                <img 
+                  src={template.image} 
+                  alt={template.title}
+                  className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
               <div className="flex justify-between space-x-2">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="flex-1">
                   <Eye className="mr-2 h-4 w-4" /> Preview
                 </Button>
-                <Button variant="outline" size="sm">
-                  <Download className="mr-2 h-4 w-4" /> Download
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Edit3 className="mr-2 h-4 w-4" /> Customize
+                <Button variant="outline" size="sm" className="flex-1">
+                  <Edit3 className="mr-2 h-4 w-4" /> Use Template
                 </Button>
               </div>
             </CardContent>

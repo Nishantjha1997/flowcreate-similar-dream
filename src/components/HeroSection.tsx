@@ -1,8 +1,32 @@
+
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
+  const companies = [
+    {
+      name: 'Google',
+      logo: 'https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?w=200&h=100&fit=crop',
+    },
+    {
+      name: 'Microsoft',
+      logo: 'https://images.unsplash.com/photo-1642132652075-2b0036f8e646?w=200&h=100&fit=crop',
+    },
+    {
+      name: 'Adobe',
+      logo: 'https://images.unsplash.com/photo-1673033004290-6e7b509ca7b6?w=200&h=100&fit=crop',
+    },
+    {
+      name: 'Amazon',
+      logo: 'https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?w=200&h=100&fit=crop',
+    },
+    {
+      name: 'Meta',
+      logo: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=200&h=100&fit=crop',
+    }
+  ];
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-700">
       {/* Background Pattern */}
@@ -46,12 +70,22 @@ const HeroSection = () => {
             </p>
             
             {/* Trusted By Section */}
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col space-y-4">
               <p className="text-sm text-blue-200 font-medium">TRUSTED BY PROFESSIONALS FROM</p>
               <div className="flex flex-wrap gap-6 items-center">
-                {['Google', 'Microsoft', 'Adobe', 'Amazon', 'Meta'].map((company) => (
-                  <div key={company} className="text-white/80 font-semibold text-lg">
-                    {company}
+                {companies.map((company) => (
+                  <div 
+                    key={company.name} 
+                    className="flex items-center space-x-2 bg-white/10 rounded-lg px-4 py-2 backdrop-blur-sm"
+                  >
+                    <img 
+                      src={company.logo} 
+                      alt={`${company.name} logo`} 
+                      className="w-8 h-8 object-contain rounded"
+                    />
+                    <span className="text-white/90 font-semibold">
+                      {company.name}
+                    </span>
                   </div>
                 ))}
               </div>
