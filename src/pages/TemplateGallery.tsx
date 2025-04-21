@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Edit3, Eye, Grid, List } from 'lucide-react';
+import TemplatePreviewModal from '@/components/templates/TemplatePreviewModal';
 
 const templateCategories = [
   'Modern', 
@@ -67,6 +67,7 @@ const templates = [
 const TemplateGallery: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<typeof templates[0] | null>(null);
 
   const filteredTemplates = selectedCategory
     ? templates.filter(template => template.category === selectedCategory)
@@ -129,42 +130,60 @@ const TemplateGallery: React.FC = () => {
             key={template.id} 
             className="group hover:shadow-lg transition-all duration-300"
           >
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle>{template.title}</CardTitle>
-                  <CardDescription className="mt-1">
-                    {template.description}
-                  </CardDescription>
+            <CardContent className="p-0">
+              <div className="relative aspect-[3/4] rounded-t-lg overflow-hidden">
+                <img 
+                  src={template.image} 
+                  alt={template.title} 
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    onClick={() => setSelectedTemplate(template)}
+                  >
+                    <Eye className="mr-2 h-4 w-4" /> Preview
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    onClick={() => window.location.href = `/resume-builder?template=${template.id}`}
+                  >
+                    <Edit3 className="mr-2 h-4 w-4" /> Use Template
+                  </Button>
                 </div>
+              </div>
+              
+              <div className="p-6">
+                <CardTitle>{template.title}</CardTitle>
+                <CardDescription className="mt-1">
+                  {template.description}
+                </CardDescription>
                 {template.popular && (
                   <span className="bg-primary/10 text-primary text-xs font-medium px-2 py-1 rounded-full">
                     Popular
                   </span>
                 )}
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="relative aspect-[3/4] rounded-lg overflow-hidden">
-                <img 
-                  src={template.image} 
-                  alt={template.title}
-                  className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
-              <div className="flex justify-between space-x-2">
-                <Button variant="outline" size="sm" className="flex-1">
-                  <Eye className="mr-2 h-4 w-4" /> Preview
-                </Button>
-                <Button variant="outline" size="sm" className="flex-1">
-                  <Edit3 className="mr-2 h-4 w-4" /> Use Template
-                </Button>
-              </div>
             </CardContent>
           </Card>
         ))}
       </div>
+      
+      {filteredTemplates.length === 0 && (
+        <p className="text-center text-muted-foreground">
+          No templates found for the selected category.
+        </p>
+      )}
+
+      {selectedTemplate && (
+        <TemplatePreviewModal
+          isOpen={!!selectedTemplate}
+          onClose={() => setSelectedTemplate(null)}
+          template={selectedTemplate}
+        />
+      )}
     </div>
   );
 };
