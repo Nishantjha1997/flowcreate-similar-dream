@@ -3,7 +3,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Github, Heart, Code, Users, Coffee, ArrowRight } from 'lucide-react';
+import { Github, Heart, Code, Users, Coffee, ArrowRight, User, Mail } from 'lucide-react';
 
 const About = () => {
   return (
@@ -137,6 +137,32 @@ const About = () => {
                 Thank you for being part of our community. Together, we're making professional resume creation accessible to everyone.
               </p>
               
+              {/* About the Creator Section */}
+              <div className="bg-muted rounded-xl p-8 mt-16">
+                <h3 className="text-2xl font-semibold mb-4 text-center flex items-center justify-center gap-2">
+                  <User className="h-6 w-6 text-primary" /> About the Creator
+                </h3>
+                <div className="text-center mb-2">
+                  <span className="font-bold text-lg text-foreground">
+                    Nishant
+                  </span>
+                </div>
+                <div className="flex flex-col items-center space-y-1 mb-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Mail className="h-5 w-5" />
+                    <a 
+                      href="mailto:hinishaant@gmail.com"
+                      className="text-primary underline hover:text-primary/80"
+                    >
+                      hinishaant@gmail.com
+                    </a>
+                  </div>
+                </div>
+                <p className="text-base text-muted-foreground text-center italic">
+                  "My mission is to empower job seekers globally by providing accessible, free, and professional resume building tools that help everyone stand out and succeed."
+                </p>
+              </div>
+              
               <div className="text-center mt-12">
                 <Link to="/resume-builder">
                   <Button size="lg" className="mt-4">
@@ -154,3 +180,4 @@ const About = () => {
 };
 
 export default About;
+
