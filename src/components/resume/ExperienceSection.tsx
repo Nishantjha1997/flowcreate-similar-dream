@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -7,6 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Plus, Trash2 } from 'lucide-react';
 import { ResumeData } from '@/utils/resumeAdapterUtils';
+import { fetchGeminiSuggestion } from '@/utils/ai/gemini';
+import { Loader2, Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ExperienceSectionProps {
   experience: ResumeData['experience'];
@@ -23,6 +25,35 @@ export const ExperienceSection = ({
   onAdd,
   onRemove
 }: ExperienceSectionProps) => {
+  const [loadingIndex, setLoadingIndex] = React.useState<number | null>(null);
+  const [aiSuggestion, setAiSuggestion] = React.useState<{ [key: number]: string }>({});
+
+  async function handleGetSuggestion(index: number) {
+    setLoadingIndex(index);
+    setAiSuggestion(aiSuggestion => ({ ...aiSuggestion, [index]: '' }));
+    const currentDesc = experience[index]?.description || '';
+    toast.info("Generating AI suggestion...");
+    try {
+      const suggestion = await fetchGeminiSuggestion(currentDesc);
+      setAiSuggestion(prev => ({ ...prev, [index]: suggestion }));
+      toast.success("AI suggestion ready!");
+    } catch (e: any) {
+      toast.error(e.message || "Failed to get AI suggestion");
+    } finally {
+      setLoadingIndex(null);
+    }
+  }
+
+  function handleAcceptSuggestion(index: number) {
+    // Insert suggestion into the description field
+    const fakeEvent = {
+      target: { name: 'description', value: aiSuggestion[index] || '' }
+    } as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
+    onChange(fakeEvent, index);
+    toast.success("Suggestion applied");
+    setAiSuggestion(prev => ({ ...prev, [index]: '' }));
+  }
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Work Experience</h2>
@@ -130,6 +161,40 @@ export const ExperienceSection = ({
               rows={4}
               placeholder="Describe your responsibilities and achievements..."
             />
+            <div className="flex items-center gap-2 mt-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                type="button"
+                onClick={() => handleGetSuggestion(index)}
+                disabled={loadingIndex === index}
+                className="flex items-center gap-1"
+              >
+                {loadingIndex === index ? (
+                  <Loader2 className="animate-spin h-4 w-4" />
+                ) : (
+                  <Sparkles className="h-4 w-4" />
+                )}
+                {loadingIndex === index ? 'Generating...' : 'Get AI Suggestion'}
+              </Button>
+              {aiSuggestion[index] && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  type="button"
+                  onClick={() => handleAcceptSuggestion(index)}
+                >
+                  Insert Suggestion
+                </Button>
+              )}
+            </div>
+            {aiSuggestion[index] && (
+              <div className="bg-primary/5 border border-primary/20 rounded-md mt-2 p-2 text-sm">
+                <span className="font-semibold text-primary">AI Suggestion:</span>
+                <br />
+                {aiSuggestion[index]}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground mt-1">
               Tip: Use bullet points (•) to format your description.
             </p>
