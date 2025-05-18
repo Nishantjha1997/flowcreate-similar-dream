@@ -2,6 +2,9 @@
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { useState } from "react";
+import TemplatePreviewModal from "@/components/templates/TemplatePreviewModal";
+import TemplateCustomizationModal from "@/components/templates/TemplateCustomizationModal";
 
 const templates = [
   {
@@ -47,6 +50,12 @@ const templates = [
 ];
 
 const TemplatesSection = () => {
+  const [previewId, setPreviewId] = useState<number | null>(null);
+  const [customizeId, setCustomizeId] = useState<number | null>(null);
+
+  const previewTemplate = previewId !== null ? templates.find(t => t.id === previewId) : null;
+  const customizeTemplate = customizeId !== null ? templates.find(t => t.id === customizeId) : null;
+
   return (
     <section className="py-24 bg-muted/30">
       <div className="container mx-auto px-4">
@@ -62,7 +71,7 @@ const TemplatesSection = () => {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {templates.map((template) => (
             <div key={template.id} className="group relative overflow-hidden rounded-xl border bg-background shadow-md transition-all duration-300 hover:shadow-xl">
-              <div className="aspect-[3/4] overflow-hidden">
+              <div className="aspect-[3/4] overflow-hidden cursor-pointer" onClick={() => setPreviewId(template.id)}>
                 <img 
                   src={template.image} 
                   alt={template.name} 
@@ -78,13 +87,6 @@ const TemplatesSection = () => {
                 <h3 className="text-xl font-semibold text-foreground">{template.name}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{template.description}</p>
               </div>
-              <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                <Link to={`/resume-builder?template=${template.id}`}>
-                  <Button variant="default" className="font-medium">
-                    Use this template
-                  </Button>
-                </Link>
-              </div>
             </div>
           ))}
         </div>
@@ -97,9 +99,33 @@ const TemplatesSection = () => {
             </Button>
           </Link>
         </div>
+
+        {previewTemplate && (
+          <TemplatePreviewModal
+            isOpen={!!previewTemplate}
+            onClose={() => setPreviewId(null)}
+            template={previewTemplate}
+            onCustomize={(id) => {
+              setPreviewId(null);
+              setCustomizeId(id);
+            }}
+          />
+        )}
+        {customizeTemplate && (
+          <TemplateCustomizationModal
+            isOpen={!!customizeTemplate}
+            onClose={() => setCustomizeId(null)}
+            templateName={customizeTemplate.name}
+            onStart={() => {
+              // For now, navigate directly to builder with the template
+              window.location.href = `/resume-builder?template=${customizeTemplate.id}&custom=true`;
+            }}
+          />
+        )}
       </div>
     </section>
   );
 };
 
 export default TemplatesSection;
+

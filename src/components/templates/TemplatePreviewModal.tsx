@@ -14,9 +14,10 @@ interface TemplatePreviewModalProps {
     image: string;
     category: string;
   };
+  onCustomize?: (templateId: number) => void;
 }
 
-const TemplatePreviewModal = ({ isOpen, onClose, template }: TemplatePreviewModalProps) => {
+const TemplatePreviewModal = ({ isOpen, onClose, template, onCustomize }: TemplatePreviewModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl">
@@ -65,10 +66,17 @@ const TemplatePreviewModal = ({ isOpen, onClose, template }: TemplatePreviewModa
                 {template.category} roles and professionals looking for a {template.category.toLowerCase()} approach.
               </p>
             </div>
-            
-            <Link to={`/resume-builder?template=${template.id}`} className="block">
-              <Button className="w-full">Use this template</Button>
-            </Link>
+
+            <div className="flex flex-col gap-3">
+              {onCustomize && (
+                <Button className="w-full" onClick={() => onCustomize(template.id)}>
+                  Customize &amp; Use Template
+                </Button>
+              )}
+              <Link to={`/resume-builder?template=${template.id}`} className="block">
+                <Button variant="outline" className="w-full">Use this template without customization</Button>
+              </Link>
+            </div>
           </div>
         </div>
       </DialogContent>
@@ -77,3 +85,4 @@ const TemplatePreviewModal = ({ isOpen, onClose, template }: TemplatePreviewModa
 };
 
 export default TemplatePreviewModal;
+
