@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Edit3, Eye, Grid, List } from 'lucide-react';
 import TemplatePreviewModal from '@/components/templates/TemplatePreviewModal';
@@ -16,7 +17,7 @@ const templateCategories = [
 const templates = [
   {
     id: 1,
-    title: "Modern Professional",
+    name: "Modern Professional",
     description: "Clean and contemporary design perfect for tech and business roles",
     category: "Modern",
     image: "https://images.unsplash.com/photo-1586281380117-5a60ae2050cc?w=400",
@@ -24,7 +25,7 @@ const templates = [
   },
   {
     id: 2,
-    title: "Classic Executive",
+    name: "Classic Executive",
     description: "Traditional layout trusted by senior professionals",
     category: "Classic",
     image: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=400",
@@ -32,7 +33,7 @@ const templates = [
   },
   {
     id: 3,
-    title: "Creative Portfolio",
+    name: "Creative Portfolio",
     description: "Stand out with a unique design for creative industries",
     category: "Creative",
     image: "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400",
@@ -40,7 +41,7 @@ const templates = [
   },
   {
     id: 4,
-    title: "Technical Specialist",
+    name: "Technical Specialist",
     description: "Optimized for technical roles and skill highlighting",
     category: "Technical",
     image: "https://images.unsplash.com/photo-1512626120412-faf41adb4874?w=400",
@@ -48,7 +49,7 @@ const templates = [
   },
   {
     id: 5,
-    title: "Minimal Clean",
+    name: "Minimal Clean",
     description: "Simple and elegant design that lets your content shine",
     category: "Minimal",
     image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=400",
@@ -56,7 +57,7 @@ const templates = [
   },
   {
     id: 6,
-    title: "Professional Impact",
+    name: "Professional Impact",
     description: "Make a strong first impression with this balanced layout",
     category: "Professional",
     image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400",
@@ -134,7 +135,7 @@ const TemplateGallery: React.FC = () => {
               <div className="relative aspect-[3/4] rounded-t-lg overflow-hidden">
                 <img 
                   src={template.image} 
-                  alt={template.title} 
+                  alt={template.name} 
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
@@ -156,7 +157,7 @@ const TemplateGallery: React.FC = () => {
               </div>
               
               <div className="p-6">
-                <CardTitle>{template.title}</CardTitle>
+                <CardTitle>{template.name}</CardTitle>
                 <CardDescription className="mt-1">
                   {template.description}
                 </CardDescription>
