@@ -12,6 +12,10 @@ import { SectionDragDropCustomizer } from '@/components/resume/SectionDragDropCu
 import { ResumeData } from '@/utils/types';
 import { emptyEducation, emptyExperience, emptyProject, exampleResumes, templateNames } from '@/components/resume/ResumeData';
 
+import { useAuth } from "@/hooks/useAuth";
+import { usePremiumStatus } from "@/hooks/usePremiumStatus";
+import { useResumeCount } from "@/hooks/useResumeLimit";
+
 const ResumeBuilder = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -137,6 +141,13 @@ const ResumeBuilder = () => {
       localStorage.setItem('resumeData', JSON.stringify(resume));
     }
   }, [resume, isExample]);
+
+  const { user } = useAuth();
+  const userId = user?.id;
+
+  const { data: premium, isLoading: loadingPremium } = usePremiumStatus(userId);
+  const { data: resumeCount, isLoading: loadingCount, refetch: refetchResumeCount } =
+    useResumeCount(userId);
 
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -338,11 +349,56 @@ const ResumeBuilder = () => {
     setHiddenSections(hidden);
   };
 
+  // Modified handler for adding resume (limit by plan)
+  const handleSaveResume = async () => {
+    if (loadingPremium || loadingCount) {
+      toast.warning("Checking your plan...");
+      return;
+    }
+    // Free plan: allow max 1 resume
+    if (!premium?.isPremium && resumeCount >= 1) {
+      toast.error("Free users can only save 1 resume. Upgrade to Premium to save more.");
+      return;
+    }
+
+    // Insert/update resume in Supabase
+    const { error } = await supabase
+      .from("resumes")
+      .insert([{ user_id: userId, resume_data: resume }]);
+
+    if (error) {
+      toast.error("Error saving resume: " + error.message);
+    } else {
+      toast.success("Resume saved!");
+      refetchResumeCount();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="py-8">
         <div className="container mx-auto px-4">
+          {/* PREMIUM UPGRADE BANNER */}
+          {!premium?.isPremium && (
+            <div className="mb-5 bg-yellow-50 text-yellow-900 border-l-4 border-yellow-400 p-3 rounded flex items-center justify-between shadow">
+              <span>
+                Free users can only save 1 resume.{" "}
+                <b>Upgrade to Premium</b> for unlimited resumes!
+              </span>
+              {/* Placeholder Upgrade-to-Premium Button */}
+              <button
+                className="ml-4 px-4 py-2 bg-primary text-white font-bold rounded shadow hover:bg-primary/90 transition-all"
+                // We'll later integrate Razorpay
+                onClick={() =>
+                  toast.info("Premium upgrade coming soon! (Razorpay will be integrated)")
+                }
+              >
+                Upgrade ₹199/month
+              </button>
+            </div>
+          )}
+
           <ResumeHeaderSection 
             resumeElementRef={resumeElementRef}
             resumeName={resumeName}
