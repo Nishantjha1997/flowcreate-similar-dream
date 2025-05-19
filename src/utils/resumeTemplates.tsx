@@ -919,10 +919,12 @@ const templateStyles: Record<string, TemplateStyles> = {
 
 const ResumeTemplate = ({ 
   data, 
-  templateName = 'modern' 
+  templateName = 'modern',
+  sectionOrder, // <-- Add this
 }: { 
   data: ResumeData | TypesResumeData; 
   templateName?: string;
+  sectionOrder?: string[];
 }) => {
   const isTypesResumeData = 'education' in data && Array.isArray(data.education) && 
     data.education.length > 0 && 'institution' in data.education[0];
@@ -963,89 +965,125 @@ const ResumeTemplate = ({
     </>
   );
 
+  // Helper to render each section based on key
+  const renderSection = (key: string) => {
+    switch (key) {
+      case "summary":
+        if (resumeData.personal.summary) {
+          return (
+            <div style={styles.section} key="summary">
+              <div style={styles.sectionTitle}>Summary</div>
+              <div style={styles.itemDescription}>{resumeData.personal.summary}</div>
+            </div>
+          );
+        }
+        break;
+      case "experience":
+        if (resumeData.experience && resumeData.experience.length > 0) {
+          return (
+            <div style={styles.section} key="experience">
+              <div style={styles.sectionTitle}>Experience</div>
+              <div style={styles.sectionContent}>
+                {resumeData.experience.map((exp) => (
+                  <div key={exp.id} style={styles.item}>
+                    <div style={styles.itemTitle}>{exp.title}</div>
+                    <div style={styles.itemSubtitle}>{exp.company}{exp.location ? ` | ${exp.location}` : ''}</div>
+                    <div style={styles.itemDate}>{exp.startDate} - {exp.current ? 'Present' : exp.endDate}</div>
+                    <div style={styles.itemDescription}>{exp.description}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        break;
+      case "education":
+        if (resumeData.education && resumeData.education.length > 0) {
+          return (
+            <div style={styles.section} key="education">
+              <div style={styles.sectionTitle}>Education</div>
+              <div style={styles.sectionContent}>
+                {resumeData.education.map((edu) => (
+                  <div key={edu.id} style={styles.item}>
+                    <div style={styles.itemTitle}>{edu.degree} {edu.field ? `in ${edu.field}` : ''}</div>
+                    <div style={styles.itemSubtitle}>{edu.school}</div>
+                    <div style={styles.itemDate}>{edu.startDate} - {edu.endDate}</div>
+                    {edu.description && <div style={styles.itemDescription}>{edu.description}</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        break;
+      case "skills":
+        if (resumeData.skills && resumeData.skills.length > 0) {
+          return (
+            <div style={styles.section} key="skills">
+              <div style={styles.sectionTitle}>Skills</div>
+              <div style={styles.skillsList}>
+                {resumeData.skills.map((skill, index) => (
+                  <div key={index} style={styles.skill}>{skill}</div>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        break;
+      case "projects":
+        if (resumeData.projects && resumeData.projects.length > 0) {
+          return (
+            <div style={styles.section} key="projects">
+              <div style={styles.sectionTitle}>Projects</div>
+              <div style={styles.sectionContent}>
+                {resumeData.projects.map((project) => (
+                  <div key={project.id} style={styles.item}>
+                    <div style={styles.itemTitle}>
+                      {project.title}
+                      {project.link && (
+                        <a href={project.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: '8px', fontSize: '14px' }}>
+                          Link
+                        </a>
+                      )}
+                    </div>
+                    <div style={styles.itemDescription}>{project.description}</div>
+                    {project.technologies && project.technologies.length > 0 && (
+                      <div style={{ ...styles.skillsList, marginTop: '5px' }}>
+                        {project.technologies.map((tech, i) => (
+                          <div key={i} style={{ ...styles.skill, fontSize: '12px' }}>{tech}</div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        break;
+      // Add more dynamic custom sections as needed using similar logic
+      default:
+        return null;
+    }
+    return null;
+  };
+
+  // Determine section order: if provided, use; else, default.
+  const defaultOrder = [
+    "summary",
+    "experience",
+    "education",
+    "skills",
+    "projects",
+  ];
+  const useOrder = sectionOrder && sectionOrder.length > 0 ? sectionOrder : defaultOrder;
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
         {headerContent}
       </div>
-      
-      {resumeData.personal.summary && (
-        <div style={styles.section}>
-          <div style={styles.sectionTitle}>Summary</div>
-          <div style={styles.itemDescription}>{resumeData.personal.summary}</div>
-        </div>
-      )}
-      
-      {resumeData.experience && resumeData.experience.length > 0 && (
-        <div style={styles.section}>
-          <div style={styles.sectionTitle}>Experience</div>
-          <div style={styles.sectionContent}>
-            {resumeData.experience.map((exp) => (
-              <div key={exp.id} style={styles.item}>
-                <div style={styles.itemTitle}>{exp.title}</div>
-                <div style={styles.itemSubtitle}>{exp.company}{exp.location ? ` | ${exp.location}` : ''}</div>
-                <div style={styles.itemDate}>{exp.startDate} - {exp.current ? 'Present' : exp.endDate}</div>
-                <div style={styles.itemDescription}>{exp.description}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {resumeData.education && resumeData.education.length > 0 && (
-        <div style={styles.section}>
-          <div style={styles.sectionTitle}>Education</div>
-          <div style={styles.sectionContent}>
-            {resumeData.education.map((edu) => (
-              <div key={edu.id} style={styles.item}>
-                <div style={styles.itemTitle}>{edu.degree} {edu.field ? `in ${edu.field}` : ''}</div>
-                <div style={styles.itemSubtitle}>{edu.school}</div>
-                <div style={styles.itemDate}>{edu.startDate} - {edu.endDate}</div>
-                {edu.description && <div style={styles.itemDescription}>{edu.description}</div>}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {resumeData.skills && resumeData.skills.length > 0 && (
-        <div style={styles.section}>
-          <div style={styles.sectionTitle}>Skills</div>
-          <div style={styles.skillsList}>
-            {resumeData.skills.map((skill, index) => (
-              <div key={index} style={styles.skill}>{skill}</div>
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {resumeData.projects && resumeData.projects.length > 0 && (
-        <div style={styles.section}>
-          <div style={styles.sectionTitle}>Projects</div>
-          <div style={styles.sectionContent}>
-            {resumeData.projects.map((project) => (
-              <div key={project.id} style={styles.item}>
-                <div style={styles.itemTitle}>
-                  {project.title}
-                  {project.link && (
-                    <a href={project.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: '8px', fontSize: '14px' }}>
-                      Link
-                    </a>
-                  )}
-                </div>
-                <div style={styles.itemDescription}>{project.description}</div>
-                {project.technologies && project.technologies.length > 0 && (
-                  <div style={{ ...styles.skillsList, marginTop: '5px' }}>
-                    {project.technologies.map((tech, i) => (
-                      <div key={i} style={{ ...styles.skill, fontSize: '12px' }}>{tech}</div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {useOrder.map((sectionKey) => renderSection(sectionKey))}
     </div>
   );
 };
