@@ -73,7 +73,7 @@ const HeroSection = () => {
             <div className="relative rounded-xl overflow-hidden shadow-2xl transform transition-transform hover:scale-[1.02]">
               <div className="bg-white p-4 rounded-xl">
                 <img 
-                  src="https://images.unsplash.com/photo-1586281380117-5a60ae2050cc?q=80&w=2070" 
+                  src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?q=80&w=2070" 
                   alt="Resume builder interface" 
                   className="w-full h-auto rounded-lg"
                 />
