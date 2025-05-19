@@ -15,6 +15,8 @@ import {
 interface ResumePreviewProps {
   resumeData: ResumeData;
   previewComponent: React.ReactNode;
+  sectionOrder?: string[];
+  hiddenSections?: string[];
 }
 
 /**
@@ -22,7 +24,12 @@ interface ResumePreviewProps {
  * @param {ResumePreviewProps} props - Component props
  * @returns {JSX.Element} The resume preview component
  */
-export const ResumePreview = ({ resumeData, previewComponent }: ResumePreviewProps) => {
+export const ResumePreview = ({
+  resumeData,
+  previewComponent,
+  sectionOrder,
+  hiddenSections
+}: ResumePreviewProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const resumeRef = useRef<HTMLDivElement>(null);
@@ -178,7 +185,14 @@ export const ResumePreview = ({ resumeData, previewComponent }: ResumePreviewPro
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
         <div className="p-2">
           <div ref={resumeRef} className="bg-white rounded-md shadow-md p-6 mb-4 resume-content">
-            {previewComponent}
+            {/* Pass the extra props for live PDF preview */}
+            {React.cloneElement(
+              previewComponent as React.ReactElement<any>,
+              {
+                sectionOrder,
+                hiddenSections
+              }
+            )}
           </div>
           
           <div className="flex justify-center gap-3 mt-4">

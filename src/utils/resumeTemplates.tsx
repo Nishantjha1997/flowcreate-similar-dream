@@ -915,16 +915,328 @@ const templateStyles: Record<string, TemplateStyles> = {
       color: '#555',
     }
   },
+
+  bold: {
+    container: {
+      fontFamily: "'Oswald', sans-serif",
+      color: '#1a1a1a',
+      backgroundColor: '#fff',
+      padding: '32px',
+      maxWidth: '100%',
+      height: '100%',
+      boxSizing: 'border-box',
+    },
+    header: {
+      marginBottom: '32px',
+      borderBottom: '4px solid #c1121f',
+      paddingBottom: '18px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '2rem'
+    },
+    profilePhoto: {
+      width: '120px',
+      height: '120px',
+      borderRadius: '40%',
+      objectFit: 'cover',
+      border: '2px solid #c1121f',
+    },
+    name: { fontSize: '30px', fontWeight: 800, marginBottom: '7px', color: '#c1121f', textTransform: 'uppercase' },
+    contact: { fontSize: '14px', color: '#222', display: 'flex', flexWrap: 'wrap', gap: '1.2rem', marginTop: '7px' },
+    section: { marginBottom: '24px' },
+    sectionTitle: { fontSize: '17px', fontWeight: 700, color: '#c1121f', marginBottom: '10px', borderBottom: '2px solid #e63946', paddingBottom: '4px' },
+    sectionContent: { marginTop: '7px' },
+    item: { marginBottom: '13px' },
+    itemTitle: { fontSize: '15px', fontWeight: 600, color: '#222', marginBottom: '2px' },
+    itemSubtitle: { fontSize: '13px', color: '#444' },
+    itemDate: { fontSize: '12px', color: '#666' },
+    itemDescription: { fontSize: '13px', color: '#222', lineHeight: '1.5', whiteSpace: 'pre-line' },
+    skillsList: { display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '7px' },
+    skill: { padding: '3px 11px', fontSize: '12px', backgroundColor: '#e63946', color: '#fff', borderRadius: '2px' }
+  },
 };
 
-const ResumeTemplate = ({ 
-  data, 
+Object.assign(templateStyles, {
+  elegant: {
+    container: {
+      fontFamily: "'Cormorant Garamond', serif",
+      color: '#333',
+      lineHeight: '1.6',
+      maxWidth: '100%',
+      height: '100%',
+      padding: '35px',
+      backgroundColor: '#fff',
+      boxSizing: 'border-box',
+    },
+    header: {
+      marginBottom: '30px',
+      borderBottom: '1px solid #ccc',
+      paddingBottom: '25px',
+      textAlign: 'center',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+    profilePhoto: {
+      width: '120px',
+      height: '120px',
+      borderRadius: '50%',
+      objectFit: 'cover',
+      border: '3px solid #f3f3f3',
+      marginBottom: '15px',
+    },
+    name: {
+      fontSize: '34px',
+      fontWeight: 600,
+      marginBottom: '8px',
+      color: '#333',
+      letterSpacing: '1px',
+    },
+    contact: {
+      fontSize: '15px',
+      display: 'flex',
+      justifyContent: 'center',
+      flexWrap: 'wrap',
+      gap: '15px',
+      marginTop: '12px',
+      color: '#555',
+    },
+    section: {
+      marginBottom: '28px',
+    },
+    sectionTitle: {
+      fontSize: '20px',
+      fontWeight: 600,
+      textAlign: 'center',
+      color: '#333',
+      marginBottom: '18px',
+      position: 'relative',
+      paddingBottom: '10px',
+    },
+    sectionContent: {
+      marginTop: '18px',
+    },
+    item: {
+      marginBottom: '22px',
+    },
+    itemTitle: {
+      fontSize: '18px',
+      fontWeight: 600,
+      color: '#333',
+      marginBottom: '4px',
+    },
+    itemSubtitle: {
+      fontSize: '16px',
+      fontWeight: 500,
+      color: '#555',
+      fontStyle: 'italic',
+    },
+    itemDate: {
+      fontSize: '15px',
+      color: '#666',
+      marginBottom: '8px',
+    },
+    itemDescription: {
+      fontSize: '16px',
+      whiteSpace: 'pre-line',
+      lineHeight: '1.7',
+      color: '#444',
+    },
+    skillsList: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '12px',
+      justifyContent: 'center',
+      marginTop: '15px',
+    },
+    skill: {
+      padding: '5px 15px',
+      fontSize: '14px',
+      border: '1px solid #ccc',
+      borderRadius: '20px',
+      color: '#555',
+    }
+  },
+});
+
+export const templateMockData: Record<string, ResumeData> = {
+  modern: {
+    personal: {
+      name: 'Alex Johnson',
+      email: 'alex.johnson@email.com',
+      phone: '(555) 123-4567',
+      address: '123 Main St, San Francisco, CA',
+      summary: 'Product-focused software engineer with 6+ years building modern user experiences.',
+      website: 'alexjohnson.dev',
+      linkedin: 'linkedin.com/in/alexjohnson',
+      profileImage: '',
+    },
+    experience: [
+      {
+        id: 1,
+        title: 'Senior Software Engineer',
+        company: 'Tech Dynamix',
+        location: 'Remote',
+        startDate: 'Apr 2020',
+        endDate: '',
+        current: true,
+        description: 'Lead React/TypeScript projects; mentoring 8 engineers; designed authentication and cloud integrations.'
+      },
+      {
+        id: 2,
+        title: 'Frontend Developer',
+        company: 'Pixel Rocket',
+        location: 'San Jose, CA',
+        startDate: 'Jan 2018',
+        endDate: 'Mar 2020',
+        current: false,
+        description: 'Developed robust web interfaces for SaaS platform used by Fortune 500 partners.'
+      }
+    ],
+    education: [
+      {
+        id: 1,
+        school: 'UC Berkeley',
+        degree: 'B.Sc.',
+        field: 'Computer Science',
+        startDate: '2014',
+        endDate: '2017',
+        description: 'Graduated with honors in advanced computing topics and research'
+      }
+    ],
+    skills: ['JavaScript', 'React', 'TypeScript', 'User Experience', 'Cloud', 'REST APIs'],
+    projects: [
+      {
+        id: 1,
+        title: 'Realtime Collaboration App',
+        description: 'An in-browser team editor with live presence and versioning.',
+        technologies: ['React', 'Socket.IO', 'AWS'],
+        link: 'https://github.com/alexjohnson/realtime-collab'
+      },
+    ],
+    customization: {
+      primaryColor: '#2563eb',
+      secondaryColor: '#6b7280',
+      fontSize: 'medium',
+      spacing: 'normal'
+    }
+  },
+  elegant: {
+    personal: {
+      name: 'Charlotte Evans',
+      email: 'charlotte.evans@example.com',
+      phone: '+44 7123 456789',
+      address: 'London, UK',
+      summary: 'Marketing strategist & campaign manager with a creative eye for branding.',
+      website: 'charlotte-evans.com',
+      linkedin: 'linkedin.com/in/charlotteevans',
+      profileImage: '',
+    },
+    experience: [
+      {
+        id: 1,
+        title: 'Lead Marketing Strategist',
+        company: 'Visionary Brands',
+        location: 'London',
+        startDate: '2019',
+        endDate: '',
+        current: true,
+        description: "Increased conversions by 40% with integrated digital campaigns targeting UK retail sector."
+      }
+    ],
+    education: [
+      {
+        id: 1,
+        school: 'University of Oxford',
+        degree: 'MA',
+        field: 'Marketing',
+        startDate: '2015',
+        endDate: '2018',
+        description: 'Dissertation on social branding trends'
+      }
+    ],
+    skills: ['Digital Marketing', 'Copywriting', 'Brand Development', 'Team Leadership'],
+    projects: [
+      {
+        id: 1,
+        title: 'Brand Relaunch for XCORP',
+        description: 'Rebranded a national franchise – new logo, website, and social assets.',
+        technologies: ['Branding', 'Graphic Design', 'UX'],
+        link: ''
+      },
+    ],
+    customization: {
+      primaryColor: '#748ca6',
+      secondaryColor: '#353535',
+      fontSize: 'large',
+      spacing: 'spacious'
+    }
+  },
+  bold: {
+    personal: {
+      name: 'Maya Patel',
+      email: 'maya.patel@mail.com',
+      phone: '+1 (785) 888-2468',
+      address: 'Austin, TX',
+      summary: 'Direct and driven sales leader with consistent multi-million targets exceeded.',
+      website: 'mayapatel.io',
+      linkedin: 'linkedin.com/in/mayapatel',
+      profileImage: '',
+    },
+    experience: [
+      {
+        id: 1,
+        title: 'Director of Sales',
+        company: 'SkyLine Telecom',
+        location: 'Austin, TX',
+        startDate: '2020',
+        endDate: '',
+        current: true,
+        description: 'Managed 20+ member sales team and expanded regional revenue by 82%.'
+      },
+      {
+        id: 2,
+        title: 'Sales Executive',
+        company: 'WaveConnect',
+        location: 'Houston, TX',
+        startDate: '2017',
+        endDate: '2020',
+        current: false,
+        description: 'Ranked top 1% zone performer for 2 consecutive years.'
+      }
+    ],
+    education: [
+      {
+        id: 1,
+        school: 'Texas A&M University',
+        degree: 'MBA',
+        field: 'Business Administration',
+        startDate: '2011',
+        endDate: '2015',
+        description: ''
+      }
+    ],
+    skills: ['Negotiation', 'Team Building', 'B2B Sales', 'Customer Retention'],
+    projects: [],
+    customization: {
+      primaryColor: '#c1121f',
+      secondaryColor: '#e63946',
+      fontSize: 'medium',
+      spacing: 'normal'
+    }
+  },
+};
+
+const ResumeTemplate = ({
+  data,
   templateName = 'modern',
-  sectionOrder, // <-- Add this
-}: { 
-  data: ResumeData | TypesResumeData; 
+  sectionOrder,
+  hiddenSections,
+}: {
+  data: ResumeData | TypesResumeData;
   templateName?: string;
   sectionOrder?: string[];
+  hiddenSections?: string[];
 }) => {
   const isTypesResumeData = 'education' in data && Array.isArray(data.education) && 
     data.education.length > 0 && 'institution' in data.education[0];
@@ -965,8 +1277,8 @@ const ResumeTemplate = ({
     </>
   );
 
-  // Helper to render each section based on key
   const renderSection = (key: string) => {
+    if (hiddenSections && hiddenSections.includes(key)) return null;
     switch (key) {
       case "summary":
         if (resumeData.personal.summary) {
@@ -1061,14 +1373,12 @@ const ResumeTemplate = ({
           );
         }
         break;
-      // Add more dynamic custom sections as needed using similar logic
       default:
         return null;
     }
     return null;
   };
 
-  // Determine section order: if provided, use; else, default.
   const defaultOrder = [
     "summary",
     "experience",

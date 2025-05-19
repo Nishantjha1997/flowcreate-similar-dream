@@ -1,4 +1,3 @@
-
 import { useRef } from 'react';
 import { FileText } from 'lucide-react';
 import { ResumePreview } from '@/components/ResumePreview';
@@ -13,7 +12,13 @@ interface ResumeVisualPreviewProps {
   hiddenSections?: string[];
 }
 
-export const ResumeVisualPreview = ({ resume, templateId, templateNames, sectionOrder, hiddenSections }: ResumeVisualPreviewProps) => {
+export const ResumeVisualPreview = ({
+  resume,
+  templateId,
+  templateNames,
+  sectionOrder,
+  hiddenSections
+}: ResumeVisualPreviewProps) => {
   const resumeRef = useRef<HTMLDivElement>(null);
   
   const hasContent = resume.personal.name || resume.experience.some(e => e.title || e.company);
@@ -35,6 +40,7 @@ export const ResumeVisualPreview = ({ resume, templateId, templateNames, section
                 data={resume} 
                 templateName={templateNames[templateId] || 'modern'}
                 sectionOrder={getOrderedSections()}
+                hiddenSections={hiddenSections}
               />
             </div>
           </div>
@@ -54,18 +60,28 @@ export const ResumeVisualPreview = ({ resume, templateId, templateNames, section
   );
 };
 
-export const EnhancedResumePreview = ({ resume, templateId, templateNames }: ResumeVisualPreviewProps) => {
+export const EnhancedResumePreview = ({
+  resume,
+  templateId,
+  templateNames,
+  sectionOrder,
+  hiddenSections
+}: ResumeVisualPreviewProps) => {
   const adaptedData = adaptResumeData(resume);
-  
+
   return (
     <ResumePreview
       resumeData={adaptedData}
       previewComponent={
         <ResumeTemplate 
           data={resume} 
-          templateName={templateNames[templateId] || 'modern'} 
+          templateName={templateNames[templateId] || 'modern'}
+          sectionOrder={sectionOrder}
+          hiddenSections={hiddenSections}
         />
       }
+      sectionOrder={sectionOrder}
+      hiddenSections={hiddenSections}
     />
   );
 };
