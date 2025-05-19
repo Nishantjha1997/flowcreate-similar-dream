@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner'; 
@@ -8,6 +7,7 @@ import { ResumeNavigation } from '@/components/resume/ResumeNavigation';
 import { ResumeFormSection } from '@/components/resume/ResumeFormSection';
 import { ResumePreviewSection } from '@/components/resume/ResumePreviewSection';
 import { usePDFGenerator } from '@/hooks/usePDFGenerator';
+import { SectionDragDropCustomizer } from '@/components/resume/SectionDragDropCustomizer';
 
 import { ResumeData } from '@/utils/types';
 import { emptyEducation, emptyExperience, emptyProject, exampleResumes, templateNames } from '@/components/resume/ResumeData';
@@ -65,6 +65,11 @@ const ResumeBuilder = () => {
   const resumeName = resume.personal?.name || 'resume';
   const { isGenerating, generatePDF } = usePDFGenerator(`${resumeName}.pdf`);
 
+  // NEW: Section order and hidden state
+  const defaultSectionOrder = ['personal', 'experience', 'education', 'skills', 'projects'];
+  const [activeSections, setActiveSections] = useState<string[]>(defaultSectionOrder);
+  const [hiddenSections, setHiddenSections] = useState<string[]>([]);
+
   useEffect(() => {
     const savedResume = localStorage.getItem('resumeData');
     if (savedResume) {
@@ -120,6 +125,10 @@ const ResumeBuilder = () => {
           secondaryColor
         }
       }));
+      // NEW: Fill with the template's complete mock data if template is just selected (and not editing)
+      if (exampleResumes[templateId]) {
+        setResume(exampleResumes[templateId]);
+      }
     }
   }, [templateId, isExample]);
 
@@ -323,6 +332,12 @@ const ResumeBuilder = () => {
     }
   };
 
+  // NEW: Pass section arrangement and order up/downstream
+  const handleSectionsChange = (active: string[], hidden: string[]) => {
+    setActiveSections(active);
+    setHiddenSections(hidden);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -344,6 +359,16 @@ const ResumeBuilder = () => {
                 currentTemplateId={templateId}
                 onTemplateChange={handleTemplateChange}
               />
+              {/* Section customizer menu */}
+              <div className="mt-4">
+                <SectionDragDropCustomizer
+                  activeSections={activeSections}
+                  hiddenSections={hiddenSections}
+                  sectionTitles={{}} // Pass if you use titles, otherwise keep empty
+                  onSectionsChange={handleSectionsChange}
+                  onSectionTitleChange={() => {}} // Placeholder if needed
+                />
+              </div>
             </div>
 
             <div className="lg:col-span-5">
@@ -374,6 +399,8 @@ const ResumeBuilder = () => {
                 resumeRef={resumeElementRef}
                 handleDownload={handleDownload}
                 isGenerating={isGenerating}
+                sectionOrder={activeSections}
+                hiddenSections={hiddenSections}
               />
             </div>
           </div>

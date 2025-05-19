@@ -13,6 +13,8 @@ interface ResumePreviewSectionProps {
   resumeRef: React.RefObject<HTMLDivElement>;
   handleDownload: () => void;
   isGenerating: boolean;
+  sectionOrder: string[];
+  hiddenSections: string[];
 }
 
 export const ResumePreviewSection = ({ 
@@ -21,7 +23,9 @@ export const ResumePreviewSection = ({
   templateNames,
   resumeRef,
   handleDownload,
-  isGenerating
+  isGenerating,
+  sectionOrder,
+  hiddenSections
 }: ResumePreviewSectionProps) => {
   
   return (
@@ -53,6 +57,8 @@ export const ResumePreviewSection = ({
             resume={resume}
             templateId={templateId}
             templateNames={templateNames}
+            sectionOrder={sectionOrder}
+            hiddenSections={hiddenSections}
           />
         </div>
       </CardContent>

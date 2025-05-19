@@ -9,14 +9,22 @@ interface ResumeVisualPreviewProps {
   resume: ResumeData;
   templateId: string;
   templateNames: Record<string, string>;
+  sectionOrder?: string[];
+  hiddenSections?: string[];
 }
 
-export const ResumeVisualPreview = ({ resume, templateId, templateNames }: ResumeVisualPreviewProps) => {
+export const ResumeVisualPreview = ({ resume, templateId, templateNames, sectionOrder, hiddenSections }: ResumeVisualPreviewProps) => {
   const resumeRef = useRef<HTMLDivElement>(null);
   
-  // Check if resume has at least some content to display
   const hasContent = resume.personal.name || resume.experience.some(e => e.title || e.company);
-  
+
+  // If sectionOrder/hiddenSections provided by props, use them, otherwise fallback to default template
+  const getOrderedSections = () => {
+    if (!sectionOrder) return undefined;
+    const visibleSections = sectionOrder.filter(section => !hiddenSections?.includes(section));
+    return visibleSections;
+  };
+
   return (
     <div className="h-full w-full relative">
       {hasContent ? (
@@ -25,7 +33,8 @@ export const ResumeVisualPreview = ({ resume, templateId, templateNames }: Resum
             <div ref={resumeRef} className="bg-white shadow-sm resume-content">
               <ResumeTemplate 
                 data={resume} 
-                templateName={templateNames[templateId] || 'modern'} 
+                templateName={templateNames[templateId] || 'modern'}
+                sectionOrder={getOrderedSections()}
               />
             </div>
           </div>
