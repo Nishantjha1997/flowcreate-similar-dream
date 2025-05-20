@@ -6,6 +6,7 @@ import { ResumeData } from '@/utils/resumeAdapterUtils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Upload, X } from 'lucide-react';
+import { AiSuggestionButton } from "@/components/resume/AiSuggestionButton";
 
 interface PersonalInfoSectionProps {
   personal: ResumeData['personal'];
@@ -13,7 +14,11 @@ interface PersonalInfoSectionProps {
   onProfileImageChange?: (profileImage: string) => void;
 }
 
-export const PersonalInfoSection = ({ personal, onChange, onProfileImageChange }: PersonalInfoSectionProps) => {
+export const PersonalInfoSection = ({
+  personal,
+  onChange,
+  onProfileImageChange,
+}: any) => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -159,16 +164,26 @@ export const PersonalInfoSection = ({ personal, onChange, onProfileImageChange }
           />
         </div>
         <div>
-          <Label htmlFor="summary" className="block text-sm font-medium mb-1">
-            Professional Summary
-          </Label>
-          <Textarea
+          <label htmlFor="summary" className="block text-sm font-medium mb-1">
+            Professional Summary / About You
+          </label>
+          <textarea
             id="summary"
             name="summary"
             value={personal.summary}
             onChange={onChange}
-            rows={4}
-            placeholder="Write a professional summary..."
+            rows={5}
+            className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            placeholder="E.g. Results-driven marketing manager with 7+ years experience..."
+          />
+          <AiSuggestionButton
+            value={personal.summary}
+            onAccept={(suggested) =>
+              onChange({
+                target: { name: "summary", value: suggested },
+              })
+            }
+            label="Get AI Suggestion"
           />
         </div>
       </div>

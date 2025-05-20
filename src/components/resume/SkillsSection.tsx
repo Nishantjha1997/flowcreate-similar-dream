@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { AiSuggestionButton } from "@/components/resume/AiSuggestionButton";
 
 interface SkillsSectionProps {
   skills: string[];
@@ -11,6 +11,16 @@ interface SkillsSectionProps {
 export const SkillsSection = ({ skills, onChange }: SkillsSectionProps) => {
   const getSkillsString = () => {
     return skills.join(', ');
+  };
+
+  // We need a local handler to accept suggested skills string (and simulate a textarea event)
+  const handleAcceptSuggestion = (suggested: string) => {
+    // Make a fake change event as expected
+    onChange({
+      target: {
+        value: suggested,
+      },
+    } as React.ChangeEvent<HTMLTextAreaElement>);
   };
 
   return (
@@ -28,6 +38,11 @@ export const SkillsSection = ({ skills, onChange }: SkillsSectionProps) => {
           onChange={onChange}
           rows={4}
           placeholder="JavaScript, React, Project Management, Leadership"
+        />
+        <AiSuggestionButton
+          value={getSkillsString()}
+          onAccept={handleAcceptSuggestion}
+          label="Get AI Skills Suggestion"
         />
         <p className="text-xs text-muted-foreground mt-1">
           Example: JavaScript, React, Customer Service, Team Leadership

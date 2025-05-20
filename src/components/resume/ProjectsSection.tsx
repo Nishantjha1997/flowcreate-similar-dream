@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -6,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, BookOpen, Trash2 } from 'lucide-react';
 import { ResumeData } from '@/utils/resumeAdapterUtils';
+import { AiSuggestionButton } from "@/components/resume/AiSuggestionButton";
 
 interface ProjectsSectionProps {
   projects: ResumeData['projects'];
@@ -79,6 +79,13 @@ export const ProjectsSection = ({
               onChange={(e) => onChange('description', e.target.value, index)}
               rows={3}
               placeholder="Describe your project, its purpose, and your role..."
+            />
+            <AiSuggestionButton
+              value={project.description}
+              onAccept={(suggested) =>
+                onChange('description', suggested, index)
+              }
+              label="Get AI Suggestion"
             />
           </div>
           
