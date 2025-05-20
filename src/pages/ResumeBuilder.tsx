@@ -366,7 +366,12 @@ const ResumeBuilder = () => {
     // Insert/update resume in Supabase
     const { error } = await supabase
       .from("resumes")
-      .insert([{ user_id: userId, resume_data: resume }]);
+      .insert([
+        {
+          user_id: userId,
+          resume_data: resume as unknown as Json, // <--- Fix/convert here!
+        }
+      ]);
 
     if (error) {
       toast.error("Error saving resume: " + error.message);
