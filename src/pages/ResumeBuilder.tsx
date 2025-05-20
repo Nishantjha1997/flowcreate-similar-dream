@@ -17,6 +17,7 @@ import { usePremiumStatus } from "@/hooks/usePremiumStatus";
 import { useResumeCount } from "@/hooks/useResumeLimit";
 
 import { supabase } from "@/integrations/supabase/client";
+import { Json } from "@/integrations/supabase/types";
 
 const ResumeBuilder = () => {
   const [searchParams] = useSearchParams();
