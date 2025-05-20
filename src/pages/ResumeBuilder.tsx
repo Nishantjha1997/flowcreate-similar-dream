@@ -16,6 +16,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePremiumStatus } from "@/hooks/usePremiumStatus";
 import { useResumeCount } from "@/hooks/useResumeLimit";
 
+import { supabase } from "@/integrations/supabase/client";
+
 const ResumeBuilder = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
