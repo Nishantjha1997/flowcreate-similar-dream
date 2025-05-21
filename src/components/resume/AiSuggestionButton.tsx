@@ -1,9 +1,9 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 import { fetchGeminiSuggestion } from "@/utils/ai/gemini";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AiSuggestionButtonProps {
   value: string;

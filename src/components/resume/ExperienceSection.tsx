@@ -1,17 +1,13 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Trash2 } from 'lucide-react';
-import { ResumeData } from '@/utils/resumeAdapterUtils';
-import { fetchGeminiSuggestion } from '@/utils/ai/gemini';
-import { Loader2, Sparkles } from 'lucide-react';
-import { toast } from 'sonner';
+import { AiSuggestionButton } from "@/components/resume/AiSuggestionButton";
 
 interface ExperienceSectionProps {
-  experience: ResumeData['experience'];
+  experience: any[];
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => void;
   onToggleCurrent: (checked: boolean, index: number) => void;
   onAdd: () => void;
@@ -23,187 +19,128 @@ export const ExperienceSection = ({
   onChange,
   onToggleCurrent,
   onAdd,
-  onRemove
+  onRemove,
 }: ExperienceSectionProps) => {
-  const [loadingIndex, setLoadingIndex] = React.useState<number | null>(null);
-  const [aiSuggestion, setAiSuggestion] = React.useState<{ [key: number]: string }>({});
-
-  async function handleGetSuggestion(index: number) {
-    setLoadingIndex(index);
-    setAiSuggestion(aiSuggestion => ({ ...aiSuggestion, [index]: '' }));
-    const currentDesc = experience[index]?.description || '';
-    toast.info("Generating AI suggestion...");
-    try {
-      const suggestion = await fetchGeminiSuggestion(currentDesc);
-      setAiSuggestion(prev => ({ ...prev, [index]: suggestion }));
-      toast.success("AI suggestion ready!");
-    } catch (e: any) {
-      toast.error(e.message || "Failed to get AI suggestion");
-    } finally {
-      setLoadingIndex(null);
-    }
-  }
-
-  function handleAcceptSuggestion(index: number) {
-    // Insert suggestion into the description field
-    const fakeEvent = {
-      target: { name: 'description', value: aiSuggestion[index] || '' }
-    } as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
-    onChange(fakeEvent, index);
-    toast.success("Suggestion applied");
-    setAiSuggestion(prev => ({ ...prev, [index]: '' }));
-  }
+  // AI description callback
+  const handleAiDescription = (suggested: string, idx: number) => {
+    // Fake a change event for the description field
+    const event = {
+      target: {
+        name: "description",
+        value: suggested,
+      },
+    } as React.ChangeEvent<HTMLTextAreaElement>;
+    onChange(event, idx);
+  };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h2 className="text-xl font-semibold">Work Experience</h2>
-      <p className="text-muted-foreground">Add your professional experience, starting with the most recent.</p>
+      <p className="text-muted-foreground">Add your work experience, starting with the most recent.</p>
       
-      {experience.map((exp, index) => (
-        <div key={exp.id} className="p-4 border rounded-md space-y-4 relative">
-          {experience.length > 1 && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onRemove(exp.id)}
-              className="absolute right-2 top-2 h-8 w-8 text-destructive"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
-          
-          <div>
-            <Label htmlFor={`title-${index}`} className="block text-sm font-medium mb-1">
-              Job Title
-            </Label>
-            <Input
-              id={`title-${index}`}
-              name="title"
-              value={exp.title}
-              onChange={(e) => onChange(e, index)}
-              placeholder="Marketing Manager"
-            />
-          </div>
-          
-          <div>
-            <Label htmlFor={`company-${index}`} className="block text-sm font-medium mb-1">
-              Company
-            </Label>
-            <Input
-              id={`company-${index}`}
-              name="company"
-              value={exp.company}
-              onChange={(e) => onChange(e, index)}
-              placeholder="Company Name"
-            />
-          </div>
-          
-          <div>
-            <Label htmlFor={`location-${index}`} className="block text-sm font-medium mb-1">
-              Location (Optional)
-            </Label>
-            <Input
-              id={`location-${index}`}
-              name="location"
-              value={exp.location}
-              onChange={(e) => onChange(e, index)}
-              placeholder="City, Country"
-            />
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
+      {experience.map((exp, idx) => (
+        <div key={exp.id} className="mb-6 border-b border-muted pb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <Label htmlFor={`startDate-${index}`} className="block text-sm font-medium mb-1">
-                Start Date
-              </Label>
+              <Label htmlFor={`experience-title-${exp.id}`}>Job Title</Label>
               <Input
-                id={`startDate-${index}`}
-                name="startDate"
-                value={exp.startDate}
-                onChange={(e) => onChange(e, index)}
-                placeholder="Jan 2020"
+                id={`experience-title-${exp.id}`}
+                name="title"
+                value={exp.title}
+                onChange={e => onChange(e, idx)}
+                placeholder="e.g. Software Engineer"
               />
             </div>
-            
             <div>
-              <Label htmlFor={`endDate-${index}`} className="block text-sm font-medium mb-1">
-                End Date
-              </Label>
+              <Label htmlFor={`experience-company-${exp.id}`}>Company</Label>
               <Input
-                id={`endDate-${index}`}
+                id={`experience-company-${exp.id}`}
+                name="company"
+                value={exp.company}
+                onChange={e => onChange(e, idx)}
+                placeholder="e.g. Acme Inc."
+              />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <Label htmlFor={`experience-location-${exp.id}`}>Location</Label>
+              <Input
+                id={`experience-location-${exp.id}`}
+                name="location"
+                value={exp.location}
+                onChange={e => onChange(e, idx)}
+                placeholder="e.g. San Francisco, CA"
+              />
+            </div>
+            <div>
+              <Label htmlFor={`experience-startDate-${exp.id}`}>Start Date</Label>
+              <Input
+                id={`experience-startDate-${exp.id}`}
+                name="startDate"
+                value={exp.startDate}
+                onChange={e => onChange(e, idx)}
+                placeholder="e.g. Jan 2020"
+              />
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2 mb-4">
+            <Switch
+              id={`experience-current-${exp.id}`}
+              checked={exp.current}
+              onCheckedChange={checked => onToggleCurrent(checked, idx)}
+            />
+            <Label htmlFor={`experience-current-${exp.id}`}>
+              I currently work here
+            </Label>
+          </div>
+          
+          {!exp.current && (
+            <div className="mb-4">
+              <Label htmlFor={`experience-endDate-${exp.id}`}>End Date</Label>
+              <Input
+                id={`experience-endDate-${exp.id}`}
                 name="endDate"
                 value={exp.endDate}
-                onChange={(e) => onChange(e, index)}
-                placeholder="Dec 2022"
+                onChange={e => onChange(e, idx)}
+                placeholder="e.g. Dec 2022"
                 disabled={exp.current}
               />
             </div>
-          </div>
+          )}
           
-          <div className="flex items-center space-x-2">
-            <Switch 
-              id={`current-${index}`}
-              checked={exp.current}
-              onCheckedChange={(checked) => onToggleCurrent(checked, index)}
-            />
-            <Label htmlFor={`current-${index}`}>I currently work here</Label>
-          </div>
-          
-          <div>
-            <Label htmlFor={`description-${index}`} className="block text-sm font-medium mb-1">
-              Description
-            </Label>
+          <div className="mb-4">
+            <Label htmlFor={`experience-description-${exp.id}`}>Description</Label>
             <Textarea
-              id={`description-${index}`}
+              id={`experience-description-${exp.id}`}
               name="description"
               value={exp.description}
-              onChange={(e) => onChange(e, index)}
+              onChange={e => onChange(e, idx)}
               rows={4}
-              placeholder="Describe your responsibilities and achievements..."
+              className="mb-2"
+              placeholder="Describe your responsibilities and achievements"
             />
-            <div className="flex items-center gap-2 mt-2">
-              <Button
-                size="sm"
-                variant="secondary"
-                type="button"
-                onClick={() => handleGetSuggestion(index)}
-                disabled={loadingIndex === index}
-                className="flex items-center gap-1"
-              >
-                {loadingIndex === index ? (
-                  <Loader2 className="animate-spin h-4 w-4" />
-                ) : (
-                  <Sparkles className="h-4 w-4" />
-                )}
-                {loadingIndex === index ? 'Generating...' : 'Get AI Suggestion'}
-              </Button>
-              {aiSuggestion[index] && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  type="button"
-                  onClick={() => handleAcceptSuggestion(index)}
-                >
-                  Insert Suggestion
-                </Button>
-              )}
-            </div>
-            {aiSuggestion[index] && (
-              <div className="bg-primary/5 border border-primary/20 rounded-md mt-2 p-2 text-sm">
-                <span className="font-semibold text-primary">AI Suggestion:</span>
-                <br />
-                {aiSuggestion[index]}
-              </div>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">
-              Tip: Use bullet points (•) to format your description.
-            </p>
+            <AiSuggestionButton
+              value={exp.description || ""}
+              onAccept={suggested => handleAiDescription(suggested, idx)}
+              label="Suggest Description"
+            />
           </div>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => onRemove(exp.id)}
+            className="text-destructive hover:text-destructive"
+          >
+            Remove
+          </Button>
         </div>
       ))}
       
-      <Button variant="outline" className="w-full" onClick={onAdd}>
-        <Plus className="h-4 w-4 mr-2" />
+      <Button onClick={onAdd} type="button" className="mt-4">
         Add Experience
       </Button>
     </div>

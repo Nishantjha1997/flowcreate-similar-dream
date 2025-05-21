@@ -8,12 +8,12 @@ import { Link } from 'react-router-dom';
 const Pricing = () => {
   const features = [
     "Access to all templates",
-    "Unlimited resume creations",
+    "Unlimited resume creations (Premium only)",
     "PDF and DOCX downloads",
     "ATS-friendly designs",
     "Real-time preview",
     "Custom styling options",
-    "Content suggestions",
+    "AI-powered content suggestions",
     "Cover letter templates",
     "Shareable resume links",
     "Cloud storage",
@@ -34,38 +34,58 @@ const Pricing = () => {
               Simple, Transparent Pricing
             </h1>
             <p className="mt-6 text-xl text-muted-foreground">
-              FlowCreate is completely free. No hidden fees, no premium plans, no restrictions.
+              FlowCreate is free for 1 resume, with a Premium plan for unlimited resumes and power users.
             </p>
           </div>
-
-          <div className="max-w-4xl mx-auto mt-16">
-            <div className="rounded-xl border border-primary bg-card shadow-sm overflow-hidden">
+          <div className="max-w-4xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-2 gap-10">
+            {/* Free Plan */}
+            <div className="rounded-xl border border-primary bg-card shadow-sm overflow-hidden flex flex-col">
               <div className="p-8 bg-primary text-primary-foreground text-center">
-                <h2 className="text-3xl font-bold">Free Forever</h2>
+                <h2 className="text-3xl font-bold">Free</h2>
                 <div className="mt-4 flex items-center justify-center">
                   <span className="text-6xl font-bold tracking-tight">$0</span>
                   <span className="ml-2">/month</span>
                 </div>
-                <p className="mt-2 text-base">No credit card required. No hidden fees.</p>
+                <p className="mt-2 text-base">No credit card required. Save 1 resume per account.</p>
               </div>
-              
               <div className="p-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {features.map((feature, index) => (
-                    <div key={index} className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mr-2" />
-                      <span>{feature}</span>
-                    </div>
-                  ))}
+                <ul className="space-y-2">
+                  <li>✔️ All templates included</li>
+                  <li>✔️ Live preview</li>
+                  <li>✔️ AI suggestions (limited)</li>
+                  <li>✔️ Save 1 resume</li>
+                  <li>❌ Unlimited resumes</li>
+                  <li>❌ Version history</li>
+                  <li>❌ Cloud backup</li>
+                  <li>❌ Premium support</li>
+                </ul>
+              </div>
+            </div>
+            {/* Premium Plan */}
+            <div className="rounded-xl border border-yellow-500 bg-yellow-50 shadow-sm overflow-hidden flex flex-col">
+              <div className="p-8 bg-yellow-400 text-yellow-900 text-center">
+                <h2 className="text-3xl font-bold">Premium</h2>
+                <div className="mt-4 flex items-center justify-center">
+                  <span className="text-6xl font-bold tracking-tight">$2</span>
+                  <span className="ml-2">/month</span>
                 </div>
-                
-                <div className="mt-8 text-center">
-                  <Link to="/resume-builder">
-                    <Button size="lg">
-                      Get Started For Free
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Button>
-                  </Link>
+                <p className="mt-2 text-base">Unlimited resumes, full AI and all premium features.</p>
+              </div>
+              <div className="p-8">
+                <ul className="space-y-2">
+                  <li>✔️ Everything in Free</li>
+                  <li>✔️ Unlimited resumes</li>
+                  <li>✔️ Unlimited AI suggestions</li>
+                  <li>✔️ Version history</li>
+                  <li>✔️ Premium support</li>
+                </ul>
+                <div className="mt-6 text-center">
+                  <Button size="lg" variant="default" disabled>
+                    Upgrade Coming Soon!
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Premium unlocks unlimited resumes, storage, history, and more.
+                  </p>
                 </div>
               </div>
             </div>
