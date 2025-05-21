@@ -37,7 +37,12 @@ serve(async (req) => {
     );
 
     const apiData = await apiRequest.json();
+    // Log API raw response for debugging
+    console.log("[Gemini] API response", JSON.stringify(apiData));
 
+    let errorDetail = apiData.error?.message || apiData.error || undefined;
+
+    // Try candidates[0].content.parts[0].text as before
     if (
       apiData &&
       apiData.candidates &&
@@ -48,13 +53,19 @@ serve(async (req) => {
         JSON.stringify({ suggestion: apiData.candidates[0].content.parts[0].text }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    } else if (errorDetail) {
+      return new Response(
+        JSON.stringify({ error: errorDetail }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     } else {
       return new Response(
-        JSON.stringify({ error: "No suggestion returned from Gemini." }),
+        JSON.stringify({ error: "No suggestion returned from Gemini. Raw response: " + JSON.stringify(apiData) }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
   } catch (error) {
+    console.log("[Gemini] Function error", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

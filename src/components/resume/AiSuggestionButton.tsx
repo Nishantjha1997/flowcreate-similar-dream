@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2, Lightbulb } from "lucide-react";
@@ -27,8 +28,10 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
       const result = await fetchGeminiSuggestion(value);
       setSuggestion(result);
       toast.success("AI suggestion ready!");
+      console.log("[Gemini] AI suggestion:", result); // <-- log the returned suggestion
     } catch (e: any) {
       toast.error(e.message || "Failed to get AI suggestion");
+      console.error("[Gemini] Suggestion error:", e); // <-- log error
     }
     setLoading(false);
   }

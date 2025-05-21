@@ -28,9 +28,13 @@ export async function fetchGeminiSuggestion(description: string): Promise<string
   );
 
   const data = await response.json();
+  // Add diagnostic logging to help debug frontend issues
+  console.log("[Gemini] Suggestion response", data);
+
   if (data.suggestion) {
     return data.suggestion;
   } else {
-    throw new Error(data.error || "No suggestions returned from Gemini. Try again later.");
+    // Show all error info for better user debug
+    throw new Error(data.error || JSON.stringify(data) || "No suggestions returned from Gemini. Try again later.");
   }
 }

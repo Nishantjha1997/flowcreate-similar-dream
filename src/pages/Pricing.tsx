@@ -63,13 +63,13 @@ const Pricing = () => {
             </div>
             {/* Premium Plan */}
             <div className="rounded-xl border border-yellow-500 bg-yellow-50 shadow-sm overflow-hidden flex flex-col">
-              <div className="p-8 bg-yellow-400 text-yellow-900 text-center">
-                <h2 className="text-3xl font-bold">Premium</h2>
+              <div className="p-8 bg-yellow-400 text-yellow-900 text-center" style={{ textShadow: "0px 1px 3px #fafafa, 0 1px 2px #00000016" }}>
+                <h2 className="text-3xl font-bold" style={{ color: "#904803" }}>Premium</h2>
                 <div className="mt-4 flex items-center justify-center">
-                  <span className="text-6xl font-bold tracking-tight">$2</span>
-                  <span className="ml-2">/month</span>
+                  <span className="text-6xl font-bold tracking-tight" style={{ color: "#202020", textShadow: "0 2px 6px #ffffff99" }}>$2</span>
+                  <span className="ml-2" style={{ color: "#202020" }}>/month</span>
                 </div>
-                <p className="mt-2 text-base">Unlimited resumes, full AI and all premium features.</p>
+                <p className="mt-2 text-base" style={{ color: "#783f04" }}>Unlimited resumes, full AI and all premium features.</p>
               </div>
               <div className="p-8">
                 <ul className="space-y-2">
@@ -78,6 +78,7 @@ const Pricing = () => {
                   <li>✔️ Unlimited AI suggestions</li>
                   <li>✔️ Version history</li>
                   <li>✔️ Premium support</li>
+                  <li>✔️ Cloud backup</li>
                 </ul>
                 <div className="mt-6 text-center">
                   <Button size="lg" variant="default" disabled>
@@ -90,7 +91,6 @@ const Pricing = () => {
               </div>
             </div>
           </div>
-
           {/* FAQs */}
           <div className="max-w-3xl mx-auto mt-20">
             <h2 className="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
