@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -14,6 +13,7 @@ export async function fetchGeminiSuggestion(description: string): Promise<string
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
+  // Only set Authorization if we have a token!
   if (accessToken) {
     headers["Authorization"] = `Bearer ${accessToken}`;
   }
@@ -28,13 +28,16 @@ export async function fetchGeminiSuggestion(description: string): Promise<string
   );
 
   const data = await response.json();
-  // Add diagnostic logging to help debug frontend issues
   console.log("[Gemini] Suggestion response", data);
 
   if (data.suggestion) {
-    return data.suggestion;
+    return data.suggestion.trim();
+  } else if (data.code === 401 || data.message?.toLowerCase().includes('authorization')) {
+    // Show a more specific error if auth is the problem
+    throw new Error(
+      "Authorization error: Please make sure you are logged in, or contact support if this issue persists."
+    );
   } else {
-    // Show all error info for better user debug
     throw new Error(data.error || JSON.stringify(data) || "No suggestions returned from Gemini. Try again later.");
   }
 }

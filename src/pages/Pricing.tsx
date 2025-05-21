@@ -49,7 +49,7 @@ const Pricing = () => {
                 <p className="mt-2 text-base">No credit card required. Save 1 resume per account.</p>
               </div>
               <div className="p-8">
-                <ul className="space-y-2">
+                <ul className="space-y-2 text-foreground">
                   <li>✔️ All templates included</li>
                   <li>✔️ Live preview</li>
                   <li>✔️ AI suggestions (limited)</li>
@@ -63,7 +63,7 @@ const Pricing = () => {
             </div>
             {/* Premium Plan */}
             <div className="rounded-xl border border-yellow-500 bg-yellow-50 shadow-sm overflow-hidden flex flex-col">
-              <div className="p-8 bg-yellow-400 text-yellow-900 text-center" style={{ textShadow: "0px 1px 3px #fafafa, 0 1px 2px #00000016" }}>
+              <div className="p-8 bg-yellow-400 text-center" style={{ textShadow: "0px 1px 3px #fafafa, 0 1px 2px #00000016" }}>
                 <h2 className="text-3xl font-bold" style={{ color: "#904803" }}>Premium</h2>
                 <div className="mt-4 flex items-center justify-center">
                   <span className="text-6xl font-bold tracking-tight" style={{ color: "#202020", textShadow: "0 2px 6px #ffffff99" }}>$2</span>
@@ -72,13 +72,13 @@ const Pricing = () => {
                 <p className="mt-2 text-base" style={{ color: "#783f04" }}>Unlimited resumes, full AI and all premium features.</p>
               </div>
               <div className="p-8">
-                <ul className="space-y-2">
+                <ul className="space-y-2 text-yellow-900 font-semibold">
                   <li>✔️ Everything in Free</li>
                   <li>✔️ Unlimited resumes</li>
                   <li>✔️ Unlimited AI suggestions</li>
                   <li>✔️ Version history</li>
-                  <li>✔️ Premium support</li>
                   <li>✔️ Cloud backup</li>
+                  <li>✔️ Premium support</li>
                 </ul>
                 <div className="mt-6 text-center">
                   <Button size="lg" variant="default" disabled>

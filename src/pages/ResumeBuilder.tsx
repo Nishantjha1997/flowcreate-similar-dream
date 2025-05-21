@@ -382,6 +382,18 @@ const ResumeBuilder = () => {
     }
   };
 
+  // Add a notice about Premium "Version History"
+  const versionHistoryBanner = (
+    (!premium?.isPremium) && (
+      <div className="mb-3 bg-yellow-100 text-yellow-900 border border-yellow-300 rounded p-2 flex items-center justify-between">
+        <span>
+          <b>Version History</b> is a <span className="underline">Premium</span> feature. <br />
+          Upgrade to access multiple resume versions.
+        </span>
+      </div>
+    )
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -406,7 +418,8 @@ const ResumeBuilder = () => {
               </button>
             </div>
           )}
-
+          {/* Version History Premium notice */}
+          {versionHistoryBanner}
           <ResumeHeaderSection 
             resumeElementRef={resumeElementRef}
             resumeName={resumeName}

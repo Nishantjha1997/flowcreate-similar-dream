@@ -14,17 +14,15 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
-
   try {
     const { prompt } = await req.json();
-
     if (!prompt || typeof prompt !== "string") {
       return new Response(
         JSON.stringify({ error: "Prompt is required." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-
+    // Ignore Authorization header, treat as public
     const apiRequest = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
       {
@@ -35,14 +33,10 @@ serve(async (req) => {
         }),
       }
     );
-
     const apiData = await apiRequest.json();
-    // Log API raw response for debugging
     console.log("[Gemini] API response", JSON.stringify(apiData));
-
     let errorDetail = apiData.error?.message || apiData.error || undefined;
 
-    // Try candidates[0].content.parts[0].text as before
     if (
       apiData &&
       apiData.candidates &&
