@@ -4,7 +4,7 @@ import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { useAllMembers } from "@/hooks/useAllMembers";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption } from "@/components/ui/table";
 import { toast } from "@/components/ui/use-toast";
@@ -19,6 +19,8 @@ const Admin = () => {
   const { data: isAdmin, isLoading: loadingAdmin } = useAdminStatus(userId);
   const { data: members = [], isLoading: loadingMembers, refetch } = useAllMembers(!!isAdmin);
 
+  const [removingId, setRemovingId] = useState<string | null>(null);
+
   useEffect(() => {
     if (!isLoading && !loadingAdmin) {
       if (!userId) {
@@ -32,7 +34,6 @@ const Admin = () => {
   }, [userId, isAdmin, isLoading, loadingAdmin, navigate]);
 
   const handlePromoteToPremium = async (targetUserId: string) => {
-    // Upsert to subscriptions as premium
     const { error } = await supabase
       .from("subscriptions")
       .upsert({
@@ -47,9 +48,45 @@ const Admin = () => {
     }
   };
 
+  // Remove a user (from auth and relevant tables)
+  const handleRemoveUser = async (targetUserId: string) => {
+    setRemovingId(targetUserId);
+    try {
+      // Remove user roles
+      await supabase.from("user_roles").delete().eq("user_id", targetUserId);
+
+      // Remove subscriptions
+      await supabase.from("subscriptions").delete().eq("user_id", targetUserId);
+
+      // Remove resumes
+      await supabase.from("resumes").delete().eq("user_id", targetUserId);
+
+      // Remove user from auth (requires service_role, can only trigger from secure backend: here we just remove their data)
+      toast({ title: "User data removed", description: "Data for user has been deleted from app database." });
+      refetch();
+      queryClient.invalidateQueries();
+    } catch (error: any) {
+      toast({
+        title: "Remove failed",
+        description: error.message || "Error removing user",
+        variant: "destructive"
+      });
+    } finally {
+      setRemovingId(null);
+    }
+  };
+
+  // Confirm dialog (simple alert for now)
+  const confirmAndRemove = (targetUserId: string, email?: string) => {
+    if (window.confirm(`Are you sure you want to remove this user${email ? ` (${email})` : ""}? This will delete all their data.`)) {
+      handleRemoveUser(targetUserId);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background p-8">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+      <p className="mb-3 text-muted-foreground text-sm">Signed in as: <span className="font-semibold">{user?.email}</span></p>
       <Table>
         <TableCaption>All Platform Members</TableCaption>
         <TableHeader>
@@ -60,6 +97,7 @@ const Admin = () => {
             <TableHead># Resumes</TableHead>
             <TableHead>Actions</TableHead>
             <TableHead>Resumes</TableHead>
+            <TableHead>Remove</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -90,6 +128,21 @@ const Admin = () => {
                   </details>
                 ) : (
                   <span className="text-xs text-muted-foreground">No resumes</span>
+                )}
+              </TableCell>
+              <TableCell>
+                {(m.user_id !== userId) && (
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    disabled={removingId === m.user_id}
+                    onClick={() => confirmAndRemove(m.user_id, m.email)}
+                  >
+                    {removingId === m.user_id ? "Removing..." : "Remove"}
+                  </Button>
+                )}
+                {m.user_id === userId && (
+                  <span className="text-xs text-muted-foreground">(you)</span>
                 )}
               </TableCell>
             </TableRow>
