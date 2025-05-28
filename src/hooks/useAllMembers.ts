@@ -8,16 +8,19 @@ export function useAllMembers(isAdmin: boolean) {
     queryKey: ["all-members", isAdmin],
     queryFn: async () => {
       if (!isAdmin) return [];
+      
       // Get all user roles
       const { data: roles, error: roleErr } = await supabase
         .from("user_roles")
         .select("user_id,role");
       if (roleErr) throw roleErr;
+      
       // Get all subscriptions
       const { data: subs, error: subErr } = await supabase
         .from("subscriptions")
         .select("user_id,is_premium");
       if (subErr) throw subErr;
+      
       // Get all resumes
       const { data: resumes, error: resErr } = await supabase
         .from("resumes")
@@ -42,6 +45,7 @@ export function useAllMembers(isAdmin: boolean) {
           is_premium: !!sub && !!sub.is_premium,
           resume_count: userResumes.length,
           resumes: userResumes,
+          email: null, // Email not available from client-side queries to auth.users
         };
       });
     },

@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { useAllMembers } from "@/hooks/useAllMembers";
@@ -77,8 +76,8 @@ const Admin = () => {
   };
 
   // Confirm dialog (simple alert for now)
-  const confirmAndRemove = (targetUserId: string, email?: string) => {
-    if (window.confirm(`Are you sure you want to remove this user${email ? ` (${email})` : ""}? This will delete all their data.`)) {
+  const confirmAndRemove = (targetUserId: string) => {
+    if (window.confirm(`Are you sure you want to remove this user (${targetUserId})? This will delete all their data.`)) {
       handleRemoveUser(targetUserId);
     }
   };
@@ -136,7 +135,7 @@ const Admin = () => {
                     size="sm"
                     variant="destructive"
                     disabled={removingId === m.user_id}
-                    onClick={() => confirmAndRemove(m.user_id, m.email)}
+                    onClick={() => confirmAndRemove(m.user_id)}
                   >
                     {removingId === m.user_id ? "Removing..." : "Remove"}
                   </Button>
