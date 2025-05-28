@@ -14,7 +14,7 @@ export function useAllMembers(isAdmin: boolean) {
         return [];
       }
       
-      // Get all user roles
+      // Get all user roles (admins can see all due to RLS policy)
       const { data: roles, error: roleErr } = await supabase
         .from("user_roles")
         .select("user_id,role");
@@ -24,7 +24,7 @@ export function useAllMembers(isAdmin: boolean) {
       }
       console.log("Roles fetched:", roles);
       
-      // Get all subscriptions
+      // Get all subscriptions (admins can see all due to RLS policy)
       const { data: subs, error: subErr } = await supabase
         .from("subscriptions")
         .select("user_id,is_premium");
@@ -34,7 +34,7 @@ export function useAllMembers(isAdmin: boolean) {
       }
       console.log("Subscriptions fetched:", subs);
       
-      // Get all resumes
+      // Get all resumes (admins can see all due to RLS policy)
       const { data: resumes, error: resErr } = await supabase
         .from("resumes")
         .select("user_id,resume_data,id");

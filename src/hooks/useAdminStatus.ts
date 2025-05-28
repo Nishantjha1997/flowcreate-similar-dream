@@ -14,22 +14,17 @@ export function useAdminStatus(userId: string | undefined) {
         return false;
       }
       
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId)
-        .eq("role", "admin")
-        .maybeSingle();
+      // Use the new is_admin() function instead of direct table query
+      const { data, error } = await supabase.rpc('is_admin');
       
       if (error) {
         console.error("Error checking admin status:", error);
         throw error;
       }
       
-      const isAdmin = !!data && data.role === "admin";
-      console.log("Admin status result:", { data, isAdmin });
+      console.log("Admin status result:", { data, isAdmin: data });
       
-      return isAdmin;
+      return !!data;
     },
     enabled: !!userId,
   });
