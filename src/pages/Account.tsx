@@ -5,12 +5,20 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
+import { usePremiumStatus } from '@/hooks/usePremiumStatus';
+import { Link } from 'react-router-dom';
+import { Shield, Crown } from 'lucide-react';
 
 const Account = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { data: isAdmin, isLoading: loadingAdmin } = useAdminStatus(user?.id);
+  const { data: premiumData, isLoading: loadingPremium } = usePremiumStatus(user?.id);
+  
   const [isUpdating, setIsUpdating] = useState(false);
   const [fullName, setFullName] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -60,7 +68,45 @@ const Account = () => {
 
   return (
     <div className="container max-w-6xl py-10">
-      <h1 className="text-3xl font-bold mb-6">My Account</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold">My Account</h1>
+        <div className="flex items-center space-x-2">
+          {premiumData?.isPremium && (
+            <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+              <Crown className="w-3 h-3 mr-1" />
+              Premium
+            </Badge>
+          )}
+          {isAdmin && (
+            <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-300">
+              <Shield className="w-3 h-3 mr-1" />
+              Admin
+            </Badge>
+          )}
+        </div>
+      </div>
+
+      {isAdmin && (
+        <Card className="mb-6 border-red-200 bg-red-50">
+          <CardHeader>
+            <CardTitle className="text-red-800 flex items-center">
+              <Shield className="w-5 h-5 mr-2" />
+              Admin Access
+            </CardTitle>
+            <CardDescription>
+              You have administrator privileges. Access the admin dashboard to manage users and system settings.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link to="/admin">
+              <Button variant="destructive" className="w-full">
+                <Shield className="w-4 h-4 mr-2" />
+                Access Admin Dashboard
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
       
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="grid w-full md:w-auto md:inline-flex grid-cols-2 mb-6">

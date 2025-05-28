@@ -2,9 +2,11 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { MenuIcon, X, User, Settings, LogOut } from 'lucide-react';
+import { MenuIcon, X, User, Settings, LogOut, Shield } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
+import { Badge } from '@/components/ui/badge';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -17,6 +19,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { data: isAdmin } = useAdminStatus(user?.id);
   
   const handleSignOut = async () => {
     await signOut();
@@ -73,6 +76,12 @@ const Header = () => {
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
                       <p className="font-medium">{user.email}</p>
+                      {isAdmin && (
+                        <Badge variant="destructive" className="text-xs w-fit">
+                          <Shield className="w-3 h-3 mr-1" />
+                          Admin
+                        </Badge>
+                      )}
                     </div>
                   </div>
                   <DropdownMenuSeparator />
@@ -88,6 +97,17 @@ const Header = () => {
                       <span>Settings</span>
                     </Link>
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin" className="flex cursor-pointer items-center">
+                          <Shield className="mr-2 h-4 w-4" />
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
                     <LogOut className="mr-2 h-4 w-4" />
@@ -127,6 +147,12 @@ const Header = () => {
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
                       <p className="font-medium">{user.email}</p>
+                      {isAdmin && (
+                        <Badge variant="destructive" className="text-xs w-fit">
+                          <Shield className="w-3 h-3 mr-1" />
+                          Admin
+                        </Badge>
+                      )}
                     </div>
                   </div>
                   <DropdownMenuItem asChild>
@@ -141,6 +167,17 @@ const Header = () => {
                       <span>Settings</span>
                     </Link>
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin" className="flex cursor-pointer items-center" onClick={() => setMobileMenuOpen(false)}>
+                          <Shield className="mr-2 h-4 w-4" />
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign out</span>
