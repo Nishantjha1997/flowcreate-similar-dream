@@ -22,41 +22,8 @@ export function UserRegistrations({ isAdmin }: UserRegistrationsProps) {
 
   const { data: userProfiles = [], isLoading, refetch } = useUserProfiles(isAdmin);
 
-  const mockUserData = [
-    {
-      id: "1",
-      email: "john.doe@example.com",
-      firstName: "John",
-      lastName: "Doe",
-      createdAt: "2024-01-15T10:30:00Z",
-      lastSignIn: "2024-01-20T14:22:00Z",
-      emailConfirmed: true,
-      status: "active"
-    },
-    {
-      id: "2", 
-      email: "jane.smith@example.com",
-      firstName: "Jane",
-      lastName: "Smith",
-      createdAt: "2024-01-18T09:15:00Z",
-      lastSignIn: "2024-01-19T16:45:00Z",
-      emailConfirmed: true,
-      status: "active"
-    },
-    {
-      id: "3",
-      email: "pending.user@example.com",
-      firstName: "Pending",
-      lastName: "User",
-      createdAt: "2024-01-20T11:00:00Z",
-      lastSignIn: null,
-      emailConfirmed: false,
-      status: "pending"
-    }
-  ];
-
-  // Use mock data for now since we don't have the actual user profiles function
-  const users = userProfiles.length > 0 ? userProfiles : mockUserData;
+  // Ensure userProfiles is always an array
+  const users = Array.isArray(userProfiles) ? userProfiles : [];
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
