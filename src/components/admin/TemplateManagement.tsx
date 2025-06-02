@@ -11,50 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { FileText, Plus, Edit, Trash2, Eye } from "lucide-react";
-
-interface Template {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
-  isActive: boolean;
-  usage: number;
-  createdAt: string;
-}
+import { useTemplates } from "@/hooks/useTemplates";
 
 export function TemplateManagement() {
-  const [templates, setTemplates] = useState<Template[]>([
-    {
-      id: "1",
-      name: "Modern Professional",
-      category: "Professional",
-      description: "Clean, sleek design with contemporary elements",
-      isActive: true,
-      usage: 245,
-      createdAt: "2024-01-15"
-    },
-    {
-      id: "2",
-      name: "Executive Classic",
-      category: "Traditional",
-      description: "Traditional layout that stands the test of time",
-      isActive: true,
-      usage: 189,
-      createdAt: "2024-01-12"
-    },
-    {
-      id: "3",
-      name: "Creative Portfolio",
-      category: "Design",
-      description: "Eye-catching design for creative professionals",
-      isActive: false,
-      usage: 67,
-      createdAt: "2024-01-10"
-    }
-  ]);
-
+  const { templates, toggleTemplate, deleteTemplate, addTemplate } = useTemplates();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const { toast } = useToast();
 
@@ -62,15 +23,14 @@ export function TemplateManagement() {
     name: "",
     category: "",
     description: "",
+    templateKey: "",
+    isActive: true
   });
 
   const handleToggleTemplate = async (templateId: string) => {
     setIsProcessing(true);
     try {
-      setTemplates(prev => prev.map(t => 
-        t.id === templateId ? { ...t, isActive: !t.isActive } : t
-      ));
-      
+      toggleTemplate(templateId);
       const template = templates.find(t => t.id === templateId);
       toast({ 
         title: "Template updated", 
@@ -94,7 +54,7 @@ export function TemplateManagement() {
 
     setIsProcessing(true);
     try {
-      setTemplates(prev => prev.filter(t => t.id !== templateId));
+      deleteTemplate(templateId);
       toast({ title: "Template deleted", description: "Template removed successfully." });
     } catch (error: any) {
       toast({ 
@@ -108,7 +68,7 @@ export function TemplateManagement() {
   };
 
   const handleAddTemplate = async () => {
-    if (!newTemplate.name || !newTemplate.category) {
+    if (!newTemplate.name || !newTemplate.category || !newTemplate.templateKey) {
       toast({ 
         title: "Missing fields", 
         description: "Please fill in all required fields.", 
@@ -119,18 +79,8 @@ export function TemplateManagement() {
 
     setIsProcessing(true);
     try {
-      const template: Template = {
-        id: (templates.length + 1).toString(),
-        name: newTemplate.name,
-        category: newTemplate.category,
-        description: newTemplate.description,
-        isActive: true,
-        usage: 0,
-        createdAt: new Date().toISOString().split('T')[0]
-      };
-
-      setTemplates(prev => [...prev, template]);
-      setNewTemplate({ name: "", category: "", description: "" });
+      addTemplate(newTemplate);
+      setNewTemplate({ name: "", category: "", description: "", templateKey: "", isActive: true });
       setShowAddDialog(false);
       
       toast({ title: "Template added", description: "New template created successfully." });
@@ -152,7 +102,7 @@ export function TemplateManagement() {
           <div>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              Template Management
+              Template Management ({templates.length} Templates)
             </CardTitle>
             <CardDescription>
               Manage resume templates, add new ones, and control availability
@@ -182,6 +132,16 @@ export function TemplateManagement() {
                     value={newTemplate.name}
                     onChange={(e) => setNewTemplate(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="e.g., Modern Professional"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="templateKey">Template Key</Label>
+                  <Input
+                    id="templateKey"
+                    value={newTemplate.templateKey}
+                    onChange={(e) => setNewTemplate(prev => ({ ...prev, templateKey: e.target.value }))}
+                    placeholder="e.g., modern-professional"
                   />
                 </div>
                 
@@ -236,6 +196,7 @@ export function TemplateManagement() {
               <TableRow>
                 <TableHead>Template Name</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead>Template Key</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Usage</TableHead>
                 <TableHead>Created</TableHead>
@@ -245,7 +206,7 @@ export function TemplateManagement() {
             <TableBody>
               {templates.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
+                  <TableCell colSpan={7} className="text-center py-8">
                     No templates found
                   </TableCell>
                 </TableRow>
@@ -260,6 +221,9 @@ export function TemplateManagement() {
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">{template.category}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <code className="text-xs bg-gray-100 px-2 py-1 rounded">{template.templateKey}</code>
                     </TableCell>
                     <TableCell>
                       {template.isActive ? (
