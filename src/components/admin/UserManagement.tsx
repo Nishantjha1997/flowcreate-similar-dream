@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +24,10 @@ export function UserManagement({ members, isLoading, refetch }: UserManagementPr
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const filteredMembers = members.filter(member => {
+  // If no members data, show loading or empty state
+  const actualMembers = Array.isArray(members) ? members : [];
+
+  const filteredMembers = actualMembers.filter(member => {
     const matchesSearch = member.user_id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === "all" || member.roles?.includes(roleFilter);
     const matchesPremium = premiumFilter === "all" || 
@@ -142,7 +144,7 @@ export function UserManagement({ members, isLoading, refetch }: UserManagementPr
           User Management
         </CardTitle>
         <CardDescription>
-          Manage users, roles, and premium memberships
+          Manage users, roles, and premium memberships ({actualMembers.length} users found)
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -196,13 +198,16 @@ export function UserManagement({ members, isLoading, refetch }: UserManagementPr
               {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8">
-                    Loading users...
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                      Loading users...
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : filteredMembers.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8">
-                    {members.length === 0 ? "No users found in the system" : "No users match your filters"}
+                    {actualMembers.length === 0 ? "No users found in the system" : "No users match your filters"}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -230,7 +235,7 @@ export function UserManagement({ members, isLoading, refetch }: UserManagementPr
                         <Badge variant="outline">Free</Badge>
                       )}
                     </TableCell>
-                    <TableCell>{member.resume_count}</TableCell>
+                    <TableCell>{member.resume_count || 0}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
                         {!member.is_premium ? (

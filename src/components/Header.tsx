@@ -46,12 +46,6 @@ const Header = () => {
             <Link to="/templates" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
               Templates
             </Link>
-            <Link to="/examples" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
-              Examples
-            </Link>
-            <Link to="/features" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
-              Features
-            </Link>
             <Link to="/pricing" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
               Pricing
             </Link>
@@ -229,20 +223,6 @@ const Header = () => {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Templates
-                </Link>
-                <Link
-                  to="/examples"
-                  className="block text-base font-medium text-foreground/70 hover:text-foreground"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Examples
-                </Link>
-                <Link
-                  to="/features"
-                  className="block text-base font-medium text-foreground/70 hover:text-foreground"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Features
                 </Link>
                 <Link
                   to="/pricing"

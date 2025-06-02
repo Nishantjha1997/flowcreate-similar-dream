@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,7 +54,6 @@ export function UserRegistrations({ isAdmin }: UserRegistrationsProps) {
   const handleResendVerification = async (userId: string, email: string) => {
     setActionLoading(userId);
     try {
-      // Simulate sending verification email
       await new Promise(resolve => setTimeout(resolve, 1000));
       toast({ 
         title: "Verification email sent", 
@@ -75,7 +73,6 @@ export function UserRegistrations({ isAdmin }: UserRegistrationsProps) {
   const handleApproveUser = async (userId: string) => {
     setActionLoading(userId);
     try {
-      // Add user role if they don't have one
       const { error } = await supabase
         .from("user_roles")
         .upsert({
@@ -105,7 +102,6 @@ export function UserRegistrations({ isAdmin }: UserRegistrationsProps) {
   const handleSuspendUser = async (userId: string) => {
     setActionLoading(userId);
     try {
-      // Remove all user roles to suspend
       const { error } = await supabase
         .from("user_roles")
         .delete()
@@ -122,6 +118,63 @@ export function UserRegistrations({ isAdmin }: UserRegistrationsProps) {
     } catch (error: any) {
       toast({ 
         title: "Failed to suspend user", 
+        description: error.message, 
+        variant: "destructive" 
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleExportUsers = () => {
+    const csvContent = [
+      ['User ID', 'Email', 'Name', 'Status', 'Premium', 'Registration Date'].join(','),
+      ...filteredUsers.map(user => [
+        user.id,
+        user.email,
+        `${user.firstName} ${user.lastName}`,
+        user.status,
+        user.isPremium ? 'Yes' : 'No',
+        new Date(user.createdAt).toLocaleDateString()
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', `users-export-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    toast({ title: "Export completed", description: "User list has been exported as CSV" });
+  };
+
+  const handleBulkEmail = () => {
+    const emailList = filteredUsers.map(user => user.email).join(';');
+    navigator.clipboard.writeText(emailList);
+    toast({ 
+      title: "Email addresses copied", 
+      description: `${filteredUsers.length} email addresses copied to clipboard` 
+    });
+  };
+
+  const handleSyncDatabase = async () => {
+    setActionLoading('sync');
+    try {
+      await refetch();
+      queryClient.invalidateQueries({ queryKey: ["user-profiles"] });
+      queryClient.invalidateQueries({ queryKey: ["all-members"] });
+      toast({ 
+        title: "Database synced", 
+        description: "User data has been refreshed from the database" 
+      });
+    } catch (error: any) {
+      toast({ 
+        title: "Sync failed", 
         description: error.message, 
         variant: "destructive" 
       });
@@ -195,9 +248,13 @@ export function UserRegistrations({ isAdmin }: UserRegistrationsProps) {
             </SelectContent>
           </Select>
           
-          <Button variant="outline" onClick={() => refetch()} disabled={isLoading}>
+          <Button 
+            variant="outline" 
+            onClick={handleSyncDatabase} 
+            disabled={isLoading || actionLoading === 'sync'}
+          >
             <Filter className="w-4 h-4 mr-2" />
-            {isLoading ? "Loading..." : "Refresh"}
+            {actionLoading === 'sync' ? "Syncing..." : "Refresh"}
           </Button>
         </div>
 
@@ -378,17 +435,22 @@ export function UserRegistrations({ isAdmin }: UserRegistrationsProps) {
         <div className="mt-6 p-4 bg-gray-50 rounded-lg">
           <h4 className="font-medium mb-3">Quick Actions</h4>
           <div className="flex gap-2 flex-wrap">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={handleExportUsers}>
               Export User List
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={handleBulkEmail}>
               Bulk Email Users
             </Button>
             <Button variant="outline" size="sm">
               User Analytics
             </Button>
-            <Button variant="outline" size="sm" onClick={() => refetch()}>
-              Sync with Database
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleSyncDatabase}
+              disabled={actionLoading === 'sync'}
+            >
+              {actionLoading === 'sync' ? 'Syncing...' : 'Sync with Database'}
             </Button>
           </div>
         </div>

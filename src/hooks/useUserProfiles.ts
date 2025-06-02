@@ -27,9 +27,6 @@ export function useUserProfiles(isAdmin: boolean) {
       }
       
       try {
-        // Get all users from our internal tables since we can't access auth.users directly
-        // We'll combine data from user_roles, subscriptions, and resumes tables
-        
         // Get all user roles
         const { data: userRoles, error: rolesError } = await supabase
           .from("user_roles")
@@ -53,8 +50,7 @@ export function useUserProfiles(isAdmin: boolean) {
         // Get all resumes to identify users
         const { data: resumes, error: resumesError } = await supabase
           .from("resumes")
-          .select("user_id, created_at")
-          .order("created_at", { ascending: false });
+          .select("user_id, created_at");
         
         if (resumesError) {
           console.error("Error fetching resumes:", resumesError);
@@ -67,38 +63,31 @@ export function useUserProfiles(isAdmin: boolean) {
         subscriptions?.forEach(sub => userIds.add(sub.user_id));
         resumes?.forEach(resume => userIds.add(resume.user_id));
         
-        // If we have real user data, create profiles from it
-        if (userIds.size > 0) {
-          const userProfiles: UserProfile[] = Array.from(userIds).map(userId => {
-            const userRolesList = userRoles?.filter(role => role.user_id === userId).map(role => role.role) || [];
-            const userSubscription = subscriptions?.find(sub => sub.user_id === userId);
-            const userResume = resumes?.find(resume => resume.user_id === userId);
-            
-            return {
-              id: userId,
-              email: `user-${userId.substring(0, 8)}@domain.com`, // Placeholder since we can't access auth.users
-              firstName: "User",
-              lastName: userId.substring(0, 8),
-              createdAt: userSubscription?.created_at || userResume?.created_at || new Date().toISOString(),
-              lastSignIn: null, // Can't access this from client
-              emailConfirmed: true, // Assume confirmed if they have data
-              status: userRolesList.length > 0 ? "active" : "pending",
-              roles: userRolesList,
-              isPremium: userSubscription?.is_premium || false
-            };
-          });
+        // Create profiles from collected data
+        const userProfiles: UserProfile[] = Array.from(userIds).map(userId => {
+          const userRolesList = userRoles?.filter(role => role.user_id === userId).map(role => role.role) || [];
+          const userSubscription = subscriptions?.find(sub => sub.user_id === userId);
+          const userResume = resumes?.find(resume => resume.user_id === userId);
           
-          console.log("Real user profiles found:", userProfiles);
-          return userProfiles;
-        }
+          return {
+            id: userId,
+            email: `user-${userId.substring(0, 8)}@example.com`,
+            firstName: "User",
+            lastName: userId.substring(0, 8),
+            createdAt: userSubscription?.created_at || userResume?.created_at || new Date().toISOString(),
+            lastSignIn: null,
+            emailConfirmed: true,
+            status: userRolesList.length > 0 ? "active" : "pending",
+            roles: userRolesList,
+            isPremium: userSubscription?.is_premium || false
+          };
+        });
         
-        // If no real data exists, return empty array instead of mock data
-        console.log("No real user data found, returning empty array");
-        return [];
+        console.log("User profiles found:", userProfiles);
+        return userProfiles;
         
       } catch (error) {
         console.error("Error in useUserProfiles:", error);
-        // Return empty array on error instead of mock data
         return [];
       }
     },

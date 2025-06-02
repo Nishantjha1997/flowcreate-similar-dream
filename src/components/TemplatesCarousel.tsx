@@ -63,12 +63,15 @@ const TemplatesCarousel = () => {
   const customizeTemplate = customizeId !== null ? templates.find(t => t.id === customizeId) : null;
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % Math.max(1, templates.length - 2));
+    setCurrentIndex((prev) => (prev + 1) % templates.length);
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + Math.max(1, templates.length - 2)) % Math.max(1, templates.length - 2));
+    setCurrentIndex((prev) => (prev - 1 + templates.length) % templates.length);
   };
+
+  const visibleTemplates = 3;
+  const maxIndex = Math.max(0, templates.length - visibleTemplates);
 
   return (
     <section className="py-24 bg-gradient-to-b from-background via-muted/20 to-background relative overflow-hidden">
@@ -86,7 +89,7 @@ const TemplatesCarousel = () => {
             Professional Resume Templates
           </h2>
           <p className="text-xl text-muted-foreground">
-            Choose from our collection of ATS-friendly, employer-approved templates
+            Choose from our collection of ATS-friendly, employer-approved templates with real-time preview
           </p>
         </div>
         
@@ -97,6 +100,7 @@ const TemplatesCarousel = () => {
             size="icon"
             className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm border-2 shadow-lg hover:bg-background"
             onClick={prevSlide}
+            disabled={currentIndex === 0}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -106,6 +110,7 @@ const TemplatesCarousel = () => {
             size="icon"
             className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm border-2 shadow-lg hover:bg-background"
             onClick={nextSlide}
+            disabled={currentIndex >= maxIndex}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -114,23 +119,17 @@ const TemplatesCarousel = () => {
           <div className="overflow-hidden rounded-xl">
             <div 
               className="flex transition-transform duration-500 ease-in-out"
-              style={{ transform: `translateX(-${currentIndex * 33.333}%)` }}
+              style={{ transform: `translateX(-${currentIndex * (100 / visibleTemplates)}%)` }}
             >
               {templates.map((template) => (
                 <div key={template.id} className="w-1/3 flex-shrink-0 px-3">
                   <div className="group relative overflow-hidden rounded-xl border bg-background/60 backdrop-blur-sm shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
                     <div className="aspect-[3/4] overflow-hidden cursor-pointer bg-gradient-to-br from-muted/50 to-muted/20" onClick={() => setPreviewId(template.id)}>
-                      {template.preview ? (
-                        <img 
-                          src={template.preview} 
-                          alt={`${template.name} preview`} 
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="h-full w-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-                          <span className="text-muted-foreground">Preview</span>
-                        </div>
-                      )}
+                      <img 
+                        src={template.preview} 
+                        alt={`${template.name} template preview`} 
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
                       
                       {/* Overlay on hover */}
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -164,7 +163,7 @@ const TemplatesCarousel = () => {
 
           {/* Dots Indicator */}
           <div className="flex justify-center mt-8 space-x-2">
-            {Array.from({ length: Math.max(1, templates.length - 2) }).map((_, index) => (
+            {Array.from({ length: maxIndex + 1 }).map((_, index) => (
               <button
                 key={index}
                 className={`w-3 h-3 rounded-full transition-all duration-300 ${
