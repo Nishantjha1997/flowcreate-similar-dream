@@ -1,10 +1,12 @@
+
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { useAllMembers } from "@/hooks/useAllMembers";
+import { useUserProfiles } from "@/hooks/useUserProfiles";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
-import { SystemStats } from "@/components/admin/SystemStats";
+import { EnhancedSystemStats } from "@/components/admin/EnhancedSystemStats";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { QuickActions } from "@/components/admin/QuickActions";
 import { WebsiteCustomization } from "@/components/admin/WebsiteCustomization";
@@ -19,6 +21,7 @@ const Admin = () => {
 
   const { data: isAdmin, isLoading: loadingAdmin } = useAdminStatus(userId);
   const { data: members = [], isLoading: loadingMembers, refetch } = useAllMembers(!!isAdmin);
+  const { data: userProfiles = [], isLoading: loadingProfiles } = useUserProfiles(!!isAdmin);
 
   useEffect(() => {
     if (!isLoading && !loadingAdmin) {
@@ -40,7 +43,7 @@ const Admin = () => {
             <div className="h-8 bg-muted rounded mb-4 w-64"></div>
             <div className="h-4 bg-muted rounded mb-8 w-96"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(4)].map((_, i) => (
+              {[...Array(8)].map((_, i) => (
                 <div key={i} className="h-32 bg-muted rounded"></div>
               ))}
             </div>
@@ -60,21 +63,29 @@ const Admin = () => {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
           <p className="text-muted-foreground">
-            Manage users, memberships, templates, and system settings. Signed in as:{" "}
+            Complete website and user management system. Signed in as:{" "}
             <span className="font-semibold">{user?.email}</span>
           </p>
         </div>
 
-        <SystemStats members={members} isLoading={loadingMembers} />
+        <EnhancedSystemStats 
+          members={members} 
+          userProfiles={userProfiles}
+          isLoading={loadingMembers || loadingProfiles} 
+        />
         
-        <Tabs defaultValue="users" className="w-full">
+        <Tabs defaultValue="registrations" className="w-full">
           <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="registrations">User Registrations</TabsTrigger>
             <TabsTrigger value="users">User Management</TabsTrigger>
-            <TabsTrigger value="registrations">Registrations</TabsTrigger>
             <TabsTrigger value="templates">Templates</TabsTrigger>
             <TabsTrigger value="website">Website</TabsTrigger>
             <TabsTrigger value="actions">Quick Actions</TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="registrations" className="mt-6">
+            <UserRegistrations isAdmin={!!isAdmin} />
+          </TabsContent>
           
           <TabsContent value="users" className="mt-6">
             <UserManagement 
@@ -82,10 +93,6 @@ const Admin = () => {
               isLoading={loadingMembers} 
               refetch={refetch} 
             />
-          </TabsContent>
-          
-          <TabsContent value="registrations" className="mt-6">
-            <UserRegistrations isAdmin={!!isAdmin} />
           </TabsContent>
           
           <TabsContent value="templates" className="mt-6">
