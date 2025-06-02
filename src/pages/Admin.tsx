@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { useAllMembers } from "@/hooks/useAllMembers";
@@ -8,6 +7,10 @@ import { toast } from "@/components/ui/use-toast";
 import { SystemStats } from "@/components/admin/SystemStats";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { QuickActions } from "@/components/admin/QuickActions";
+import { WebsiteCustomization } from "@/components/admin/WebsiteCustomization";
+import { TemplateManagement } from "@/components/admin/TemplateManagement";
+import { UserRegistrations } from "@/components/admin/UserRegistrations";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Admin = () => {
   const { user, isLoading } = useAuth();
@@ -57,20 +60,46 @@ const Admin = () => {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
           <p className="text-muted-foreground">
-            Manage users, memberships, and system settings. Signed in as:{" "}
+            Manage users, memberships, templates, and system settings. Signed in as:{" "}
             <span className="font-semibold">{user?.email}</span>
           </p>
         </div>
 
         <SystemStats members={members} isLoading={loadingMembers} />
         
-        <QuickActions refetch={refetch} />
-        
-        <UserManagement 
-          members={members} 
-          isLoading={loadingMembers} 
-          refetch={refetch} 
-        />
+        <Tabs defaultValue="users" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="users">User Management</TabsTrigger>
+            <TabsTrigger value="registrations">Registrations</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="website">Website</TabsTrigger>
+            <TabsTrigger value="actions">Quick Actions</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="users" className="mt-6">
+            <UserManagement 
+              members={members} 
+              isLoading={loadingMembers} 
+              refetch={refetch} 
+            />
+          </TabsContent>
+          
+          <TabsContent value="registrations" className="mt-6">
+            <UserRegistrations isAdmin={!!isAdmin} />
+          </TabsContent>
+          
+          <TabsContent value="templates" className="mt-6">
+            <TemplateManagement />
+          </TabsContent>
+          
+          <TabsContent value="website" className="mt-6">
+            <WebsiteCustomization />
+          </TabsContent>
+          
+          <TabsContent value="actions" className="mt-6">
+            <QuickActions refetch={refetch} />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
