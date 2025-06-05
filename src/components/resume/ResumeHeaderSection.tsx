@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Share2 } from 'lucide-react';
+import { Download, Share2, Save } from 'lucide-react';
 
 interface ResumeHeaderSectionProps {
   resumeElementRef: React.RefObject<HTMLDivElement>;
@@ -9,6 +9,9 @@ interface ResumeHeaderSectionProps {
   handleShare: () => void;
   handleDownload: () => void;
   isGenerating: boolean;
+  onSave?: () => void;
+  isSaving?: boolean;
+  isEditing?: boolean;
 }
 
 export const ResumeHeaderSection = ({
@@ -16,15 +19,28 @@ export const ResumeHeaderSection = ({
   resumeName,
   handleShare,
   handleDownload,
-  isGenerating
+  isGenerating,
+  onSave,
+  isSaving = false,
+  isEditing = false
 }: ResumeHeaderSectionProps) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Resume Builder</h1>
-        <p className="text-muted-foreground">Create a professional resume in minutes</p>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {isEditing ? 'Edit Resume' : 'Resume Builder'}
+        </h1>
+        <p className="text-muted-foreground">
+          {isEditing ? 'Update your professional resume' : 'Create a professional resume in minutes'}
+        </p>
       </div>
       <div className="flex gap-2">
+        {onSave && (
+          <Button onClick={onSave} disabled={isSaving} size="sm" className="flex items-center gap-2">
+            <Save className="h-4 w-4" />
+            {isSaving ? 'Saving...' : isEditing ? 'Update Resume' : 'Save Resume'}
+          </Button>
+        )}
         <Button onClick={handleShare} variant="outline" size="sm" className="flex items-center gap-2">
           <Share2 className="h-4 w-4" />
           Share

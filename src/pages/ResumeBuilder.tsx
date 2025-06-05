@@ -18,14 +18,17 @@ import { useResumeCount } from "@/hooks/useResumeLimit";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from "@/integrations/supabase/types";
+import { useQuery } from '@tanstack/react-query';
 
 const ResumeBuilder = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const templateId = searchParams.get('template') || '1';
   const isExample = searchParams.get('example') === 'true';
+  const editResumeId = searchParams.get('edit');
   const [activeSection, setActiveSection] = useState('personal');
   const resumeElementRef = useRef<HTMLDivElement>(null);
+  const [isSaving, setIsSaving] = useState(false);
   
   const [resume, setResume] = useState<ResumeData>({
     personal: {
@@ -69,6 +72,24 @@ const ResumeBuilder = () => {
     }
   });
 
+  // Fetch existing resume if editing
+  const { data: existingResume, isLoading: loadingExistingResume } = useQuery({
+    queryKey: ['resume', editResumeId],
+    queryFn: async () => {
+      if (!editResumeId) return null;
+      
+      const { data, error } = await supabase
+        .from('resumes')
+        .select('*')
+        .eq('id', editResumeId)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!editResumeId
+  });
+
   const resumeName = resume.personal?.name || 'resume';
   const { isGenerating, generatePDF } = usePDFGenerator(`${resumeName}.pdf`);
 
@@ -77,9 +98,15 @@ const ResumeBuilder = () => {
   const [activeSections, setActiveSections] = useState<string[]>(defaultSectionOrder);
   const [hiddenSections, setHiddenSections] = useState<string[]>([]);
 
+  // Load existing resume data if editing
   useEffect(() => {
+    if (existingResume && existingResume.resume_data) {
+      setResume(existingResume.resume_data as ResumeData);
+      return;
+    }
+    
     const savedResume = localStorage.getItem('resumeData');
-    if (savedResume) {
+    if (savedResume && !editResumeId) {
       setResume(JSON.parse(savedResume));
     }
     
@@ -88,7 +115,7 @@ const ResumeBuilder = () => {
       if (exampleResumes[exampleId]) {
         setResume(exampleResumes[exampleId]);
       }
-    } else {
+    } else if (!editResumeId) {
       const templateKey = templateNames[templateId];
       let primaryColor = '#2563eb';
       let secondaryColor = '#6b7280';
@@ -137,13 +164,13 @@ const ResumeBuilder = () => {
         setResume(exampleResumes[templateId]);
       }
     }
-  }, [templateId, isExample]);
+  }, [templateId, isExample, existingResume, editResumeId]);
 
   useEffect(() => {
-    if (!isExample) {
+    if (!isExample && !editResumeId) {
       localStorage.setItem('resumeData', JSON.stringify(resume));
     }
-  }, [resume, isExample]);
+  }, [resume, isExample, editResumeId]);
 
   const { user } = useAuth();
   const userId = user?.id;
@@ -272,7 +299,7 @@ const ResumeBuilder = () => {
   };
 
   const handleTemplateChange = (newTemplateId: string) => {
-    navigate(`/resume-builder?template=${newTemplateId}${isExample ? '&example=true' : ''}`);
+    navigate(`/resume-builder?template=${newTemplateId}${isExample ? '&example=true' : ''}${editResumeId ? `&edit=${editResumeId}` : ''}`);
   };
 
   const handleProjectChange = (field: string, value: string, index: number) => {
@@ -352,33 +379,66 @@ const ResumeBuilder = () => {
     setHiddenSections(hidden);
   };
 
-  // Modified handler for adding resume (limit by plan)
+  // Modified handler for adding/updating resume (limit by plan)
   const handleSaveResume = async () => {
+    if (!userId) {
+      toast.error("Please log in to save your resume.");
+      return;
+    }
+
     if (loadingPremium || loadingCount) {
       toast.warning("Checking your plan...");
       return;
     }
-    // Free plan: allow max 1 resume
-    if (!premium?.isPremium && resumeCount >= 1) {
-      toast.error("Free users can only save 1 resume. Upgrade to Premium to save more.");
-      return;
-    }
 
-    // Insert/update resume in Supabase
-    const { error } = await supabase
-      .from("resumes")
-      .insert([
-        {
-          user_id: userId,
-          resume_data: resume as unknown as Json, // <--- Fix/convert here!
+    setIsSaving(true);
+
+    try {
+      if (editResumeId) {
+        // Update existing resume
+        const { error } = await supabase
+          .from("resumes")
+          .update({
+            resume_data: resume as unknown as Json,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', editResumeId)
+          .eq('user_id', userId);
+
+        if (error) {
+          toast.error("Error updating resume: " + error.message);
+        } else {
+          toast.success("Resume updated successfully!");
         }
-      ]);
+      } else {
+        // Create new resume
+        // Free plan: allow max 1 resume
+        if (!premium?.isPremium && resumeCount >= 1) {
+          toast.error("Free users can only save 1 resume. Upgrade to Premium to save more.");
+          return;
+        }
 
-    if (error) {
-      toast.error("Error saving resume: " + error.message);
-    } else {
-      toast.success("Resume saved!");
-      refetchResumeCount();
+        // Insert new resume
+        const { error } = await supabase
+          .from("resumes")
+          .insert([
+            {
+              user_id: userId,
+              resume_data: resume as unknown as Json,
+            }
+          ]);
+
+        if (error) {
+          toast.error("Error saving resume: " + error.message);
+        } else {
+          toast.success("Resume saved successfully!");
+          refetchResumeCount();
+        }
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -393,6 +453,17 @@ const ResumeBuilder = () => {
       </div>
     )
   );
+
+  if (loadingExistingResume) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">Loading resume...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -426,6 +497,9 @@ const ResumeBuilder = () => {
             handleShare={handleShare}
             handleDownload={handleDownload}
             isGenerating={isGenerating}
+            onSave={handleSaveResume}
+            isSaving={isSaving}
+            isEditing={!!editResumeId}
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
