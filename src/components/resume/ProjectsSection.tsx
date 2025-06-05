@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -12,13 +13,17 @@ interface ProjectsSectionProps {
   onChange: (field: string, value: string, index: number) => void;
   onAdd: () => void;
   onRemove: (id: number) => void;
+  onAIFeatureUpsell?: () => void;
+  isPremium?: boolean;
 }
 
 export const ProjectsSection = ({
   projects,
   onChange,
   onAdd,
-  onRemove
+  onRemove,
+  onAIFeatureUpsell,
+  isPremium
 }: ProjectsSectionProps) => {
   if (!projects || projects.length === 0) {
     return (
@@ -86,6 +91,8 @@ export const ProjectsSection = ({
                 onChange('description', suggested, index)
               }
               label="Get AI Suggestion"
+              isPremium={isPremium}
+              onUpsell={onAIFeatureUpsell}
             />
           </div>
           

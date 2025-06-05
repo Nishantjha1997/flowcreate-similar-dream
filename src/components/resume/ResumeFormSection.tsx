@@ -107,6 +107,7 @@ export const ResumeFormSection = ({
           <CustomizationPanel
             customization={resume.customization}
             onCustomizationChange={handleCustomizationChange}
+            resumeData={resume}
           />
         );
       default:

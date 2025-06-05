@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -9,17 +10,21 @@ import { AiSuggestionButton } from "@/components/resume/AiSuggestionButton";
 interface ExperienceSectionProps {
   experience: any[];
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => void;
-  onToggleCurrent: (checked: boolean, index: number) => void;
+  onCurrentJobToggle: (checked: boolean, index: number) => void;
   onAdd: () => void;
   onRemove: (id: number) => void;
+  onAIFeatureUpsell?: () => void;
+  isPremium?: boolean;
 }
 
 export const ExperienceSection = ({
   experience,
   onChange,
-  onToggleCurrent,
+  onCurrentJobToggle,
   onAdd,
   onRemove,
+  onAIFeatureUpsell,
+  isPremium
 }: ExperienceSectionProps) => {
   // AI description callback
   const handleAiDescription = (suggested: string, idx: number) => {
@@ -90,7 +95,7 @@ export const ExperienceSection = ({
             <Switch
               id={`experience-current-${exp.id}`}
               checked={exp.current}
-              onCheckedChange={checked => onToggleCurrent(checked, idx)}
+              onCheckedChange={checked => onCurrentJobToggle(checked, idx)}
             />
             <Label htmlFor={`experience-current-${exp.id}`}>
               I currently work here
@@ -126,6 +131,8 @@ export const ExperienceSection = ({
               value={exp.description || ""}
               onAccept={suggested => handleAiDescription(suggested, idx)}
               label="Suggest Description"
+              isPremium={isPremium}
+              onUpsell={onAIFeatureUpsell}
             />
           </div>
           

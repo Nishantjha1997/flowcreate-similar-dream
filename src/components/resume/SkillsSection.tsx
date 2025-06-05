@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -6,9 +7,11 @@ import { AiSuggestionButton } from "@/components/resume/AiSuggestionButton";
 interface SkillsSectionProps {
   skills: string[];
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onAIFeatureUpsell?: () => void;
+  isPremium?: boolean;
 }
 
-export const SkillsSection = ({ skills, onChange }: SkillsSectionProps) => {
+export const SkillsSection = ({ skills, onChange, onAIFeatureUpsell, isPremium }: SkillsSectionProps) => {
   const getSkillsString = () => {
     return skills.join(', ');
   };
@@ -43,6 +46,8 @@ export const SkillsSection = ({ skills, onChange }: SkillsSectionProps) => {
           value={getSkillsString()}
           onAccept={handleAcceptSuggestion}
           label="Get AI Skills Suggestion"
+          isPremium={isPremium}
+          onUpsell={onAIFeatureUpsell}
         />
         <p className="text-xs text-muted-foreground mt-1">
           Example: JavaScript, React, Customer Service, Team Leadership
