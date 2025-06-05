@@ -22,19 +22,26 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    // Ignore Authorization header, treat as public
+    
+    // Updated to use the correct Gemini model
     const apiRequest = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 1000,
+          }
         }),
       }
     );
+    
     const apiData = await apiRequest.json();
     console.log("[Gemini] API response", JSON.stringify(apiData));
+    
     let errorDetail = apiData.error?.message || apiData.error || undefined;
 
     if (

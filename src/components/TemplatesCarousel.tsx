@@ -5,53 +5,107 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import TemplatePreviewModal from "@/components/templates/TemplatePreviewModal";
 import TemplateCustomizationModal from "@/components/templates/TemplateCustomizationModal";
+import ResumeTemplate from '@/utils/resumeTemplates';
+
+// Mock resume data to show in templates
+const mockResumeData = {
+  personal: {
+    name: "John Smith",
+    email: "john.smith@email.com",
+    phone: "(555) 123-4567",
+    location: "New York, NY",
+    website: "johndoe.com",
+    linkedin: "linkedin.com/in/johnsmith"
+  },
+  summary: "Experienced software engineer with 5+ years developing scalable web applications. Passionate about creating efficient solutions and leading development teams.",
+  experience: [
+    {
+      title: "Senior Software Engineer",
+      company: "Tech Corp",
+      location: "New York, NY",
+      startDate: "2022-01",
+      endDate: "Present",
+      description: [
+        "Led development of microservices architecture serving 1M+ users",
+        "Improved application performance by 40% through optimization",
+        "Mentored junior developers and conducted code reviews"
+      ]
+    },
+    {
+      title: "Software Engineer",
+      company: "StartupXYZ",
+      location: "San Francisco, CA",
+      startDate: "2020-03",
+      endDate: "2021-12",
+      description: [
+        "Built responsive web applications using React and Node.js",
+        "Collaborated with cross-functional teams to deliver features",
+        "Implemented automated testing reducing bugs by 60%"
+      ]
+    }
+  ],
+  education: [
+    {
+      degree: "Bachelor of Science in Computer Science",
+      school: "University of Technology",
+      location: "Boston, MA",
+      graduationDate: "2020-05",
+      gpa: "3.8"
+    }
+  ],
+  skills: [
+    { name: "JavaScript", level: "Expert" },
+    { name: "React", level: "Expert" },
+    { name: "Node.js", level: "Advanced" },
+    { name: "Python", level: "Intermediate" },
+    { name: "AWS", level: "Intermediate" }
+  ],
+  projects: [
+    {
+      name: "E-commerce Platform",
+      description: "Full-stack e-commerce solution with payment integration",
+      technologies: ["React", "Node.js", "MongoDB", "Stripe"],
+      link: "github.com/johnsmith/ecommerce"
+    }
+  ]
+};
 
 const templates = [
   {
     id: 1,
     name: "Modern Professional",
-    image: "https://images.unsplash.com/photo-1586281380117-5a60ae2050cc",
     category: "Professional",
     templateKey: "modern",
-    description: "Clean, sleek design with contemporary elements",
-    preview: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjEwIiBoZWlnaHQ9IjI5NyIgdmlld0JveD0iMCAwIDIxMCAyOTciIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIxMCIgaGVpZ2h0PSIyOTciIGZpbGw9IndoaXRlIi8+PHJlY3QgeD0iMjAiIHk9IjIwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMzMzIi8+PHJlY3QgeD0iMjAiIHk9IjgwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE1IiBmaWxsPSIjNjY2Ii8+PHJlY3QgeD0iMjAiIHk9IjExMCIgd2lkdGg9IjE3MCIgaGVpZ2h0PSIyIiBmaWxsPSIjY2NjIi8+PHJlY3QgeD0iMjAiIHk9IjEzMCIgd2lkdGg9IjE3MCIgaGVpZ2h0PSIxMCIgZmlsbD0iIzMzMyIvPjxyZWN0IHg9IjIwIiB5PSIxNTAiIHdpZHRoPSIxNjAiIGhlaWdodD0iOCIgZmlsbD0iIzk5OSIvPjwvc3ZnPg=="
+    description: "Clean, sleek design with contemporary elements"
   },
   {
     id: 2,
     name: "Executive Classic",
-    image: "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e",
     category: "Traditional",
     templateKey: "classic",
-    description: "Traditional layout that stands the test of time",
-    preview: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjEwIiBoZWlnaHQ9IjI5NyIgdmlld0JveD0iMCAwIDIxMCAyOTciIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIxMCIgaGVpZ2h0PSIyOTciIGZpbGw9IndoaXRlIi8+PHJlY3QgeD0iMjAiIHk9IjIwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMjIyIi8+PHJlY3QgeD0iMjAiIHk9IjYwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyIiBmaWxsPSIjNTU1Ii8+PHJlY3QgeD0iMjAiIHk9IjkwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjEiIGZpbGw9IiMwMDAiLz48cmVjdCB4PSIyMCIgeT0iMTEwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjE1IiBmaWxsPSIjMjIyIi8+PHJlY3QgeD0iMjAiIHk9IjEzNSIgd2lkdGg9IjE1MCIgaGVpZ2h0PSI4IiBmaWxsPSIjNzc3Ii8+PC9zdmc+"
+    description: "Traditional layout that stands the test of time"
   },
   {
     id: 3,
     name: "Creative Portfolio",
-    image: "https://images.unsplash.com/photo-1626785774573-4b799315345d",
     category: "Design",
     templateKey: "creative",
-    description: "Eye-catching design for creative professionals",
-    preview: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjEwIiBoZWlnaHQ9IjI5NyIgdmlld0JveD0iMCAwIDIxMCAyOTciIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIxMCIgaGVpZ2h0PSIyOTciIGZpbGw9IndoaXRlIi8+PHJlY3QgeD0iMjAiIHk9IjIwIiB3aWR0aD0iNjAiIGhlaWdodD0iMjU3IiBmaWxsPSIjZjMxMjYwIi8+PHJlY3QgeD0iMTAwIiB5PSIyMCIgd2lkdGg9IjkwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMzMzIi8+PHJlY3QgeD0iMTAwIiB5PSI2MCIgd2lkdGg9IjcwIiBoZWlnaHQ9IjEyIiBmaWxsPSIjNjY2Ii8+PHJlY3QgeD0iMTAwIiB5PSI5MCIgd2lkdGg9IjkwIiBoZWlnaHQ9IjE1IiBmaWxsPSIjMzMzIi8+PC9zdmc+"
+    description: "Eye-catching design for creative professionals"
   },
   {
     id: 4,
     name: "Tech Specialist",
-    image: "https://images.unsplash.com/photo-1593720213428-28a5b9e94613",
     category: "Technical",
     templateKey: "technical",
-    description: "Optimized for tech and engineering fields",
-    preview: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjEwIiBoZWlnaHQ9IjI5NyIgdmlld0JveD0iMCAwIDIxMCAyOTciIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIxMCIgaGVpZ2h0PSIyOTciIGZpbGw9IiNmOWZhZmIiLz48cmVjdCB4PSIyMCIgeT0iMjAiIHdpZHRoPSIxNzAiIGhlaWdodD0iMjUiIGZpbGw9IiMxMTFhMjciLz48cmVjdCB4PSIyMCIgeT0iNjAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAiIGZpbGw9IiM0YjViNjkiLz48cmVjdCB4PSIyMCIgeT0iOTAiIHdpZHRoPSIxNzAiIGhlaWdodD0iMTIiIGZpbGw9IiMxMTFhMjciLz48cmVjdCB4PSIyMCIgeT0iMTEwIiB3aWR0aD0iMTQwIiBoZWlnaHQ9IjgiIGZpbGw9IiM2YjczODAiLz48L3N2Zz4="
+    description: "Optimized for tech and engineering fields"
   },
   {
     id: 5,
     name: "Corporate Elite",
-    image: "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e",
     category: "Professional",
     templateKey: "professional",
-    description: "Polished and refined for executive positions",
-    preview: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjEwIiBoZWlnaHQ9IjI5NyIgdmlld0JveD0iMCAwIDIxMCAyOTciIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIxMCIgaGVpZ2h0PSIyOTciIGZpbGw9IndoaXRlIi8+PHJlY3QgeD0iMjAiIHk9IjIwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjMWY0ZTc5Ii8+PHJlY3QgeD0iMjAiIHk9IjkwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyIiBmaWxsPSIjMzc0MTUxIi8+PHJlY3QgeD0iMjAiIHk9IjEyMCIgd2lkdGg9IjE3MCIgaGVpZ2h0PSIxNSIgZmlsbD0iIzFmNGU3OSIvPjxyZWN0IHg9IjIwIiB5PSIxNDUiIHdpZHRoPSIxNTAiIGhlaWdodD0iOCIgZmlsbD0iIzZiNzI4MCIvPjwvc3ZnPg=="
-  },
+    description: "Polished and refined for executive positions"
+  }
 ];
 
 const TemplatesCarousel = () => {
@@ -124,12 +178,16 @@ const TemplatesCarousel = () => {
               {templates.map((template) => (
                 <div key={template.id} className="w-1/3 flex-shrink-0 px-3">
                   <div className="group relative overflow-hidden rounded-xl border bg-background/60 backdrop-blur-sm shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
-                    <div className="aspect-[3/4] overflow-hidden cursor-pointer bg-gradient-to-br from-muted/50 to-muted/20" onClick={() => setPreviewId(template.id)}>
-                      <img 
-                        src={template.preview} 
-                        alt={`${template.name} template preview`} 
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
+                    <div className="aspect-[3/4] overflow-hidden cursor-pointer bg-white p-4" onClick={() => setPreviewId(template.id)}>
+                      {/* Live Resume Template Preview */}
+                      <div className="h-full w-full bg-white rounded shadow-sm overflow-hidden transform scale-75 origin-top-left">
+                        <div style={{ transform: 'scale(0.4)', transformOrigin: 'top left', width: '250%', height: '250%' }}>
+                          <ResumeTemplate 
+                            data={mockResumeData} 
+                            templateName={template.templateKey}
+                          />
+                        </div>
+                      </div>
                       
                       {/* Overlay on hover */}
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
