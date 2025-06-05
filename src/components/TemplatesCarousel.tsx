@@ -13,61 +13,61 @@ const mockResumeData = {
     name: "John Smith",
     email: "john.smith@email.com",
     phone: "(555) 123-4567",
-    location: "New York, NY",
+    address: "New York, NY",
+    summary: "Experienced software engineer with 5+ years developing scalable web applications. Passionate about creating efficient solutions and leading development teams.",
     website: "johndoe.com",
     linkedin: "linkedin.com/in/johnsmith"
   },
-  summary: "Experienced software engineer with 5+ years developing scalable web applications. Passionate about creating efficient solutions and leading development teams.",
   experience: [
     {
+      id: 1,
       title: "Senior Software Engineer",
       company: "Tech Corp",
       location: "New York, NY",
       startDate: "2022-01",
       endDate: "Present",
-      description: [
-        "Led development of microservices architecture serving 1M+ users",
-        "Improved application performance by 40% through optimization",
-        "Mentored junior developers and conducted code reviews"
-      ]
+      current: true,
+      description: "Led development of microservices architecture serving 1M+ users. Improved application performance by 40% through optimization. Mentored junior developers and conducted code reviews."
     },
     {
+      id: 2,
       title: "Software Engineer",
       company: "StartupXYZ",
       location: "San Francisco, CA",
       startDate: "2020-03",
       endDate: "2021-12",
-      description: [
-        "Built responsive web applications using React and Node.js",
-        "Collaborated with cross-functional teams to deliver features",
-        "Implemented automated testing reducing bugs by 60%"
-      ]
+      current: false,
+      description: "Built responsive web applications using React and Node.js. Collaborated with cross-functional teams to deliver features. Implemented automated testing reducing bugs by 60%."
     }
   ],
   education: [
     {
+      id: 1,
       degree: "Bachelor of Science in Computer Science",
       school: "University of Technology",
+      field: "Computer Science",
       location: "Boston, MA",
-      graduationDate: "2020-05",
-      gpa: "3.8"
+      startDate: "2016-08",
+      endDate: "2020-05",
+      description: "GPA: 3.8/4.0"
     }
   ],
-  skills: [
-    { name: "JavaScript", level: "Expert" },
-    { name: "React", level: "Expert" },
-    { name: "Node.js", level: "Advanced" },
-    { name: "Python", level: "Intermediate" },
-    { name: "AWS", level: "Intermediate" }
-  ],
+  skills: ["JavaScript", "React", "Node.js", "Python", "AWS"],
   projects: [
     {
-      name: "E-commerce Platform",
+      id: 1,
+      title: "E-commerce Platform",
       description: "Full-stack e-commerce solution with payment integration",
       technologies: ["React", "Node.js", "MongoDB", "Stripe"],
       link: "github.com/johnsmith/ecommerce"
     }
-  ]
+  ],
+  customization: {
+    primaryColor: '#2563eb',
+    secondaryColor: '#6b7280',
+    fontSize: 'medium' as const,
+    spacing: 'normal' as const
+  }
 };
 
 const templates = [
@@ -76,35 +76,40 @@ const templates = [
     name: "Modern Professional",
     category: "Professional",
     templateKey: "modern",
-    description: "Clean, sleek design with contemporary elements"
+    description: "Clean, sleek design with contemporary elements",
+    image: "/placeholder.svg"
   },
   {
     id: 2,
     name: "Executive Classic",
     category: "Traditional",
     templateKey: "classic",
-    description: "Traditional layout that stands the test of time"
+    description: "Traditional layout that stands the test of time",
+    image: "/placeholder.svg"
   },
   {
     id: 3,
     name: "Creative Portfolio",
     category: "Design",
     templateKey: "creative",
-    description: "Eye-catching design for creative professionals"
+    description: "Eye-catching design for creative professionals",
+    image: "/placeholder.svg"
   },
   {
     id: 4,
     name: "Tech Specialist",
     category: "Technical",
     templateKey: "technical",
-    description: "Optimized for tech and engineering fields"
+    description: "Optimized for tech and engineering fields",
+    image: "/placeholder.svg"
   },
   {
     id: 5,
     name: "Corporate Elite",
     category: "Professional",
     templateKey: "professional",
-    description: "Polished and refined for executive positions"
+    description: "Polished and refined for executive positions",
+    image: "/placeholder.svg"
   }
 ];
 
