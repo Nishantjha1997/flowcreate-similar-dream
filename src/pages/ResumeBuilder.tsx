@@ -411,10 +411,9 @@ const ResumeBuilder = () => {
           toast.success("Resume updated successfully!");
         }
       } else {
-        // Create new resume
-        // Free plan: allow max 1 resume
+        // Create new resume - Check limits for free users
         if (!premium?.isPremium && resumeCount >= 1) {
-          toast.error("Free users can only save 1 resume. Upgrade to Premium to save more.");
+          toast.error("Free users can only save 1 resume. Please delete your existing resume or upgrade to Premium to save more.");
           return;
         }
 
@@ -442,17 +441,14 @@ const ResumeBuilder = () => {
     }
   };
 
-  // Add a notice about Premium "Version History"
-  const versionHistoryBanner = (
-    (!premium?.isPremium) && (
-      <div className="mb-3 bg-yellow-100 text-yellow-900 border border-yellow-300 rounded p-2 flex items-center justify-between">
-        <span>
-          <b>Version History</b> is a <span className="underline">Premium</span> feature. <br />
-          Upgrade to access multiple resume versions.
-        </span>
-      </div>
-    )
-  );
+  // Handle AI feature upsell for free users
+  const handleAIFeatureUpsell = () => {
+    if (!premium?.isPremium) {
+      toast.info("AI features are available with Premium! Upgrade for just ₹199/month to unlock AI-powered resume suggestions.");
+      // You can add navigation to pricing page here if needed
+      // navigate('/pricing');
+    }
+  };
 
   if (loadingExistingResume) {
     return (
@@ -470,27 +466,24 @@ const ResumeBuilder = () => {
       <Header />
       <main className="py-8">
         <div className="container mx-auto px-4">
-          {/* PREMIUM UPGRADE BANNER */}
+          {/* FREE USER LIMITATION BANNER */}
           {!premium?.isPremium && (
             <div className="mb-5 bg-yellow-50 text-yellow-900 border-l-4 border-yellow-400 p-3 rounded flex items-center justify-between shadow">
               <span>
-                Free users can only save 1 resume.{" "}
-                <b>Upgrade to Premium</b> for unlimited resumes!
+                Free users can only save 1 resume. You have {resumeCount || 0}/1 resume saved.{" "}
+                <b>Upgrade to Premium</b> for unlimited resumes and AI features!
               </span>
-              {/* Placeholder Upgrade-to-Premium Button */}
               <button
                 className="ml-4 px-4 py-2 bg-primary text-white font-bold rounded shadow hover:bg-primary/90 transition-all"
-                // We'll later integrate Razorpay
                 onClick={() =>
-                  toast.info("Premium upgrade coming soon! (Razorpay will be integrated)")
+                  toast.info("Premium upgrade coming soon! Get unlimited resumes + AI features for ₹199/month")
                 }
               >
                 Upgrade ₹199/month
               </button>
             </div>
           )}
-          {/* Version History Premium notice */}
-          {versionHistoryBanner}
+
           <ResumeHeaderSection 
             resumeElementRef={resumeElementRef}
             resumeName={resumeName}
@@ -515,9 +508,9 @@ const ResumeBuilder = () => {
                 <SectionDragDropCustomizer
                   activeSections={activeSections}
                   hiddenSections={hiddenSections}
-                  sectionTitles={{}} // Pass if you use titles, otherwise keep empty
+                  sectionTitles={{}}
                   onSectionsChange={handleSectionsChange}
-                  onSectionTitleChange={() => {}} // Placeholder if needed
+                  onSectionTitleChange={() => {}}
                 />
               </div>
             </div>
@@ -539,6 +532,8 @@ const ResumeBuilder = () => {
                 addProject={addProject}
                 removeProject={removeProject}
                 handleCustomizationChange={handleCustomizationChange}
+                onAIFeatureUpsell={handleAIFeatureUpsell}
+                isPremium={premium?.isPremium}
               />
             </div>
 

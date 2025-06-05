@@ -1,13 +1,12 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { PersonalInfoSection } from '@/components/resume/PersonalInfoSection';
-import { ExperienceSection } from '@/components/resume/ExperienceSection';
-import { EducationSection } from '@/components/resume/EducationSection';
-import { SkillsSection } from '@/components/resume/SkillsSection';
-import { ProjectsSection } from '@/components/resume/ProjectsSection';
-import { CustomizationPanel } from '@/components/CustomizationPanel';
-import { ResumeData } from '@/utils/resumeAdapterUtils';
+import { PersonalInfoSection } from './PersonalInfoSection';
+import { ExperienceSection } from './ExperienceSection';
+import { EducationSection } from './EducationSection';
+import { SkillsSection } from './SkillsSection';
+import { ProjectsSection } from './ProjectsSection';
+import { CustomizationPanel } from '../CustomizationPanel';
+import { ResumeData } from '@/utils/types';
 
 interface ResumeFormSectionProps {
   activeSection: string;
@@ -25,6 +24,8 @@ interface ResumeFormSectionProps {
   addProject: () => void;
   removeProject: (id: number) => void;
   handleCustomizationChange: (customization: ResumeData['customization']) => void;
+  onAIFeatureUpsell?: () => void;
+  isPremium?: boolean;
 }
 
 export const ResumeFormSection = ({
@@ -42,76 +43,80 @@ export const ResumeFormSection = ({
   handleProjectChange,
   addProject,
   removeProject,
-  handleCustomizationChange
+  handleCustomizationChange,
+  onAIFeatureUpsell,
+  isPremium
 }: ResumeFormSectionProps) => {
   
-  const handleProfileImageChange = (profileImage: string) => {
-    const event = {
-      target: {
-        name: 'profileImage',
-        value: profileImage
-      }
-    } as React.ChangeEvent<HTMLInputElement>;
-    
-    handlePersonalInfoChange(event);
+  const renderSection = () => {
+    switch (activeSection) {
+      case 'personal':
+        return (
+          <PersonalInfoSection
+            personal={resume.personal}
+            onChange={handlePersonalInfoChange}
+            onAIFeatureUpsell={onAIFeatureUpsell}
+            isPremium={isPremium}
+          />
+        );
+      case 'experience':
+        return (
+          <ExperienceSection
+            experiences={resume.experience}
+            onChange={handleExperienceChange}
+            onCurrentJobToggle={handleCurrentJobToggle}
+            onAdd={addExperience}
+            onRemove={removeExperience}
+            onAIFeatureUpsell={onAIFeatureUpsell}
+            isPremium={isPremium}
+          />
+        );
+      case 'education':
+        return (
+          <EducationSection
+            education={resume.education}
+            onChange={handleEducationChange}
+            onAdd={addEducation}
+            onRemove={removeEducation}
+            onAIFeatureUpsell={onAIFeatureUpsell}
+            isPremium={isPremium}
+          />
+        );
+      case 'skills':
+        return (
+          <SkillsSection
+            skills={resume.skills}
+            onChange={handleSkillsChange}
+            onAIFeatureUpsell={onAIFeatureUpsell}
+            isPremium={isPremium}
+          />
+        );
+      case 'projects':
+        return (
+          <ProjectsSection
+            projects={resume.projects || []}
+            onChange={handleProjectChange}
+            onAdd={addProject}
+            onRemove={removeProject}
+            onAIFeatureUpsell={onAIFeatureUpsell}
+            isPremium={isPremium}
+          />
+        );
+      case 'customization':
+        return (
+          <CustomizationPanel
+            customization={resume.customization}
+            onChange={handleCustomizationChange}
+          />
+        );
+      default:
+        return null;
+    }
   };
-  
+
   return (
-    <Card className="h-full overflow-hidden flex flex-col">
-      <CardContent className="flex-1 p-0 overflow-auto">
-        <div className="p-5">
-          {activeSection === 'personal' && (
-            <PersonalInfoSection 
-              personal={resume.personal} 
-              onChange={handlePersonalInfoChange}
-              onProfileImageChange={handleProfileImageChange}
-            />
-          )}
-          
-          {activeSection === 'experience' && (
-            <ExperienceSection 
-              experience={resume.experience}
-              onChange={handleExperienceChange}
-              onToggleCurrent={handleCurrentJobToggle}
-              onAdd={addExperience}
-              onRemove={removeExperience}
-            />
-          )}
-          
-          {activeSection === 'education' && (
-            <EducationSection 
-              education={resume.education}
-              onChange={handleEducationChange}
-              onAdd={addEducation}
-              onRemove={removeEducation}
-            />
-          )}
-          
-          {activeSection === 'skills' && (
-            <SkillsSection 
-              skills={resume.skills}
-              onChange={handleSkillsChange}
-            />
-          )}
-          
-          {activeSection === 'projects' && (
-            <ProjectsSection
-              projects={resume.projects || []}
-              onChange={handleProjectChange}
-              onAdd={addProject}
-              onRemove={removeProject}
-            />
-          )}
-          
-          {activeSection === 'customize' && (
-            <CustomizationPanel
-              customization={resume.customization}
-              onCustomizationChange={handleCustomizationChange}
-              resumeData={resume}
-            />
-          )}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="bg-white rounded-lg shadow-sm border p-6">
+      {renderSection()}
+    </div>
   );
 };
