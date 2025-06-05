@@ -101,7 +101,7 @@ const ResumeBuilder = () => {
   // Load existing resume data if editing
   useEffect(() => {
     if (existingResume && existingResume.resume_data) {
-      setResume(existingResume.resume_data as ResumeData);
+      setResume(existingResume.resume_data as unknown as ResumeData);
       return;
     }
     
