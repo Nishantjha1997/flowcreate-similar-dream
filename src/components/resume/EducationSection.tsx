@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,6 +10,8 @@ interface EducationSectionProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => void;
   onAdd: () => void;
   onRemove: (id: number) => void;
+  onAIFeatureUpsell?: () => void;
+  isPremium?: boolean;
 }
 
 export const EducationSection = ({
@@ -16,6 +19,8 @@ export const EducationSection = ({
   onChange,
   onAdd,
   onRemove,
+  onAIFeatureUpsell,
+  isPremium
 }: EducationSectionProps) => {
   // AI description callback
   const handleAiDescription = (suggested: string, idx: number) => {
@@ -102,6 +107,8 @@ export const EducationSection = ({
             value={edu.description || ""}
             onAccept={suggested => handleAiDescription(suggested, idx)}
             label="Suggest Education Description"
+            isPremium={isPremium}
+            onUpsell={onAIFeatureUpsell}
           />
           <Button onClick={() => onRemove(edu.id)} type="button" variant="destructive" size="sm">
             Remove Education

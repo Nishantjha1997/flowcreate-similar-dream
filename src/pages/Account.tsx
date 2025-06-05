@@ -189,8 +189,8 @@ const Account = () => {
       
       resumeElement.innerHTML = resumeHTML;
       
-      // Generate PDF
-      generatePDF(resumeElement, `${resumeName}.pdf`);
+      // Generate PDF with correct single argument
+      generatePDF(resumeElement);
       
       // Clean up
       setTimeout(() => {

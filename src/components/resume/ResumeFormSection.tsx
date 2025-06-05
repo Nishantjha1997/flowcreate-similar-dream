@@ -62,7 +62,7 @@ export const ResumeFormSection = ({
       case 'experience':
         return (
           <ExperienceSection
-            experiences={resume.experience}
+            experience={resume.experience}
             onChange={handleExperienceChange}
             onCurrentJobToggle={handleCurrentJobToggle}
             onAdd={addExperience}
@@ -106,7 +106,7 @@ export const ResumeFormSection = ({
         return (
           <CustomizationPanel
             customization={resume.customization}
-            onChange={handleCustomizationChange}
+            onCustomizationChange={handleCustomizationChange}
           />
         );
       default:
