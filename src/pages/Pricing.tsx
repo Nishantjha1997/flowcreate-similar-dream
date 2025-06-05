@@ -43,7 +43,7 @@ const Pricing = () => {
               <div className="p-8 bg-primary text-primary-foreground text-center">
                 <h2 className="text-3xl font-bold">Free</h2>
                 <div className="mt-4 flex items-center justify-center">
-                  <span className="text-6xl font-bold tracking-tight">$0</span>
+                  <span className="text-6xl font-bold tracking-tight">₹0</span>
                   <span className="ml-2">/month</span>
                 </div>
                 <p className="mt-2 text-base">No credit card required. Save 1 resume per account.</p>
@@ -52,8 +52,9 @@ const Pricing = () => {
                 <ul className="space-y-2 text-foreground">
                   <li>✔️ All templates included</li>
                   <li>✔️ Live preview</li>
-                  <li>✔️ AI suggestions (limited)</li>
+                  <li>✔️ Basic editing features</li>
                   <li>✔️ Save 1 resume</li>
+                  <li>❌ AI suggestions</li>
                   <li>❌ Unlimited resumes</li>
                   <li>❌ Version history</li>
                   <li>❌ Cloud backup</li>
@@ -66,7 +67,7 @@ const Pricing = () => {
               <div className="p-8 bg-yellow-400 text-center" style={{ textShadow: "0px 1px 3px #fafafa, 0 1px 2px #00000016" }}>
                 <h2 className="text-3xl font-bold" style={{ color: "#904803" }}>Premium</h2>
                 <div className="mt-4 flex items-center justify-center">
-                  <span className="text-6xl font-bold tracking-tight" style={{ color: "#202020", textShadow: "0 2px 6px #ffffff99" }}>$2</span>
+                  <span className="text-6xl font-bold tracking-tight" style={{ color: "#202020", textShadow: "0 2px 6px #ffffff99" }}>₹199</span>
                   <span className="ml-2" style={{ color: "#202020" }}>/month</span>
                 </div>
                 <p className="mt-2 text-base" style={{ color: "#783f04" }}>Unlimited resumes, full AI and all premium features.</p>
@@ -97,43 +98,42 @@ const Pricing = () => {
             
             <div className="space-y-6">
               <div className="rounded-lg border p-6">
-                <h3 className="text-lg font-semibold mb-2">How can you offer everything for free?</h3>
+                <h3 className="text-lg font-semibold mb-2">What's included in the Premium plan?</h3>
                 <p className="text-muted-foreground">
-                  FlowCreate is an open-source project maintained by volunteers and community contributions. 
-                  We believe that everyone should have access to high-quality resume tools regardless of their 
-                  financial situation.
+                  Premium includes unlimited resumes, AI-powered content suggestions, cloud backup, 
+                  version history, advanced customization options, and priority support - all for just ₹199/month.
                 </p>
               </div>
               
               <div className="rounded-lg border p-6">
-                <h3 className="text-lg font-semibold mb-2">Is there really no premium plan?</h3>
+                <h3 className="text-lg font-semibold mb-2">How do AI suggestions work?</h3>
                 <p className="text-muted-foreground">
-                  Correct! We don't have a premium tier or hidden upsells. All features are available to all users.
+                  Our AI analyzes your existing content and provides intelligent suggestions to improve 
+                  your resume sections, making them more compelling and ATS-friendly.
                 </p>
               </div>
               
               <div className="rounded-lg border p-6">
-                <h3 className="text-lg font-semibold mb-2">How do you sustain the platform?</h3>
+                <h3 className="text-lg font-semibold mb-2">Can I cancel anytime?</h3>
                 <p className="text-muted-foreground">
-                  We operate on minimal costs thanks to our volunteer contributors. We accept donations to cover 
-                  hosting expenses, but this is completely optional and doesn't unlock any additional features.
+                  Yes! You can cancel your Premium subscription at any time. You'll continue to have 
+                  access to Premium features until the end of your billing period.
                 </p>
               </div>
               
               <div className="rounded-lg border p-6">
-                <h3 className="text-lg font-semibold mb-2">Can I use the resumes I create for commercial purposes?</h3>
+                <h3 className="text-lg font-semibold mb-2">Is there a free trial?</h3>
                 <p className="text-muted-foreground">
-                  Absolutely! The resumes you create are yours to use however you wish. There are no restrictions 
-                  on how you use your created resumes.
+                  You can use FlowCreate for free with 1 resume save. This gives you a chance to 
+                  explore all the basic features before deciding to upgrade.
                 </p>
               </div>
               
               <div className="rounded-lg border p-6">
                 <h3 className="text-lg font-semibold mb-2">How can I support FlowCreate?</h3>
                 <p className="text-muted-foreground">
-                  If you'd like to support us, you can contribute to our open-source codebase, help translate 
-                  the platform, report bugs, or make a small donation. But the best way to support us is simply 
-                  by using the platform and spreading the word!
+                  The best way to support us is by upgrading to Premium for ₹199/month. This helps 
+                  us maintain the platform, develop new features, and provide excellent support.
                 </p>
               </div>
             </div>
