@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { Search, UserPlus, Crown, Shield, Trash2 } from "lucide-react";
+import { Search, Crown, Shield, Trash2 } from "lucide-react";
+import { AddUserModal } from "./AddUserModal";
 
 interface UserManagementProps {
   members: any[];
@@ -140,13 +141,18 @@ export function UserManagement({ members, isLoading, refetch }: UserManagementPr
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Shield className="w-5 h-5" />
-          User Management
-        </CardTitle>
-        <CardDescription>
-          Manage users, roles, and premium memberships ({actualMembers.length} users found)
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5" />
+              User Management
+            </CardTitle>
+            <CardDescription>
+              Manage users, roles, and premium memberships ({actualMembers.length} users found)
+            </CardDescription>
+          </div>
+          <AddUserModal refetch={refetch} />
+        </div>
       </CardHeader>
       <CardContent>
         {/* Filters */}
