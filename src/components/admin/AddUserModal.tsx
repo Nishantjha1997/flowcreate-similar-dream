@@ -45,62 +45,49 @@ export function AddUserModal({ refetch }: AddUserModalProps) {
 
     setIsLoading(true);
     try {
-      // Create user via Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: formData.email,
-        password: formData.password,
-        user_metadata: {
-          first_name: formData.firstName,
-          last_name: formData.lastName
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: "Authentication Error",
+          description: "You must be logged in to create users",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const response = await fetch('/functions/v1/admin-create-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
-        email_confirm: true
+        body: JSON.stringify(formData)
       });
 
-      if (authError) throw authError;
+      const result = await response.json();
 
-      if (authData.user) {
-        // Add role if not default user
-        if (formData.role !== "user") {
-          const { error: roleError } = await supabase
-            .from("user_roles")
-            .insert({
-              user_id: authData.user.id,
-              role: formData.role as any
-            });
-          
-          if (roleError) throw roleError;
-        }
-
-        // Add premium subscription if selected
-        if (formData.isPremium) {
-          const { error: subscriptionError } = await supabase
-            .from("subscriptions")
-            .insert({
-              user_id: authData.user.id,
-              is_premium: true
-            });
-          
-          if (subscriptionError) throw subscriptionError;
-        }
-
-        toast({
-          title: "Success",
-          description: `User ${formData.email} created successfully`
-        });
-
-        // Reset form and close modal
-        setFormData({
-          email: "",
-          password: "",
-          firstName: "",
-          lastName: "",
-          role: "user",
-          isPremium: false
-        });
-        setIsOpen(false);
-        refetch();
-        queryClient.invalidateQueries();
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to create user');
       }
+
+      toast({
+        title: "Success",
+        description: `User ${formData.email} created successfully`
+      });
+
+      // Reset form and close modal
+      setFormData({
+        email: "",
+        password: "",
+        firstName: "",
+        lastName: "",
+        role: "user",
+        isPremium: false
+      });
+      setIsOpen(false);
+      refetch();
+      queryClient.invalidateQueries();
     } catch (error: any) {
       toast({
         title: "Error creating user",
@@ -115,39 +102,43 @@ export function AddUserModal({ refetch }: AddUserModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
+        <Button className="gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300">
           <UserPlus className="w-4 h-4" />
           Add New User
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md backdrop-blur-xl bg-white/95 border border-white/20 shadow-2xl">
         <DialogHeader>
-          <DialogTitle>Add New User</DialogTitle>
+          <DialogTitle className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Add New User
+          </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="firstName">First Name</Label>
+            <div className="space-y-2">
+              <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">First Name</Label>
               <Input
                 id="firstName"
                 value={formData.firstName}
                 onChange={(e) => handleInputChange("firstName", e.target.value)}
                 placeholder="John"
+                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
               />
             </div>
-            <div>
-              <Label htmlFor="lastName">Last Name</Label>
+            <div className="space-y-2">
+              <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">Last Name</Label>
               <Input
                 id="lastName"
                 value={formData.lastName}
                 onChange={(e) => handleInputChange("lastName", e.target.value)}
                 placeholder="Doe"
+                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
               />
             </div>
           </div>
           
-          <div>
-            <Label htmlFor="email">Email *</Label>
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email *</Label>
             <Input
               id="email"
               type="email"
@@ -155,11 +146,12 @@ export function AddUserModal({ refetch }: AddUserModalProps) {
               onChange={(e) => handleInputChange("email", e.target.value)}
               placeholder="john@example.com"
               required
+              className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
             />
           </div>
           
-          <div>
-            <Label htmlFor="password">Password *</Label>
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password *</Label>
             <Input
               id="password"
               type="password"
@@ -168,16 +160,17 @@ export function AddUserModal({ refetch }: AddUserModalProps) {
               placeholder="Minimum 6 characters"
               required
               minLength={6}
+              className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
             />
           </div>
           
-          <div>
-            <Label htmlFor="role">Role</Label>
+          <div className="space-y-2">
+            <Label htmlFor="role" className="text-sm font-medium text-gray-700">Role</Label>
             <Select value={formData.role} onValueChange={(value) => handleInputChange("role", value)}>
-              <SelectTrigger>
+              <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="backdrop-blur-xl bg-white/95 border border-white/20">
                 <SelectItem value="user">User</SelectItem>
                 <SelectItem value="moderator">Moderator</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
@@ -185,22 +178,33 @@ export function AddUserModal({ refetch }: AddUserModalProps) {
             </Select>
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-lg bg-gray-50/80 border border-gray-200">
             <input
               type="checkbox"
               id="isPremium"
               checked={formData.isPremium}
               onChange={(e) => handleInputChange("isPremium", e.target.checked)}
-              className="rounded"
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
             />
-            <Label htmlFor="isPremium">Grant Premium Access</Label>
+            <Label htmlFor="isPremium" className="text-sm font-medium text-gray-700 cursor-pointer">
+              Grant Premium Access
+            </Label>
           </div>
           
           <div className="flex gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className="flex-1">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setIsOpen(false)} 
+              className="flex-1 border-gray-300 hover:bg-gray-50"
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading} className="flex-1">
+            <Button 
+              type="submit" 
+              disabled={isLoading} 
+              className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300"
+            >
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
