@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { UserPlus, Loader2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -45,35 +45,18 @@ export function AddUserModal({ refetch }: AddUserModalProps) {
 
     setIsLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast({
-          title: "Authentication Error",
-          description: "You must be logged in to create users",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      const response = await fetch('/functions/v1/admin-create-user', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify(formData)
+      const { data, error } = await supabase.functions.invoke('admin-create-user', {
+        body: formData
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to create user');
+      if (error) {
+        throw new Error(error.message || 'Failed to create user');
       }
 
       toast({
         title: "Success",
-        description: `User ${formData.email} created successfully`
+        description: `User ${formData.email} created successfully`,
+        variant: "success"
       });
 
       // Reset form and close modal
@@ -89,6 +72,7 @@ export function AddUserModal({ refetch }: AddUserModalProps) {
       refetch();
       queryClient.invalidateQueries();
     } catch (error: any) {
+      console.error('User creation error:', error);
       toast({
         title: "Error creating user",
         description: error.message || "An error occurred while creating the user",
