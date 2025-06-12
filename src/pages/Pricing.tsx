@@ -1,11 +1,14 @@
-
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, HelpCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PremiumUpgradeButton } from '@/components/PremiumUpgradeButton';
+import { useAuth } from '@/hooks/useAuth';
 
 const Pricing = () => {
+  const { user } = useAuth();
+
   const features = [
     "Access to all templates",
     "Unlimited resume creations (Premium only)",
@@ -60,6 +63,19 @@ const Pricing = () => {
                   <li>❌ Cloud backup</li>
                   <li>❌ Premium support</li>
                 </ul>
+                <div className="mt-6 text-center">
+                  {user ? (
+                    <Button variant="outline" size="lg" disabled>
+                      Current Plan
+                    </Button>
+                  ) : (
+                    <Link to="/register">
+                      <Button variant="outline" size="lg">
+                        Get Started Free
+                      </Button>
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
             {/* Premium Plan */}
@@ -82,9 +98,22 @@ const Pricing = () => {
                   <li>✔️ Premium support</li>
                 </ul>
                 <div className="mt-6 text-center">
-                  <Button size="lg" variant="default" disabled>
-                    Upgrade Coming Soon!
-                  </Button>
+                  {user ? (
+                    <PremiumUpgradeButton
+                      planType="monthly"
+                      amount={199}
+                      size="lg"
+                      className="w-full"
+                    >
+                      Upgrade to Premium
+                    </PremiumUpgradeButton>
+                  ) : (
+                    <Link to="/login">
+                      <Button size="lg" className="w-full">
+                        Sign In to Upgrade
+                      </Button>
+                    </Link>
+                  )}
                   <p className="text-xs text-muted-foreground mt-2">
                     Premium unlocks unlimited resumes, storage, history, and more.
                   </p>
@@ -92,6 +121,36 @@ const Pricing = () => {
               </div>
             </div>
           </div>
+
+          {/* Yearly Plan Option */}
+          {user && (
+            <div className="max-w-2xl mx-auto mt-12">
+              <div className="rounded-xl border-2 border-green-500 bg-green-50 shadow-lg overflow-hidden">
+                <div className="p-6 bg-green-500 text-white text-center">
+                  <h3 className="text-2xl font-bold">Yearly Premium</h3>
+                  <div className="mt-2 flex items-center justify-center">
+                    <span className="text-4xl font-bold">₹1,999</span>
+                    <span className="ml-2">/year</span>
+                  </div>
+                  <p className="mt-1 text-green-100">Save ₹389 compared to monthly!</p>
+                </div>
+                <div className="p-6 text-center">
+                  <p className="text-green-800 mb-4">
+                    Get 2 months free with our yearly plan. All premium features included.
+                  </p>
+                  <PremiumUpgradeButton
+                    planType="yearly"
+                    amount={1999}
+                    size="lg"
+                    className="w-full bg-green-600 hover:bg-green-700"
+                  >
+                    Upgrade to Yearly - Save ₹389
+                  </PremiumUpgradeButton>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* FAQs */}
           <div className="max-w-3xl mx-auto mt-20">
             <h2 className="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
