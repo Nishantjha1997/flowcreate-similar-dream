@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -12,13 +13,17 @@ interface PersonalInfoSectionProps {
   personal: ResumeData['personal'];
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onProfileImageChange?: (profileImage: string) => void;
+  onAIFeatureUpsell?: () => void;
+  isPremium?: boolean;
 }
 
 export const PersonalInfoSection = ({
   personal,
   onChange,
   onProfileImageChange,
-}: any) => {
+  onAIFeatureUpsell,
+  isPremium
+}: PersonalInfoSectionProps) => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -181,9 +186,13 @@ export const PersonalInfoSection = ({
             onAccept={(suggested) =>
               onChange({
                 target: { name: "summary", value: suggested },
-              })
+              } as React.ChangeEvent<HTMLTextAreaElement>)
             }
-            label="Get AI Suggestion"
+            label="Get AI Summary Suggestions"
+            section="summary"
+            isPremium={isPremium}
+            onUpsell={onAIFeatureUpsell}
+            additionalContext="Professional summary for resume header"
           />
         </div>
       </div>

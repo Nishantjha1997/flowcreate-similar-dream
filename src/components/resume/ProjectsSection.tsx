@@ -29,7 +29,7 @@ export const ProjectsSection = ({
     return (
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Projects</h2>
-        <p className="text-muted-foreground">Add your personal or professional projects to showcase your work.</p>
+        <p className="text-muted-foreground">Add your personal or professional projects to showcase your technical skills and achievements.</p>
         
         <div className="p-6 border border-dashed rounded-md text-center">
           <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
@@ -49,7 +49,7 @@ export const ProjectsSection = ({
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Projects</h2>
-      <p className="text-muted-foreground">Add your personal or professional projects to showcase your work.</p>
+      <p className="text-muted-foreground">Add your personal or professional projects to showcase your technical skills and achievements.</p>
       
       {projects.map((project, index) => (
         <div key={project.id} className="p-4 border rounded-md space-y-4 relative">
@@ -70,47 +70,49 @@ export const ProjectsSection = ({
               id={`projectTitle-${index}`}
               value={project.title}
               onChange={(e) => onChange('title', e.target.value, index)}
-              placeholder="E-commerce Website"
+              placeholder="E-commerce Website, Mobile App, Data Analysis Dashboard"
             />
           </div>
           
           <div>
             <Label htmlFor={`projectDescription-${index}`} className="block text-sm font-medium mb-1">
-              Description
+              Project Description & Your Role
             </Label>
             <Textarea
               id={`projectDescription-${index}`}
               value={project.description}
               onChange={(e) => onChange('description', e.target.value, index)}
               rows={3}
-              placeholder="Describe your project, its purpose, and your role..."
+              placeholder="Describe the project, your specific role, challenges solved, and measurable impact..."
             />
             <AiSuggestionButton
               value={project.description}
               onAccept={(suggested) =>
                 onChange('description', suggested, index)
               }
-              label="Get AI Suggestion"
+              label="Get AI Project Suggestions"
+              section="projects"
               isPremium={isPremium}
               onUpsell={onAIFeatureUpsell}
+              additionalContext={`Project: ${project.title}`}
             />
           </div>
           
           <div>
             <Label htmlFor={`projectLink-${index}`} className="block text-sm font-medium mb-1">
-              Link (Optional)
+              Project Link (Optional)
             </Label>
             <Input
               id={`projectLink-${index}`}
               value={project.link || ''}
               onChange={(e) => onChange('link', e.target.value, index)}
-              placeholder="https://github.com/yourusername/project"
+              placeholder="https://github.com/yourusername/project or live demo URL"
             />
           </div>
           
           <div>
             <Label htmlFor={`projectTech-${index}`} className="block text-sm font-medium mb-1">
-              Technologies Used (comma separated)
+              Technologies & Tools Used
             </Label>
             <Input
               id={`projectTech-${index}`}
@@ -119,7 +121,7 @@ export const ProjectsSection = ({
                 const techs = e.target.value.split(',').map(t => t.trim()).filter(Boolean);
                 onChange('technologies', JSON.stringify(techs), index);
               }}
-              placeholder="React, Node.js, MongoDB"
+              placeholder="React, Node.js, MongoDB, AWS, Docker, Python"
             />
           </div>
         </div>

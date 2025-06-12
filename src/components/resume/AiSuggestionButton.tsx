@@ -1,9 +1,9 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, Lightbulb, Crown } from "lucide-react";
+import { Sparkles, Loader2, Lightbulb, Crown, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-import { fetchGeminiSuggestion } from "@/utils/ai/gemini";
+import { fetchGeminiSuggestions, SuggestionType, ResumeSection } from "@/utils/ai/gemini";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +11,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AiSuggestionButtonProps {
   value: string;
@@ -18,18 +25,45 @@ interface AiSuggestionButtonProps {
   label?: string;
   isPremium?: boolean;
   onUpsell?: () => void;
+  section: ResumeSection;
+  jobTitle?: string;
+  company?: string;
+  additionalContext?: string;
 }
 
 export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
   value,
   onAccept,
-  label = "Get AI Suggestion",
+  label = "Get AI Suggestions",
   isPremium = false,
-  onUpsell
+  onUpsell,
+  section,
+  jobTitle,
+  company,
+  additionalContext
 }) => {
   const [loading, setLoading] = React.useState(false);
-  const [suggestion, setSuggestion] = React.useState<string | null>(null);
+  const [suggestions, setSuggestions] = React.useState<string[]>([]);
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+  const [suggestionType, setSuggestionType] = useState<SuggestionType>('bullet');
+
+  const getSuggestionTypeLabel = (type: SuggestionType) => {
+    switch (type) {
+      case 'bullet': return 'Bullet Points';
+      case 'paragraph': return 'Paragraph';
+      case 'concise': return 'Concise';
+      default: return 'Bullet Points';
+    }
+  };
+
+  const getSectionSpecificTypes = (section: ResumeSection): SuggestionType[] => {
+    switch (section) {
+      case 'skills':
+        return ['bullet', 'concise'];
+      default:
+        return ['bullet', 'paragraph', 'concise'];
+    }
+  };
 
   async function handleGenerate() {
     if (!isPremium) {
@@ -37,39 +71,52 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
       return;
     }
 
+    if (!value.trim()) {
+      toast.error("Please enter some content first to get AI suggestions.");
+      return;
+    }
+
     setLoading(true);
-    setSuggestion(null);
-    toast.info("Requesting AI suggestion...");
+    setSuggestions([]);
+    toast.info("Generating AI suggestions...");
+    
     try {
-      const result = await fetchGeminiSuggestion(value);
-      setSuggestion(result);
-      toast.success("AI suggestion ready!");
-      console.log("[Gemini] AI suggestion:", result);
+      const results = await fetchGeminiSuggestions({
+        content: value,
+        section,
+        suggestionType,
+        jobTitle,
+        company,
+        additionalContext
+      });
+      
+      setSuggestions(results);
+      toast.success(`Generated ${results.length} AI suggestions!`);
+      console.log("[Gemini] AI suggestions:", results);
     } catch (e: any) {
-      toast.error(e.message || "Failed to get AI suggestion");
+      toast.error(e.message || "Failed to get AI suggestions");
       console.error("[Gemini] Suggestion error:", e);
     }
     setLoading(false);
   }
 
-  function handleAccept() {
-    if (suggestion) {
-      onAccept(suggestion);
-      setSuggestion(null);
-      toast.success("Suggestion applied!");
-    }
+  function handleAccept(suggestion: string) {
+    onAccept(suggestion);
+    setSuggestions([]);
+    toast.success("Suggestion applied!");
   }
 
   const handleUpgrade = () => {
     setShowUpgradeDialog(false);
     toast.info("Premium upgrade coming soon! Get unlimited resumes + AI features for ₹199/month");
-    // You can add navigation to pricing page here when ready
-    // navigate('/pricing');
+    if (onUpsell) onUpsell();
   };
+
+  const availableTypes = getSectionSpecificTypes(section);
 
   return (
     <>
-      <div className="mt-2 space-y-2">
+      <div className="mt-2 space-y-3">
         <div className="flex items-center gap-2">
           <Button
             type="button"
@@ -86,23 +133,75 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
             ) : (
               <Crown className="h-4 w-4 text-yellow-600" />
             )}
-            {loading ? "Generating..." : isPremium ? label : label}
+            {loading ? "Generating..." : label}
           </Button>
-          <span className="text-xs text-muted-foreground">
-            {isPremium ? "Powered by Gemini AI" : "Premium Feature - ₹199/month"}
-          </span>
+          
+          {isPremium && availableTypes.length > 1 && (
+            <Select value={suggestionType} onValueChange={(value: SuggestionType) => setSuggestionType(value)}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {availableTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {getSuggestionTypeLabel(type)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
-        {suggestion && (
-          <div className="bg-primary/5 border border-primary/20 rounded-md p-2 text-sm">
-            <span className="font-semibold text-primary">AI Suggestion:</span>
-            <br />
-            {suggestion}
-            <div className="flex gap-2 mt-2">
-              <Button size="sm" variant="outline" type="button" onClick={handleAccept}>
-                Insert Suggestion
+        
+        <span className="text-xs text-muted-foreground">
+          {isPremium ? "Powered by Gemini AI - Multiple suggestions available" : "Premium Feature - ₹199/month"}
+        </span>
+        
+        {suggestions.length > 0 && (
+          <div className="space-y-3">
+            {suggestions.map((suggestion, index) => (
+              <div key={index} className="bg-primary/5 border border-primary/20 rounded-md p-3 text-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-semibold text-primary">
+                    AI Suggestion {index + 1} ({getSuggestionTypeLabel(suggestionType)})
+                  </span>
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      type="button" 
+                      onClick={() => handleAccept(suggestion)}
+                      className="text-xs"
+                    >
+                      Use This
+                    </Button>
+                  </div>
+                </div>
+                <div className="whitespace-pre-wrap text-sm text-muted-foreground mb-2">
+                  {suggestion}
+                </div>
+              </div>
+            ))}
+            
+            <div className="flex gap-2">
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                type="button" 
+                onClick={() => setSuggestions([])}
+                className="text-xs"
+              >
+                Clear All
               </Button>
-              <Button size="sm" variant="ghost" type="button" onClick={() => setSuggestion(null)}>
-                Dismiss
+              <Button 
+                size="sm" 
+                variant="outline" 
+                type="button" 
+                onClick={handleGenerate}
+                disabled={loading}
+                className="text-xs flex items-center gap-1"
+              >
+                <RefreshCw className="h-3 w-3" />
+                Generate New
               </Button>
             </div>
           </div>
@@ -123,13 +222,13 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
               </p>
               
               <div className="bg-gradient-to-br from-yellow-50 to-orange-50 p-4 rounded-lg border border-yellow-200">
-                <h4 className="font-semibold text-yellow-800 mb-2">Premium Benefits:</h4>
+                <h4 className="font-semibold text-yellow-800 mb-2">Premium AI Benefits:</h4>
                 <ul className="text-sm text-yellow-700 space-y-1">
-                  <li>✨ Unlimited AI-powered content suggestions</li>
-                  <li>📄 Unlimited resume saves</li>
-                  <li>☁️ Cloud backup & sync</li>
-                  <li>📚 Version history</li>
-                  <li>🎨 Advanced customization options</li>
+                  <li>✨ Multiple AI suggestion formats (bullets, paragraphs, concise)</li>
+                  <li>🎯 Context-aware suggestions for each resume section</li>
+                  <li>📊 Achievement-focused, quantifiable content</li>
+                  <li>🔄 Unlimited regeneration and refinement</li>
+                  <li>📄 Unlimited resume saves & cloud backup</li>
                   <li>🚀 Priority support</li>
                 </ul>
               </div>

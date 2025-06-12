@@ -32,11 +32,15 @@ export const EducationSection = ({
     } as React.ChangeEvent<HTMLTextAreaElement>;
     onChange(event, idx);
   };
+  
   return (
     <div className="space-y-6">
+      <h2 className="text-xl font-semibold">Education</h2>
+      <p className="text-muted-foreground">Add your educational background, starting with the most recent.</p>
+      
       {education.map((edu, idx) => (
         <div key={edu.id} className="mb-6 border-b border-muted pb-6">
-          <Label htmlFor={`education-school-${edu.id}`}>School</Label>
+          <Label htmlFor={`education-school-${edu.id}`}>School/Institution</Label>
           <Textarea
             id={`education-school-${edu.id}`}
             name="school"
@@ -44,7 +48,7 @@ export const EducationSection = ({
             onChange={e => onChange(e, idx)}
             rows={1}
             className="mb-2"
-            placeholder="Name of Institution"
+            placeholder="University of California, Berkeley"
           />
 
           <Label htmlFor={`education-degree-${edu.id}`}>Degree</Label>
@@ -55,7 +59,7 @@ export const EducationSection = ({
             onChange={e => onChange(e, idx)}
             rows={1}
             className="mb-2"
-            placeholder="Degree Earned"
+            placeholder="Bachelor of Science"
           />
 
           <Label htmlFor={`education-field-${edu.id}`}>Field of Study</Label>
@@ -66,7 +70,7 @@ export const EducationSection = ({
             onChange={e => onChange(e, idx)}
             rows={1}
             className="mb-2"
-            placeholder="Major and/or Minor"
+            placeholder="Computer Science"
           />
 
           <div className="grid grid-cols-2 gap-4 mb-2">
@@ -78,7 +82,7 @@ export const EducationSection = ({
                 value={edu.startDate}
                 onChange={e => onChange(e, idx)}
                 rows={1}
-                placeholder="MM/YYYY"
+                placeholder="08/2018"
               />
             </div>
             <div>
@@ -89,10 +93,11 @@ export const EducationSection = ({
                 value={edu.endDate}
                 onChange={e => onChange(e, idx)}
                 rows={1}
-                placeholder="MM/YYYY or Present"
+                placeholder="05/2022"
               />
             </div>
           </div>
+          
           <Label htmlFor={`education-description-${edu.id}`}>Description</Label>
           <Textarea
             id={`education-description-${edu.id}`}
@@ -101,16 +106,19 @@ export const EducationSection = ({
             onChange={e => onChange(e, idx)}
             rows={3}
             className="mb-2"
-            placeholder="Add any honors, societies, or coursework"
+            placeholder="GPA: 3.8/4.0, Dean's List, Relevant coursework, honors, activities..."
           />
           <AiSuggestionButton
             value={edu.description || ""}
             onAccept={suggested => handleAiDescription(suggested, idx)}
-            label="Suggest Education Description"
+            label="Get AI Education Suggestions"
+            section="education"
             isPremium={isPremium}
             onUpsell={onAIFeatureUpsell}
+            additionalContext={`Education: ${edu.degree} in ${edu.field} from ${edu.school}`}
           />
-          <Button onClick={() => onRemove(edu.id)} type="button" variant="destructive" size="sm">
+          
+          <Button onClick={() => onRemove(edu.id)} type="button" variant="destructive" size="sm" className="mt-2">
             Remove Education
           </Button>
         </div>

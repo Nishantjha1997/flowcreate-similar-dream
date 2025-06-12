@@ -117,7 +117,7 @@ export const ExperienceSection = ({
           )}
           
           <div className="mb-4">
-            <Label htmlFor={`experience-description-${exp.id}`}>Description</Label>
+            <Label htmlFor={`experience-description-${exp.id}`}>Job Description & Achievements</Label>
             <Textarea
               id={`experience-description-${exp.id}`}
               name="description"
@@ -125,14 +125,18 @@ export const ExperienceSection = ({
               onChange={e => onChange(e, idx)}
               rows={4}
               className="mb-2"
-              placeholder="Describe your responsibilities and achievements"
+              placeholder="Describe your responsibilities and achievements with quantifiable results..."
             />
             <AiSuggestionButton
               value={exp.description || ""}
               onAccept={suggested => handleAiDescription(suggested, idx)}
-              label="Suggest Description"
+              label="Get AI Job Description Suggestions"
+              section="experience"
+              jobTitle={exp.title}
+              company={exp.company}
               isPremium={isPremium}
               onUpsell={onAIFeatureUpsell}
+              additionalContext={`Work experience at ${exp.company} as ${exp.title}`}
             />
           </div>
           
