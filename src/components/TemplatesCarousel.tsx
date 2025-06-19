@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -183,10 +182,10 @@ const TemplatesCarousel = () => {
               {templates.map((template) => (
                 <div key={template.id} className="w-1/3 flex-shrink-0 px-3">
                   <div className="group relative overflow-hidden rounded-xl border bg-background/60 backdrop-blur-sm shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
-                    <div className="aspect-[3/4] overflow-hidden cursor-pointer bg-white p-4" onClick={() => setPreviewId(template.id)}>
-                      {/* Live Resume Template Preview */}
-                      <div className="h-full w-full bg-white rounded shadow-sm overflow-hidden transform scale-75 origin-top-left">
-                        <div style={{ transform: 'scale(0.4)', transformOrigin: 'top left', width: '250%', height: '250%' }}>
+                    <div className="aspect-[3/4] overflow-hidden cursor-pointer bg-white p-2" onClick={() => setPreviewId(template.id)}>
+                      {/* Live Resume Template Preview with better scaling */}
+                      <div className="h-full w-full bg-white rounded shadow-sm overflow-hidden">
+                        <div style={{ transform: 'scale(0.85)', transformOrigin: 'top left', width: '117.6%', height: '117.6%' }}>
                           <ResumeTemplate 
                             data={mockResumeData} 
                             templateName={template.templateKey}

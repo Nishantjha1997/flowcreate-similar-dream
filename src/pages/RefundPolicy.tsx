@@ -8,125 +8,131 @@ const RefundPolicy = () => {
       <Header />
       <main className="container mx-auto px-4 py-12 md:py-16">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-foreground mb-8">Refund and Cancellation Policy</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-8">Cancellation and Refund Policy</h1>
           
           <div className="prose prose-gray dark:prose-invert max-w-none">
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-8">
-              <h2 className="text-xl font-semibold text-red-800 dark:text-red-200 mb-2">No Refund Policy</h2>
-              <p className="text-red-700 dark:text-red-300 font-semibold">
-                ALL SALES ARE FINAL. FlowCreate does not provide refunds for any subscription purchases under any circumstances.
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-8">
+              <h2 className="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-2">Important Notice</h2>
+              <p className="text-blue-700 dark:text-blue-300">
+                Please review our cancellation and refund terms carefully before making a purchase. All payments are processed immediately and subscription benefits are activated instantly.
               </p>
             </div>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">1. No Refund Policy</h2>
+              <h2 className="text-2xl font-semibold mb-4">1. Subscription Cancellation</h2>
               <p className="mb-4">
-                By purchasing any subscription plan (Monthly ₹199 or Annual ₹1999), you acknowledge and agree that:
+                You can cancel your FlowCreate subscription at any time through your account settings:
               </p>
               <ul className="list-disc list-inside space-y-2">
-                <li><strong>No refunds will be provided</strong> for any reason whatsoever</li>
-                <li>All payments are final and non-refundable</li>
-                <li>This policy applies to all subscription types and durations</li>
-                <li>Technical issues, change of mind, or dissatisfaction do not qualify for refunds</li>
-                <li>Accidental purchases are not eligible for refunds</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">2. Subscription Cancellation</h2>
-              <p className="mb-4">
-                While refunds are not available, you can cancel your subscription at any time:
-              </p>
-              <ul className="list-disc list-inside space-y-2">
-                <li>Log into your account and go to Account Settings</li>
-                <li>Navigate to the Subscription section</li>
+                <li>Log into your account and navigate to Account Settings</li>
+                <li>Go to the Subscription section</li>
                 <li>Click "Cancel Subscription"</li>
                 <li>Your premium access will continue until the end of your current billing period</li>
-                <li>No further charges will be made after cancellation</li>
+                <li>No future charges will be made after successful cancellation</li>
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">3. What Happens After Cancellation</h2>
+              <h2 className="text-2xl font-semibold mb-4">2. What Happens After Cancellation</h2>
               <p className="mb-4">
                 When you cancel your subscription:
               </p>
               <ul className="list-disc list-inside space-y-2">
-                <li>You retain access to premium features until the end of your billing period</li>
-                <li>After the billing period ends, your account reverts to the free plan</li>
-                <li>Your resume data remains saved in your account</li>
-                <li>You can re-subscribe at any time to regain premium access</li>
-                <li><strong>No refund is provided for the unused portion of your subscription</strong></li>
+                <li>You retain access to premium features until your billing period ends</li>
+                <li>Your account automatically reverts to the free plan afterward</li>
+                <li>All your resume data remains safely stored in your account</li>
+                <li>You can reactivate your subscription at any time</li>
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">4. Free Trial Policy</h2>
+              <h2 className="text-2xl font-semibold mb-4">3. Refund Policy</h2>
               <p className="mb-4">
-                Currently, FlowCreate does not offer free trials. All subscriptions begin immediately upon payment and are subject to this no-refund policy.
+                Due to the instant digital nature of our service and immediate activation of premium features:
+              </p>
+              <ul className="list-disc list-inside space-y-2">
+                <li>All subscription purchases are considered final</li>
+                <li>Premium features are activated immediately upon payment confirmation</li>
+                <li>Refunds are not provided for unused portions of active subscriptions</li>
+                <li>This policy applies to both monthly (₹199) and annual (₹1999) plans</li>
+              </ul>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4">4. Free Trial Information</h2>
+              <p className="mb-4">
+                Currently, FlowCreate does not offer free trial periods. All subscriptions begin immediately upon successful payment and provide instant access to premium features.
               </p>
             </section>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">5. Payment Processing</h2>
               <p className="mb-4">
-                All payments are processed securely through Razorpay. Once payment is confirmed:
+                All payments are securely processed through Razorpay. Upon successful payment:
               </p>
               <ul className="list-disc list-inside space-y-2">
-                <li>Your premium subscription is activated immediately</li>
-                <li>You gain instant access to all premium features</li>
-                <li>The transaction is final and cannot be reversed</li>
+                <li>Your premium subscription activates immediately</li>
+                <li>You gain instant access to all premium templates and features</li>
+                <li>AI-powered suggestions become available right away</li>
+                <li>Advanced customization options are unlocked</li>
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">6. Technical Issues</h2>
+              <h2 className="text-2xl font-semibold mb-4">6. Technical Support</h2>
               <p className="mb-4">
-                If you experience technical difficulties:
+                If you experience any technical issues with our service:
               </p>
               <ul className="list-disc list-inside space-y-2">
                 <li>Contact our support team at support@flowcreate.com</li>
-                <li>We will work to resolve technical issues promptly</li>
-                <li>Technical support does not constitute grounds for a refund</li>
-                <li>Service interruptions do not qualify for refunds</li>
+                <li>We're committed to resolving technical problems promptly</li>
+                <li>Our team will work with you to ensure you can access your premium features</li>
+                <li>Response time is typically within 24 hours</li>
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">7. Billing Disputes</h2>
+              <h2 className="text-2xl font-semibold mb-4">7. Billing Inquiries</h2>
               <p className="mb-4">
-                For billing inquiries:
+                For any billing-related questions:
               </p>
               <ul className="list-disc list-inside space-y-2">
-                <li>Contact support@flowcreate.com within 30 days of the charge</li>
-                <li>Provide your account email and transaction details</li>
-                <li>We will investigate legitimate billing errors</li>
-                <li>Billing disputes do not guarantee refunds</li>
+                <li>Contact support@flowcreate.com with your account details</li>
+                <li>Include your transaction ID and billing email</li>
+                <li>We'll investigate any legitimate billing concerns</li>
+                <li>Please reach out within 30 days of the transaction</li>
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">8. Legal Compliance</h2>
+              <h2 className="text-2xl font-semibold mb-4">8. Auto-Renewal</h2>
               <p className="mb-4">
-                This no-refund policy is enforced to the fullest extent permitted by applicable law. By using our service, you waive any right to dispute charges or request refunds through your payment provider.
+                Subscription plans automatically renew unless cancelled:
               </p>
+              <ul className="list-disc list-inside space-y-2">
+                <li>Monthly plans renew every 30 days</li>
+                <li>Annual plans renew every 365 days</li>
+                <li>You'll receive a reminder email before renewal</li>
+                <li>Cancel anytime to prevent future charges</li>
+              </ul>
             </section>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">9. Policy Updates</h2>
               <p className="mb-4">
-                We reserve the right to update this refund policy at any time. Changes will be posted on this page with an updated revision date. Your continued use of the service after changes constitutes acceptance of the new policy.
+                We may update this policy from time to time. Changes will be posted on this page with an updated date. Your continued use of our service constitutes acceptance of any policy changes.
               </p>
             </section>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">10. Contact Information</h2>
               <p>
-                For questions about cancellations or this policy:
+                For questions about cancellations, billing, or this policy:
               </p>
               <p className="mt-2">
                 <strong>Email:</strong> support@flowcreate.com<br />
-                <strong>Response Time:</strong> Within 24 hours
+                <strong>Response Time:</strong> Within 24 hours<br />
+                <strong>Business Hours:</strong> Monday to Friday, 9 AM - 6 PM IST
               </p>
             </section>
 
