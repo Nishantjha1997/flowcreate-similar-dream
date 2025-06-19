@@ -21,6 +21,10 @@ import NotFound from "./pages/NotFound";
 import Account from "./pages/Account";
 import AccountSettings from "./pages/AccountSettings";
 import Admin from "./pages/Admin";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import RefundPolicy from "./pages/RefundPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -54,6 +58,10 @@ const App = () => (
                 <Route path="/account" element={<Account />} />
                 <Route path="/account/settings" element={<AccountSettings />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/refund-policy" element={<RefundPolicy />} />
+                <Route path="/shipping-policy" element={<ShippingPolicy />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
