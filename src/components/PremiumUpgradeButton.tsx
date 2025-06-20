@@ -7,7 +7,7 @@ import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 import { useAuth } from '@/hooks/useAuth';
 
 interface PremiumUpgradeButtonProps {
-  planType?: 'monthly' | 'yearly';
+  planType?: 'monthly' | 'yearly' | 'lifetime';
   amount: number; // in rupees
   className?: string;
   size?: 'sm' | 'default' | 'lg';
