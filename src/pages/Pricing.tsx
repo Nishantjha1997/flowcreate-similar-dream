@@ -50,25 +50,12 @@ const Pricing = () => {
     );
   }
 
-  const features = [
-    "Access to all templates",
-    "Unlimited resume creations (Premium only)",
-    "PDF and DOCX downloads",
-    "ATS-friendly designs",
-    "Real-time preview",
-    "Custom styling options",
-    "AI-powered content suggestions",
-    "Cover letter templates",
-    "Shareable resume links",
-    "Cloud storage",
-    "Version history",
-    "No watermarks"
-  ];
-
   const monthlyPrice = isIndianUser ? '₹199' : '$2.99';
   const yearlyPrice = isIndianUser ? '₹1,999' : '$19.99';
-  const yearlyAmount = isIndianUser ? 1999 : 1999; // Keep INR amount for payment processing
-  const monthlyAmount = isIndianUser ? 199 : 199; // Keep INR amount for payment processing
+  const lifetimePrice = isIndianUser ? '₹2,500' : '$29.99';
+  const yearlyAmount = isIndianUser ? 1999 : 1999;
+  const monthlyAmount = isIndianUser ? 199 : 199;
+  const lifetimeAmount = isIndianUser ? 2500 : 2500;
 
   return (
     <div className="min-h-screen bg-background">
@@ -83,10 +70,10 @@ const Pricing = () => {
               Simple, Transparent Pricing
             </h1>
             <p className="mt-6 text-xl text-muted-foreground">
-              FlowCreate is free for 1 resume, with a Premium plan for unlimited resumes and power users.
+              FlowCreate is free for 1 resume, with Premium plans for unlimited resumes and power users.
             </p>
           </div>
-          <div className="max-w-4xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-2 gap-10">
+          <div className="max-w-6xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Free Plan */}
             <div className="rounded-xl border border-primary bg-card shadow-sm overflow-hidden flex flex-col">
               <div className="p-8 bg-primary text-primary-foreground text-center">
@@ -124,10 +111,11 @@ const Pricing = () => {
                 </div>
               </div>
             </div>
-            {/* Premium Plan */}
+            
+            {/* Monthly Premium Plan */}
             <div className="rounded-xl border border-yellow-500 bg-yellow-50 shadow-sm overflow-hidden flex flex-col">
               <div className="p-8 bg-yellow-400 text-center" style={{ textShadow: "0px 1px 3px #fafafa, 0 1px 2px #00000016" }}>
-                <h2 className="text-3xl font-bold" style={{ color: "#904803" }}>Premium</h2>
+                <h2 className="text-3xl font-bold" style={{ color: "#904803" }}>Monthly</h2>
                 <div className="mt-4 flex items-center justify-center">
                   <span className="text-6xl font-bold tracking-tight" style={{ color: "#202020", textShadow: "0 2px 6px #ffffff99" }}>{monthlyPrice}</span>
                   <span className="ml-2" style={{ color: "#202020" }}>/month</span>
@@ -151,7 +139,7 @@ const Pricing = () => {
                       size="lg"
                       className="w-full"
                     >
-                      Upgrade to Premium
+                      Upgrade to Monthly
                     </PremiumUpgradeButton>
                   ) : (
                     <Link to="/login">
@@ -160,44 +148,93 @@ const Pricing = () => {
                       </Button>
                     </Link>
                   )}
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Premium unlocks unlimited resumes, storage, history, and more.
-                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Yearly Plan */}
+            <div className="rounded-xl border-2 border-green-500 bg-green-50 shadow-lg overflow-hidden flex flex-col">
+              <div className="p-8 bg-green-500 text-white text-center">
+                <h2 className="text-3xl font-bold">Yearly</h2>
+                <div className="mt-4 flex items-center justify-center">
+                  <span className="text-6xl font-bold tracking-tight">{yearlyPrice}</span>
+                  <span className="ml-2">/year</span>
+                </div>
+                <p className="mt-2 text-base text-green-100">
+                  {isIndianUser ? 'Save ₹389 compared to monthly!' : 'Save $16.89 compared to monthly!'}
+                </p>
+              </div>
+              <div className="p-8">
+                <ul className="space-y-2 text-green-900 font-semibold">
+                  <li>✔️ Everything in Monthly</li>
+                  <li>✔️ 2 months free</li>
+                  <li>✔️ Priority support</li>
+                  <li>✔️ Advanced features</li>
+                  <li>✔️ Version history</li>
+                  <li>✔️ Cloud backup</li>
+                </ul>
+                <div className="mt-6 text-center">
+                  {user ? (
+                    <PremiumUpgradeButton
+                      planType="yearly"
+                      amount={yearlyAmount}
+                      size="lg"
+                      className="w-full bg-green-600 hover:bg-green-700"
+                    >
+                      Upgrade to Yearly
+                    </PremiumUpgradeButton>
+                  ) : (
+                    <Link to="/login">
+                      <Button size="lg" className="w-full bg-green-600 hover:bg-green-700">
+                        Sign In to Upgrade
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Lifetime Plan */}
+            <div className="rounded-xl border-2 border-purple-500 bg-purple-50 shadow-lg overflow-hidden flex flex-col">
+              <div className="p-8 bg-purple-500 text-white text-center">
+                <h2 className="text-3xl font-bold">Lifetime</h2>
+                <div className="mt-4 flex items-center justify-center">
+                  <span className="text-6xl font-bold tracking-tight">{lifetimePrice}</span>
+                </div>
+                <p className="mt-2 text-base text-purple-100">
+                  One-time payment, lifetime access
+                </p>
+              </div>
+              <div className="p-8">
+                <ul className="space-y-2 text-purple-900 font-semibold">
+                  <li>✔️ Everything in Yearly</li>
+                  <li>✔️ Lifetime updates</li>
+                  <li>✔️ Future template updates</li>
+                  <li>✔️ Advanced customization</li>
+                  <li>✔️ Portfolio builder</li>
+                  <li>✔️ Interview preparation</li>
+                </ul>
+                <div className="mt-6 text-center">
+                  {user ? (
+                    <PremiumUpgradeButton
+                      planType="lifetime"
+                      amount={lifetimeAmount}
+                      size="lg"
+                      className="w-full bg-purple-600 hover:bg-purple-700"
+                    >
+                      Get Lifetime Access
+                    </PremiumUpgradeButton>
+                  ) : (
+                    <Link to="/login">
+                      <Button size="lg" className="w-full bg-purple-600 hover:bg-purple-700">
+                        Sign In to Upgrade
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Yearly Plan Option */}
-          {user && (
-            <div className="max-w-2xl mx-auto mt-12">
-              <div className="rounded-xl border-2 border-green-500 bg-green-50 shadow-lg overflow-hidden">
-                <div className="p-6 bg-green-500 text-white text-center">
-                  <h3 className="text-2xl font-bold">Yearly Premium</h3>
-                  <div className="mt-2 flex items-center justify-center">
-                    <span className="text-4xl font-bold">{yearlyPrice}</span>
-                    <span className="ml-2">/year</span>
-                  </div>
-                  <p className="mt-1 text-green-100">
-                    {isIndianUser ? 'Save ₹389 compared to monthly!' : 'Save $16.89 compared to monthly!'}
-                  </p>
-                </div>
-                <div className="p-6 text-center">
-                  <p className="text-green-800 mb-4">
-                    Get 2 months free with our yearly plan. All premium features included.
-                  </p>
-                  <PremiumUpgradeButton
-                    planType="yearly"
-                    amount={yearlyAmount}
-                    size="lg"
-                    className="w-full bg-green-600 hover:bg-green-700"
-                  >
-                    Upgrade to Yearly - Save {isIndianUser ? '₹389' : '$16.89'}
-                  </PremiumUpgradeButton>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* FAQs */}
           <div className="max-w-3xl mx-auto mt-20">
@@ -205,10 +242,10 @@ const Pricing = () => {
             
             <div className="space-y-6">
               <div className="rounded-lg border p-6">
-                <h3 className="text-lg font-semibold mb-2">What's included in the Premium plan?</h3>
+                <h3 className="text-lg font-semibold mb-2">What's included in the Premium plans?</h3>
                 <p className="text-muted-foreground">
                   Premium includes unlimited resumes, AI-powered content suggestions, cloud backup, 
-                  version history, advanced customization options, and priority support - all for just ₹199/month.
+                  version history, advanced customization options, and priority support.
                 </p>
               </div>
               
@@ -229,18 +266,18 @@ const Pricing = () => {
               </div>
               
               <div className="rounded-lg border p-6">
-                <h3 className="text-lg font-semibold mb-2">Is there a free trial?</h3>
+                <h3 className="text-lg font-semibold mb-2">What's the difference between Yearly and Lifetime?</h3>
                 <p className="text-muted-foreground">
-                  You can use FlowCreate for free with 1 resume save. This gives you a chance to 
-                  explore all the basic features before deciding to upgrade.
+                  Yearly plans provide access for 12 months and need to be renewed. Lifetime plans 
+                  provide permanent access with a one-time payment and include all future updates.
                 </p>
               </div>
               
               <div className="rounded-lg border p-6">
-                <h3 className="text-lg font-semibold mb-2">How can I support FlowCreate?</h3>
+                <h3 className="text-lg font-semibold mb-2">Is there a free trial?</h3>
                 <p className="text-muted-foreground">
-                  The best way to support us is by upgrading to Premium for ₹199/month. This helps 
-                  us maintain the platform, develop new features, and provide excellent support.
+                  You can use FlowCreate for free with 1 resume save. This gives you a chance to 
+                  explore all the basic features before deciding to upgrade.
                 </p>
               </div>
             </div>

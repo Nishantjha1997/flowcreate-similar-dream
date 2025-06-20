@@ -83,6 +83,11 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/shipping-policy" className="text-sm text-muted-foreground hover:text-foreground">
+                  Shipping Policy
+                </Link>
+              </li>
+              <li>
                 <a 
                   href="https://github.com/flowcreate/resume-builder" 
                   target="_blank" 

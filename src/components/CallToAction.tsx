@@ -56,15 +56,30 @@ const CallToAction = () => {
       popular: true
     },
     {
-      name: "Lifetime",
+      name: "Yearly",
       price: isIndianUser ? "₹1,999" : "$19.99",
+      period: "/year",
+      description: "Annual plan with great savings",
+      features: [
+        "Everything in Pro",
+        "2 months free",
+        "Priority support",
+        "Advanced features",
+        "Version history"
+      ],
+      popular: false
+    },
+    {
+      name: "Lifetime",
+      price: isIndianUser ? "₹2,500" : "$29.99",
       description: "One-time payment, lifetime access",
       features: [
         "Everything in Pro",
         "Future template updates",
         "Advanced customization",
         "Portfolio builder",
-        "Interview preparation"
+        "Interview preparation",
+        "Lifetime updates"
       ],
       popular: false
     }
@@ -129,7 +144,7 @@ const CallToAction = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {plans.map((plan, index) => (
               <Card key={index} className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg ${plan.popular ? 'border-primary shadow-lg scale-105' : 'hover:scale-105'} bg-background/60 backdrop-blur-sm`}>
                 {plan.popular && (
