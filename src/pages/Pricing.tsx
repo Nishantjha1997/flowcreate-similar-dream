@@ -1,3 +1,4 @@
+
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -5,9 +6,49 @@ import { CheckCircle, HelpCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PremiumUpgradeButton } from '@/components/PremiumUpgradeButton';
 import { useAuth } from '@/hooks/useAuth';
+import { useState, useEffect } from 'react';
 
 const Pricing = () => {
   const { user } = useAuth();
+  const [isIndianUser, setIsIndianUser] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Detect user location
+    const detectLocation = async () => {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        setIsIndianUser(data.country_code === 'IN');
+      } catch (error) {
+        // Default to USD if detection fails
+        setIsIndianUser(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    detectLocation();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center mb-12">
+              <div className="animate-pulse">
+                <div className="h-8 bg-gray-300 rounded mb-4"></div>
+                <div className="h-4 bg-gray-300 rounded mb-8"></div>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   const features = [
     "Access to all templates",
@@ -23,6 +64,11 @@ const Pricing = () => {
     "Version history",
     "No watermarks"
   ];
+
+  const monthlyPrice = isIndianUser ? '₹199' : '$2.99';
+  const yearlyPrice = isIndianUser ? '₹1,999' : '$19.99';
+  const yearlyAmount = isIndianUser ? 1999 : 1999; // Keep INR amount for payment processing
+  const monthlyAmount = isIndianUser ? 199 : 199; // Keep INR amount for payment processing
 
   return (
     <div className="min-h-screen bg-background">
@@ -46,7 +92,7 @@ const Pricing = () => {
               <div className="p-8 bg-primary text-primary-foreground text-center">
                 <h2 className="text-3xl font-bold">Free</h2>
                 <div className="mt-4 flex items-center justify-center">
-                  <span className="text-6xl font-bold tracking-tight">₹0</span>
+                  <span className="text-6xl font-bold tracking-tight">{isIndianUser ? '₹0' : '$0'}</span>
                   <span className="ml-2">/month</span>
                 </div>
                 <p className="mt-2 text-base">No credit card required. Save 1 resume per account.</p>
@@ -83,7 +129,7 @@ const Pricing = () => {
               <div className="p-8 bg-yellow-400 text-center" style={{ textShadow: "0px 1px 3px #fafafa, 0 1px 2px #00000016" }}>
                 <h2 className="text-3xl font-bold" style={{ color: "#904803" }}>Premium</h2>
                 <div className="mt-4 flex items-center justify-center">
-                  <span className="text-6xl font-bold tracking-tight" style={{ color: "#202020", textShadow: "0 2px 6px #ffffff99" }}>₹199</span>
+                  <span className="text-6xl font-bold tracking-tight" style={{ color: "#202020", textShadow: "0 2px 6px #ffffff99" }}>{monthlyPrice}</span>
                   <span className="ml-2" style={{ color: "#202020" }}>/month</span>
                 </div>
                 <p className="mt-2 text-base" style={{ color: "#783f04" }}>Unlimited resumes, full AI and all premium features.</p>
@@ -101,7 +147,7 @@ const Pricing = () => {
                   {user ? (
                     <PremiumUpgradeButton
                       planType="monthly"
-                      amount={199}
+                      amount={monthlyAmount}
                       size="lg"
                       className="w-full"
                     >
@@ -129,10 +175,12 @@ const Pricing = () => {
                 <div className="p-6 bg-green-500 text-white text-center">
                   <h3 className="text-2xl font-bold">Yearly Premium</h3>
                   <div className="mt-2 flex items-center justify-center">
-                    <span className="text-4xl font-bold">₹1,999</span>
+                    <span className="text-4xl font-bold">{yearlyPrice}</span>
                     <span className="ml-2">/year</span>
                   </div>
-                  <p className="mt-1 text-green-100">Save ₹389 compared to monthly!</p>
+                  <p className="mt-1 text-green-100">
+                    {isIndianUser ? 'Save ₹389 compared to monthly!' : 'Save $16.89 compared to monthly!'}
+                  </p>
                 </div>
                 <div className="p-6 text-center">
                   <p className="text-green-800 mb-4">
@@ -140,11 +188,11 @@ const Pricing = () => {
                   </p>
                   <PremiumUpgradeButton
                     planType="yearly"
-                    amount={1999}
+                    amount={yearlyAmount}
                     size="lg"
                     className="w-full bg-green-600 hover:bg-green-700"
                   >
-                    Upgrade to Yearly - Save ₹389
+                    Upgrade to Yearly - Save {isIndianUser ? '₹389' : '$16.89'}
                   </PremiumUpgradeButton>
                 </div>
               </div>

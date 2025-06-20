@@ -3,12 +3,34 @@ import { ArrowRight, Check, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 const CallToAction = () => {
+  const [isIndianUser, setIsIndianUser] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Detect user location
+    const detectLocation = async () => {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        setIsIndianUser(data.country_code === 'IN');
+      } catch (error) {
+        // Default to USD if detection fails
+        setIsIndianUser(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    detectLocation();
+  }, []);
+
   const plans = [
     {
       name: "Free",
-      price: "$0",
+      price: isIndianUser ? "₹0" : "$0",
       description: "Perfect for getting started",
       features: [
         "1 resume template",
@@ -20,7 +42,7 @@ const CallToAction = () => {
     },
     {
       name: "Pro",
-      price: "$9.99",
+      price: isIndianUser ? "₹199" : "$2.99",
       period: "/month",
       description: "Everything you need for job hunting",
       features: [
@@ -35,7 +57,7 @@ const CallToAction = () => {
     },
     {
       name: "Lifetime",
-      price: "$49.99",
+      price: isIndianUser ? "₹1,999" : "$19.99",
       description: "One-time payment, lifetime access",
       features: [
         "Everything in Pro",
@@ -47,6 +69,21 @@ const CallToAction = () => {
       popular: false
     }
   ];
+
+  if (loading) {
+    return (
+      <section className="py-24 bg-gradient-to-b from-background to-muted/30 relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-300 rounded mb-4"></div>
+              <div className="h-4 bg-gray-300 rounded mb-8"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-24 bg-gradient-to-b from-background to-muted/30 relative overflow-hidden">
