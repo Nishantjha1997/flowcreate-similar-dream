@@ -1,4 +1,3 @@
-
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -50,11 +49,13 @@ const Pricing = () => {
     );
   }
 
+  const testPrice = isIndianUser ? '₹1' : '$0.01';
   const monthlyPrice = isIndianUser ? '₹199' : '$2.99';
   const yearlyPrice = isIndianUser ? '₹1,999' : '$19.99';
   const lifetimePrice = isIndianUser ? '₹2,500' : '$29.99';
-  const yearlyAmount = isIndianUser ? 1999 : 1999;
+  const testAmount = isIndianUser ? 1 : 1;
   const monthlyAmount = isIndianUser ? 199 : 199;
+  const yearlyAmount = isIndianUser ? 1999 : 1999;
   const lifetimeAmount = isIndianUser ? 2500 : 2500;
 
   return (
@@ -73,19 +74,57 @@ const Pricing = () => {
               FlowCreate is free for 1 resume, with Premium plans for unlimited resumes and power users.
             </p>
           </div>
-          <div className="max-w-6xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="max-w-7xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+            {/* Test Plan */}
+            <div className="rounded-xl border-2 border-orange-500 bg-orange-50 shadow-lg overflow-hidden flex flex-col">
+              <div className="p-6 bg-orange-500 text-white text-center">
+                <h2 className="text-2xl font-bold">Test</h2>
+                <div className="mt-4 flex items-center justify-center">
+                  <span className="text-5xl font-bold tracking-tight">{testPrice}</span>
+                </div>
+                <p className="mt-2 text-base text-orange-100">
+                  Test payment - Premium access
+                </p>
+              </div>
+              <div className="p-6">
+                <ul className="space-y-2 text-orange-900 font-semibold text-sm">
+                  <li>✔️ Everything in Premium</li>
+                  <li>✔️ Test payment only</li>
+                  <li>✔️ Full premium features</li>
+                </ul>
+                <div className="mt-6 text-center">
+                  {user ? (
+                    <PremiumUpgradeButton
+                      planType="monthly"
+                      amount={testAmount}
+                      size="lg"
+                      className="w-full bg-orange-600 hover:bg-orange-700 text-xs"
+                    >
+                      Test Payment
+                    </PremiumUpgradeButton>
+                  ) : (
+                    <Link to="/login">
+                      <Button size="lg" className="w-full bg-orange-600 hover:bg-orange-700 text-xs">
+                        Sign In to Test
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Free Plan */}
             <div className="rounded-xl border border-primary bg-card shadow-sm overflow-hidden flex flex-col">
-              <div className="p-8 bg-primary text-primary-foreground text-center">
-                <h2 className="text-3xl font-bold">Free</h2>
+              <div className="p-6 bg-primary text-primary-foreground text-center">
+                <h2 className="text-2xl font-bold">Free</h2>
                 <div className="mt-4 flex items-center justify-center">
-                  <span className="text-6xl font-bold tracking-tight">{isIndianUser ? '₹0' : '$0'}</span>
-                  <span className="ml-2">/month</span>
+                  <span className="text-5xl font-bold tracking-tight">{isIndianUser ? '₹0' : '$0'}</span>
+                  <span className="ml-2 text-sm">/month</span>
                 </div>
                 <p className="mt-2 text-base">No credit card required. Save 1 resume per account.</p>
               </div>
-              <div className="p-8">
-                <ul className="space-y-2 text-foreground">
+              <div className="p-6">
+                <ul className="space-y-2 text-foreground text-sm">
                   <li>✔️ All templates included</li>
                   <li>✔️ Live preview</li>
                   <li>✔️ Basic editing features</li>
@@ -114,16 +153,16 @@ const Pricing = () => {
             
             {/* Monthly Premium Plan */}
             <div className="rounded-xl border border-yellow-500 bg-yellow-50 shadow-sm overflow-hidden flex flex-col">
-              <div className="p-8 bg-yellow-400 text-center" style={{ textShadow: "0px 1px 3px #fafafa, 0 1px 2px #00000016" }}>
-                <h2 className="text-3xl font-bold" style={{ color: "#904803" }}>Monthly</h2>
+              <div className="p-6 bg-yellow-400 text-center" style={{ textShadow: "0px 1px 3px #fafafa, 0 1px 2px #00000016" }}>
+                <h2 className="text-2xl font-bold" style={{ color: "#904803" }}>Monthly</h2>
                 <div className="mt-4 flex items-center justify-center">
-                  <span className="text-6xl font-bold tracking-tight" style={{ color: "#202020", textShadow: "0 2px 6px #ffffff99" }}>{monthlyPrice}</span>
-                  <span className="ml-2" style={{ color: "#202020" }}>/month</span>
+                  <span className="text-5xl font-bold tracking-tight" style={{ color: "#202020", textShadow: "0 2px 6px #ffffff99" }}>{monthlyPrice}</span>
+                  <span className="ml-2 text-sm" style={{ color: "#202020" }}>/month</span>
                 </div>
                 <p className="mt-2 text-base" style={{ color: "#783f04" }}>Unlimited resumes, full AI and all premium features.</p>
               </div>
-              <div className="p-8">
-                <ul className="space-y-2 text-yellow-900 font-semibold">
+              <div className="p-6">
+                <ul className="space-y-2 text-yellow-900 font-semibold text-sm">
                   <li>✔️ Everything in Free</li>
                   <li>✔️ Unlimited resumes</li>
                   <li>✔️ Unlimited AI suggestions</li>
@@ -154,18 +193,18 @@ const Pricing = () => {
 
             {/* Yearly Plan */}
             <div className="rounded-xl border-2 border-green-500 bg-green-50 shadow-lg overflow-hidden flex flex-col">
-              <div className="p-8 bg-green-500 text-white text-center">
-                <h2 className="text-3xl font-bold">Yearly</h2>
+              <div className="p-6 bg-green-500 text-white text-center">
+                <h2 className="text-2xl font-bold">Yearly</h2>
                 <div className="mt-4 flex items-center justify-center">
-                  <span className="text-6xl font-bold tracking-tight">{yearlyPrice}</span>
-                  <span className="ml-2">/year</span>
+                  <span className="text-5xl font-bold tracking-tight">{yearlyPrice}</span>
+                  <span className="ml-2 text-sm">/year</span>
                 </div>
                 <p className="mt-2 text-base text-green-100">
                   {isIndianUser ? 'Save ₹389 compared to monthly!' : 'Save $16.89 compared to monthly!'}
                 </p>
               </div>
-              <div className="p-8">
-                <ul className="space-y-2 text-green-900 font-semibold">
+              <div className="p-6">
+                <ul className="space-y-2 text-green-900 font-semibold text-sm">
                   <li>✔️ Everything in Monthly</li>
                   <li>✔️ 2 months free</li>
                   <li>✔️ Priority support</li>
@@ -196,17 +235,17 @@ const Pricing = () => {
 
             {/* Lifetime Plan */}
             <div className="rounded-xl border-2 border-purple-500 bg-purple-50 shadow-lg overflow-hidden flex flex-col">
-              <div className="p-8 bg-purple-500 text-white text-center">
-                <h2 className="text-3xl font-bold">Lifetime</h2>
+              <div className="p-6 bg-purple-500 text-white text-center">
+                <h2 className="text-2xl font-bold">Lifetime</h2>
                 <div className="mt-4 flex items-center justify-center">
-                  <span className="text-6xl font-bold tracking-tight">{lifetimePrice}</span>
+                  <span className="text-5xl font-bold tracking-tight">{lifetimePrice}</span>
                 </div>
                 <p className="mt-2 text-base text-purple-100">
                   One-time payment, lifetime access
                 </p>
               </div>
-              <div className="p-8">
-                <ul className="space-y-2 text-purple-900 font-semibold">
+              <div className="p-6">
+                <ul className="space-y-2 text-purple-900 font-semibold text-sm">
                   <li>✔️ Everything in Yearly</li>
                   <li>✔️ Lifetime updates</li>
                   <li>✔️ Future template updates</li>

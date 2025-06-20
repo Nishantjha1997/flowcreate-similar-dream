@@ -57,7 +57,7 @@ export const useRazorpayPayment = () => {
 
       // Configure Razorpay options
       const razorpayOptions = {
-        key: 'rzp_test_9999999999', // This will be replaced with actual key from environment
+        key: 'rzp_live_4iFgy48cvcW4fF', // Live key
         amount: amount,
         currency: currency,
         name: 'FlowCreate',
@@ -90,7 +90,7 @@ export const useRazorpayPayment = () => {
             toast({
               title: "Payment Successful!",
               description: "Your premium subscription has been activated.",
-              variant: "success"
+              variant: "default"
             });
 
             // Refresh the page to update user status
@@ -109,7 +109,7 @@ export const useRazorpayPayment = () => {
             toast({
               title: "Payment cancelled",
               description: "You can try again anytime.",
-              variant: "info"
+              variant: "default"
             });
           }
         }
