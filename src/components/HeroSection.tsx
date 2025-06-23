@@ -33,11 +33,11 @@ const HeroSection = () => {
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 items-center">
           <div className="flex flex-col space-y-6 animate-fade-in">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white">
-              Land Your Dream Job with a 
-              <span className="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent"> Standout Resume</span>
+              Create Professional Resumes with
+              <span className="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent"> AI-Powered Analysis</span>
             </h1>
             <p className="text-xl text-blue-100/90 leading-relaxed">
-              Create a professional resume in minutes with our easy-to-use builder, AI assistance, and expert-designed templates.
+              Build standout resumes with intelligent suggestions, ATS optimization, and expert-designed templates. Get hired faster with AI-powered resume analysis.
             </p>
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
               <Link to="/resume-builder" className="w-full sm:w-auto">
@@ -59,7 +59,7 @@ const HeroSection = () => {
               </Link>
             </div>
             <p className="text-sm text-blue-100/80">
-              No credit card required. Free to get started.
+              No credit card required. AI-powered suggestions included.
             </p>
             
             {/* Trusted By Section with transparency */}
@@ -82,14 +82,14 @@ const HeroSection = () => {
             <div className="relative rounded-2xl overflow-hidden shadow-2xl transform transition-transform hover:scale-[1.02] duration-500">
               <div className="bg-white/95 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
                 <img 
-                  src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?q=80&w=2070" 
-                  alt="Resume builder interface" 
+                  src="/images/hero-resume-builder.jpg" 
+                  alt="AI-powered resume builder interface showing code and analytics" 
                   className="w-full h-auto rounded-lg"
                 />
               </div>
               <div className="absolute -bottom-6 -right-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-4 shadow-2xl backdrop-blur-sm border border-white/10">
                 <p className="text-white font-bold text-sm">
-                  Join 2M+ users creating standout resumes
+                  Join 2M+ users with AI-optimized resumes
                 </p>
               </div>
             </div>
