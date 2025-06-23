@@ -31,7 +31,7 @@ export const useRazorpayPayment = () => {
       toast({
         title: "Payment system loading",
         description: "Please wait for the payment system to load.",
-        variant: "warning"
+        variant: "default"
       });
       return;
     }
@@ -39,6 +39,8 @@ export const useRazorpayPayment = () => {
     setIsProcessing(true);
 
     try {
+      console.log('Initiating payment with options:', options);
+
       // Create order via Supabase edge function
       const { data: orderData, error: orderError } = await supabase.functions.invoke('create-razorpay-order', {
         body: {
@@ -50,8 +52,11 @@ export const useRazorpayPayment = () => {
       });
 
       if (orderError) {
+        console.error('Order creation error:', orderError);
         throw new Error(orderError.message);
       }
+
+      console.log('Order created successfully:', orderData);
 
       const { order_id, amount, currency } = orderData;
 
@@ -72,6 +77,8 @@ export const useRazorpayPayment = () => {
         },
         handler: async (response: any) => {
           try {
+            console.log('Payment completed, verifying:', response);
+            
             // Verify payment via Supabase edge function
             const { data: verificationData, error: verificationError } = await supabase.functions.invoke('verify-razorpay-payment', {
               body: {
@@ -84,8 +91,11 @@ export const useRazorpayPayment = () => {
             });
 
             if (verificationError) {
-              throw new Error(verificationError.message);
+              console.error('Payment verification error:', verificationError);
+              throw new Error(verificationError.message || 'Payment verification failed');
             }
+
+            console.log('Payment verification successful:', verificationData);
 
             toast({
               title: "Payment Successful!",
@@ -94,12 +104,14 @@ export const useRazorpayPayment = () => {
             });
 
             // Refresh the page to update user status
-            window.location.reload();
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
           } catch (error) {
             console.error('Payment verification failed:', error);
             toast({
               title: "Payment verification failed",
-              description: "Please contact support if your payment was deducted.",
+              description: "Please contact support if your payment was deducted. Error: " + (error instanceof Error ? error.message : 'Unknown error'),
               variant: "destructive"
             });
           }
@@ -123,7 +135,7 @@ export const useRazorpayPayment = () => {
       console.error('Payment initiation failed:', error);
       toast({
         title: "Payment failed",
-        description: "Unable to initiate payment. Please try again.",
+        description: "Unable to initiate payment. Please try again. Error: " + (error instanceof Error ? error.message : 'Unknown error'),
         variant: "destructive"
       });
     } finally {

@@ -17,8 +17,11 @@ serve(async (req) => {
   try {
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature, user_id, planType } = await req.json()
 
+    console.log('Payment verification request:', { razorpay_payment_id, razorpay_order_id, user_id, planType })
+
     // Validate input
     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature || !user_id) {
+      console.error('Missing required parameters')
       return new Response(
         JSON.stringify({ error: 'Missing required parameters' }),
         { 
@@ -30,6 +33,7 @@ serve(async (req) => {
 
     const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET')
     if (!razorpayKeySecret) {
+      console.error('Razorpay secret not configured')
       return new Response(
         JSON.stringify({ error: 'Razorpay secret not configured' }),
         { 
@@ -43,6 +47,7 @@ serve(async (req) => {
     const expectedSignature = hmac("sha256", razorpayKeySecret, `${razorpay_order_id}|${razorpay_payment_id}`, "utf8", "hex")
     
     if (expectedSignature !== razorpay_signature) {
+      console.error('Payment verification failed - signature mismatch')
       return new Response(
         JSON.stringify({ error: 'Payment verification failed' }),
         { 
@@ -51,6 +56,8 @@ serve(async (req) => {
         }
       )
     }
+
+    console.log('Payment signature verified successfully')
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
@@ -68,6 +75,7 @@ serve(async (req) => {
     })
 
     if (!paymentResponse.ok) {
+      console.error('Failed to fetch payment details from Razorpay')
       return new Response(
         JSON.stringify({ error: 'Failed to fetch payment details' }),
         { 
@@ -78,13 +86,16 @@ serve(async (req) => {
     }
 
     const paymentData = await paymentResponse.json()
+    console.log('Payment data from Razorpay:', paymentData)
 
-    // Calculate subscription period
+    // Calculate subscription period based on plan type
     const currentDate = new Date()
     const endDate = new Date()
     
     if (planType === 'yearly') {
       endDate.setFullYear(endDate.getFullYear() + 1)
+    } else if (planType === 'lifetime') {
+      endDate.setFullYear(endDate.getFullYear() + 100) // 100 years for lifetime
     } else {
       endDate.setMonth(endDate.getMonth() + 1)
     }
@@ -118,6 +129,8 @@ serve(async (req) => {
       )
     }
 
+    console.log('Subscription updated successfully:', subscription)
+
     // Record payment
     const { error: paymentError } = await supabase
       .from('payments')
@@ -136,6 +149,8 @@ serve(async (req) => {
       console.error('Payment record error:', paymentError)
       // Don't fail the entire process if payment recording fails
     }
+
+    console.log('Payment verification completed successfully')
 
     return new Response(
       JSON.stringify({ 
