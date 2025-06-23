@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { useAllMembers } from "@/hooks/useAllMembers";
@@ -15,6 +14,7 @@ import { UserRegistrations } from "@/components/admin/UserRegistrations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Skeleton } from "@/components/ui/loading-skeleton";
+import { ImprovementPlans } from "@/components/admin/ImprovementPlans";
 
 const Admin = () => {
   const { user, isLoading } = useAuth();
@@ -94,7 +94,7 @@ const Admin = () => {
         
         <GlassCard variant="elevated" className="p-6">
           <Tabs defaultValue="registrations" className="w-full">
-            <TabsList className="grid w-full grid-cols-5 bg-white/50 backdrop-blur-sm border border-white/20">
+            <TabsList className="grid w-full grid-cols-6 bg-white/50 backdrop-blur-sm border border-white/20">
               <TabsTrigger value="registrations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
                 User Registrations
               </TabsTrigger>
@@ -106,6 +106,9 @@ const Admin = () => {
               </TabsTrigger>
               <TabsTrigger value="website" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
                 Website
+              </TabsTrigger>
+              <TabsTrigger value="improvements" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
+                Improvements
               </TabsTrigger>
               <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
                 Quick Actions
@@ -130,6 +133,10 @@ const Admin = () => {
             
             <TabsContent value="website" className="mt-6">
               <WebsiteCustomization />
+            </TabsContent>
+            
+            <TabsContent value="improvements" className="mt-6">
+              <ImprovementPlans />
             </TabsContent>
             
             <TabsContent value="actions" className="mt-6">
