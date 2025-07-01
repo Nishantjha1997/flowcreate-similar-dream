@@ -492,6 +492,11 @@ const ResumeBuilder = () => {
             onSave={handleSaveResume}
             isSaving={isSaving}
             isEditing={!!editResumeId}
+            resume={resume}
+            templateId={templateId}
+            templateNames={templateNames}
+            sectionOrder={activeSections}
+            hiddenSections={hiddenSections}
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
@@ -531,8 +536,6 @@ const ResumeBuilder = () => {
                 templateId={templateId}
                 templateNames={templateNames}
                 resumeRef={resumeElementRef}
-                handleDownload={handleDownload}
-                isGenerating={isGenerating}
                 sectionOrder={activeSections}
                 hiddenSections={hiddenSections}
               />

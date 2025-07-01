@@ -1,7 +1,9 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Share2, Save } from 'lucide-react';
+import { Download, Share2, Save, Eye } from 'lucide-react';
+import { EnhancedResumePreview } from '@/components/resume/ResumeVisualPreview';
+import { ResumeData } from '@/utils/types';
 
 interface ResumeHeaderSectionProps {
   resumeElementRef: React.RefObject<HTMLDivElement>;
@@ -12,6 +14,11 @@ interface ResumeHeaderSectionProps {
   onSave?: () => void;
   isSaving?: boolean;
   isEditing?: boolean;
+  resume: ResumeData;
+  templateId: string;
+  templateNames: Record<string, string>;
+  sectionOrder: string[];
+  hiddenSections: string[];
 }
 
 export const ResumeHeaderSection = ({
@@ -22,7 +29,12 @@ export const ResumeHeaderSection = ({
   isGenerating,
   onSave,
   isSaving = false,
-  isEditing = false
+  isEditing = false,
+  resume,
+  templateId,
+  templateNames,
+  sectionOrder,
+  hiddenSections
 }: ResumeHeaderSectionProps) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -49,6 +61,13 @@ export const ResumeHeaderSection = ({
           <Download className="h-4 w-4" />
           {isGenerating ? 'Generating...' : 'Download PDF'}
         </Button>
+        <EnhancedResumePreview 
+          resume={resume}
+          templateId={templateId}
+          templateNames={templateNames}
+          sectionOrder={sectionOrder}
+          hiddenSections={hiddenSections}
+        />
       </div>
     </div>
   );
