@@ -116,7 +116,7 @@ export const ResumeFormSection = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
+    <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
       {renderSection()}
     </div>
   );

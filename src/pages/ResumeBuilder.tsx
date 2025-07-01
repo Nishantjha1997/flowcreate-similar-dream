@@ -3,8 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner'; 
 import Header from '@/components/Header';
 import { ResumeHeaderSection } from '@/components/resume/ResumeHeaderSection';
-import { ResumeNavigation } from '@/components/resume/ResumeNavigation';
-import { ResumeFormSection } from '@/components/resume/ResumeFormSection';
+import { ResumeBuilderSidebar } from '@/components/resume/ResumeBuilderSidebar';
 import { ResumePreviewSection } from '@/components/resume/ResumePreviewSection';
 import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 import { SectionDragDropCustomizer } from '@/components/resume/SectionDragDropCustomizer';
@@ -495,29 +494,13 @@ const ResumeBuilder = () => {
             isEditing={!!editResumeId}
           />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
             <div className="lg:col-span-3">
-              <ResumeNavigation
+              <ResumeBuilderSidebar
                 activeSection={activeSection}
                 onSectionChange={handleSectionChange}
                 currentTemplateId={templateId}
                 onTemplateChange={handleTemplateChange}
-              />
-              {/* Section customizer menu */}
-              <div className="mt-4">
-                <SectionDragDropCustomizer
-                  activeSections={activeSections}
-                  hiddenSections={hiddenSections}
-                  sectionTitles={{}}
-                  onSectionsChange={handleSectionsChange}
-                  onSectionTitleChange={() => {}}
-                />
-              </div>
-            </div>
-
-            <div className="lg:col-span-5">
-              <ResumeFormSection
-                activeSection={activeSection}
                 resume={resume}
                 handlePersonalInfoChange={handlePersonalInfoChange}
                 handleExperienceChange={handleExperienceChange}
@@ -534,10 +517,15 @@ const ResumeBuilder = () => {
                 handleCustomizationChange={handleCustomizationChange}
                 onAIFeatureUpsell={handleAIFeatureUpsell}
                 isPremium={premium?.isPremium}
+                activeSections={activeSections}
+                hiddenSections={hiddenSections}
+                sectionTitles={{}}
+                onSectionsChange={handleSectionsChange}
+                onSectionTitleChange={() => {}}
               />
             </div>
 
-            <div className="lg:col-span-4">
+            <div className="lg:col-span-7">
               <ResumePreviewSection
                 resume={resume}
                 templateId={templateId}
