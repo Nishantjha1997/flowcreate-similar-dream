@@ -35,10 +35,8 @@ const ResumeBuilder = () => {
   };
 
   const handleDownload = () => {
-    const resumeContent = document.querySelector('.resume-content');
-    
-    if (resumeContent) {
-      generatePDF(resumeContent as HTMLElement);
+    if (resumeElementRef.current) {
+      generatePDF(resumeElementRef.current);
     } else {
       toast.error("Could not find resume content to download.");
     }
