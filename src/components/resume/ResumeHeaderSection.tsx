@@ -57,10 +57,6 @@ export const ResumeHeaderSection = ({
           <Share2 className="h-4 w-4" />
           Share
         </Button>
-        <Button onClick={handleDownload} size="sm" disabled={isGenerating} className="flex items-center gap-2">
-          <Download className="h-4 w-4" />
-          {isGenerating ? 'Generating...' : 'Download PDF'}
-        </Button>
         <EnhancedResumePreview 
           resume={resume}
           templateId={templateId}

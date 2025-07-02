@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
+import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 
 interface TemplateSelectorProps {
   currentTemplateId: string;
@@ -167,11 +168,10 @@ export const TemplateSelector = ({ currentTemplateId, onTemplateChange }: Templa
             }`}
             onClick={() => onTemplateChange(template.id)}
           >
-            <div className="relative">
-              <img 
-                src={template.image} 
-                alt={`Template ${template.name}`} 
-                className="w-full aspect-[3/4] object-cover"
+            <div className="relative aspect-[3/4] overflow-hidden bg-gray-50">
+              <ResumeTemplatePreview 
+                templateKey={template.templateKey}
+                className="w-full h-full"
               />
               {currentTemplateId === template.id && (
                 <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">

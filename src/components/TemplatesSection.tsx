@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useState } from "react";
 import TemplatePreviewModal from "@/components/templates/TemplatePreviewModal";
 import TemplateCustomizationModal from "@/components/templates/TemplateCustomizationModal";
+import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 
 const templates = [
   {
@@ -71,11 +72,10 @@ const TemplatesSection = () => {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {templates.map((template) => (
             <div key={template.id} className="group relative overflow-hidden rounded-xl border bg-background shadow-md transition-all duration-300 hover:shadow-xl">
-              <div className="aspect-[3/4] overflow-hidden cursor-pointer" onClick={() => setPreviewId(template.id)}>
-                <img 
-                  src={template.image} 
-                  alt={template.name} 
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              <div className="aspect-[3/4] overflow-hidden cursor-pointer bg-gray-50" onClick={() => setPreviewId(template.id)}>
+                <ResumeTemplatePreview 
+                  templateKey={template.templateKey}
+                  className="w-full h-full transform transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
               <div className="p-6">

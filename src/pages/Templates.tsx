@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { ResumeData } from '@/utils/resumeAdapterUtils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 
 const templates = [
   // Professional Templates
@@ -409,11 +410,10 @@ const Templates = () => {
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredTemplates.map((template) => (
               <Card key={template.id} className="overflow-hidden h-full transition-all duration-300 hover:shadow-lg template-card group">
-                <div className="relative aspect-[3/4] overflow-hidden">
-                  <img 
-                    src={template.image} 
-                    alt={template.name} 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                <div className="relative aspect-[3/4] overflow-hidden bg-gray-50">
+                  <ResumeTemplatePreview 
+                    templateKey={template.templateKey}
+                    className="w-full h-full transform transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute top-3 left-3 flex flex-col gap-2">
                     {template.featured && (
