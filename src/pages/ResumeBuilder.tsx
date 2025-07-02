@@ -35,10 +35,10 @@ const ResumeBuilder = () => {
   };
 
   const handleDownload = () => {
-    const resumeContainer = document.getElementById('resume-preview-container');
+    const resumeContent = document.querySelector('.resume-content');
     
-    if (resumeContainer) {
-      generatePDF(resumeContainer);
+    if (resumeContent) {
+      generatePDF(resumeContent as HTMLElement);
     } else {
       toast.error("Could not find resume content to download.");
     }
