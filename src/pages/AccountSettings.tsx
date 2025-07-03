@@ -1,135 +1,208 @@
-
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
+import { usePremiumStatus } from '@/hooks/usePremiumStatus';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { Link } from 'react-router-dom';
+import { Shield, Crown, Download, Edit, Plus, Trash2, Save, RefreshCw, User, Briefcase, GraduationCap, Award } from 'lucide-react';
+import Header from '@/components/Header';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { ResumeData } from '@/utils/types';
+import { templateNames } from '@/components/resume/ResumeData';
+
+// Profile Components
+import { ProfileCompletenessCard } from '@/components/profile/ProfileCompletenessCard';
+import { PersonalInfoForm } from '@/components/profile/PersonalInfoForm';
+import { ProfessionalInfoForm } from '@/components/profile/ProfessionalInfoForm';
+import { SkillsForm } from '@/components/profile/SkillsForm';
 
 const AccountSettings = () => {
+  const { user } = useAuth();
   const { toast } = useToast();
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [settings, setSettings] = useState({
-    emailNotifications: true,
-    marketingEmails: false,
-    resumeAutosave: true,
-    darkModeDefault: false,
+  const { data: isAdmin } = useAdminStatus(user?.id);
+  const { data: premiumData } = usePremiumStatus(user?.id);
+  const { 
+    profile, 
+    isLoading: profileLoading, 
+    updateProfile, 
+    isUpdating,
+    calculateCompleteness 
+  } = useUserProfile();
+  
+  const [pendingChanges, setPendingChanges] = useState<any>({});
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Fetch user's saved resumes
+  const { data: savedResumes, isLoading: loadingResumes, refetch: refetchResumes } = useQuery({
+    queryKey: ['userResumes', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('resumes')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id
   });
 
-  const handleToggle = (setting: keyof typeof settings) => {
-    setSettings({
-      ...settings,
-      [setting]: !settings[setting]
-    });
+  const handleProfileUpdate = (updates: any) => {
+    setPendingChanges({ ...pendingChanges, ...updates });
+    setHasUnsavedChanges(true);
   };
 
-  const handleSaveSettings = () => {
-    setIsUpdating(true);
-    
-    // This is a placeholder - in a real app, you would save settings to Supabase
-    setTimeout(() => {
-      toast({
-        title: "Settings updated",
-        description: "Your account settings have been saved successfully.",
-      });
-      setIsUpdating(false);
-    }, 1000);
+  const saveProfileChanges = () => {
+    if (Object.keys(pendingChanges).length > 0) {
+      updateProfile(pendingChanges);
+      setPendingChanges({});
+      setHasUnsavedChanges(false);
+    }
   };
+
+  const handleDeleteResume = async (resumeId: string) => {
+    if (!user?.id) return;
+    
+    try {
+      const { error } = await supabase
+        .from('resumes')
+        .delete()
+        .eq('id', resumeId)
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Resume deleted",
+        description: "Your resume has been deleted successfully.",
+      });
+      
+      refetchResumes();
+    } catch (error) {
+      console.error('Error deleting resume:', error);
+      toast({
+        title: "Delete failed",
+        description: "There was an error deleting your resume. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">Loading your profile...</div>
+        </div>
+      </div>
+    );
+  }
+
+  const mergedProfile = { ...profile, ...pendingChanges };
 
   return (
-    <div className="container max-w-6xl py-10">
-      <h1 className="text-3xl font-bold mb-6">Account Settings</h1>
-      
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Notification Preferences</CardTitle>
-          <CardDescription>
-            Manage how and when you receive notifications from FlowCreate.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="email-notifications">Email Notifications</Label>
-              <p className="text-sm text-muted-foreground">
-                Receive emails about your account activity and resume edits.
-              </p>
-            </div>
-            <Switch
-              id="email-notifications"
-              checked={settings.emailNotifications}
-              onCheckedChange={() => handleToggle('emailNotifications')}
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="container max-w-7xl py-10">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold">Account Settings</h1>
+            <p className="text-muted-foreground">Manage your comprehensive profile</p>
+          </div>
+          <div className="flex items-center space-x-2">
+            {premiumData?.isPremium && (
+              <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                <Crown className="w-3 h-3 mr-1" />
+                Premium
+              </Badge>
+            )}
+            {isAdmin && (
+              <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-300">
+                <Shield className="w-3 h-3 mr-1" />
+                Admin
+              </Badge>
+            )}
+          </div>
+        </div>
+
+        {hasUnsavedChanges && (
+          <Card className="mb-6 border-orange-200 bg-orange-50">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-orange-800 text-sm">Unsaved Changes</CardTitle>
+                  <CardDescription className="text-orange-700">
+                    You have unsaved changes to your profile.
+                  </CardDescription>
+                </div>
+                <Button onClick={saveProfileChanges} disabled={isUpdating} size="sm">
+                  <Save className="w-4 h-4 mr-2" />
+                  {isUpdating ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </CardHeader>
+          </Card>
+        )}
+        
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-1">
+            <ProfileCompletenessCard 
+              profile={mergedProfile} 
+              completeness={calculateCompleteness(mergedProfile)} 
             />
           </div>
-          
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="marketing-emails">Marketing Emails</Label>
-              <p className="text-sm text-muted-foreground">
-                Receive emails about new features, tips, and special offers.
-              </p>
-            </div>
-            <Switch
-              id="marketing-emails"
-              checked={settings.marketingEmails}
-              onCheckedChange={() => handleToggle('marketingEmails')}
-            />
+
+          <div className="lg:col-span-3">
+            <Tabs defaultValue="personal" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="personal">
+                  <User className="w-4 h-4 mr-1" />
+                  Personal
+                </TabsTrigger>
+                <TabsTrigger value="professional">
+                  <Briefcase className="w-4 h-4 mr-1" />
+                  Professional
+                </TabsTrigger>
+                <TabsTrigger value="skills">
+                  <Award className="w-4 h-4 mr-1" />
+                  Skills
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="personal" className="mt-6">
+                <PersonalInfoForm 
+                  profile={mergedProfile} 
+                  onUpdate={handleProfileUpdate} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="professional" className="mt-6">
+                <ProfessionalInfoForm 
+                  profile={mergedProfile} 
+                  onUpdate={handleProfileUpdate} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="skills" className="mt-6">
+                <SkillsForm 
+                  profile={mergedProfile} 
+                  onUpdate={handleProfileUpdate} 
+                />
+              </TabsContent>
+            </Tabs>
           </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Resume Builder Settings</CardTitle>
-          <CardDescription>
-            Customize your resume building experience.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="resume-autosave">Auto-Save</Label>
-              <p className="text-sm text-muted-foreground">
-                Automatically save your resume changes as you work.
-              </p>
-            </div>
-            <Switch
-              id="resume-autosave"
-              checked={settings.resumeAutosave}
-              onCheckedChange={() => handleToggle('resumeAutosave')}
-            />
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>Appearance</CardTitle>
-          <CardDescription>
-            Customize how FlowCreate looks for you.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="dark-mode">Dark Mode Default</Label>
-              <p className="text-sm text-muted-foreground">
-                Set dark mode as your default theme.
-              </p>
-            </div>
-            <Switch
-              id="dark-mode"
-              checked={settings.darkModeDefault}
-              onCheckedChange={() => handleToggle('darkModeDefault')}
-            />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button onClick={handleSaveSettings} disabled={isUpdating}>
-            {isUpdating ? "Saving..." : "Save Settings"}
-          </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

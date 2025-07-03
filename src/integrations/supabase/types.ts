@@ -56,11 +56,123 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          achievements: Json | null
+          address: string | null
+          auto_sync_enabled: boolean | null
+          avatar_url: string | null
+          certifications: Json | null
+          city: string | null
+          country: string | null
+          created_at: string
+          current_position: string | null
+          date_of_birth: string | null
+          education: Json | null
+          email: string | null
+          experience_level: string | null
+          full_name: string | null
+          github_url: string | null
+          id: string
+          industry: string | null
+          languages: Json | null
+          last_resume_sync: string | null
+          linkedin_url: string | null
+          phone: string | null
+          portfolio_url: string | null
+          postal_code: string | null
+          professional_summary: string | null
+          profile_completeness: number | null
+          projects: Json | null
+          soft_skills: Json | null
+          state: string | null
+          technical_skills: Json | null
+          updated_at: string
+          user_id: string
+          volunteer_experience: Json | null
+          website_url: string | null
+          work_experience: Json | null
+        }
+        Insert: {
+          achievements?: Json | null
+          address?: string | null
+          auto_sync_enabled?: boolean | null
+          avatar_url?: string | null
+          certifications?: Json | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          current_position?: string | null
+          date_of_birth?: string | null
+          education?: Json | null
+          email?: string | null
+          experience_level?: string | null
+          full_name?: string | null
+          github_url?: string | null
+          id?: string
+          industry?: string | null
+          languages?: Json | null
+          last_resume_sync?: string | null
+          linkedin_url?: string | null
+          phone?: string | null
+          portfolio_url?: string | null
+          postal_code?: string | null
+          professional_summary?: string | null
+          profile_completeness?: number | null
+          projects?: Json | null
+          soft_skills?: Json | null
+          state?: string | null
+          technical_skills?: Json | null
+          updated_at?: string
+          user_id: string
+          volunteer_experience?: Json | null
+          website_url?: string | null
+          work_experience?: Json | null
+        }
+        Update: {
+          achievements?: Json | null
+          address?: string | null
+          auto_sync_enabled?: boolean | null
+          avatar_url?: string | null
+          certifications?: Json | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          current_position?: string | null
+          date_of_birth?: string | null
+          education?: Json | null
+          email?: string | null
+          experience_level?: string | null
+          full_name?: string | null
+          github_url?: string | null
+          id?: string
+          industry?: string | null
+          languages?: Json | null
+          last_resume_sync?: string | null
+          linkedin_url?: string | null
+          phone?: string | null
+          portfolio_url?: string | null
+          postal_code?: string | null
+          professional_summary?: string | null
+          profile_completeness?: number | null
+          projects?: Json | null
+          soft_skills?: Json | null
+          state?: string | null
+          technical_skills?: Json | null
+          updated_at?: string
+          user_id?: string
+          volunteer_experience?: Json | null
+          website_url?: string | null
+          work_experience?: Json | null
+        }
+        Relationships: []
+      }
       resumes: {
         Row: {
           created_at: string
           id: string
           resume_data: Json
+          template_id: string | null
           updated_at: string
           user_id: string
         }
@@ -68,6 +180,7 @@ export type Database = {
           created_at?: string
           id?: string
           resume_data: Json
+          template_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -75,6 +188,7 @@ export type Database = {
           created_at?: string
           id?: string
           resume_data?: Json
+          template_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -148,6 +262,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_profile_completeness: {
+        Args: { profile_data: Json }
+        Returns: number
+      }
       get_user_role: {
         Args: { user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
