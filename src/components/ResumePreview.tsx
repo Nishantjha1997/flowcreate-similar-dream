@@ -180,7 +180,7 @@ export const ResumePreview = ({
     <Dialog>
       <DialogTrigger asChild>
         <Button className="flex items-center gap-2 text-sm">
-          <Eye className="h-4 w-4" /> Full Preview
+          <Eye className="h-4 w-4" /> Preview & Download
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">

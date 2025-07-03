@@ -108,100 +108,71 @@ const Account = () => {
       tempContainer.style.padding = '0.5in';
       tempContainer.style.boxSizing = 'border-box';
       
-      // Render the resume template in the container
+      // Create resume element
       const resumeElement = document.createElement('div');
-      resumeElement.innerHTML = '';
+      resumeElement.className = 'resume-content bg-white p-6';
       
-      // We need to create a React element and render it
-      // For now, let's use a simple approach
+      // Render the actual template using our template system
+      const { default: ResumeTemplate } = await import('@/utils/resumeTemplates');
+      
+      // Create a temporary React root to render the template
+      const ReactDOM = await import('react-dom/client');
+      const React = await import('react');
+      
+      const root = ReactDOM.createRoot(resumeElement);
+      
+      // Render the template
+      root.render(
+        React.createElement(ResumeTemplate, {
+          data: resumeData,
+          templateName: templateNames[resume.template_id] || 'modern'
+        })
+      );
+      
+      // Add to DOM temporarily
       document.body.appendChild(tempContainer);
       tempContainer.appendChild(resumeElement);
       
-      // Create the resume content HTML
-      const resumeHTML = `
-        <div style="font-family: 'Arial', sans-serif; line-height: 1.6; color: #333;">
-          <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid ${resumeData.customization.primaryColor}; padding-bottom: 15px;">
-            <h1 style="margin: 0; color: ${resumeData.customization.primaryColor}; font-size: 28px;">${resumeData.personal.name}</h1>
-            <p style="margin: 5px 0; color: ${resumeData.customization.secondaryColor};">
-              ${resumeData.personal.email} | ${resumeData.personal.phone} | ${resumeData.personal.address}
-            </p>
-            ${resumeData.personal.website ? `<p style="margin: 5px 0;">Website: ${resumeData.personal.website}</p>` : ''}
-            ${resumeData.personal.linkedin ? `<p style="margin: 5px 0;">LinkedIn: ${resumeData.personal.linkedin}</p>` : ''}
-          </div>
-          
-          ${resumeData.personal.summary ? `
-            <div style="margin-bottom: 20px;">
-              <h2 style="color: ${resumeData.customization.primaryColor}; border-bottom: 1px solid #eee; padding-bottom: 5px;">Summary</h2>
-              <p>${resumeData.personal.summary}</p>
-            </div>
-          ` : ''}
-          
-          ${resumeData.experience && resumeData.experience.length > 0 ? `
-            <div style="margin-bottom: 20px;">
-              <h2 style="color: ${resumeData.customization.primaryColor}; border-bottom: 1px solid #eee; padding-bottom: 5px;">Experience</h2>
-              ${resumeData.experience.map(exp => `
-                <div style="margin-bottom: 15px;">
-                  <h3 style="margin: 0; color: ${resumeData.customization.secondaryColor};">${exp.title}</h3>
-                  <p style="margin: 2px 0; font-weight: bold;">${exp.company} | ${exp.location}</p>
-                  <p style="margin: 2px 0; font-style: italic;">${exp.startDate} - ${exp.current ? 'Present' : exp.endDate}</p>
-                  ${exp.description ? `<p style="margin: 8px 0;">${exp.description}</p>` : ''}
-                </div>
-              `).join('')}
-            </div>
-          ` : ''}
-          
-          ${resumeData.education && resumeData.education.length > 0 ? `
-            <div style="margin-bottom: 20px;">
-              <h2 style="color: ${resumeData.customization.primaryColor}; border-bottom: 1px solid #eee; padding-bottom: 5px;">Education</h2>
-              ${resumeData.education.map(edu => `
-                <div style="margin-bottom: 15px;">
-                  <h3 style="margin: 0; color: ${resumeData.customization.secondaryColor};">${edu.degree} ${edu.field ? `in ${edu.field}` : ''}</h3>
-                  <p style="margin: 2px 0; font-weight: bold;">${edu.school}</p>
-                  <p style="margin: 2px 0; font-style: italic;">${edu.startDate} - ${edu.endDate}</p>
-                  ${edu.description ? `<p style="margin: 8px 0;">${edu.description}</p>` : ''}
-                </div>
-              `).join('')}
-            </div>
-          ` : ''}
-          
-          ${resumeData.skills && resumeData.skills.length > 0 ? `
-            <div style="margin-bottom: 20px;">
-              <h2 style="color: ${resumeData.customization.primaryColor}; border-bottom: 1px solid #eee; padding-bottom: 5px;">Skills</h2>
-              <p>${resumeData.skills.join(', ')}</p>
-            </div>
-          ` : ''}
-          
-          ${resumeData.projects && resumeData.projects.length > 0 ? `
-            <div style="margin-bottom: 20px;">
-              <h2 style="color: ${resumeData.customization.primaryColor}; border-bottom: 1px solid #eee; padding-bottom: 5px;">Projects</h2>
-              ${resumeData.projects.map(project => `
-                <div style="margin-bottom: 15px;">
-                  <h3 style="margin: 0; color: ${resumeData.customization.secondaryColor};">${project.title}</h3>
-                  ${project.link ? `<p style="margin: 2px 0;"><a href="${project.link}" style="color: ${resumeData.customization.primaryColor};">${project.link}</a></p>` : ''}
-                  ${project.description ? `<p style="margin: 8px 0;">${project.description}</p>` : ''}
-                  ${project.technologies && project.technologies.length > 0 ? `<p style="margin: 5px 0; font-style: italic;">Technologies: ${project.technologies.join(', ')}</p>` : ''}
-                </div>
-              `).join('')}
-            </div>
-          ` : ''}
-        </div>
-      `;
+      // Wait for rendering to complete
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      resumeElement.innerHTML = resumeHTML;
+      // Use the same PDF generation logic as ResumePreview
+      const options = {
+        margin: [10, 10, 10, 10],
+        filename: `${resumeName}.pdf`,
+        image: { type: 'jpeg', quality: 1.0 },
+        html2canvas: { 
+          scale: 5, 
+          useCORS: true,
+          logging: false,
+          letterRendering: true,
+          dpi: 600
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'portrait',
+          compress: false, 
+          precision: 32
+        }
+      };
+
+      const html2pdf = await import('html2pdf.js');
       
-      // Generate PDF with correct single argument
-      generatePDF(resumeElement);
+      await html2pdf.default()
+        .from(resumeElement)
+        .set(options)
+        .save();
       
       // Clean up
-      setTimeout(() => {
-        if (tempContainer.parentNode) {
-          document.body.removeChild(tempContainer);
-        }
-      }, 1000);
+      root.unmount();
+      if (tempContainer.parentNode) {
+        document.body.removeChild(tempContainer);
+      }
       
       toast({
-        title: "Downloading resume",
-        description: `${resumeName} is being prepared for download.`,
+        title: "Resume downloaded successfully!",
+        description: `${resumeName} has been downloaded as PDF.`,
       });
     } catch (error) {
       console.error('Error downloading resume:', error);
