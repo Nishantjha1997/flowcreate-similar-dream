@@ -15,6 +15,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Skeleton } from "@/components/ui/loading-skeleton";
 import { ImprovementPlans } from "@/components/admin/ImprovementPlans";
+import { ContentManagement } from "@/components/admin/ContentManagement";
+import { SecuritySettings } from "@/components/admin/SecuritySettings";
 
 const Admin = () => {
   const { user, isLoading } = useAuth();
@@ -94,7 +96,7 @@ const Admin = () => {
         
         <GlassCard variant="elevated" className="p-6">
           <Tabs defaultValue="registrations" className="w-full">
-            <TabsList className="grid w-full grid-cols-6 bg-white/50 backdrop-blur-sm border border-white/20">
+            <TabsList className="grid w-full grid-cols-8 bg-white/50 backdrop-blur-sm border border-white/20">
               <TabsTrigger value="registrations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
                 User Registrations
               </TabsTrigger>
@@ -112,6 +114,12 @@ const Admin = () => {
               </TabsTrigger>
               <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
                 Quick Actions
+              </TabsTrigger>
+              <TabsTrigger value="content" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
+                Content
+              </TabsTrigger>
+              <TabsTrigger value="security" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
+                Security
               </TabsTrigger>
             </TabsList>
             
@@ -141,6 +149,14 @@ const Admin = () => {
             
             <TabsContent value="actions" className="mt-6">
               <QuickActions refetch={refetch} />
+            </TabsContent>
+            
+            <TabsContent value="content" className="mt-6">
+              <ContentManagement />
+            </TabsContent>
+            
+            <TabsContent value="security" className="mt-6">
+              <SecuritySettings />
             </TabsContent>
           </Tabs>
         </GlassCard>

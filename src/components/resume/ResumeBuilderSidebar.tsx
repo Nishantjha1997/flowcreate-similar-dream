@@ -65,7 +65,9 @@ export const ResumeBuilderSidebar = ({
   hiddenSections,
   sectionTitles,
   onSectionsChange,
-  onSectionTitleChange
+  onSectionTitleChange,
+  onPopulateFromProfile,
+  hasProfileData
 }: ResumeBuilderSidebarProps) => {
   return (
     <div className="h-screen max-h-screen overflow-y-auto bg-gray-800 rounded-lg shadow-xl">
@@ -117,6 +119,8 @@ export const ResumeBuilderSidebar = ({
           handleCustomizationChange={handleCustomizationChange}
           onAIFeatureUpsell={onAIFeatureUpsell}
           isPremium={isPremium}
+          onPopulateFromProfile={onPopulateFromProfile}
+          hasProfileData={hasProfileData}
         />
       </div>
 

@@ -6,13 +6,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { ResumeData } from '@/utils/resumeAdapterUtils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, UserCheck } from 'lucide-react';
 import { AiSuggestionButton } from "@/components/resume/AiSuggestionButton";
 
 interface PersonalInfoSectionProps {
   personal: ResumeData['personal'];
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onProfileImageChange?: (profileImage: string) => void;
+  onPopulateFromProfile?: () => void;
+  hasProfileData?: boolean;
   onAIFeatureUpsell?: () => void;
   isPremium?: boolean;
 }
@@ -22,7 +24,9 @@ export const PersonalInfoSection = ({
   onChange,
   onProfileImageChange,
   onAIFeatureUpsell,
-  isPremium
+  isPremium,
+  onPopulateFromProfile,
+  hasProfileData
 }: PersonalInfoSectionProps) => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -47,7 +51,20 @@ export const PersonalInfoSection = ({
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Personal Information</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Personal Information</h2>
+        {hasProfileData && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onPopulateFromProfile}
+            className="flex items-center gap-2"
+          >
+            <UserCheck className="h-4 w-4" />
+            Fill from Profile
+          </Button>
+        )}
+      </div>
       
       <div className="flex flex-col items-center gap-4 mb-6">
         <Avatar className="w-24 h-24 border-2">

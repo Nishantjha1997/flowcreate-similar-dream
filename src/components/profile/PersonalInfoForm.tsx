@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AvatarUploader } from '@/components/AvatarUploader';
 import { UserProfile } from '@/hooks/useUserProfile';
 
 interface PersonalInfoFormProps {
@@ -22,6 +23,16 @@ export const PersonalInfoForm = ({ profile, onUpdate }: PersonalInfoFormProps) =
         <CardTitle>Personal Information</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <AvatarUploader
+          currentImage={{
+            src: profile?.avatar_url || null,
+            size: 150,
+            shape: 'circle'
+          }}
+          onImageChange={(imageData) => {
+            onUpdate({ avatar_url: imageData.src });
+          }}
+        />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="full_name">Full Name *</Label>

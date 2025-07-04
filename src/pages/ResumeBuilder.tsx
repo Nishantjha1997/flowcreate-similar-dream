@@ -10,6 +10,7 @@ import { useResumeData } from '@/hooks/useResumeData';
 import { useResumeHandlers } from '@/hooks/useResumeHandlers';
 import { useResumeSave } from '@/hooks/useResumeSave';
 import { useSectionManagement } from '@/hooks/useSectionManagement';
+import { useResumeProfileSync } from '@/hooks/useResumeProfileSync';
 import { templateNames } from '@/components/resume/ResumeData';
 
 const ResumeBuilder = () => {
@@ -21,6 +22,13 @@ const ResumeBuilder = () => {
   const handlers = useResumeHandlers(setResume);
   const { isSaving, handleSaveResume, handleAIFeatureUpsell, premium, resumeCount } = useResumeSave(editResumeId);
   const { activeSection, activeSections, hiddenSections, handleSectionChange, handleSectionsChange } = useSectionManagement();
+  
+  // Profile sync for auto-population
+  const { profile, populateFromProfile, hasProfileData } = useResumeProfileSync({
+    resume,
+    setResume,
+    shouldAutoPopulate: !isExample && !editResumeId && !resume.personal.name
+  });
 
   const resumeName = resume.personal?.name || 'resume';
   const { isGenerating, generatePDF } = usePDFGenerator(`${resumeName}.pdf`);
@@ -120,6 +128,8 @@ const ResumeBuilder = () => {
                 sectionTitles={{}}
                 onSectionsChange={handleSectionsChange}
                 onSectionTitleChange={() => {}}
+                onPopulateFromProfile={populateFromProfile}
+                hasProfileData={hasProfileData}
               />
             </div>
 

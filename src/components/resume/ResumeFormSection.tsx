@@ -26,6 +26,8 @@ interface ResumeFormSectionProps {
   handleCustomizationChange: (customization: ResumeData['customization']) => void;
   onAIFeatureUpsell?: () => void;
   isPremium?: boolean;
+  onPopulateFromProfile?: () => void;
+  hasProfileData?: boolean;
 }
 
 export const ResumeFormSection = ({
@@ -45,7 +47,9 @@ export const ResumeFormSection = ({
   removeProject,
   handleCustomizationChange,
   onAIFeatureUpsell,
-  isPremium
+  isPremium,
+  onPopulateFromProfile,
+  hasProfileData
 }: ResumeFormSectionProps) => {
   
   const renderSection = () => {
@@ -57,6 +61,8 @@ export const ResumeFormSection = ({
             onChange={handlePersonalInfoChange}
             onAIFeatureUpsell={onAIFeatureUpsell}
             isPremium={isPremium}
+            onPopulateFromProfile={onPopulateFromProfile}
+            hasProfileData={hasProfileData}
           />
         );
       case 'experience':
