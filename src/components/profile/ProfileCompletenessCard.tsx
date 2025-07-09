@@ -34,6 +34,18 @@ export const ProfileCompletenessCard = ({ profile, completeness }: ProfileComple
       icon: GraduationCap,
       completed: !!(profile?.education && profile.education.length > 0),
       description: 'Educational background'
+    },
+    {
+      name: 'Skills & Languages',
+      icon: Star,
+      completed: !!(profile?.technical_skills && profile.technical_skills.length > 0),
+      description: 'Technical and soft skills'
+    },
+    {
+      name: 'Projects',
+      icon: Star,
+      completed: !!(profile?.projects && profile.projects.length > 0),
+      description: 'Portfolio projects'
     }
   ];
 

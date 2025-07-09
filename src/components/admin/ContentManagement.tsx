@@ -111,7 +111,7 @@ export const ContentManagement = () => {
       
       <CardContent>
         <Tabs defaultValue="landing" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-3 bg-muted">
             <TabsTrigger value="landing">Landing Page</TabsTrigger>
             <TabsTrigger value="seo">SEO Settings</TabsTrigger>
             <TabsTrigger value="pages">Page Management</TabsTrigger>
@@ -271,7 +271,7 @@ export const ContentManagement = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <CardTitle className="text-base">{section.title}</CardTitle>
+                        <CardTitle className="text-base text-foreground">{section.title}</CardTitle>
                         <Badge variant={section.isVisible ? "default" : "secondary"}>
                           {section.isVisible ? "Published" : "Draft"}
                         </Badge>
@@ -286,7 +286,7 @@ export const ContentManagement = () => {
                         </Button>
                       </div>
                     </div>
-                    <CardDescription>
+                    <CardDescription className="text-muted-foreground">
                       Last updated: {section.lastUpdated}
                     </CardDescription>
                   </CardHeader>

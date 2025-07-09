@@ -139,10 +139,10 @@ export const SecuritySettings = () => {
       
       <CardContent>
         <Tabs defaultValue="policies" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="policies">Security Policies</TabsTrigger>
-            <TabsTrigger value="monitoring">Activity Monitoring</TabsTrigger>
-            <TabsTrigger value="limits">Rate Limiting</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 bg-muted">
+            <TabsTrigger value="policies" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Security Policies</TabsTrigger>
+            <TabsTrigger value="monitoring" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Activity Monitoring</TabsTrigger>
+            <TabsTrigger value="limits" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Rate Limiting</TabsTrigger>
           </TabsList>
           
           <TabsContent value="policies" className="space-y-6">
@@ -313,7 +313,7 @@ export const SecuritySettings = () => {
                       <div className="flex items-center gap-3">
                         {getActionIcon(log.type)}
                         <div>
-                          <p className="font-medium text-sm">{log.action}</p>
+                          <p className="font-medium text-sm text-foreground">{log.action}</p>
                           <p className="text-xs text-muted-foreground">
                             {log.user} • {log.timestamp} • IP: {log.ipAddress}
                           </p>

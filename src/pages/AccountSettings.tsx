@@ -21,6 +21,11 @@ import { ProfileCompletenessCard } from '@/components/profile/ProfileCompletenes
 import { PersonalInfoForm } from '@/components/profile/PersonalInfoForm';
 import { ProfessionalInfoForm } from '@/components/profile/ProfessionalInfoForm';
 import { SkillsForm } from '@/components/profile/SkillsForm';
+import { WorkExperienceForm } from '@/components/profile/WorkExperienceForm';
+import { EducationForm } from '@/components/profile/EducationForm';
+import { ProjectsForm } from '@/components/profile/ProjectsForm';
+import { CertificationsForm } from '@/components/profile/CertificationsForm';
+import { VolunteerForm } from '@/components/profile/VolunteerForm';
 
 const AccountSettings = () => {
   const { user } = useAuth();
@@ -164,7 +169,7 @@ const AccountSettings = () => {
 
           <div className="lg:col-span-3">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-7 lg:grid-cols-7">
                 <TabsTrigger value="personal">
                   <User className="w-4 h-4 mr-1" />
                   Personal
@@ -172,6 +177,22 @@ const AccountSettings = () => {
                 <TabsTrigger value="professional">
                   <Briefcase className="w-4 h-4 mr-1" />
                   Professional
+                </TabsTrigger>
+                <TabsTrigger value="experience">
+                  <Briefcase className="w-4 h-4 mr-1" />
+                  Experience
+                </TabsTrigger>
+                <TabsTrigger value="education">
+                  <GraduationCap className="w-4 h-4 mr-1" />
+                  Education
+                </TabsTrigger>
+                <TabsTrigger value="projects">
+                  <Shield className="w-4 h-4 mr-1" />
+                  Projects
+                </TabsTrigger>
+                <TabsTrigger value="certifications">
+                  <Award className="w-4 h-4 mr-1" />
+                  Certifications
                 </TabsTrigger>
                 <TabsTrigger value="skills">
                   <Award className="w-4 h-4 mr-1" />
@@ -193,11 +214,45 @@ const AccountSettings = () => {
                 />
               </TabsContent>
               
-              <TabsContent value="skills" className="mt-6">
-                <SkillsForm 
+              <TabsContent value="experience" className="mt-6">
+                <WorkExperienceForm 
                   profile={mergedProfile} 
                   onUpdate={handleProfileUpdate} 
                 />
+              </TabsContent>
+              
+              <TabsContent value="education" className="mt-6">
+                <EducationForm 
+                  profile={mergedProfile} 
+                  onUpdate={handleProfileUpdate} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="projects" className="mt-6">
+                <ProjectsForm 
+                  profile={mergedProfile} 
+                  onUpdate={handleProfileUpdate} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="certifications" className="mt-6">
+                <CertificationsForm 
+                  profile={mergedProfile} 
+                  onUpdate={handleProfileUpdate} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="skills" className="mt-6">
+                <div className="space-y-6">
+                  <SkillsForm 
+                    profile={mergedProfile} 
+                    onUpdate={handleProfileUpdate} 
+                  />
+                  <VolunteerForm 
+                    profile={mergedProfile} 
+                    onUpdate={handleProfileUpdate} 
+                  />
+                </div>
               </TabsContent>
             </Tabs>
           </div>

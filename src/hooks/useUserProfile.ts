@@ -145,13 +145,16 @@ export const useUserProfile = () => {
     const arrays = [
       profile.technical_skills,
       profile.work_experience,
-      profile.education
+      profile.education,
+      profile.projects,
+      profile.certifications,
+      profile.languages
     ];
 
     let completed = fields.filter(field => field && field.trim() !== '').length;
     completed += arrays.filter(arr => arr && arr.length > 0).length;
 
-    return Math.round((completed / 9) * 100);
+    return Math.round((completed / 12) * 100);
   };
 
   return {
