@@ -38,6 +38,10 @@ interface ResumeBuilderSidebarProps {
   sectionTitles: Record<string, string>;
   onSectionsChange: (active: string[], hidden: string[]) => void;
   onSectionTitleChange: (sectionId: string, title: string) => void;
+  
+  // Profile sync props
+  onPopulateFromProfile?: () => void;
+  hasProfileData?: boolean;
 }
 
 export const ResumeBuilderSidebar = ({
