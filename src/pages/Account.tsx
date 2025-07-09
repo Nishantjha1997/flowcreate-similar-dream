@@ -9,8 +9,9 @@ import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { Link } from 'react-router-dom';
-import { Shield, Crown, Download, Edit, Plus, Trash2 } from 'lucide-react';
+import { Shield, Crown, Download, Edit, Plus, Trash2, Save, User, Briefcase, GraduationCap, Award } from 'lucide-react';
 import Header from '@/components/Header';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,11 +20,29 @@ import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 import ResumeTemplate from '@/utils/resumeTemplates';
 import { templateNames } from '@/components/resume/ResumeData';
 
+// Profile Components
+import { ProfileCompletenessCard } from '@/components/profile/ProfileCompletenessCard';
+import { PersonalInfoForm } from '@/components/profile/PersonalInfoForm';
+import { ProfessionalInfoForm } from '@/components/profile/ProfessionalInfoForm';
+import { SkillsForm } from '@/components/profile/SkillsForm';
+import { WorkExperienceForm } from '@/components/profile/WorkExperienceForm';
+import { EducationForm } from '@/components/profile/EducationForm';
+import { ProjectsForm } from '@/components/profile/ProjectsForm';
+import { CertificationsForm } from '@/components/profile/CertificationsForm';
+import { VolunteerForm } from '@/components/profile/VolunteerForm';
+
 const Account = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { data: isAdmin, isLoading: loadingAdmin } = useAdminStatus(user?.id);
   const { data: premiumData, isLoading: loadingPremium } = usePremiumStatus(user?.id);
+  const { 
+    profile, 
+    isLoading: profileLoading, 
+    updateProfile, 
+    isUpdating: profileUpdating,
+    calculateCompleteness 
+  } = useUserProfile();
   
   const [isUpdating, setIsUpdating] = useState(false);
   const [fullName, setFullName] = useState('');
@@ -31,6 +50,8 @@ const Account = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [deletingResumeId, setDeletingResumeId] = useState<string | null>(null);
+  const [pendingChanges, setPendingChanges] = useState<any>({});
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Fetch user's saved resumes
   const { data: savedResumes, isLoading: loadingResumes, refetch: refetchResumes } = useQuery({
@@ -216,6 +237,19 @@ const Account = () => {
     }
   };
 
+  const handleProfileUpdate = (updates: any) => {
+    setPendingChanges({ ...pendingChanges, ...updates });
+    setHasUnsavedChanges(true);
+  };
+
+  const saveProfileChanges = () => {
+    if (Object.keys(pendingChanges).length > 0) {
+      updateProfile(pendingChanges);
+      setPendingChanges({});
+      setHasUnsavedChanges(false);
+    }
+  };
+
   const getResumeName = (resumeData: any) => {
     try {
       const data = resumeData as ResumeData;
@@ -225,12 +259,28 @@ const Account = () => {
     }
   };
 
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">Loading your profile...</div>
+        </div>
+      </div>
+    );
+  }
+
+  const mergedProfile = { ...profile, ...pendingChanges };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container max-w-6xl py-10">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">My Account</h1>
+          <div>
+            <h1 className="text-3xl font-bold">My Account</h1>
+            <p className="text-muted-foreground">Manage your comprehensive profile and resume data</p>
+          </div>
           <div className="flex items-center space-x-2">
             {premiumData?.isPremium && (
               <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300">
@@ -246,6 +296,25 @@ const Account = () => {
             )}
           </div>
         </div>
+
+        {hasUnsavedChanges && (
+          <Card className="mb-6 border-orange-200 bg-orange-50">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-orange-800 text-sm">Unsaved Changes</CardTitle>
+                  <CardDescription className="text-orange-700">
+                    You have unsaved changes to your profile.
+                  </CardDescription>
+                </div>
+                <Button onClick={saveProfileChanges} disabled={profileUpdating} size="sm">
+                  <Save className="w-4 h-4 mr-2" />
+                  {profileUpdating ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </CardHeader>
+          </Card>
+        )}
 
         {isAdmin && (
           <Card className="mb-6 border-red-200 bg-red-50">
@@ -269,190 +338,247 @@ const Account = () => {
           </Card>
         )}
         
-        <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full md:w-auto md:inline-flex grid-cols-3 mb-6">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="resumes">My Resumes</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="profile">
-            <Card>
-              <CardHeader>
-                <CardTitle>Profile Information</CardTitle>
-                <CardDescription>
-                  Update your account profile information and email address.
-                </CardDescription>
-              </CardHeader>
-              <form onSubmit={handleUpdateProfile}>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input 
-                      id="email" 
-                      type="email" 
-                      value={user?.email || ''}
-                      disabled 
-                      className="bg-muted"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Your email address is your identity on FlowCreate and is used for login.
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input 
-                      id="name" 
-                      value={fullName} 
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Enter your full name"
-                    />
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button type="submit" disabled={isUpdating}>
-                    {isUpdating ? "Saving..." : "Save Changes"}
-                  </Button>
-                </CardFooter>
-              </form>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="security">
-            <Card>
-              <CardHeader>
-                <CardTitle>Password</CardTitle>
-                <CardDescription>
-                  Change your password to keep your account secure.
-                </CardDescription>
-              </CardHeader>
-              <form onSubmit={handleUpdatePassword}>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="current_password">Current Password</Label>
-                    <Input 
-                      id="current_password" 
-                      type="password" 
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="new_password">New Password</Label>
-                    <Input 
-                      id="new_password" 
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm_password">Confirm New Password</Label>
-                    <Input 
-                      id="confirm_password" 
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button type="submit" disabled={isUpdating}>
-                    {isUpdating ? "Updating..." : "Update Password"}
-                  </Button>
-                </CardFooter>
-              </form>
-            </Card>
-          </TabsContent>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-1">
+            <ProfileCompletenessCard 
+              profile={mergedProfile} 
+              completeness={calculateCompleteness(mergedProfile)} 
+            />
+          </div>
 
-          <TabsContent value="resumes">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  My Resumes
-                  <Link to="/resume-builder">
-                    <Button>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create New Resume
+          <div className="lg:col-span-3">
+            <Tabs defaultValue="personal" className="w-full">
+              <TabsList className="grid w-full grid-cols-7 lg:grid-cols-7">
+                <TabsTrigger value="personal">
+                  <User className="w-4 h-4 mr-1" />
+                  Personal
+                </TabsTrigger>
+                <TabsTrigger value="professional">
+                  <Briefcase className="w-4 h-4 mr-1" />
+                  Professional
+                </TabsTrigger>
+                <TabsTrigger value="experience">
+                  <Briefcase className="w-4 h-4 mr-1" />
+                  Experience
+                </TabsTrigger>
+                <TabsTrigger value="education">
+                  <GraduationCap className="w-4 h-4 mr-1" />
+                  Education
+                </TabsTrigger>
+                <TabsTrigger value="projects">
+                  <Shield className="w-4 h-4 mr-1" />
+                  Projects
+                </TabsTrigger>
+                <TabsTrigger value="certifications">
+                  <Award className="w-4 h-4 mr-1" />
+                  Certifications
+                </TabsTrigger>
+                <TabsTrigger value="skills">
+                  <Award className="w-4 h-4 mr-1" />
+                  Skills
+                </TabsTrigger>
+              </TabsList>
+          
+              <TabsContent value="personal" className="mt-6">
+                <PersonalInfoForm 
+                  profile={mergedProfile} 
+                  onUpdate={handleProfileUpdate} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="professional" className="mt-6">
+                <ProfessionalInfoForm 
+                  profile={mergedProfile} 
+                  onUpdate={handleProfileUpdate} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="experience" className="mt-6">
+                <WorkExperienceForm 
+                  profile={mergedProfile} 
+                  onUpdate={handleProfileUpdate} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="education" className="mt-6">
+                <EducationForm 
+                  profile={mergedProfile} 
+                  onUpdate={handleProfileUpdate} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="projects" className="mt-6">
+                <ProjectsForm 
+                  profile={mergedProfile} 
+                  onUpdate={handleProfileUpdate} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="certifications" className="mt-6">
+                <CertificationsForm 
+                  profile={mergedProfile} 
+                  onUpdate={handleProfileUpdate} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="skills" className="mt-6">
+                <div className="space-y-6">
+                  <SkillsForm 
+                    profile={mergedProfile} 
+                    onUpdate={handleProfileUpdate} 
+                  />
+                  <VolunteerForm 
+                    profile={mergedProfile} 
+                    onUpdate={handleProfileUpdate} 
+                  />
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+
+        <div className="mt-12">
+          <Tabs defaultValue="security" className="w-full">
+            <TabsList className="grid w-full md:w-auto md:inline-flex grid-cols-2 mb-6">
+              <TabsTrigger value="security">Security</TabsTrigger>
+              <TabsTrigger value="resumes">My Resumes</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="security">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Password</CardTitle>
+                  <CardDescription>
+                    Change your password to keep your account secure.
+                  </CardDescription>
+                </CardHeader>
+                <form onSubmit={handleUpdatePassword}>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="current_password">Current Password</Label>
+                      <Input 
+                        id="current_password" 
+                        type="password" 
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="new_password">New Password</Label>
+                      <Input 
+                        id="new_password" 
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="confirm_password">Confirm New Password</Label>
+                      <Input 
+                        id="confirm_password" 
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button type="submit" disabled={isUpdating}>
+                      {isUpdating ? "Updating..." : "Update Password"}
                     </Button>
-                  </Link>
-                </CardTitle>
-                <CardDescription>
-                  Manage all your saved resumes. Download or edit them anytime.
-                  {!premiumData?.isPremium && (
-                    <span className="block mt-2 text-yellow-700 bg-yellow-100 p-2 rounded">
-                      Free users can save 1 resume. Upgrade to Premium for unlimited resumes!
-                    </span>
-                  )}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {loadingResumes ? (
-                  <div className="text-center py-8">Loading your resumes...</div>
-                ) : savedResumes && savedResumes.length > 0 ? (
-                  <div className="space-y-4">
-                    {savedResumes.map((resume) => (
-                      <div key={resume.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div>
-                          <h3 className="font-medium">{getResumeName(resume.resume_data)}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            Created on {new Date(resume.created_at).toLocaleDateString()}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Last updated {new Date(resume.updated_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDownloadResume(resume)}
-                          >
-                            <Download className="w-4 h-4 mr-2" />
-                            Download
-                          </Button>
-                          <Link to={`/resume-builder?edit=${resume.id}`}>
-                            <Button size="sm">
-                              <Edit className="w-4 h-4 mr-2" />
-                              Edit
-                            </Button>
-                          </Link>
-                          {!premiumData?.isPremium && (
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => handleDeleteResume(resume.id)}
-                              disabled={deletingResumeId === resume.id}
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              {deletingResumeId === resume.id ? 'Deleting...' : 'Delete'}
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground mb-4">You haven't created any resumes yet.</p>
+                  </CardFooter>
+                </form>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="resumes">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    My Resumes
                     <Link to="/resume-builder">
                       <Button>
                         <Plus className="w-4 h-4 mr-2" />
-                        Create Your First Resume
+                        Create New Resume
                       </Button>
                     </Link>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                  </CardTitle>
+                  <CardDescription>
+                    Manage all your saved resumes. Download or edit them anytime.
+                    {!premiumData?.isPremium && (
+                      <span className="block mt-2 text-yellow-700 bg-yellow-100 p-2 rounded">
+                        Free users can save 1 resume. Upgrade to Premium for unlimited resumes!
+                      </span>
+                    )}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {loadingResumes ? (
+                    <div className="text-center py-8">Loading your resumes...</div>
+                  ) : savedResumes && savedResumes.length > 0 ? (
+                    <div className="space-y-4">
+                      {savedResumes.map((resume) => (
+                        <div key={resume.id} className="flex items-center justify-between p-4 border rounded-lg">
+                          <div>
+                            <h3 className="font-medium">{getResumeName(resume.resume_data)}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              Created on {new Date(resume.created_at).toLocaleDateString()}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Last updated {new Date(resume.updated_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDownloadResume(resume)}
+                            >
+                              <Download className="w-4 h-4 mr-2" />
+                              Download
+                            </Button>
+                            <Link to={`/resume-builder?edit=${resume.id}`}>
+                              <Button size="sm">
+                                <Edit className="w-4 h-4 mr-2" />
+                                Edit
+                              </Button>
+                            </Link>
+                            {!premiumData?.isPremium && (
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteResume(resume.id)}
+                                disabled={deletingResumeId === resume.id}
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                {deletingResumeId === resume.id ? 'Deleting...' : 'Delete'}
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground mb-4">You haven't created any resumes yet.</p>
+                      <Link to="/resume-builder">
+                        <Button>
+                          <Plus className="w-4 h-4 mr-2" />
+                          Create Your First Resume
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
