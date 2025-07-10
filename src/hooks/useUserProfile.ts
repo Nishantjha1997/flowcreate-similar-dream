@@ -97,7 +97,7 @@ export const useUserProfile = () => {
       
       const { data, error } = await supabase
         .from('profiles')
-        .upsert(updateData)
+        .upsert(updateData, { onConflict: 'user_id' })
         .select()
         .single();
       
