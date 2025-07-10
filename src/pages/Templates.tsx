@@ -12,8 +12,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 
+// Updated Templates with Enhanced Variety and Creative Designs
 const templates = [
-  // Professional Templates
+  // Professional Templates - Enhanced with variety
   {
     id: 1,
     name: "Executive Modern",
@@ -23,7 +24,7 @@ const templates = [
     featured: true,
     popular: true,
     atsOptimized: true,
-    description: "Clean and professional template with a modern layout, perfect for senior executives and corporate roles."
+    description: "Cutting-edge professional template with gradient headers and modern typography, perfect for tech executives."
   },
   {
     id: 2,
@@ -34,7 +35,7 @@ const templates = [
     featured: false,
     popular: true,
     atsOptimized: true,
-    description: "Timeless design with traditional formatting, suitable for all industries and experience levels."
+    description: "Sophisticated traditional design with elegant typography, ideal for finance and legal professionals."
   },
   {
     id: 3,
@@ -45,10 +46,10 @@ const templates = [
     featured: false,
     popular: true,
     atsOptimized: true,
-    description: "Balanced and versatile template for professionals in any field."
+    description: "Premium corporate template with clean lines and professional aesthetics for all industries."
   },
   
-  // Tech & Engineering Templates
+  // Technology Templates - Enhanced designs
   {
     id: 4,
     name: "Software Engineer Pro",
@@ -58,7 +59,7 @@ const templates = [
     featured: true,
     popular: false,
     atsOptimized: true,
-    description: "Focused on technical skills with dedicated sections for projects and expertise."
+    description: "Matrix-inspired dark theme with terminal aesthetics, perfect for software engineers and developers."
   },
   {
     id: 5,
@@ -69,7 +70,7 @@ const templates = [
     featured: false,
     popular: true,
     atsOptimized: true,
-    description: "Perfect for DevOps engineers and cloud specialists with emphasis on tools and certifications."
+    description: "Code-focused design with emerald accents and mono fonts, ideal for DevOps and system engineers."
   },
   {
     id: 6,
@@ -80,10 +81,10 @@ const templates = [
     featured: true,
     popular: false,
     atsOptimized: true,
-    description: "Specialized for data scientists with sections for publications, projects, and technical skills."
+    description: "Purple-themed analytical design with structured layouts for data scientists and researchers."
   },
   
-  // Creative & Design Templates
+  // Creative & Design Templates - Bold new designs
   {
     id: 7,
     name: "Creative Portfolio",
@@ -93,7 +94,7 @@ const templates = [
     featured: true,
     popular: false,
     atsOptimized: false,
-    description: "Bold and eye-catching layout for creative professionals looking to stand out."
+    description: "Vibrant gradient design with rounded corners and creative flair for designers and artists."
   },
   {
     id: 8,
@@ -104,7 +105,7 @@ const templates = [
     featured: false,
     popular: true,
     atsOptimized: false,
-    description: "Refined and elegant design with sophisticated typography perfect for designers."
+    description: "Rose-themed sophisticated design with elegant typography for UI/UX designers."
   },
   {
     id: 9,
@@ -115,10 +116,10 @@ const templates = [
     featured: false,
     popular: false,
     atsOptimized: false,
-    description: "Vibrant and artistic template showcasing creativity and visual design skills."
+    description: "Bold artistic template with amber gradients and dynamic layouts for graphic artists."
   },
   
-  // Healthcare Templates
+  // Healthcare Templates - New professional medical designs
   {
     id: 10,
     name: "Medical Professional",
@@ -128,7 +129,7 @@ const templates = [
     featured: true,
     popular: true,
     atsOptimized: true,
-    description: "Professional template designed for doctors, nurses, and healthcare professionals."
+    description: "Teal-themed healthcare template with clean design for doctors and medical professionals."
   },
   {
     id: 11,
@@ -139,10 +140,10 @@ const templates = [
     featured: false,
     popular: false,
     atsOptimized: true,
-    description: "Specialized for pharmaceutical professionals with emphasis on research and compliance."
+    description: "Blue-accented professional design for pharmaceutical and research professionals."
   },
   
-  // Education & Academia Templates
+  // Education & Academia Templates - Enhanced academic styling
   {
     id: 12,
     name: "Academic Researcher",
@@ -152,7 +153,7 @@ const templates = [
     featured: true,
     popular: false,
     atsOptimized: true,
-    description: "Perfect for professors, researchers, and academic professionals with publication sections."
+    description: "Indigo-themed scholarly design with traditional elements for professors and researchers."
   },
   {
     id: 13,
@@ -163,10 +164,10 @@ const templates = [
     featured: false,
     popular: true,
     atsOptimized: true,
-    description: "Designed for educators with sections for certifications and teaching experience."
+    description: "Green-accented educational template perfect for teachers and education professionals."
   },
   
-  // Sales & Marketing Templates
+  // Sales & Marketing Templates - Dynamic and energetic
   {
     id: 14,
     name: "Sales Executive",
@@ -176,7 +177,7 @@ const templates = [
     featured: true,
     popular: true,
     atsOptimized: true,
-    description: "Results-focused template perfect for sales professionals highlighting achievements."
+    description: "High-energy orange gradient design that showcases results and achievements for sales professionals."
   },
   {
     id: 15,
@@ -187,7 +188,7 @@ const templates = [
     featured: false,
     popular: true,
     atsOptimized: true,
-    description: "Creative yet professional template for marketing professionals and brand managers."
+    description: "Pink-to-purple gradient design with creative elements for marketing professionals."
   },
   {
     id: 16,
@@ -198,10 +199,10 @@ const templates = [
     featured: true,
     popular: false,
     atsOptimized: true,
-    description: "Modern template focused on digital skills and campaign results."
+    description: "Multi-colored gradient backdrop with modern design for digital marketing experts."
   },
   
-  // Finance & Consulting Templates
+  // Finance & Consulting Templates - Professional with distinction
   {
     id: 17,
     name: "Financial Analyst",
@@ -211,7 +212,7 @@ const templates = [
     featured: false,
     popular: true,
     atsOptimized: true,
-    description: "Professional template for finance professionals with emphasis on analytical skills."
+    description: "Emerald-themed professional template emphasizing trust and analytical skills."
   },
   {
     id: 18,
@@ -222,10 +223,10 @@ const templates = [
     featured: true,
     popular: false,
     atsOptimized: true,
-    description: "Sophisticated template for consultants and strategic advisors."
+    description: "Dark sophisticated header with clean layouts for strategic consultants and advisors."
   },
   
-  // Executive & Leadership Templates
+  // Executive & Leadership Templates - Premium designs
   {
     id: 19,
     name: "C-Level Executive",
@@ -235,7 +236,7 @@ const templates = [
     featured: true,
     popular: false,
     atsOptimized: true,
-    description: "Sophisticated design for senior managers and executives highlighting leadership experience."
+    description: "Premium executive template with elegant typography and sophisticated styling."
   },
   {
     id: 20,
@@ -246,10 +247,10 @@ const templates = [
     featured: false,
     popular: true,
     atsOptimized: true,
-    description: "Executive-level template emphasizing strategic leadership and business impact."
+    description: "Navy blue executive template with bold typography for senior leadership roles."
   },
   
-  // ATS-Optimized Simple Templates
+  // ATS-Optimized Simple Templates - Clean and scannable
   {
     id: 21,
     name: "ATS Optimized Pro",
@@ -259,7 +260,7 @@ const templates = [
     featured: true,
     popular: true,
     atsOptimized: true,
-    description: "Specifically designed to pass ATS systems while maintaining professional appearance."
+    description: "Specifically designed for ATS systems with clean formatting and optimal keyword placement."
   },
   {
     id: 22,
@@ -270,7 +271,7 @@ const templates = [
     featured: false,
     popular: true,
     atsOptimized: true,
-    description: "Space-efficient layout that maximizes content while maintaining ATS compatibility."
+    description: "Compact space-efficient layout optimized for both ATS systems and human readers."
   },
   {
     id: 23,
@@ -281,10 +282,10 @@ const templates = [
     featured: false,
     popular: false,
     atsOptimized: true,
-    description: "Ultra-clean design optimized for ATS parsing with maximum readability."
+    description: "Ultra-clean minimalist design with optimal ATS parsing and maximum readability."
   },
   
-  // Startup & Entrepreneurship Templates
+  // Startup & Entrepreneurship Templates - Modern and dynamic
   {
     id: 24,
     name: "Startup Founder",
@@ -294,7 +295,7 @@ const templates = [
     featured: true,
     popular: false,
     atsOptimized: false,
-    description: "Dynamic template for entrepreneurs and startup professionals."
+    description: "Violet-to-cyan gradient design perfect for entrepreneurs and startup professionals."
   },
   {
     id: 25,
@@ -305,7 +306,7 @@ const templates = [
     featured: false,
     popular: true,
     atsOptimized: true,
-    description: "Perfect for product managers with sections for product launches and metrics."
+    description: "Cyan-themed modern template highlighting product launches and user metrics."
   }
 ];
 
