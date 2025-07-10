@@ -17,6 +17,7 @@ interface ResumeBuilderSidebarProps {
   // Form props
   resume: ResumeData;
   handlePersonalInfoChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onProfileImageChange?: (profileImage: string) => void;
   handleExperienceChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => void;
   handleCurrentJobToggle: (checked: boolean, index: number) => void;
   addExperience: () => void;
@@ -51,6 +52,7 @@ export const ResumeBuilderSidebar = ({
   onTemplateChange,
   resume,
   handlePersonalInfoChange,
+  onProfileImageChange,
   handleExperienceChange,
   handleCurrentJobToggle,
   addExperience,
@@ -109,6 +111,7 @@ export const ResumeBuilderSidebar = ({
           activeSection={activeSection}
           resume={resume}
           handlePersonalInfoChange={handlePersonalInfoChange}
+          onProfileImageChange={onProfileImageChange}
           handleExperienceChange={handleExperienceChange}
           handleCurrentJobToggle={handleCurrentJobToggle}
           addExperience={addExperience}

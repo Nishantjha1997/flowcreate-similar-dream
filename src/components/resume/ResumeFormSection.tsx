@@ -12,6 +12,7 @@ interface ResumeFormSectionProps {
   activeSection: string;
   resume: ResumeData;
   handlePersonalInfoChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onProfileImageChange?: (profileImage: string) => void;
   handleExperienceChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => void;
   handleCurrentJobToggle: (checked: boolean, index: number) => void;
   addExperience: () => void;
@@ -34,6 +35,7 @@ export const ResumeFormSection = ({
   activeSection,
   resume,
   handlePersonalInfoChange,
+  onProfileImageChange,
   handleExperienceChange,
   handleCurrentJobToggle,
   addExperience,
@@ -59,6 +61,7 @@ export const ResumeFormSection = ({
           <PersonalInfoSection
             personal={resume.personal}
             onChange={handlePersonalInfoChange}
+            onProfileImageChange={onProfileImageChange}
             onAIFeatureUpsell={onAIFeatureUpsell}
             isPremium={isPremium}
             onPopulateFromProfile={onPopulateFromProfile}

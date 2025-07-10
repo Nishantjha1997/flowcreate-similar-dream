@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { ResumeData } from '@/utils/types';
 
 export interface UserProfile {
   id: string;
@@ -83,17 +84,29 @@ export const useUserProfile = () => {
     mutationFn: async (profileData: Partial<UserProfile>) => {
       if (!user?.id) throw new Error('User not authenticated');
       
+      console.log('Updating profile with data:', profileData);
+      console.log('User ID:', user.id);
+      
+      const updateData = {
+        user_id: user.id,
+        ...profileData,
+        updated_at: new Date().toISOString()
+      };
+      
+      console.log('Final update data:', updateData);
+      
       const { data, error } = await supabase
         .from('profiles')
-        .upsert({
-          user_id: user.id,
-          ...profileData,
-          updated_at: new Date().toISOString()
-        })
+        .upsert(updateData)
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('Profile updated successfully:', data);
       return data;
     },
     onSuccess: () => {
@@ -102,33 +115,63 @@ export const useUserProfile = () => {
     },
     onError: (error) => {
       console.error('Error updating profile:', error);
-      toast.error('Failed to update profile. Please try again.');
+      console.error('Error details:', JSON.stringify(error, null, 2));
+      toast.error(`Failed to update profile: ${error?.message || 'Unknown error'}. Please try again.`);
     }
   });
 
   // Auto-populate resume from profile
-  const populateResumeFromProfile = (profile: UserProfile) => {
-    return {
-      personal: {
-        name: profile.full_name || '',
-        email: profile.email || '',
-        phone: profile.phone || '',
-        address: profile.address || '',
-        linkedin: profile.linkedin_url || '',
-        website: profile.website_url || '',
-        summary: profile.professional_summary || ''
-      },
-      experience: profile.work_experience || [],
-      education: profile.education || [],
-      skills: profile.technical_skills || [],
-      projects: profile.projects || [],
-      customization: {
-        primaryColor: '#2563eb',
-        secondaryColor: '#6b7280',
-        fontSize: 'medium',
-        spacing: 'normal'
-      }
+  const populateResumeFromProfile = (profile: UserProfile): Partial<ResumeData> => {
+    const populatedData: Partial<ResumeData> = {};
+    
+    // Populate personal information
+    populatedData.personal = {
+      name: profile.full_name || '',
+      email: profile.email || '',
+      phone: profile.phone || '',
+      address: profile.address || '',
+      linkedin: profile.linkedin_url || '',
+      website: profile.website_url || profile.portfolio_url || '',
+      summary: profile.professional_summary || '',
+      profileImage: profile.avatar_url || ''
     };
+
+    // Populate experience if available
+    if (profile.work_experience && Array.isArray(profile.work_experience) && profile.work_experience.length > 0) {
+      populatedData.experience = profile.work_experience;
+    }
+
+    // Populate education if available
+    if (profile.education && Array.isArray(profile.education) && profile.education.length > 0) {
+      populatedData.education = profile.education;
+    }
+
+    // Populate skills if available
+    if (profile.technical_skills && Array.isArray(profile.technical_skills) && profile.technical_skills.length > 0) {
+      populatedData.skills = profile.technical_skills;
+    }
+
+    // Populate projects if available
+    if (profile.projects && Array.isArray(profile.projects) && profile.projects.length > 0) {
+      populatedData.projects = profile.projects;
+    }
+
+    // Populate certifications if available
+    if (profile.certifications && Array.isArray(profile.certifications) && profile.certifications.length > 0) {
+      populatedData.certifications = profile.certifications;
+    }
+
+    // Populate volunteer experience if available
+    if (profile.volunteer_experience && Array.isArray(profile.volunteer_experience) && profile.volunteer_experience.length > 0) {
+      populatedData.volunteer = profile.volunteer_experience;
+    }
+
+    // Populate languages if available
+    if (profile.languages && Array.isArray(profile.languages) && profile.languages.length > 0) {
+      populatedData.languages = profile.languages;
+    }
+
+    return populatedData;
   };
 
   // Calculate profile completeness

@@ -20,6 +20,17 @@ const ResumeBuilder = () => {
   // Custom hooks for data management
   const { resume, setResume, templateId, isExample, editResumeId, loadingExistingResume } = useResumeData();
   const handlers = useResumeHandlers(setResume);
+  
+  // Profile image handler
+  const handleProfileImageChange = (profileImage: string) => {
+    setResume(prev => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        profileImage
+      }
+    }));
+  };
   const { isSaving, handleSaveResume, handleAIFeatureUpsell, premium, resumeCount } = useResumeSave(editResumeId);
   const { activeSection, activeSections, hiddenSections, handleSectionChange, handleSectionsChange } = useSectionManagement();
   
@@ -109,6 +120,7 @@ const ResumeBuilder = () => {
                 onTemplateChange={handleTemplateChange}
                 resume={resume}
                 handlePersonalInfoChange={handlers.handlePersonalInfoChange}
+                onProfileImageChange={handleProfileImageChange}
                 handleExperienceChange={handlers.handleExperienceChange}
                 handleCurrentJobToggle={handlers.handleCurrentJobToggle}
                 addExperience={handlers.addExperience}
