@@ -43,6 +43,7 @@ interface ResumeBuilderSidebarProps {
   // Profile sync props
   onPopulateFromProfile?: () => void;
   hasProfileData?: boolean;
+  onPDFDataExtracted?: (data: Partial<ResumeData>) => void;
 }
 
 export const ResumeBuilderSidebar = ({
@@ -73,7 +74,8 @@ export const ResumeBuilderSidebar = ({
   onSectionsChange,
   onSectionTitleChange,
   onPopulateFromProfile,
-  hasProfileData
+  hasProfileData,
+  onPDFDataExtracted
 }: ResumeBuilderSidebarProps) => {
   return (
     <div className="h-screen max-h-screen overflow-y-auto bg-gray-800 rounded-lg shadow-xl">
@@ -128,6 +130,7 @@ export const ResumeBuilderSidebar = ({
           isPremium={isPremium}
           onPopulateFromProfile={onPopulateFromProfile}
           hasProfileData={hasProfileData}
+          onPDFDataExtracted={onPDFDataExtracted}
         />
       </div>
 

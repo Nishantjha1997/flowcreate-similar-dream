@@ -12,6 +12,7 @@ import { useResumeSave } from '@/hooks/useResumeSave';
 import { useSectionManagement } from '@/hooks/useSectionManagement';
 import { useResumeProfileSync } from '@/hooks/useResumeProfileSync';
 import { templateNames } from '@/components/resume/ResumeData';
+import { ResumeData } from '@/utils/types';
 
 const ResumeBuilder = () => {
   const navigate = useNavigate();
@@ -46,6 +47,19 @@ const ResumeBuilder = () => {
 
   const handleTemplateChange = (newTemplateId: string) => {
     navigate(`/resume-builder?template=${newTemplateId}${isExample ? '&example=true' : ''}${editResumeId ? `&edit=${editResumeId}` : ''}`);
+  };
+
+  const handlePDFDataExtracted = (extractedData: Partial<ResumeData>) => {
+    setResume(prev => ({
+      ...prev,
+      ...extractedData,
+      personal: { ...prev.personal, ...extractedData.personal },
+      experience: extractedData.experience || prev.experience,
+      education: extractedData.education || prev.education,
+      skills: extractedData.skills || prev.skills,
+      projects: extractedData.projects || prev.projects
+    }));
+    toast.success("Resume data imported successfully!");
   };
 
   const handleShare = () => {
@@ -142,6 +156,7 @@ const ResumeBuilder = () => {
                 onSectionTitleChange={() => {}}
                 onPopulateFromProfile={populateFromProfile}
                 hasProfileData={hasProfileData}
+                onPDFDataExtracted={handlePDFDataExtracted}
               />
             </div>
 

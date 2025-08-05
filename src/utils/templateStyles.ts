@@ -1,5 +1,5 @@
 export const templateStyles = {
-  // Enhanced Modern - Tech Industry
+  // Enhanced Modern - Tech Industry (Blue Gradient)
   modern: {
     container: "font-sans max-w-4xl mx-auto bg-white shadow-2xl border border-slate-200",
     header: "bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 text-white p-8 relative overflow-hidden",
@@ -16,24 +16,24 @@ export const templateStyles = {
     skillBadge: "bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium shadow-md hover:shadow-lg transition-all",
   },
 
-  // Enhanced Classic - Finance/Legal
+  // Enhanced Classic - Finance/Legal (Charcoal Gray)
   classic: {
-    container: "font-serif max-w-4xl mx-auto bg-white shadow-xl border-2 border-slate-300",
-    header: "text-center py-12 border-b-4 border-slate-800 bg-slate-50",
-    headerName: "text-5xl font-bold text-slate-900 tracking-wide",
-    headerTitle: "text-2xl mt-4 text-slate-700 italic",
-    headerContact: "mt-6 flex justify-center flex-wrap gap-6 text-base text-slate-600",
-    section: "p-8 border-b-2 border-slate-200",
-    sectionTitle: "text-3xl font-bold mb-6 text-slate-900 text-center border-b-2 border-slate-400 pb-3",
-    subsection: "mb-8 border-l-4 border-slate-400 pl-6",
-    subsectionTitle: "text-xl font-bold text-slate-900 flex justify-between mb-2",
-    subsectionDate: "text-slate-600 italic font-medium",
-    subsectionContent: "mt-4 text-slate-800 leading-loose text-lg",
+    container: "font-serif max-w-4xl mx-auto bg-white shadow-xl border-2 border-gray-300",
+    header: "text-center py-12 border-b-4 border-gray-800 bg-gray-50",
+    headerName: "text-5xl font-bold text-gray-900 tracking-wide",
+    headerTitle: "text-2xl mt-4 text-gray-700 italic",
+    headerContact: "mt-6 flex justify-center flex-wrap gap-6 text-base text-gray-600",
+    section: "p-8 border-b-2 border-gray-200",
+    sectionTitle: "text-3xl font-bold mb-6 text-gray-900 text-center border-b-2 border-gray-400 pb-3",
+    subsection: "mb-8 border-l-4 border-gray-400 pl-6",
+    subsectionTitle: "text-xl font-bold text-gray-900 flex justify-between mb-2",
+    subsectionDate: "text-gray-600 italic font-medium",
+    subsectionContent: "mt-4 text-gray-800 leading-loose text-lg",
     skillsContainer: "flex flex-wrap gap-4 justify-center",
-    skillBadge: "border-2 border-slate-700 text-slate-800 px-4 py-2 rounded-md text-base font-medium hover:bg-slate-100 transition-colors",
+    skillBadge: "border-2 border-gray-700 text-gray-800 px-4 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition-colors",
   },
 
-  // Enhanced Creative - Design/Marketing
+  // Enhanced Creative - Design/Marketing (Purple-Pink Gradient)
   creative: {
     container: "font-sans max-w-4xl mx-auto bg-white shadow-2xl rounded-3xl overflow-hidden",
     header: "bg-gradient-to-br from-purple-600 via-pink-600 to-red-500 text-white p-10 relative",

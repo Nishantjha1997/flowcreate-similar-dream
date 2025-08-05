@@ -1,13 +1,15 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ResumeData } from '@/utils/resumeAdapterUtils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Upload, X, UserCheck } from 'lucide-react';
+import { Upload, X, UserCheck, FileText } from 'lucide-react';
 import { AiSuggestionButton } from "@/components/resume/AiSuggestionButton";
+import { PDFUploader } from '@/components/PDFUploader';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 interface PersonalInfoSectionProps {
   personal: ResumeData['personal'];
@@ -17,17 +19,20 @@ interface PersonalInfoSectionProps {
   hasProfileData?: boolean;
   onAIFeatureUpsell?: () => void;
   isPremium?: boolean;
+  onPDFDataExtracted?: (data: any) => void;
 }
 
-export const PersonalInfoSection = ({
-  personal,
-  onChange,
+export const PersonalInfoSection = ({ 
+  personal, 
+  onChange, 
   onProfileImageChange,
   onAIFeatureUpsell,
   isPremium,
   onPopulateFromProfile,
-  hasProfileData
+  hasProfileData,
+  onPDFDataExtracted
 }: PersonalInfoSectionProps) => {
+  const [showPDFUploader, setShowPDFUploader] = useState(false);
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -53,17 +58,45 @@ export const PersonalInfoSection = ({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Personal Information</h2>
-        {hasProfileData && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onPopulateFromProfile}
-            className="flex items-center gap-2"
-          >
-            <UserCheck className="h-4 w-4" />
-            Fill from Profile
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {hasProfileData && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onPopulateFromProfile}
+              className="flex items-center gap-2"
+            >
+              <UserCheck className="h-4 w-4" />
+              Fill from Profile
+            </Button>
+          )}
+          <Dialog open={showPDFUploader} onOpenChange={setShowPDFUploader}>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <FileText className="h-4 w-4" />
+                Upload Resume PDF
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Upload Resume PDF</DialogTitle>
+              </DialogHeader>
+              <PDFUploader
+                onDataExtracted={(data) => {
+                  if (onPDFDataExtracted) {
+                    onPDFDataExtracted(data);
+                  }
+                  setShowPDFUploader(false);
+                }}
+                onClose={() => setShowPDFUploader(false)}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
       
       <div className="flex flex-col items-center gap-4 mb-6">

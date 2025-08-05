@@ -29,6 +29,7 @@ interface ResumeFormSectionProps {
   isPremium?: boolean;
   onPopulateFromProfile?: () => void;
   hasProfileData?: boolean;
+  onPDFDataExtracted?: (data: Partial<ResumeData>) => void;
 }
 
 export const ResumeFormSection = ({
@@ -51,7 +52,8 @@ export const ResumeFormSection = ({
   onAIFeatureUpsell,
   isPremium,
   onPopulateFromProfile,
-  hasProfileData
+  hasProfileData,
+  onPDFDataExtracted
 }: ResumeFormSectionProps) => {
   
   const renderSection = () => {
@@ -66,6 +68,7 @@ export const ResumeFormSection = ({
             isPremium={isPremium}
             onPopulateFromProfile={onPopulateFromProfile}
             hasProfileData={hasProfileData}
+            onPDFDataExtracted={onPDFDataExtracted}
           />
         );
       case 'experience':
@@ -111,7 +114,7 @@ export const ResumeFormSection = ({
             isPremium={isPremium}
           />
         );
-      case 'customization':
+      case 'customize':
         return (
           <CustomizationPanel
             customization={resume.customization}
