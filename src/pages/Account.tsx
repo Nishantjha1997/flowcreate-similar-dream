@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
+import { toast as sonnerToast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
@@ -30,6 +31,7 @@ import { EducationForm } from '@/components/profile/EducationForm';
 import { ProjectsForm } from '@/components/profile/ProjectsForm';
 import { CertificationsForm } from '@/components/profile/CertificationsForm';
 import { VolunteerForm } from '@/components/profile/VolunteerForm';
+import { PDFResumeUploader } from '@/components/profile/PDFResumeUploader';
 
 const Account = () => {
   const { user } = useAuth();
@@ -52,6 +54,7 @@ const Account = () => {
   const [deletingResumeId, setDeletingResumeId] = useState<string | null>(null);
   const [pendingChanges, setPendingChanges] = useState<any>({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [extractedProfileData, setExtractedProfileData] = useState<any>(null);
 
   // Fetch user's saved resumes
   const { data: savedResumes, isLoading: loadingResumes, refetch: refetchResumes } = useQuery({
@@ -242,6 +245,22 @@ const Account = () => {
     setHasUnsavedChanges(true);
   };
 
+  const handlePDFDataExtracted = (extractedData: any) => {
+    setExtractedProfileData(extractedData);
+  };
+
+  const importExtractedData = () => {
+    if (extractedProfileData) {
+      handleProfileUpdate(extractedProfileData);
+      setExtractedProfileData(null);
+      sonnerToast.success('Profile data imported from resume!');
+    }
+  };
+
+  const discardExtractedData = () => {
+    setExtractedProfileData(null);
+  };
+
   const saveProfileChanges = () => {
     if (Object.keys(pendingChanges).length > 0) {
       updateProfile(pendingChanges);
@@ -338,12 +357,36 @@ const Account = () => {
           </Card>
         )}
         
+        {extractedProfileData && (
+          <Card className="mb-6 border-blue-200 bg-blue-50">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-blue-800 text-sm">Resume Data Extracted</CardTitle>
+                  <CardDescription className="text-blue-700">
+                    We've extracted information from your resume. Review and import the data below.
+                  </CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={importExtractedData} size="sm">
+                    Import Data
+                  </Button>
+                  <Button onClick={discardExtractedData} variant="outline" size="sm">
+                    Discard
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-6">
             <ProfileCompletenessCard 
               profile={mergedProfile} 
               completeness={calculateCompleteness(mergedProfile)} 
             />
+            <PDFResumeUploader onDataExtracted={handlePDFDataExtracted} />
           </div>
 
           <div className="lg:col-span-3">

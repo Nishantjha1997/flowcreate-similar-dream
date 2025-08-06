@@ -92,7 +92,6 @@ export const PersonalInfoSection = ({
                   }
                   setShowPDFUploader(false);
                 }}
-                onClose={() => setShowPDFUploader(false)}
               />
             </DialogContent>
           </Dialog>

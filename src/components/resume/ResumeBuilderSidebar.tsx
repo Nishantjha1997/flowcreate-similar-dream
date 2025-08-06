@@ -78,16 +78,17 @@ export const ResumeBuilderSidebar = ({
   onPDFDataExtracted
 }: ResumeBuilderSidebarProps) => {
   return (
-    <div className="h-screen max-h-screen overflow-y-auto bg-gray-800 rounded-lg shadow-xl">
+    <div className="h-[calc(100vh-2rem)] overflow-y-auto bg-card border rounded-lg shadow-lg"
+         style={{ maxHeight: 'calc(100vh - 2rem)' }}>
       {/* Navigation Tabs */}
-      <Card className="bg-gray-900/50 border-gray-700 mb-4">
+      <Card className="bg-card border mb-4">
         <CardContent className="p-0">
           <Tabs defaultValue="sections" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-gray-700">
-              <TabsTrigger value="sections" className="text-gray-300 data-[state=active]:bg-gray-700 data-[state=active]:text-white">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="sections">
                 Sections
               </TabsTrigger>
-              <TabsTrigger value="templates" className="text-gray-300 data-[state=active]:bg-gray-700 data-[state=active]:text-white">
+              <TabsTrigger value="templates">
                 Templates
               </TabsTrigger>
             </TabsList>
@@ -135,7 +136,7 @@ export const ResumeBuilderSidebar = ({
       </div>
 
       {/* Section Customizer */}
-      <Card className="bg-gray-900/50 border-gray-700">
+      <Card className="bg-card border">
         <CardContent className="p-4">
           <SectionDragDropCustomizer
             activeSections={activeSections}
