@@ -1,14 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export const OpenAIKeyCollector = () => {
+export const GeminiKeyCollector = () => {
   return (
     <Card className="mb-4">
       <CardHeader>
-        <CardTitle>OpenAI API Key Required</CardTitle>
+        <CardTitle>Gemini API Key Required</CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground mb-4">
-          To use the PDF parsing feature, an OpenAI API key is required. Please add it to your Supabase Edge Function secrets.
+          To use the PDF parsing feature, a Gemini API key is required. Please add it to your Supabase Edge Function secrets.
         </p>
       </CardContent>
     </Card>
