@@ -249,6 +249,40 @@ export const templateStyles = {
     skillBadge: "bg-slate-700 text-white px-4 py-2 rounded text-sm font-medium border border-slate-600",
   },
 
+  // NEW: ATS Optimized Pro
+  "ats-pro": {
+    container: "font-sans max-w-4xl mx-auto bg-white shadow-lg border border-gray-300 rounded-sm",
+    header: "bg-gray-50 p-8 border-b-2 border-gray-400",
+    headerName: "text-3xl font-bold text-gray-900 tracking-normal",
+    headerTitle: "text-xl mt-2 text-gray-700",
+    headerContact: "mt-4 flex flex-wrap gap-4 text-base text-gray-600",
+    section: "p-6 border-b border-gray-200",
+    sectionTitle: "text-xl font-bold text-gray-800 mb-4 border-b border-gray-300 pb-2",
+    subsection: "mb-6 p-4 bg-gray-50 rounded",
+    subsectionTitle: "text-lg font-semibold flex justify-between text-gray-900",
+    subsectionDate: "text-gray-600 font-medium",
+    subsectionContent: "mt-3 text-gray-800 leading-relaxed",
+    skillsContainer: "flex flex-wrap gap-2",
+    skillBadge: "bg-gray-200 text-gray-800 px-3 py-1 rounded text-sm border border-gray-300",
+  },
+
+  // NEW: Compact Layout
+  compact: {
+    container: "font-sans max-w-3xl mx-auto bg-white shadow-md border border-gray-200 text-sm",
+    header: "bg-white p-6 border-b border-gray-300",
+    headerName: "text-2xl font-bold text-gray-900 mb-1",
+    headerTitle: "text-lg text-gray-700 mb-2",
+    headerContact: "flex flex-wrap gap-3 text-sm text-gray-600",
+    section: "p-4 border-b border-gray-100",
+    sectionTitle: "text-lg font-bold text-gray-800 mb-3 pb-1 border-b border-gray-200",
+    subsection: "mb-4",
+    subsectionTitle: "text-base font-semibold flex justify-between text-gray-900",
+    subsectionDate: "text-gray-600 text-sm",
+    subsectionContent: "mt-2 text-gray-700 leading-snug text-sm",
+    skillsContainer: "flex flex-wrap gap-2",
+    skillBadge: "bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs",
+  },
+
   // NEW: Product Manager
   "product-manager": {
     container: "font-sans max-w-4xl mx-auto bg-white shadow-2xl border border-cyan-200 rounded-xl overflow-hidden",
@@ -351,39 +385,6 @@ export const templateStyles = {
     skillBadge: "bg-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold",
   },
 
-  // NEW: ATS Optimized Pro
-  "ats-pro": {
-    container: "font-sans max-w-4xl mx-auto bg-white shadow-md border border-gray-300",
-    header: "bg-gray-100 p-8 border-b-2 border-gray-400",
-    headerName: "text-3xl font-bold text-gray-900",
-    headerTitle: "text-xl mt-2 text-gray-700",
-    headerContact: "mt-4 flex flex-wrap gap-4 text-sm text-gray-600",
-    section: "p-6 border-b border-gray-200",
-    sectionTitle: "text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide",
-    subsection: "mb-6",
-    subsectionTitle: "text-lg font-bold text-gray-900 flex justify-between",
-    subsectionDate: "text-gray-600",
-    subsectionContent: "mt-2 text-gray-700 leading-relaxed",
-    skillsContainer: "flex flex-wrap gap-2",
-    skillBadge: "bg-gray-200 text-gray-800 px-3 py-1 rounded text-sm",
-  },
-
-  // NEW: Compact Layout
-  compact: {
-    container: "font-sans max-w-3xl mx-auto bg-white shadow-lg border border-gray-200 text-sm",
-    header: "bg-gray-50 p-6 border-b border-gray-300",
-    headerName: "text-2xl font-bold text-gray-900",
-    headerTitle: "text-lg mt-1 text-gray-700",
-    headerContact: "mt-3 flex flex-wrap gap-3 text-xs text-gray-600",
-    section: "p-4 border-b border-gray-100",
-    sectionTitle: "text-lg font-bold text-gray-800 mb-3 uppercase tracking-wide",
-    subsection: "mb-4",
-    subsectionTitle: "text-base font-bold text-gray-900 flex justify-between",
-    subsectionDate: "text-gray-600 text-xs",
-    subsectionContent: "mt-1 text-gray-700 leading-snug text-sm",
-    skillsContainer: "flex flex-wrap gap-1",
-    skillBadge: "bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs",
-  },
 
   // NEW: VP Leader
   "vp-leader": {

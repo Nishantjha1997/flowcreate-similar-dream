@@ -111,10 +111,10 @@ export const SectionDragDropCustomizer = ({
   );
 
   return (
-    <div className="space-y-6">
-      <Label className="block font-medium">Section Order & Visibility</Label>
-      <p className="text-sm text-muted-foreground mb-2">
-        Drag to reorder sections or toggle visibility
+    <div className="space-y-4">
+      <Label className="block text-sm font-medium">Layout Customization</Label>
+      <p className="text-xs text-muted-foreground">
+        Drag to reorder • Click eye to toggle visibility
       </p>
 
       <DragDropContext onDragEnd={onDragEnd}>
@@ -134,64 +134,59 @@ export const SectionDragDropCustomizer = ({
                 return (
                   <Draggable key={sectionId} draggableId={sectionId} index={index}>
                     {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        className={`flex items-center justify-between p-3 bg-background rounded-md border 
-                          transition-colors ${snapshot.isDragging ? 'border-primary' : ''} 
-                          ${isHidden ? 'opacity-70' : ''}`}
-                      >
-                        <div className="flex items-center flex-1 gap-3">
-                          <div 
-                            {...provided.dragHandleProps} 
-                            className="cursor-grab text-muted-foreground hover:text-foreground"
-                          >
-                            <GripVertical className="h-5 w-5" />
-                          </div>
-                          
-                          {sectionIcons[sectionId] && (
-                            <span className="text-muted-foreground">
-                              {sectionIcons[sectionId]}
-                            </span>
-                          )}
-                          
-                          <div className="flex-1">
-                            <EditableHeading
-                              id={sectionId}
-                              title={sectionLabel}
-                              onTitleChange={onSectionTitleChange}
-                              icon={null}
-                            />
-                          </div>
-                        </div>
+                       <div
+                         ref={provided.innerRef}
+                         {...provided.draggableProps}
+                         className={`flex items-center justify-between p-2 bg-background rounded border text-xs
+                           transition-colors ${snapshot.isDragging ? 'border-primary shadow-md' : 'border-border'} 
+                           ${isHidden ? 'opacity-60 bg-muted/30' : 'hover:bg-muted/50'}`}
+                       >
+                         <div className="flex items-center flex-1 gap-2">
+                           <div 
+                             {...provided.dragHandleProps} 
+                             className="cursor-grab text-muted-foreground hover:text-foreground"
+                           >
+                             <GripVertical className="h-3 w-3" />
+                           </div>
+                           
+                           {sectionIcons[sectionId] && (
+                             <span className="text-muted-foreground">
+                               {React.cloneElement(sectionIcons[sectionId] as React.ReactElement, { className: "h-3 w-3" })}
+                             </span>
+                           )}
+                           
+                           <span className="flex-1 text-xs font-medium truncate">
+                             {sectionLabel}
+                           </span>
+                         </div>
 
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => toggleSectionVisibility(sectionId)}
-                            className="h-8 w-8"
-                            title={isHidden ? "Show section" : "Hide section"}
-                          >
-                            {isHidden ? 
-                              <EyeOff className="h-4 w-4" /> : 
-                              <Eye className="h-4 w-4" />
-                            }
-                          </Button>
-                          
-                          {/* Don't allow removing essential sections */}
-                          {!['personal', 'experience', 'education'].includes(sectionId) && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => removeSection(sectionId)}
-                              className="h-8 w-8 text-destructive"
-                              title="Remove section"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                            </Button>
-                          )}
-                        </div>
+                         <div className="flex items-center gap-1">
+                           <Button
+                             variant="ghost"
+                             size="sm"
+                             onClick={() => toggleSectionVisibility(sectionId)}
+                             className="h-6 w-6 p-0"
+                             title={isHidden ? "Show section" : "Hide section"}
+                           >
+                             {isHidden ? 
+                               <EyeOff className="h-3 w-3" /> : 
+                               <Eye className="h-3 w-3" />
+                             }
+                           </Button>
+                           
+                           {/* Don't allow removing essential sections */}
+                           {!['personal', 'experience', 'education'].includes(sectionId) && (
+                             <Button
+                               variant="ghost"
+                               size="sm"
+                               onClick={() => removeSection(sectionId)}
+                               className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                               title="Remove section"
+                             >
+                               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                             </Button>
+                           )}
+                         </div>
                       </div>
                     )}
                   </Draggable>
@@ -205,19 +200,19 @@ export const SectionDragDropCustomizer = ({
 
       {/* Add Section Section */}
       {addableSections.length > 0 && (
-        <div className="border-t pt-4 mt-4">
-          <Label className="block mb-2">Add Sections</Label>
-          <div className="grid grid-cols-2 gap-2">
+        <div className="border-t pt-3 mt-3">
+          <Label className="block mb-2 text-xs">Add More</Label>
+          <div className="grid grid-cols-2 gap-1">
             {addableSections.map(section => (
               <Button
                 key={section.id}
                 variant="outline"
                 size="sm"
                 onClick={() => addSection(section.id)}
-                className="justify-start"
+                className="justify-start h-7 text-xs px-2"
               >
-                {sectionIcons[section.id]}
-                <span className="ml-2">{section.label}</span>
+                {React.cloneElement(sectionIcons[section.id] as React.ReactElement, { className: "h-3 w-3" })}
+                <span className="ml-1 truncate">{section.label}</span>
               </Button>
             ))}
           </div>

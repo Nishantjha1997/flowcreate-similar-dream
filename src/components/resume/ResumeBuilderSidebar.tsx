@@ -78,38 +78,54 @@ export const ResumeBuilderSidebar = ({
   onPDFDataExtracted
 }: ResumeBuilderSidebarProps) => {
   return (
-    <div className="h-[calc(100vh-2rem)] overflow-y-auto bg-card border rounded-lg shadow-lg"
-         style={{ maxHeight: 'calc(100vh - 2rem)' }}>
-      {/* Navigation Tabs */}
-      <Card className="bg-card border mb-4">
-        <CardContent className="p-0">
+    <div className="flex flex-col h-[calc(100vh-8rem)] max-h-[calc(100vh-8rem)] bg-background">
+      {/* Navigation Tabs - Fixed Height */}
+      <Card className="flex-shrink-0 mb-3 shadow-sm">
+        <CardContent className="p-2">
           <Tabs defaultValue="sections" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="sections">
-                Sections
+            <TabsList className="grid w-full grid-cols-3 h-9 text-xs">
+              <TabsTrigger value="sections" className="text-xs px-2">
+                Edit
               </TabsTrigger>
-              <TabsTrigger value="templates">
-                Templates
+              <TabsTrigger value="templates" className="text-xs px-2">
+                Themes
+              </TabsTrigger>
+              <TabsTrigger value="customize" className="text-xs px-2">
+                Layout
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="sections" className="mt-0">
+            
+            <TabsContent value="sections" className="mt-2 space-y-0">
               <SectionNav 
                 activeSection={activeSection} 
                 onSectionChange={onSectionChange} 
               />
             </TabsContent>
-            <TabsContent value="templates" className="mt-0">
+            
+            <TabsContent value="templates" className="mt-2 space-y-0">
               <TemplateSelector 
                 currentTemplateId={currentTemplateId} 
                 onTemplateChange={onTemplateChange}
               />
             </TabsContent>
+            
+            <TabsContent value="customize" className="mt-2 space-y-0">
+              <div className="max-h-48 overflow-y-auto">
+                <SectionDragDropCustomizer
+                  activeSections={activeSections}
+                  hiddenSections={hiddenSections}
+                  sectionTitles={sectionTitles}
+                  onSectionsChange={onSectionsChange}
+                  onSectionTitleChange={onSectionTitleChange}
+                />
+              </div>
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
 
-      {/* Form Section */}
-      <div className="mb-4">
+      {/* Form Section - Scrollable */}
+      <div className="flex-1 overflow-y-auto">
         <ResumeFormSection
           activeSection={activeSection}
           resume={resume}
@@ -134,19 +150,6 @@ export const ResumeBuilderSidebar = ({
           onPDFDataExtracted={onPDFDataExtracted}
         />
       </div>
-
-      {/* Section Customizer */}
-      <Card className="bg-card border">
-        <CardContent className="p-4">
-          <SectionDragDropCustomizer
-            activeSections={activeSections}
-            hiddenSections={hiddenSections}
-            sectionTitles={sectionTitles}
-            onSectionsChange={onSectionsChange}
-            onSectionTitleChange={onSectionTitleChange}
-          />
-        </CardContent>
-      </Card>
     </div>
   );
 };
