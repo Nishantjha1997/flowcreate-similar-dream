@@ -1,11 +1,25 @@
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SectionNav } from '@/components/resume/SectionNav';
-import { TemplateSelector } from '@/components/resume/TemplateSelector';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 import { ResumeFormSection } from '@/components/resume/ResumeFormSection';
 import { SectionDragDropCustomizer } from '@/components/resume/SectionDragDropCustomizer';
 import { ResumeData } from '@/utils/types';
+import { 
+  User, 
+  Briefcase, 
+  GraduationCap, 
+  Award, 
+  BookOpen, 
+  Settings,
+  Palette,
+  Layout,
+  FileText
+} from 'lucide-react';
 
 interface ResumeBuilderSidebarProps {
   // Navigation props
@@ -46,6 +60,106 @@ interface ResumeBuilderSidebarProps {
   onPDFDataExtracted?: (data: Partial<ResumeData>) => void;
 }
 
+// Template data for inline component
+const templates = [
+  {
+    id: "1",
+    name: "Executive Modern",
+    category: "Professional",
+    templateKey: "modern",
+    featured: true,
+    atsOptimized: true
+  },
+  {
+    id: "2",
+    name: "Corporate Classic",
+    category: "Professional",
+    templateKey: "classic",
+    featured: false,
+    atsOptimized: true
+  },
+  {
+    id: "3",
+    name: "Business Elite",
+    category: "Professional",
+    templateKey: "professional",
+    featured: false,
+    atsOptimized: true
+  },
+  {
+    id: "4",
+    name: "Software Engineer Pro",
+    category: "Technology",
+    templateKey: "technical",
+    featured: true,
+    atsOptimized: true
+  },
+  {
+    id: "5",
+    name: "DevOps Specialist",
+    category: "Technology",
+    templateKey: "developer",
+    featured: false,
+    atsOptimized: true
+  },
+  {
+    id: "6",
+    name: "Data Scientist",
+    category: "Technology",
+    templateKey: "data-scientist",
+    featured: true,
+    atsOptimized: true
+  },
+  {
+    id: "7",
+    name: "Creative Portfolio",
+    category: "Creative",
+    templateKey: "creative",
+    featured: true,
+    atsOptimized: false
+  },
+  {
+    id: "8",
+    name: "UI/UX Designer",
+    category: "Creative",
+    templateKey: "elegant",
+    featured: false,
+    atsOptimized: false
+  },
+  {
+    id: "10",
+    name: "Medical Professional",
+    category: "Healthcare",
+    templateKey: "medical",
+    featured: true,
+    atsOptimized: true
+  },
+  {
+    id: "12",
+    name: "Academic Researcher",
+    category: "Education",
+    templateKey: "academic",
+    featured: true,
+    atsOptimized: true
+  },
+  {
+    id: "19",
+    name: "C-Level Executive",
+    category: "Executive",
+    templateKey: "executive",
+    featured: true,
+    atsOptimized: true
+  },
+  {
+    id: "21",
+    name: "ATS Optimized Pro",
+    category: "ATS-Friendly",
+    templateKey: "ats-pro",
+    featured: true,
+    atsOptimized: true
+  }
+];
+
 export const ResumeBuilderSidebar = ({
   activeSection,
   onSectionChange,
@@ -77,40 +191,106 @@ export const ResumeBuilderSidebar = ({
   hasProfileData,
   onPDFDataExtracted
 }: ResumeBuilderSidebarProps) => {
-  return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] max-h-[calc(100vh-8rem)] bg-background">
-      {/* Navigation Tabs - Fixed Height */}
-      <Card className="flex-shrink-0 mb-3 shadow-sm">
-        <CardContent className="p-2">
-          <Tabs defaultValue="sections" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-9 text-xs">
-              <TabsTrigger value="sections" className="text-xs px-2">
-                Edit
-              </TabsTrigger>
-              <TabsTrigger value="templates" className="text-xs px-2">
-                Themes
-              </TabsTrigger>
-              <TabsTrigger value="customize" className="text-xs px-2">
-                Layout
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="sections" className="mt-2 space-y-0">
-              <SectionNav 
-                activeSection={activeSection} 
-                onSectionChange={onSectionChange} 
-              />
-            </TabsContent>
-            
-            <TabsContent value="templates" className="mt-2 space-y-0">
-              <TemplateSelector 
-                currentTemplateId={currentTemplateId} 
-                onTemplateChange={onTemplateChange}
-              />
-            </TabsContent>
-            
-            <TabsContent value="customize" className="mt-2 space-y-0">
-              <div className="max-h-48 overflow-y-auto">
+  const [activeTab, setActiveTab] = useState('edit');
+
+  const sections = [
+    { id: 'personal', name: 'Personal Info', icon: User },
+    { id: 'experience', name: 'Experience', icon: Briefcase },
+    { id: 'education', name: 'Education', icon: GraduationCap },
+    { id: 'skills', name: 'Skills', icon: Award },
+    { id: 'projects', name: 'Projects', icon: BookOpen },
+    { id: 'customize', name: 'Customize', icon: Settings },
+  ];
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'edit':
+        return (
+          <div className="space-y-2">
+            <div className="text-sm font-medium text-muted-foreground mb-3 px-1">
+              Resume Sections
+            </div>
+            {sections.map((section) => {
+              const Icon = section.icon;
+              return (
+                <Button
+                  key={section.id}
+                  variant={activeSection === section.id ? 'default' : 'ghost'}
+                  size="sm"
+                  className="w-full justify-start h-9 px-3"
+                  onClick={() => onSectionChange(section.id)}
+                >
+                  <Icon className="h-4 w-4 mr-2 flex-shrink-0" />
+                  <span className="truncate">{section.name}</span>
+                </Button>
+              );
+            })}
+          </div>
+        );
+      
+      case 'templates':
+        return (
+          <div className="space-y-3">
+            <div className="text-sm font-medium text-muted-foreground px-1">
+              Choose Template
+            </div>
+            <ScrollArea className="h-[calc(100vh-20rem)]">
+              <div className="grid grid-cols-2 gap-2 pr-3">
+                {templates.map((template) => (
+                  <div
+                    key={template.id}
+                    className={`relative cursor-pointer border rounded-lg overflow-hidden transition-all hover:shadow-md hover:scale-[1.02] ${
+                      currentTemplateId === template.id ? 'ring-2 ring-primary shadow-lg' : ''
+                    }`}
+                    onClick={() => onTemplateChange(template.id)}
+                  >
+                    <div className="aspect-[3/4] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 overflow-hidden">
+                      <ResumeTemplatePreview 
+                        templateKey={template.templateKey}
+                        className="w-full h-full scale-75 origin-top-left"
+                      />
+                      {currentTemplateId === template.id && (
+                        <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
+                          <Badge className="text-xs">Active</Badge>
+                        </div>
+                      )}
+                      <div className="absolute top-1.5 left-1.5 flex flex-col gap-1">
+                        {template.featured && (
+                          <Badge variant="secondary" className="text-[10px] px-1 py-0 h-4">
+                            ⭐
+                          </Badge>
+                        )}
+                        {template.atsOptimized && (
+                          <Badge className="text-[10px] px-1 py-0 h-4 bg-green-500 hover:bg-green-600">
+                            ATS
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    <div className="p-2 bg-background border-t">
+                      <div className="text-xs font-medium truncate">{template.name}</div>
+                      <div className="text-[10px] text-muted-foreground truncate">{template.category}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+            <div className="mt-3 p-2 bg-muted/30 rounded-lg">
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                💡 <strong>ATS templates</strong> are optimized for applicant tracking systems
+              </p>
+            </div>
+          </div>
+        );
+      
+      case 'layout':
+        return (
+          <div className="space-y-3">
+            <div className="text-sm font-medium text-muted-foreground px-1">
+              Section Layout
+            </div>
+            <ScrollArea className="h-[calc(100vh-18rem)]">
+              <div className="pr-3">
                 <SectionDragDropCustomizer
                   activeSections={activeSections}
                   hiddenSections={hiddenSections}
@@ -119,37 +299,90 @@ export const ResumeBuilderSidebar = ({
                   onSectionTitleChange={onSectionTitleChange}
                 />
               </div>
-            </TabsContent>
-          </Tabs>
+            </ScrollArea>
+          </div>
+        );
+      
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full bg-background border-r">
+      {/* Tab Navigation */}
+      <Card className="flex-shrink-0 border-b border-t-0 border-l-0 border-r-0 rounded-none">
+        <CardContent className="p-0">
+          <div className="grid grid-cols-3 border-b">
+            <Button
+              variant={activeTab === 'edit' ? 'default' : 'ghost'}
+              size="sm"
+              className="h-10 rounded-none border-r flex-col gap-1 py-2"
+              onClick={() => setActiveTab('edit')}
+            >
+              <FileText className="h-3.5 w-3.5" />
+              <span className="text-xs">Edit</span>
+            </Button>
+            <Button
+              variant={activeTab === 'templates' ? 'default' : 'ghost'}
+              size="sm"
+              className="h-10 rounded-none border-r flex-col gap-1 py-2"
+              onClick={() => setActiveTab('templates')}
+            >
+              <Palette className="h-3.5 w-3.5" />
+              <span className="text-xs">Themes</span>
+            </Button>
+            <Button
+              variant={activeTab === 'layout' ? 'default' : 'ghost'}
+              size="sm"
+              className="h-10 rounded-none flex-col gap-1 py-2"
+              onClick={() => setActiveTab('layout')}
+            >
+              <Layout className="h-3.5 w-3.5" />
+              <span className="text-xs">Layout</span>
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Form Section - Scrollable */}
-      <div className="flex-1 overflow-y-auto">
-        <ResumeFormSection
-          activeSection={activeSection}
-          resume={resume}
-          handlePersonalInfoChange={handlePersonalInfoChange}
-          onProfileImageChange={onProfileImageChange}
-          handleExperienceChange={handleExperienceChange}
-          handleCurrentJobToggle={handleCurrentJobToggle}
-          addExperience={addExperience}
-          removeExperience={removeExperience}
-          handleEducationChange={handleEducationChange}
-          addEducation={addEducation}
-          removeEducation={removeEducation}
-          handleSkillsChange={handleSkillsChange}
-          handleProjectChange={handleProjectChange}
-          addProject={addProject}
-          removeProject={removeProject}
-          handleCustomizationChange={handleCustomizationChange}
-          onAIFeatureUpsell={onAIFeatureUpsell}
-          isPremium={isPremium}
-          onPopulateFromProfile={onPopulateFromProfile}
-          hasProfileData={hasProfileData}
-          onPDFDataExtracted={onPDFDataExtracted}
-        />
+      {/* Tab Content */}
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full p-3">
+          {renderTabContent()}
+        </div>
       </div>
+
+      {/* Form Section */}
+      {activeTab === 'edit' && (
+        <>
+          <Separator />
+          <div className="flex-1 overflow-y-auto bg-muted/20">
+            <ResumeFormSection
+              activeSection={activeSection}
+              resume={resume}
+              handlePersonalInfoChange={handlePersonalInfoChange}
+              onProfileImageChange={onProfileImageChange}
+              handleExperienceChange={handleExperienceChange}
+              handleCurrentJobToggle={handleCurrentJobToggle}
+              addExperience={addExperience}
+              removeExperience={removeExperience}
+              handleEducationChange={handleEducationChange}
+              addEducation={addEducation}
+              removeEducation={removeEducation}
+              handleSkillsChange={handleSkillsChange}
+              handleProjectChange={handleProjectChange}
+              addProject={addProject}
+              removeProject={removeProject}
+              handleCustomizationChange={handleCustomizationChange}
+              onAIFeatureUpsell={onAIFeatureUpsell}
+              isPremium={isPremium}
+              onPopulateFromProfile={onPopulateFromProfile}
+              hasProfileData={hasProfileData}
+              onPDFDataExtracted={onPDFDataExtracted}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };
