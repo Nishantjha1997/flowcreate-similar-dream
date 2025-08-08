@@ -9,6 +9,8 @@ import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 import { ResumeFormSection } from '@/components/resume/ResumeFormSection';
 import { SectionDragDropCustomizer } from '@/components/resume/SectionDragDropCustomizer';
 import { ResumeData } from '@/utils/types';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { CustomizationPanel } from '../CustomizationPanel';
 import { 
   User, 
   Briefcase, 
@@ -199,7 +201,7 @@ export const ResumeBuilderSidebar = ({
     { id: 'education', name: 'Education', icon: GraduationCap },
     { id: 'skills', name: 'Skills', icon: Award },
     { id: 'projects', name: 'Projects', icon: BookOpen },
-    { id: 'customize', name: 'Customize', icon: Settings },
+    
   ];
 
   const renderTabContent = () => {
@@ -207,24 +209,72 @@ export const ResumeBuilderSidebar = ({
       case 'edit':
         return (
           <div className="space-y-2">
-            <div className="text-sm font-medium text-muted-foreground mb-3 px-1">
-              Resume Sections
+            <div className="flex items-center justify-between mb-2 px-1">
+              <div className="text-sm font-medium text-muted-foreground">Resume Sections</div>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button size="sm" variant="secondary" className="h-8">
+                    <Settings className="h-4 w-4 mr-1" />
+                    Customize
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-full sm:max-w-md z-50">
+                  <SheetHeader>
+                    <SheetTitle>Customize Resume</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-4 pb-4 overflow-y-auto h-[calc(100vh-8rem)]">
+                    <CustomizationPanel
+                      customization={resume.customization}
+                      onCustomizationChange={handleCustomizationChange}
+                      resumeData={resume}
+                    />
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
-            {sections.map((section) => {
-              const Icon = section.icon;
-              return (
-                <Button
-                  key={section.id}
-                  variant={activeSection === section.id ? 'default' : 'ghost'}
-                  size="sm"
-                  className="w-full justify-start h-9 px-3"
-                  onClick={() => onSectionChange(section.id)}
-                >
-                  <Icon className="h-4 w-4 mr-2 flex-shrink-0" />
-                  <span className="truncate">{section.name}</span>
-                </Button>
-              );
-            })}
+            <div className="space-y-1">
+              {sections.map((section) => {
+                const Icon = section.icon;
+                return (
+                  <Button
+                    key={section.id}
+                    variant={activeSection === section.id ? 'default' : 'ghost'}
+                    size="sm"
+                    className="w-full justify-start h-9 px-3"
+                    onClick={() => onSectionChange(section.id)}
+                  >
+                    <Icon className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span className="truncate">{section.name}</span>
+                  </Button>
+                );
+              })}
+            </div>
+            <Separator className="my-2" />
+            <div className="overflow-y-auto max-h-[calc(100vh-24rem)]">
+              <ResumeFormSection
+                activeSection={activeSection}
+                resume={resume}
+                handlePersonalInfoChange={handlePersonalInfoChange}
+                onProfileImageChange={onProfileImageChange}
+                handleExperienceChange={handleExperienceChange}
+                handleCurrentJobToggle={handleCurrentJobToggle}
+                addExperience={addExperience}
+                removeExperience={removeExperience}
+                handleEducationChange={handleEducationChange}
+                addEducation={addEducation}
+                removeEducation={removeEducation}
+                handleSkillsChange={handleSkillsChange}
+                handleProjectChange={handleProjectChange}
+                addProject={addProject}
+                removeProject={removeProject}
+                handleCustomizationChange={handleCustomizationChange}
+                onAIFeatureUpsell={onAIFeatureUpsell}
+                isPremium={isPremium}
+                onPopulateFromProfile={onPopulateFromProfile}
+                hasProfileData={hasProfileData}
+                onPDFDataExtracted={onPDFDataExtracted}
+              />
+            </div>
           </div>
         );
       
@@ -311,7 +361,7 @@ export const ResumeBuilderSidebar = ({
   return (
     <div className="flex flex-col h-full bg-background border-r">
       {/* Tab Navigation */}
-      <Card className="flex-shrink-0 border-b border-t-0 border-l-0 border-r-0 rounded-none">
+      <Card className="flex-shrink-0 border-b border-t-0 border-l-0 border-r-0 rounded-none sticky top-0 z-20 bg-background">
         <CardContent className="p-0">
           <div className="grid grid-cols-3 border-b">
             <Button
@@ -347,42 +397,11 @@ export const ResumeBuilderSidebar = ({
 
       {/* Tab Content */}
       <div className="flex-1 overflow-hidden">
-        <div className="h-full p-3">
+        <div className="h-full p-2">
           {renderTabContent()}
         </div>
       </div>
 
-      {/* Form Section */}
-      {activeTab === 'edit' && (
-        <>
-          <Separator />
-          <div className="flex-1 overflow-y-auto bg-muted/20">
-            <ResumeFormSection
-              activeSection={activeSection}
-              resume={resume}
-              handlePersonalInfoChange={handlePersonalInfoChange}
-              onProfileImageChange={onProfileImageChange}
-              handleExperienceChange={handleExperienceChange}
-              handleCurrentJobToggle={handleCurrentJobToggle}
-              addExperience={addExperience}
-              removeExperience={removeExperience}
-              handleEducationChange={handleEducationChange}
-              addEducation={addEducation}
-              removeEducation={removeEducation}
-              handleSkillsChange={handleSkillsChange}
-              handleProjectChange={handleProjectChange}
-              addProject={addProject}
-              removeProject={removeProject}
-              handleCustomizationChange={handleCustomizationChange}
-              onAIFeatureUpsell={onAIFeatureUpsell}
-              isPremium={isPremium}
-              onPopulateFromProfile={onPopulateFromProfile}
-              hasProfileData={hasProfileData}
-              onPDFDataExtracted={onPDFDataExtracted}
-            />
-          </div>
-        </>
-      )}
     </div>
   );
 };
