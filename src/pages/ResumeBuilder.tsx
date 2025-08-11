@@ -126,7 +126,7 @@ const ResumeBuilder = () => {
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-3 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] self-start">
               <ResumeBuilderSidebar
                 activeSection={activeSection}
                 onSectionChange={handleSectionChange}

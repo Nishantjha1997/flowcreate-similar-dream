@@ -56,9 +56,9 @@ export const PersonalInfoSection = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Personal Information</h2>
-        <div className="flex gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-base sm:text-lg font-semibold">Personal Information</h2>
+        <div className="flex flex-wrap gap-2">
           {hasProfileData && (
             <Button
               variant="outline"
