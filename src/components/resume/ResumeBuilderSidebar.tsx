@@ -208,7 +208,7 @@ export const ResumeBuilderSidebar = ({
     switch (activeTab) {
       case 'edit':
         return (
-          <div className="space-y-2">
+          <div className="flex h-full flex-col gap-2">
             <div className="flex items-center justify-between mb-2 px-1">
               <div className="text-sm font-medium text-muted-foreground">Resume Sections</div>
               <Sheet>
@@ -250,7 +250,7 @@ export const ResumeBuilderSidebar = ({
               })}
             </div>
             <Separator className="my-2" />
-            <div className="overflow-y-auto max-h-[calc(100vh-24rem)]">
+            <div className="flex-1 overflow-y-auto">
               <ResumeFormSection
                 activeSection={activeSection}
                 resume={resume}
@@ -280,11 +280,11 @@ export const ResumeBuilderSidebar = ({
       
       case 'templates':
         return (
-          <div className="space-y-3">
+          <div className="flex h-full flex-col gap-3">
             <div className="text-sm font-medium text-muted-foreground px-1">
               Choose Template
             </div>
-            <ScrollArea className="h-[calc(100vh-20rem)]">
+            <ScrollArea className="flex-1">
               <div className="grid grid-cols-2 gap-2 pr-3">
                 {templates.map((template) => (
                   <div
@@ -335,11 +335,11 @@ export const ResumeBuilderSidebar = ({
       
       case 'layout':
         return (
-          <div className="space-y-3">
+          <div className="flex h-full flex-col gap-3">
             <div className="text-sm font-medium text-muted-foreground px-1">
               Section Layout
             </div>
-            <ScrollArea className="h-[calc(100vh-18rem)]">
+            <ScrollArea className="flex-1">
               <div className="pr-3">
                 <SectionDragDropCustomizer
                   activeSections={activeSections}

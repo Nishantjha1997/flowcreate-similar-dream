@@ -39,14 +39,14 @@ export const ResumeHeaderSection = ({
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
           {isEditing ? 'Edit Resume' : 'Resume Builder'}
         </h1>
         <p className="text-muted-foreground">
           {isEditing ? 'Update your professional resume' : 'Create a professional resume in minutes'}
         </p>
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {onSave && (
           <Button onClick={onSave} disabled={isSaving} size="sm" className="flex items-center gap-2">
             <Save className="h-4 w-4" />
