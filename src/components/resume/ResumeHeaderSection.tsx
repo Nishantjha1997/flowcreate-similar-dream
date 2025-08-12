@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Share2, Save, Eye } from 'lucide-react';
+import { Download, Share2, Save } from 'lucide-react';
 import { EnhancedResumePreview } from '@/components/resume/ResumeVisualPreview';
 import { ResumeData } from '@/utils/types';
 
@@ -56,6 +56,10 @@ export const ResumeHeaderSection = ({
         <Button onClick={handleShare} variant="outline" size="sm" className="flex items-center gap-2">
           <Share2 className="h-4 w-4" />
           Share
+        </Button>
+        <Button onClick={handleDownload} variant="outline" size="sm" disabled={isGenerating} className="flex items-center gap-2">
+          <Download className="h-4 w-4" />
+          {isGenerating ? 'Downloading...' : 'Download PDF'}
         </Button>
         <EnhancedResumePreview 
           resume={resume}
