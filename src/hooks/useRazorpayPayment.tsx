@@ -58,11 +58,11 @@ export const useRazorpayPayment = () => {
 
       console.log('Order created successfully:', orderData);
 
-      const { order_id, amount, currency } = orderData;
+      const { order_id, amount, currency, key_id } = orderData;
 
       // Configure Razorpay options
       const razorpayOptions = {
-        key: 'rzp_live_4iFgy48cvcW4fF', // Live key
+        key: key_id,
         amount: amount,
         currency: currency,
         name: 'FlowCreate',
@@ -85,7 +85,6 @@ export const useRazorpayPayment = () => {
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_signature: response.razorpay_signature,
-                user_id: user.id,
                 planType: options.planType || 'monthly'
               }
             });

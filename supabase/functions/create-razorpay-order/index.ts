@@ -16,6 +16,27 @@ serve(async (req) => {
   try {
     const { amount, currency = 'INR', receipt, planType } = await req.json()
 
+    // Require authenticated user
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+    const supabaseAnon = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    const supabase = createClient(supabaseUrl, supabaseAnon)
+
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      )
+    }
+    const token = authHeader.replace('Bearer ', '')
+    const { data: userData, error: userError } = await supabase.auth.getUser(token)
+    if (userError || !userData?.user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      )
+    }
+
     // Validate input
     if (!amount || amount < 100) {
       return new Response(
@@ -46,7 +67,8 @@ serve(async (req) => {
       currency: currency,
       receipt: receipt || `order_${Date.now()}`,
       notes: {
-        plan_type: planType
+        plan_type: planType || 'monthly',
+        user_id: userData.user.id
       }
     }
 
@@ -80,7 +102,8 @@ serve(async (req) => {
         order_id: order.id,
         amount: order.amount,
         currency: order.currency,
-        receipt: order.receipt
+        receipt: order.receipt,
+        key_id: razorpayKeyId
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
