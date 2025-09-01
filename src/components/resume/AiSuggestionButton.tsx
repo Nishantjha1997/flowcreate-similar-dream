@@ -1,7 +1,6 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, Lightbulb, Crown, RefreshCw } from "lucide-react";
+import { Sparkles, Loader2, Lightbulb, Crown, RefreshCw, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { fetchGeminiSuggestions, SuggestionType, ResumeSection } from "@/utils/ai/gemini";
 import {
@@ -18,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface AiSuggestionButtonProps {
   value: string;
@@ -30,6 +30,24 @@ interface AiSuggestionButtonProps {
   company?: string;
   additionalContext?: string;
 }
+
+// Demo suggestions for free users
+const demoSuggestions = {
+  experience: [
+    "• Led a cross-functional team of 8 developers to deliver a customer portal that increased user engagement by 35% and reduced support tickets by 22%",
+    "• Implemented automated testing framework using Jest and Selenium, reducing manual testing time by 60% and improving code quality metrics",
+    "• Optimized database queries and introduced Redis caching, resulting in 40% faster page load times and improved user experience for 10,000+ daily users"
+  ],
+  skills: [
+    "JavaScript (ES6+), React.js, Node.js, TypeScript, Python, AWS, Docker, MongoDB, PostgreSQL, Git",
+    "Frontend: React, Vue.js, Angular • Backend: Express.js, FastAPI • Cloud: AWS, Azure • Databases: PostgreSQL, MongoDB",
+    "Programming Languages: JavaScript, Python, Java • Frameworks: React, Express.js, Django • Tools: Docker, Kubernetes, Jenkins"
+  ],
+  education: [
+    "Bachelor of Science in Computer Science with Magna Cum Laude honors, GPA: 3.8/4.0. Relevant coursework: Data Structures, Algorithms, Database Systems, Software Engineering, Machine Learning.",
+    "Computer Science degree with focus on full-stack development and machine learning. Dean's List for 6 semesters. Active in coding club and hackathons."
+  ]
+};
 
 export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
   value,
@@ -46,6 +64,7 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
   const [suggestions, setSuggestions] = React.useState<string[]>([]);
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [suggestionType, setSuggestionType] = useState<SuggestionType>('bullet');
+  const [showDemoPreview, setShowDemoPreview] = useState(false);
 
   const getSuggestionTypeLabel = (type: SuggestionType) => {
     switch (type) {
@@ -65,9 +84,14 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
     }
   };
 
+  const getDemoSuggestions = (section: ResumeSection): string[] => {
+    const sectionKey = section as keyof typeof demoSuggestions;
+    return demoSuggestions[sectionKey] || demoSuggestions.experience;
+  };
+
   async function handleGenerate() {
     if (!isPremium) {
-      setShowUpgradeDialog(true);
+      setShowDemoPreview(true);
       return;
     }
 
@@ -108,15 +132,17 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
 
   const handleUpgrade = () => {
     setShowUpgradeDialog(false);
+    setShowDemoPreview(false);
     toast.info("Premium upgrade coming soon! Get unlimited resumes + AI features for ₹199/month");
     if (onUpsell) onUpsell();
   };
 
   const availableTypes = getSectionSpecificTypes(section);
+  const demos = getDemoSuggestions(section);
 
   return (
     <>
-      <div className="mt-2 space-y-3">
+      <div className="mt-2 space-y-3" data-tour="ai-button">
         <div className="flex items-center gap-2">
           <Button
             type="button"
@@ -124,24 +150,32 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
             variant={isPremium ? "secondary" : "outline"}
             onClick={handleGenerate}
             disabled={loading}
-            className={`flex items-center gap-1 ${!isPremium ? 'border-yellow-300 text-yellow-700 hover:bg-yellow-50' : ''}`}
+            className={cn(
+              "flex items-center gap-1",
+              !isPremium && "border-yellow-300 text-yellow-700 hover:bg-yellow-50"
+            )}
+            aria-label={isPremium ? "Generate AI suggestions" : "Preview AI suggestions (Premium feature)"}
           >
             {loading ? (
-              <Loader2 className="animate-spin h-4 w-4" />
+              <Loader2 className="animate-spin h-4 w-4" aria-hidden="true" />
             ) : isPremium ? (
-              <Lightbulb className="h-4 w-4 text-yellow-500" />
+              <Lightbulb className="h-4 w-4 text-yellow-500" aria-hidden="true" />
             ) : (
-              <Crown className="h-4 w-4 text-yellow-600" />
+              <Crown className="h-4 w-4 text-yellow-600" aria-hidden="true" />
             )}
             {loading ? "Generating..." : label}
           </Button>
           
           {isPremium && availableTypes.length > 1 && (
-            <Select value={suggestionType} onValueChange={(value: SuggestionType) => setSuggestionType(value)}>
+            <Select 
+              value={suggestionType} 
+              onValueChange={(value: SuggestionType) => setSuggestionType(value)}
+              aria-label="Select suggestion format type"
+            >
               <SelectTrigger className="w-32">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border shadow-lg">
                 {availableTypes.map((type) => (
                   <SelectItem key={type} value={type}>
                     {getSuggestionTypeLabel(type)}
@@ -157,7 +191,7 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
         </span>
         
         {suggestions.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-3" role="region" aria-label="AI generated suggestions">
             {suggestions.map((suggestion, index) => (
               <div key={index} className="bg-primary/5 border border-primary/20 rounded-md p-3 text-sm">
                 <div className="flex items-center justify-between mb-2">
@@ -171,6 +205,7 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
                       type="button" 
                       onClick={() => handleAccept(suggestion)}
                       className="text-xs"
+                      aria-label={`Apply suggestion ${index + 1}`}
                     >
                       Use This
                     </Button>
@@ -189,6 +224,7 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
                 type="button" 
                 onClick={() => setSuggestions([])}
                 className="text-xs"
+                aria-label="Clear all suggestions"
               >
                 Clear All
               </Button>
@@ -199,8 +235,9 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
                 onClick={handleGenerate}
                 disabled={loading}
                 className="text-xs flex items-center gap-1"
+                aria-label="Generate new suggestions"
               >
-                <RefreshCw className="h-3 w-3" />
+                <RefreshCw className="h-3 w-3" aria-hidden="true" />
                 Generate New
               </Button>
             </div>
@@ -208,12 +245,116 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
         )}
       </div>
 
-      {/* Premium Upgrade Dialog */}
-      <Dialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>
-        <DialogContent className="sm:max-w-md">
+      {/* AI Demo Preview Dialog */}
+      <Dialog open={showDemoPreview} onOpenChange={setShowDemoPreview}>
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto bg-background border shadow-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Crown className="h-5 w-5 text-yellow-600" />
+              <Eye className="h-5 w-5 text-blue-600" aria-hidden="true" />
+              AI Suggestions Preview
+            </DialogTitle>
+            <DialogDescription>
+              See how AI can enhance your {section} section with professional, tailored content.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+              <h4 className="font-semibold text-blue-800 mb-2">Sample AI Suggestions for {section}:</h4>
+              <div className="space-y-3">
+                {demos.slice(0, 2).map((demo, index) => (
+                  <div key={index} className="bg-white/80 border border-blue-200 rounded-md p-3 text-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-semibold text-blue-700">
+                        ✨ AI Suggestion {index + 1}
+                      </span>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        disabled
+                        className="text-xs opacity-75"
+                        aria-label="Premium feature - upgrade to use"
+                      >
+                        Use This (Premium)
+                      </Button>
+                    </div>
+                    <div className="text-sm text-gray-700">
+                      {demo}
+                    </div>
+                  </div>
+                ))}
+                
+                {/* Blurred additional suggestions */}
+                <div className="relative">
+                  <div className="bg-white/80 border border-blue-200 rounded-md p-3 text-sm blur-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-semibold text-blue-700">
+                        ✨ AI Suggestion 3
+                      </span>
+                      <Button size="sm" variant="outline" disabled className="text-xs">
+                        Use This
+                      </Button>
+                    </div>
+                    <div className="text-sm text-gray-700">
+                      {demos[2] || "Additional AI-generated content with industry-specific keywords and quantified achievements..."}
+                    </div>
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-lg px-4 py-2 border border-yellow-300">
+                      <div className="flex items-center gap-2 text-yellow-700">
+                        <Crown className="h-4 w-4" aria-hidden="true" />
+                        <span className="font-medium text-sm">Premium Feature</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-yellow-50 to-orange-50 p-4 rounded-lg border border-yellow-200">
+              <h4 className="font-semibold text-yellow-800 mb-2">🚀 Unlock Full AI Power:</h4>
+              <ul className="text-sm text-yellow-700 space-y-1">
+                <li>✨ Generate 5+ unique suggestions per section</li>
+                <li>🎯 Context-aware content tailored to your industry</li>
+                <li>📊 Achievement-focused, quantifiable results</li>
+                <li>🔄 Multiple formats: bullets, paragraphs, concise</li>
+                <li>📄 Unlimited resume saves & exports</li>
+              </ul>
+            </div>
+
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary">₹199/month</div>
+              <div className="text-sm text-muted-foreground">30-day money-back guarantee</div>
+            </div>
+          </div>
+
+          <div className="flex gap-3 mt-4">
+            <Button 
+              variant="outline" 
+              className="flex-1"
+              onClick={() => setShowDemoPreview(false)}
+              aria-label="Close preview and continue with free version"
+            >
+              Continue Free
+            </Button>
+            <Button 
+              className="flex-1 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white"
+              onClick={handleUpgrade}
+              aria-label="Upgrade to premium to unlock AI features"
+            >
+              <Crown className="mr-2 h-4 w-4" aria-hidden="true" />
+              Upgrade Now
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Premium Upgrade Dialog */}
+      <Dialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>
+        <DialogContent className="sm:max-w-md bg-background border shadow-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Crown className="h-5 w-5 text-yellow-600" aria-hidden="true" />
               Upgrade to Premium
             </DialogTitle>
             <DialogDescription className="space-y-4">
@@ -245,12 +386,14 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
               variant="outline" 
               className="flex-1"
               onClick={() => setShowUpgradeDialog(false)}
+              aria-label="Close upgrade dialog"
             >
               Maybe Later
             </Button>
             <Button 
               className="flex-1 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white"
               onClick={handleUpgrade}
+              aria-label="Start premium subscription"
             >
               Upgrade Now
             </Button>

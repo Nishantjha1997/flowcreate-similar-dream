@@ -36,23 +36,36 @@ const Header = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center">
+            <Link to="/" className="flex items-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
               <span className="text-2xl font-bold text-primary">Flow</span>
               <span className="text-2xl font-bold text-foreground">Create</span>
+              <span className="sr-only">FlowCreate - AI-powered resume builder</span>
             </Link>
           </div>
           
-          <nav className="hidden md:flex md:items-center md:space-x-6">
-            <Link to="/templates" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
+          <nav className="hidden md:flex md:items-center md:space-x-6" role="navigation" aria-label="Main navigation">
+            <Link 
+              to="/templates" 
+              className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
+            >
               Templates
             </Link>
-            <Link to="/account" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
+            <Link 
+              to="/account" 
+              className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
+            >
               Profile
             </Link>
-            <Link to="/pricing" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
+            <Link 
+              to="/pricing" 
+              className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
+            >
               Pricing
             </Link>
-            <Link to="/about" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
+            <Link 
+              to="/about" 
+              className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
+            >
               About
             </Link>
           </nav>
@@ -63,13 +76,18 @@ const Header = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="rounded-full focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    aria-label={`User menu for ${user.email}`}
+                  >
                     <Avatar className="h-8 w-8">
                       <AvatarFallback>{getUserInitials()}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end" className="w-56 bg-background border shadow-lg z-50">
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
                       <p className="font-medium">{user.email}</p>
@@ -115,12 +133,19 @@ const Header = () => {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  >
                     Sign in
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button size="sm">
+                  <Button 
+                    size="sm"
+                    className="focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  >
                     Sign up
                   </Button>
                 </Link>
@@ -184,10 +209,11 @@ const Header = () => {
             ) : (
               <button
                 type="button"
-                className="ml-2 -m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-foreground"
+                className="ml-2 -m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 onClick={() => setMobileMenuOpen(true)}
+                aria-label="Open main menu"
+                aria-expanded="false"
               >
-                <span className="sr-only">Open main menu</span>
                 <MenuIcon className="h-6 w-6" aria-hidden="true" />
               </button>
             )}

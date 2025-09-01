@@ -1,4 +1,4 @@
-import { useRef, Suspense, lazy } from 'react';
+import { useRef, Suspense, lazy, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner'; 
 import Header from '@/components/Header';
@@ -14,12 +14,14 @@ import { useResumeProfileSync } from '@/hooks/useResumeProfileSync';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { AutoSaveIndicator } from '@/components/ui/auto-save-indicator';
 import { ResumeSkeleton } from '@/components/ui/resume-skeleton';
+import { UserOnboarding } from '@/components/ui/user-onboarding';
 import { templateNames } from '@/components/resume/ResumeData';
 import { ResumeData } from '@/utils/types';
 
 const ResumeBuilder = () => {
   const navigate = useNavigate();
   const resumeElementRef = useRef<HTMLDivElement>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   
   // Custom hooks for data management
   const { resume, setResume, templateId, isExample, editResumeId, loadingExistingResume } = useResumeData();
@@ -51,6 +53,16 @@ const ResumeBuilder = () => {
     setResume,
     shouldAutoPopulate: !isExample && !editResumeId && !resume.personal.name
   });
+
+  
+  // Check if user is new for onboarding
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem('onboarding_completed');
+    const isFirstEdit = !editResumeId && !isExample;
+    if (!hasSeenOnboarding && isFirstEdit) {
+      setTimeout(() => setShowOnboarding(true), 2000);
+    }
+  }, [editResumeId, isExample]);
 
   const resumeName = resume.personal?.name || 'resume';
   const { isGenerating, generatePDF } = usePDFGenerator(`${resumeName}.pdf`);
@@ -112,7 +124,7 @@ const ResumeBuilder = () => {
             </div>
           )}
 
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4" data-tour="export">
             <ResumeHeaderSection 
               resumeElementRef={resumeElementRef}
               resumeName={resumeName}
@@ -132,7 +144,7 @@ const ResumeBuilder = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
-            <div className="lg:col-span-3 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] self-start">
+            <div className="lg:col-span-3 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] self-start" data-tour="section-nav">
               <ResumeBuilderSidebar
                 activeSection={activeSection}
                 onSectionChange={handleSectionChange}
@@ -166,7 +178,7 @@ const ResumeBuilder = () => {
               />
             </div>
 
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-7" data-tour="preview">
               <ResumePreviewSection
                 resume={resume}
                 templateId={templateId}
@@ -179,6 +191,12 @@ const ResumeBuilder = () => {
           </div>
         </div>
       </main>
+      
+      {/* User Onboarding */}
+      <UserOnboarding 
+        isFirstVisit={showOnboarding}
+        onComplete={() => setShowOnboarding(false)}
+      />
     </div>
   );
 };

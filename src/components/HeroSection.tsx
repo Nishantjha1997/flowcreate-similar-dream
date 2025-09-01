@@ -83,8 +83,9 @@ const HeroSection = () => {
               <div className="bg-white/95 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
                 <img 
                   src="/images/hero-resume-builder.jpg" 
-                  alt="AI-powered resume builder interface showing code and analytics" 
+                  alt="Professional resume builder interface showing modern templates and AI-powered features for creating ATS-optimized resumes" 
                   className="w-full h-auto rounded-lg"
+                  loading="eager"
                 />
               </div>
               <div className="absolute -bottom-6 -right-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-4 shadow-2xl backdrop-blur-sm border border-white/10">

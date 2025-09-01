@@ -153,7 +153,7 @@ const templates = [
 
 export const TemplateSelector = ({ currentTemplateId, onTemplateChange }: TemplateSelectorProps) => {
   return (
-    <div className="p-4">
+    <div className="p-4" data-tour="template-selector">
       <div className="mb-4">
         <h3 className="font-semibold mb-2">Choose Template Style</h3>
         <p className="text-sm text-muted-foreground">Your data will be preserved when switching templates.</p>
