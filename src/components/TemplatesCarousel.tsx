@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, Suspense, lazy } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import TemplatePreviewModal from "@/components/templates/TemplatePreviewModal";
 import TemplateCustomizationModal from "@/components/templates/TemplateCustomizationModal";
-import ResumeTemplate from '@/utils/resumeTemplates';
+import { TemplatesSkeleton } from '@/components/ui/template-skeleton';
+
+// Lazy load the heavy ResumeTemplate component
+const ResumeTemplate = lazy(() => import('@/utils/resumeTemplates'));
 
 // Mock resume data to show in templates
 const mockResumeData = {
@@ -186,10 +189,12 @@ const TemplatesCarousel = () => {
                       {/* Live Resume Template Preview with better scaling */}
                       <div className="h-full w-full bg-white rounded shadow-sm overflow-hidden">
                         <div style={{ transform: 'scale(0.85)', transformOrigin: 'top left', width: '117.6%', height: '117.6%' }}>
-                          <ResumeTemplate 
-                            data={mockResumeData} 
-                            templateName={template.templateKey}
-                          />
+                          <Suspense fallback={<div className="w-full h-full bg-gray-100 animate-pulse rounded" />}>
+                            <ResumeTemplate 
+                              data={mockResumeData} 
+                              templateName={template.templateKey}
+                            />
+                          </Suspense>
                         </div>
                       </div>
                       

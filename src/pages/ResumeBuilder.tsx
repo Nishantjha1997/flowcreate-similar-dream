@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner'; 
 import Header from '@/components/Header';
@@ -11,6 +11,9 @@ import { useResumeHandlers } from '@/hooks/useResumeHandlers';
 import { useResumeSave } from '@/hooks/useResumeSave';
 import { useSectionManagement } from '@/hooks/useSectionManagement';
 import { useResumeProfileSync } from '@/hooks/useResumeProfileSync';
+import { useAutoSave } from '@/hooks/useAutoSave';
+import { AutoSaveIndicator } from '@/components/ui/auto-save-indicator';
+import { ResumeSkeleton } from '@/components/ui/resume-skeleton';
 import { templateNames } from '@/components/resume/ResumeData';
 import { ResumeData } from '@/utils/types';
 
@@ -34,6 +37,13 @@ const ResumeBuilder = () => {
   };
   const { isSaving, handleSaveResume, handleAIFeatureUpsell, premium, resumeCount } = useResumeSave(editResumeId);
   const { activeSection, activeSections, hiddenSections, handleSectionChange, handleSectionsChange } = useSectionManagement();
+  
+  // Auto-save functionality
+  const { saveStatus, lastSaved } = useAutoSave({
+    resume,
+    editResumeId,
+    enabled: !!editResumeId || (!!resume.personal?.name && !!resume.personal?.email)
+  });
   
   // Profile sync for auto-population
   const { profile, populateFromProfile, hasProfileData } = useResumeProfileSync({
@@ -76,14 +86,7 @@ const ResumeBuilder = () => {
   };
 
   if (loadingExistingResume) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">Loading resume...</div>
-        </div>
-      </div>
-    );
+    return <ResumeSkeleton />;
   }
 
   return (
@@ -109,21 +112,24 @@ const ResumeBuilder = () => {
             </div>
           )}
 
-          <ResumeHeaderSection 
-            resumeElementRef={resumeElementRef}
-            resumeName={resumeName}
-            handleShare={handleShare}
-            handleDownload={handleDownload}
-            isGenerating={isGenerating}
-            onSave={() => handleSaveResume(resume)}
-            isSaving={isSaving}
-            isEditing={!!editResumeId}
-            resume={resume}
-            templateId={templateId}
-            templateNames={templateNames}
-            sectionOrder={activeSections}
-            hiddenSections={hiddenSections}
-          />
+          <div className="flex items-center justify-between mb-4">
+            <ResumeHeaderSection 
+              resumeElementRef={resumeElementRef}
+              resumeName={resumeName}
+              handleShare={handleShare}
+              handleDownload={handleDownload}
+              isGenerating={isGenerating}
+              onSave={() => handleSaveResume(resume)}
+              isSaving={isSaving}
+              isEditing={!!editResumeId}
+              resume={resume}
+              templateId={templateId}
+              templateNames={templateNames}
+              sectionOrder={activeSections}
+              hiddenSections={hiddenSections}
+            />
+            <AutoSaveIndicator status={saveStatus} lastSaved={lastSaved} />
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
             <div className="lg:col-span-3 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] self-start">
