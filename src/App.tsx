@@ -8,6 +8,7 @@ import { ThemeProvider } from "./components/ThemeProvider";
 import { AuthProvider } from "./hooks/useAuth";
 import { RazorpayProvider } from "./components/RazorpayProvider";
 import { LoadingFallback } from "./components/ui/loading-fallback";
+import { ErrorBoundary } from "./components/ui/error-boundary";
 
 // Lazy load pages for better initial bundle size
 const Index = lazy(() => import("./pages/Index"));
@@ -42,13 +43,14 @@ const queryClient = new QueryClient({
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="light">
-      <AuthProvider>
-        <RazorpayProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Suspense fallback={<LoadingFallback />}>
+      <ErrorBoundary>
+        <AuthProvider>
+          <RazorpayProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Suspense fallback={<LoadingFallback />}>
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/templates" element={<Templates />} />
@@ -74,6 +76,7 @@ const App = () => (
           </TooltipProvider>
         </RazorpayProvider>
       </AuthProvider>
+      </ErrorBoundary>
     </ThemeProvider>
   </QueryClientProvider>
 );

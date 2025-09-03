@@ -15,8 +15,10 @@ import { useAutoSave } from '@/hooks/useAutoSave';
 import { AutoSaveIndicator } from '@/components/ui/auto-save-indicator';
 import { ResumeSkeleton } from '@/components/ui/resume-skeleton';
 import { UserOnboarding } from '@/components/ui/user-onboarding';
+import { ProgressIndicator } from '@/components/ui/progress-indicator';
 import { templateNames } from '@/components/resume/ResumeData';
 import { ResumeData } from '@/utils/types';
+import { analytics, usePageTracking, useJourneyTracking } from '@/components/ui/analytics-tracker';
 
 const ResumeBuilder = () => {
   const navigate = useNavigate();
@@ -26,6 +28,12 @@ const ResumeBuilder = () => {
   // Custom hooks for data management
   const { resume, setResume, templateId, isExample, editResumeId, loadingExistingResume } = useResumeData();
   const handlers = useResumeHandlers(setResume);
+  const { isSaving, handleSaveResume, handleAIFeatureUpsell, premium, resumeCount } = useResumeSave(editResumeId);
+  const { activeSection, activeSections, hiddenSections, handleSectionChange, handleSectionsChange } = useSectionManagement();
+  
+  // Analytics tracking
+  usePageTracking();
+  useJourneyTracking('resume_builder', activeSection);
   
   // Profile image handler
   const handleProfileImageChange = (profileImage: string) => {
@@ -37,8 +45,6 @@ const ResumeBuilder = () => {
       }
     }));
   };
-  const { isSaving, handleSaveResume, handleAIFeatureUpsell, premium, resumeCount } = useResumeSave(editResumeId);
-  const { activeSection, activeSections, hiddenSections, handleSectionChange, handleSectionsChange } = useSectionManagement();
   
   // Auto-save functionality
   const { saveStatus, lastSaved } = useAutoSave({
@@ -145,6 +151,10 @@ const ResumeBuilder = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
             <div className="lg:col-span-3 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] self-start" data-tour="section-nav">
+              <ProgressIndicator 
+                resume={resume}
+                onSectionClick={handleSectionChange}
+              />
               <ResumeBuilderSidebar
                 activeSection={activeSection}
                 onSectionChange={handleSectionChange}
