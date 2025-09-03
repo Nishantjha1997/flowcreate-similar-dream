@@ -6,6 +6,7 @@ import { Upload, FileText, Loader2, AlertCircle, CheckCircle2 } from 'lucide-rea
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfile } from '@/hooks/useUserProfile';
+import { PDFDataPreviewModal } from './PDFDataPreviewModal';
 
 interface PDFResumeUploaderProps {
   onDataExtracted: (data: Partial<UserProfile>) => void;
@@ -16,6 +17,8 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
 }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [extractedData, setExtractedData] = useState<Partial<UserProfile> | null>(null);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -76,9 +79,10 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
           languages: extractedData.languages || [],
         };
 
-        onDataExtracted(profileData);
+        setExtractedData(profileData);
         setUploadSuccess(true);
-        toast.success('Resume data extracted and ready to import!');
+        setShowPreviewModal(true);
+        toast.success('Resume data extracted successfully! Please review and import.');
       } else {
         throw new Error(data.error || 'Failed to extract resume data');
       }
@@ -88,6 +92,18 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleImportData = (selectedData: Partial<UserProfile>) => {
+    onDataExtracted(selectedData);
+    setShowPreviewModal(false);
+    setExtractedData(null);
+    toast.success('Selected data imported successfully!');
+  };
+
+  const handleCloseModal = () => {
+    setShowPreviewModal(false);
+    setExtractedData(null);
   };
 
   return (
@@ -146,7 +162,7 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
             <Alert className="border-green-200 bg-green-50">
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-800">
-                Resume data successfully extracted! The extracted information is ready to be imported into your profile.
+                Resume data successfully extracted! Review the preview to select what to import.
               </AlertDescription>
             </Alert>
           )}
@@ -155,12 +171,21 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
               <strong>How it works:</strong> We use AI to extract information from your resume including 
-              personal details, work experience, education, skills, and projects. You can review and edit 
-              the extracted data before saving it to your profile.
+              personal details, work experience, education, skills, and projects. You can review and selectively 
+              import the extracted data into your profile.
             </AlertDescription>
           </Alert>
         </div>
       </CardContent>
+      
+      {extractedData && (
+        <PDFDataPreviewModal
+          isOpen={showPreviewModal}
+          onClose={handleCloseModal}
+          extractedData={extractedData}
+          onImport={handleImportData}
+        />
+      )}
     </Card>
   );
 };
