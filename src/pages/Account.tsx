@@ -32,6 +32,10 @@ import { ProjectsForm } from '@/components/profile/ProjectsForm';
 import { CertificationsForm } from '@/components/profile/CertificationsForm';
 import { VolunteerForm } from '@/components/profile/VolunteerForm';
 import { PDFResumeUploader } from '@/components/profile/PDFResumeUploader';
+import { ProfileInsights } from '@/components/profile/ProfileInsights';
+import { SmartProfileSuggestions } from '@/components/profile/SmartProfileSuggestions';
+import { ProfileAutoSave } from '@/components/profile/ProfileAutoSave';
+import { AdvancedSkillsForm } from '@/components/profile/AdvancedSkillsForm';
 
 const Account = () => {
   const { user } = useAuth();
@@ -386,6 +390,15 @@ const Account = () => {
               profile={mergedProfile} 
               completeness={calculateCompleteness(mergedProfile)} 
             />
+            <ProfileInsights 
+              profile={mergedProfile} 
+              completeness={calculateCompleteness(mergedProfile)} 
+            />
+            <SmartProfileSuggestions 
+              profile={mergedProfile} 
+              onApplySuggestion={handleProfileUpdate}
+              isPremium={premiumData?.isPremium || false}
+            />
             <PDFResumeUploader onDataExtracted={handlePDFDataExtracted} />
           </div>
 
@@ -466,9 +479,10 @@ const Account = () => {
               
               <TabsContent value="skills" className="mt-6">
                 <div className="space-y-6">
-                  <SkillsForm 
+                  <AdvancedSkillsForm 
                     profile={mergedProfile} 
-                    onUpdate={handleProfileUpdate} 
+                    onUpdate={handleProfileUpdate}
+                    isPremium={premiumData?.isPremium || false}
                   />
                   <VolunteerForm 
                     profile={mergedProfile} 
@@ -623,6 +637,14 @@ const Account = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Auto-save indicator */}
+      <ProfileAutoSave
+        hasUnsavedChanges={hasUnsavedChanges}
+        isUpdating={profileUpdating}
+        lastSaved={profile?.updated_at ? new Date(profile.updated_at) : undefined}
+        onSave={saveProfileChanges}
+      />
     </div>
   );
 };
