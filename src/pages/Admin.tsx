@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/loading-skeleton";
 import { ImprovementPlans } from "@/components/admin/ImprovementPlans";
 import { ContentManagement } from "@/components/admin/ContentManagement";
 import { SecuritySettings } from "@/components/admin/SecuritySettings";
+import { AIManagement } from "@/components/admin/AIManagement";
 
 const Admin = () => {
   const { user, isLoading } = useAuth();
@@ -96,7 +97,7 @@ const Admin = () => {
         
         <GlassCard variant="elevated" className="p-6">
           <Tabs defaultValue="registrations" className="w-full">
-            <TabsList className="grid w-full grid-cols-8 bg-white/50 backdrop-blur-sm border border-white/20">
+            <TabsList className="grid w-full grid-cols-9 bg-white/50 backdrop-blur-sm border border-white/20">
               <TabsTrigger value="registrations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
                 User Registrations
               </TabsTrigger>
@@ -120,6 +121,9 @@ const Admin = () => {
               </TabsTrigger>
               <TabsTrigger value="security" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
                 Security
+              </TabsTrigger>
+              <TabsTrigger value="ai" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
+                AI Management
               </TabsTrigger>
             </TabsList>
             
@@ -157,6 +161,10 @@ const Admin = () => {
             
             <TabsContent value="security" className="mt-6">
               <SecuritySettings />
+            </TabsContent>
+            
+            <TabsContent value="ai" className="mt-6">
+              <AIManagement />
             </TabsContent>
           </Tabs>
         </GlassCard>
