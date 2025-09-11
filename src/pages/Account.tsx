@@ -36,6 +36,7 @@ import { ProfileInsights } from '@/components/profile/ProfileInsights';
 import { SmartProfileSuggestions } from '@/components/profile/SmartProfileSuggestions';
 import { ProfileAutoSave } from '@/components/profile/ProfileAutoSave';
 import { AdvancedSkillsForm } from '@/components/profile/AdvancedSkillsForm';
+import { ProfileAnalytics } from '@/components/profile/ProfileAnalytics';
 
 const Account = () => {
   const { user } = useAuth();
@@ -384,8 +385,9 @@ const Account = () => {
           </Card>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-1 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Sidebar - Profile Overview */}
+          <div className="lg:col-span-3 space-y-4">
             <ProfileCompletenessCard 
               profile={mergedProfile} 
               completeness={calculateCompleteness(mergedProfile)} 
@@ -394,46 +396,48 @@ const Account = () => {
               profile={mergedProfile} 
               completeness={calculateCompleteness(mergedProfile)} 
             />
-            <SmartProfileSuggestions 
-              profile={mergedProfile} 
-              onApplySuggestion={handleProfileUpdate}
-              isPremium={premiumData?.isPremium || false}
-            />
             <PDFResumeUploader onDataExtracted={handlePDFDataExtracted} />
           </div>
 
-          <div className="lg:col-span-3">
+          {/* Main Content Area */}
+          <div className="lg:col-span-6">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-7 lg:grid-cols-7">
-                <TabsTrigger value="personal">
-                  <User className="w-4 h-4 mr-1" />
-                  Personal
+              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-4 mb-6">
+                <TabsTrigger value="personal" className="text-xs sm:text-sm">
+                  <User className="w-4 h-4 sm:mr-1" />
+                  <span className="hidden sm:inline">Personal</span>
                 </TabsTrigger>
-                <TabsTrigger value="professional">
-                  <Briefcase className="w-4 h-4 mr-1" />
-                  Professional
+                <TabsTrigger value="professional" className="text-xs sm:text-sm">
+                  <Briefcase className="w-4 h-4 sm:mr-1" />
+                  <span className="hidden sm:inline">Professional</span>
                 </TabsTrigger>
-                <TabsTrigger value="experience">
-                  <Briefcase className="w-4 h-4 mr-1" />
-                  Experience
+                <TabsTrigger value="experience" className="text-xs sm:text-sm">
+                  <Briefcase className="w-4 h-4 sm:mr-1" />
+                  <span className="hidden sm:inline">Experience</span>
                 </TabsTrigger>
-                <TabsTrigger value="education">
-                  <GraduationCap className="w-4 h-4 mr-1" />
-                  Education
-                </TabsTrigger>
-                <TabsTrigger value="projects">
-                  <Shield className="w-4 h-4 mr-1" />
-                  Projects
-                </TabsTrigger>
-                <TabsTrigger value="certifications">
-                  <Award className="w-4 h-4 mr-1" />
-                  Certifications
-                </TabsTrigger>
-                <TabsTrigger value="skills">
-                  <Award className="w-4 h-4 mr-1" />
-                  Skills
+                <TabsTrigger value="education" className="text-xs sm:text-sm">
+                  <GraduationCap className="w-4 h-4 sm:mr-1" />
+                  <span className="hidden sm:inline">Education</span>
                 </TabsTrigger>
               </TabsList>
+              
+              {/* Secondary Tabs for Additional Sections */}
+              <div className="mb-4">
+                <TabsList className="grid w-full grid-cols-3 lg:grid-cols-3">
+                  <TabsTrigger value="projects" className="text-xs sm:text-sm">
+                    <Shield className="w-4 h-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Projects</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="certifications" className="text-xs sm:text-sm">
+                    <Award className="w-4 h-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Certifications</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="skills" className="text-xs sm:text-sm">
+                    <Award className="w-4 h-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Skills</span>
+                  </TabsTrigger>
+                </TabsList>
+              </div>
           
               <TabsContent value="personal" className="mt-6">
                 <PersonalInfoForm 
@@ -484,6 +488,10 @@ const Account = () => {
                     onUpdate={handleProfileUpdate}
                     isPremium={premiumData?.isPremium || false}
                   />
+                  <SkillsForm 
+                    profile={mergedProfile} 
+                    onUpdate={handleProfileUpdate} 
+                  />
                   <VolunteerForm 
                     profile={mergedProfile} 
                     onUpdate={handleProfileUpdate} 
@@ -491,6 +499,19 @@ const Account = () => {
                 </div>
               </TabsContent>
             </Tabs>
+          </div>
+
+          {/* Right Sidebar - Smart Suggestions & Analytics */}
+          <div className="lg:col-span-3 space-y-4">
+            <SmartProfileSuggestions 
+              profile={mergedProfile} 
+              onApplySuggestion={handleProfileUpdate}
+              isPremium={premiumData?.isPremium || false}
+            />
+            <ProfileAnalytics 
+              profile={mergedProfile} 
+              completeness={calculateCompleteness(mergedProfile)} 
+            />
           </div>
         </div>
 
