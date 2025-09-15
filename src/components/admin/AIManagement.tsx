@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/components/ui/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { 
   Key, 
   Plus, 
@@ -53,54 +52,57 @@ const providerConfig = {
   deepseek: { name: 'DeepSeek', color: 'bg-purple-500', icon: '🧠' }
 };
 
+// Mock data for demonstration
+const mockApiKeys: APIKey[] = [
+  {
+    id: '1',
+    name: 'Primary OpenAI Key',
+    provider: 'openai',
+    key: 'sk-1234567890abcdef1234567890abcdef12345678',
+    is_active: true,
+    is_primary: true,
+    is_fallback: false,
+    created_at: '2024-01-15T10:00:00Z',
+    usage_count: 145,
+    last_used: '2024-01-20T15:30:00Z'
+  },
+  {
+    id: '2',
+    name: 'Gemini Backup',
+    provider: 'gemini',
+    key: 'AIzaSyC1234567890abcdef1234567890abcdef123',
+    is_active: true,
+    is_primary: false,
+    is_fallback: true,
+    created_at: '2024-01-10T08:00:00Z',
+    usage_count: 67,
+    last_used: '2024-01-19T12:15:00Z'
+  }
+];
+
+const mockTokenUsage: TokenUsage[] = [
+  {
+    provider: 'openai',
+    total_tokens: 125000,
+    tokens_today: 1250,
+    tokens_this_month: 45000,
+    cost_estimate: 12.50
+  },
+  {
+    provider: 'gemini',
+    total_tokens: 85000,
+    tokens_today: 850,
+    tokens_this_month: 25000,
+    cost_estimate: 8.30
+  }
+];
+
 export function AIManagement() {
   const { toast } = useToast();
-  const [apiKeys, setApiKeys] = useState<APIKey[]>([]);
-  const [tokenUsage, setTokenUsage] = useState<TokenUsage[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [apiKeys, setApiKeys] = useState<APIKey[]>(mockApiKeys);
+  const [tokenUsage] = useState<TokenUsage[]>(mockTokenUsage);
   const [showKey, setShowKey] = useState<{ [key: string]: boolean }>({});
   const [newKey, setNewKey] = useState({ provider: '', name: '', key: '' });
-  const [editingKey, setEditingKey] = useState<APIKey | null>(null);
-
-  useEffect(() => {
-    fetchAPIKeys();
-    fetchTokenUsage();
-  }, []);
-
-  const fetchAPIKeys = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('ai_api_keys')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setApiKeys(data || []);
-    } catch (error) {
-      console.error('Error fetching API keys:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch API keys",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchTokenUsage = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('ai_token_usage')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setTokenUsage(data || []);
-    } catch (error) {
-      console.error('Error fetching token usage:', error);
-    }
-  };
 
   const addAPIKey = async () => {
     if (!newKey.provider || !newKey.name || !newKey.key) {
@@ -112,112 +114,59 @@ export function AIManagement() {
       return;
     }
 
-    try {
-      const { error } = await supabase
-        .from('ai_api_keys')
-        .insert([{
-          name: newKey.name,
-          provider: newKey.provider,
-          key: newKey.key,
-          is_active: true,
-          is_primary: apiKeys.length === 0,
-          is_fallback: false
-        }]);
+    const newApiKey: APIKey = {
+      id: (apiKeys.length + 1).toString(),
+      name: newKey.name,
+      provider: newKey.provider as 'openai' | 'gemini' | 'deepseek',
+      key: newKey.key,
+      is_active: true,
+      is_primary: apiKeys.length === 0,
+      is_fallback: false,
+      created_at: new Date().toISOString(),
+      usage_count: 0,
+      last_used: null
+    };
 
-      if (error) throw error;
-
-      setNewKey({ provider: '', name: '', key: '' });
-      fetchAPIKeys();
-      toast({
-        title: "Success",
-        description: "API key added successfully"
-      });
-    } catch (error) {
-      console.error('Error adding API key:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add API key",
-        variant: "destructive"
-      });
-    }
+    setApiKeys([...apiKeys, newApiKey]);
+    setNewKey({ provider: '', name: '', key: '' });
+    toast({
+      title: "Success",
+      description: "API key added successfully"
+    });
   };
 
-  const updateAPIKey = async (id: string, updates: Partial<APIKey>) => {
-    try {
-      const { error } = await supabase
-        .from('ai_api_keys')
-        .update(updates)
-        .eq('id', id);
-
-      if (error) throw error;
-
-      fetchAPIKeys();
-      toast({
-        title: "Success",
-        description: "API key updated successfully"
-      });
-    } catch (error) {
-      console.error('Error updating API key:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update API key",
-        variant: "destructive"
-      });
-    }
+  const updateAPIKey = (id: string, updates: Partial<APIKey>) => {
+    setApiKeys(prev => prev.map(key => 
+      key.id === id ? { ...key, ...updates } : key
+    ));
+    toast({
+      title: "Success",
+      description: "API key updated successfully"
+    });
   };
 
-  const deleteAPIKey = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('ai_api_keys')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      fetchAPIKeys();
-      toast({
-        title: "Success",
-        description: "API key deleted successfully"
-      });
-    } catch (error) {
-      console.error('Error deleting API key:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete API key",
-        variant: "destructive"
-      });
-    }
+  const deleteAPIKey = (id: string) => {
+    setApiKeys(prev => prev.filter(key => key.id !== id));
+    toast({
+      title: "Success",
+      description: "API key deleted successfully"
+    });
   };
 
-  const setPrimary = async (id: string) => {
-    try {
-      // First, remove primary status from all keys
-      await supabase
-        .from('ai_api_keys')
-        .update({ is_primary: false })
-        .neq('id', '');
-
-      // Then set the selected key as primary
-      await updateAPIKey(id, { is_primary: true, is_active: true });
-    } catch (error) {
-      console.error('Error setting primary key:', error);
-    }
+  const setPrimary = (id: string) => {
+    setApiKeys(prev => prev.map(key => ({
+      ...key,
+      is_primary: key.id === id,
+      is_active: key.id === id ? true : key.is_active
+    })));
   };
 
-  const setFallback = async (id: string) => {
-    try {
-      // First, remove fallback status from all keys
-      await supabase
-        .from('ai_api_keys')
-        .update({ is_fallback: false })
-        .neq('id', '');
-
-      // Then set the selected key as fallback
-      await updateAPIKey(id, { is_fallback: true, is_active: true });
-    } catch (error) {
-      console.error('Error setting fallback key:', error);
-    }
+  const setFallback = (id: string) => {
+    setApiKeys(prev => prev.map(key => ({
+      ...key,
+      is_fallback: key.id === id,
+      is_active: key.id === id ? true : key.is_active
+    })));
   };
 
   const toggleKeyVisibility = (keyId: string) => {
@@ -228,10 +177,6 @@ export function AIManagement() {
     if (key.length <= 8) return '***';
     return key.substring(0, 4) + '•'.repeat(key.length - 8) + key.substring(key.length - 4);
   };
-
-  if (loading) {
-    return <div className="text-center py-8">Loading AI management...</div>;
-  }
 
   return (
     <div className="space-y-6">

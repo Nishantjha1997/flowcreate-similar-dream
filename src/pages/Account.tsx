@@ -391,9 +391,18 @@ const Account = () => {
             <ProfileCompletenessCard 
               profile={mergedProfile} 
               completeness={calculateCompleteness(mergedProfile)}
-              onDataExtracted={handlePDFDataExtracted}
             />
-            <SmartProfileSuggestions profile={mergedProfile} />
+            <SmartProfileSuggestions 
+              profile={mergedProfile} 
+              onApplySuggestion={(type, data) => {
+                handleProfileUpdate({ [type]: data });
+                toast({
+                  title: "Suggestion Applied",
+                  description: "Profile updated with suggested content"
+                });
+              }}
+              isPremium={premiumData?.isPremium || false}
+            />
           </div>
 
           {/* Main Content Area */}
@@ -502,17 +511,6 @@ const Account = () => {
             </Tabs>
           </div>
 
-          {/* Right Sidebar - Smart Suggestions & Analytics */}
-          <div className="lg:col-span-3 space-y-4">
-            <SmartProfileSuggestions 
-              profile={mergedProfile} 
-              onApplySuggestion={handleProfileUpdate}
-              isPremium={premiumData?.isPremium || false}
-            />
-            <ProfileAnalytics 
-              profile={mergedProfile} 
-              completeness={calculateCompleteness(mergedProfile)} 
-            />
           </div>
         </div>
 

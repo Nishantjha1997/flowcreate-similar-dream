@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_api_keys: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          is_fallback: boolean
+          is_primary: boolean
+          key: string
+          last_used: string | null
+          name: string
+          provider: string
+          updated_at: string
+          usage_count: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_fallback?: boolean
+          is_primary?: boolean
+          key: string
+          last_used?: string | null
+          name: string
+          provider: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_fallback?: boolean
+          is_primary?: boolean
+          key?: string
+          last_used?: string | null
+          name?: string
+          provider?: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Relationships: []
+      }
+      ai_token_usage: {
+        Row: {
+          cost_estimate: number
+          created_at: string
+          id: string
+          provider: string
+          tokens_this_month: number
+          tokens_today: number
+          total_tokens: number
+          updated_at: string
+        }
+        Insert: {
+          cost_estimate?: number
+          created_at?: string
+          id?: string
+          provider: string
+          tokens_this_month?: number
+          tokens_today?: number
+          total_tokens?: number
+          updated_at?: string
+        }
+        Update: {
+          cost_estimate?: number
+          created_at?: string
+          id?: string
+          provider?: string
+          tokens_this_month?: number
+          tokens_today?: number
+          total_tokens?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
