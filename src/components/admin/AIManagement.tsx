@@ -159,6 +159,10 @@ export function AIManagement() {
       is_primary: key.id === id,
       is_active: key.id === id ? true : key.is_active
     })));
+    toast({
+      title: "Success",
+      description: "Primary API key updated successfully"
+    });
   };
 
   const setFallback = (id: string) => {
@@ -167,6 +171,10 @@ export function AIManagement() {
       is_fallback: key.id === id,
       is_active: key.id === id ? true : key.is_active
     })));
+    toast({
+      title: "Success", 
+      description: "Fallback API key updated successfully"
+    });
   };
 
   const toggleKeyVisibility = (keyId: string) => {

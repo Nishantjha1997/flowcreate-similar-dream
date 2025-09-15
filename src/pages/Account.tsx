@@ -33,7 +33,7 @@ import { CertificationsForm } from '@/components/profile/CertificationsForm';
 import { VolunteerForm } from '@/components/profile/VolunteerForm';
 import { PDFResumeUploader } from '@/components/profile/PDFResumeUploader';
 import { ProfileInsights } from '@/components/profile/ProfileInsights';
-import { SmartProfileSuggestions } from '@/components/profile/SmartProfileSuggestions';
+import { FloatingSmartSuggestions } from '@/components/profile/FloatingSmartSuggestions';
 import { ProfileAutoSave } from '@/components/profile/ProfileAutoSave';
 import { AdvancedSkillsForm } from '@/components/profile/AdvancedSkillsForm';
 
@@ -283,6 +283,8 @@ const Account = () => {
     }
   };
 
+  const mergedProfile = { ...profile, ...pendingChanges };
+
   if (profileLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -293,8 +295,6 @@ const Account = () => {
       </div>
     );
   }
-
-  const mergedProfile = { ...profile, ...pendingChanges };
 
   return (
     <div className="min-h-screen bg-background">
@@ -391,17 +391,6 @@ const Account = () => {
             <ProfileCompletenessCard 
               profile={mergedProfile} 
               completeness={calculateCompleteness(mergedProfile)}
-            />
-            <SmartProfileSuggestions 
-              profile={mergedProfile} 
-              onApplySuggestion={(type, data) => {
-                handleProfileUpdate({ [type]: data });
-                toast({
-                  title: "Suggestion Applied",
-                  description: "Profile updated with suggested content"
-                });
-              }}
-              isPremium={premiumData?.isPremium || false}
             />
           </div>
 
