@@ -510,8 +510,6 @@ const Account = () => {
               </TabsContent>
             </Tabs>
           </div>
-
-          </div>
         </div>
 
         <div className="mt-12">
