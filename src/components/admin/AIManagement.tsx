@@ -388,7 +388,7 @@ export function AIManagement() {
                   </div>
                 </CardContent>
               </Card>
-            ))
+            ))}
           </div>
         </TabsContent>
 
@@ -429,7 +429,7 @@ export function AIManagement() {
                   </div>
                 </CardContent>
               </Card>
-            ))
+            ))}
           </div>
         </TabsContent>
 
