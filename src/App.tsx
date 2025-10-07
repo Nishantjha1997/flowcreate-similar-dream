@@ -30,6 +30,11 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
 const ShippingPolicy = lazy(() => import("./pages/ShippingPolicy"));
 
+// ATS Pages
+const ATSLanding = lazy(() => import("./pages/ats/ATSLanding"));
+const ATSLogin = lazy(() => import("./pages/ats/ATSLogin"));
+const ATSDashboard = lazy(() => import("./pages/ats/ATSDashboard"));
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -69,6 +74,12 @@ const App = () => (
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/refund-policy" element={<RefundPolicy />} />
                   <Route path="/shipping-policy" element={<ShippingPolicy />} />
+                  
+                  {/* ATS Routes */}
+                  <Route path="/ats" element={<ATSLanding />} />
+                  <Route path="/ats/login" element={<ATSLogin />} />
+                  <Route path="/ats/dashboard" element={<ATSDashboard />} />
+                  
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>

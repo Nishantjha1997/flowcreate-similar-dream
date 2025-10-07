@@ -63,6 +63,12 @@ const Header = () => {
               Pricing
             </Link>
             <Link 
+              to="/ats" 
+              className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
+            >
+              For Companies
+            </Link>
+            <Link 
               to="/about" 
               className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
             >
@@ -266,6 +272,13 @@ const Header = () => {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Pricing
+                </Link>
+                <Link
+                  to="/ats"
+                  className="block text-base font-medium text-foreground/70 hover:text-foreground"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  For Companies
                 </Link>
                 <Link
                   to="/about"
