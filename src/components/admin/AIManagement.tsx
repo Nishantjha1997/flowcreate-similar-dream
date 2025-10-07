@@ -31,9 +31,9 @@ import {
 } from 'lucide-react';
 
 const providerConfig = {
-  openai: { name: 'OpenAI', color: 'bg-green-500', icon: '🤖', bgClass: 'bg-green-50', textClass: 'text-green-700' },
-  gemini: { name: 'Google Gemini', color: 'bg-blue-500', icon: '💎', bgClass: 'bg-blue-50', textClass: 'text-blue-700' },
-  deepseek: { name: 'DeepSeek', color: 'bg-purple-500', icon: '🧠', bgClass: 'bg-purple-50', textClass: 'text-purple-700' }
+  openai: { name: 'OpenAI', color: 'bg-green-500', icon: '🤖', bgClass: 'bg-green-50 dark:bg-green-950', textClass: 'text-green-700 dark:text-green-300' },
+  gemini: { name: 'Google Gemini', color: 'bg-blue-500', icon: '💎', bgClass: 'bg-blue-50 dark:bg-blue-950', textClass: 'text-blue-700 dark:text-blue-300' },
+  deepseek: { name: 'DeepSeek', color: 'bg-purple-500', icon: '🧠', bgClass: 'bg-purple-50 dark:bg-purple-950', textClass: 'text-purple-700 dark:text-purple-300' }
 };
 
 export function AIManagement() {
@@ -231,12 +231,23 @@ export function AIManagement() {
 
           {/* Existing Keys */}
           <div className="space-y-4">
-            {apiKeys.map((key) => (
-              <Card key={key.id} className={`border-l-4 transition-all hover:shadow-md ${
-                key.is_primary ? 'border-l-green-500 bg-green-50/50' : 
-                key.is_fallback ? 'border-l-orange-500 bg-orange-50/50' : 
-                'border-l-gray-300'
-              }`}>
+            {apiKeys.length === 0 ? (
+              <Card className="border-dashed">
+                <CardContent className="p-12 text-center">
+                  <Key className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                  <h3 className="text-lg font-semibold mb-2">No API Keys Yet</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Add your first API key above to enable AI features across the platform
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              apiKeys.map((key) => (
+                <Card key={key.id} className={`border-l-4 transition-all hover:shadow-md ${
+                  key.is_primary ? 'border-l-green-500 bg-green-50/50 dark:bg-green-950/20' : 
+                  key.is_fallback ? 'border-l-orange-500 bg-orange-50/50 dark:bg-orange-950/20' : 
+                  'border-l-muted'
+                }`}>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
@@ -363,8 +374,28 @@ export function AIManagement() {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              ))
+            )}
           </div>
+
+          {apiKeys.length > 0 && (
+            <Card className="bg-muted/50">
+              <CardContent className="p-4">
+                <div className="flex items-start space-x-3">
+                  <AlertCircle className="w-5 h-5 text-blue-500 mt-0.5" />
+                  <div className="flex-1">
+                    <h4 className="font-semibold mb-1">How API Key Selection Works</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>• <strong>Primary keys</strong> are used first for all AI requests</li>
+                      <li>• <strong>Fallback keys</strong> are used automatically if the primary key fails</li>
+                      <li>• Changes take effect immediately - no page refresh needed</li>
+                      <li>• Usage statistics are tracked in real-time for monitoring</li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="usage" className="space-y-6">
