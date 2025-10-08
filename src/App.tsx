@@ -36,6 +36,8 @@ const ATSLogin = lazy(() => import("./pages/ats/ATSLogin"));
 const ATSSignup = lazy(() => import("./pages/ats/ATSSignup"));
 const ATSOnboarding = lazy(() => import("./pages/ats/ATSOnboarding"));
 const ATSDashboard = lazy(() => import("./pages/ats/ATSDashboard"));
+const ATSJobs = lazy(() => import("./pages/ats/ATSJobs"));
+const ATSJobCreate = lazy(() => import("./pages/ats/ATSJobCreate"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -83,6 +85,8 @@ const App = () => (
           <Route path="/ats/signup" element={<ATSSignup />} />
           <Route path="/ats/onboarding" element={<ATSOnboarding />} />
           <Route path="/ats/dashboard" element={<ATSDashboard />} />
+          <Route path="/ats/jobs" element={<ATSJobs />} />
+          <Route path="/ats/jobs/new" element={<ATSJobCreate />} />
                   
                   <Route path="*" element={<NotFound />} />
                 </Routes>

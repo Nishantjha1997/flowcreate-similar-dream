@@ -129,11 +129,10 @@ const ATSDashboard = () => {
             <p className="text-muted-foreground">ATS Dashboard</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline">
-              <Filter className="mr-2 h-4 w-4" />
-              Filters
+            <Button variant="outline" onClick={() => navigate('/ats/jobs')}>
+              View All Jobs
             </Button>
-            <Button>
+            <Button onClick={() => navigate('/ats/jobs/new')}>
               <Plus className="mr-2 h-4 w-4" />
               Post New Job
             </Button>
