@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Users, Briefcase, TrendingUp, Clock, 
-  Plus, Search, Filter, MoreVertical
+  Plus, Search, Filter, MoreVertical, Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -129,6 +129,10 @@ const ATSDashboard = () => {
             <p className="text-muted-foreground">ATS Dashboard</p>
           </div>
           <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={() => navigate('/ats/settings')}>
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
+            </Button>
             <Button variant="outline" onClick={() => navigate('/ats/jobs')}>
               View All Jobs
             </Button>
