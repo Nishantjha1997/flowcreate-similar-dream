@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ResumeVisualPreview } from '@/components/resume/ResumeVisualPreview';
 import { ResumeData } from '@/utils/types';
 
@@ -22,12 +21,19 @@ export const ResumePreviewSection = ({
 }: ResumePreviewSectionProps) => {
   
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
-        <h3 className="text-lg font-semibold">Live Preview</h3>
-      </CardHeader>
-      <CardContent className="flex-1 p-0 relative overflow-auto">
-        <div className="resume-container h-full" id="resume-preview-container" ref={resumeRef}>
+    <div className="h-full flex flex-col rounded-lg border bg-card overflow-hidden">
+      {/* Header */}
+      <div className="flex-shrink-0 px-4 py-2.5 border-b bg-muted/30">
+        <h3 className="text-sm font-semibold">Live Preview</h3>
+      </div>
+      
+      {/* Preview Content - Takes remaining height */}
+      <div className="flex-1 overflow-auto bg-muted/20 p-4 min-h-[500px]">
+        <div 
+          className="resume-container bg-white rounded shadow-sm mx-auto max-w-[800px]" 
+          id="resume-preview-container" 
+          ref={resumeRef}
+        >
           <ResumeVisualPreview 
             resume={resume}
             templateId={templateId}
@@ -36,7 +42,7 @@ export const ResumePreviewSection = ({
             hiddenSections={hiddenSections}
           />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

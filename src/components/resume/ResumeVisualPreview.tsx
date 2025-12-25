@@ -30,32 +30,28 @@ export const ResumeVisualPreview = ({
     return visibleSections;
   };
 
+  if (!hasContent) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px] bg-muted/30 border-dashed border-2 rounded-md">
+        <div className="text-center p-6">
+          <FileText className="h-12 w-12 mx-auto text-muted-foreground" />
+          <h3 className="text-lg font-medium mt-3">Resume Preview</h3>
+          <p className="text-sm text-muted-foreground mt-1 max-w-[250px]">
+            Start filling in your information to see your resume take shape.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-full w-full relative">
-      {hasContent ? (
-        <div className="absolute inset-0 overflow-auto p-4">
-          <div className="w-full" style={{ transformOrigin: "top left" }}>
-            <div ref={resumeRef} className="bg-white shadow-sm resume-content">
-              <ResumeTemplate 
-                data={resume} 
-                templateName={templateNames[templateId] || 'modern'}
-                sectionOrder={getOrderedSections()}
-                hiddenSections={hiddenSections}
-              />
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="absolute inset-0 flex items-center justify-center bg-background border-dashed border-2 m-4 rounded-md">
-          <div className="text-center p-4">
-            <FileText className="h-12 w-12 mx-auto text-muted-foreground" />
-            <h3 className="text-lg font-medium mt-2">Resume Preview</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Start filling in your information to see your resume take shape.
-            </p>
-          </div>
-        </div>
-      )}
+    <div ref={resumeRef} className="resume-content">
+      <ResumeTemplate 
+        data={resume} 
+        templateName={templateNames[templateId] || 'modern'}
+        sectionOrder={getOrderedSections()}
+        hiddenSections={hiddenSections}
+      />
     </div>
   );
 };

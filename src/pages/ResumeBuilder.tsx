@@ -149,46 +149,55 @@ const ResumeBuilder = () => {
             <AutoSaveIndicator status={saveStatus} lastSaved={lastSaved} />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
-            <div className="lg:col-span-3 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] self-start" data-tour="section-nav">
-              <ProgressIndicator 
-                resume={resume}
-                onSectionClick={handleSectionChange}
-              />
-              <ResumeBuilderSidebar
-                activeSection={activeSection}
-                onSectionChange={handleSectionChange}
-                currentTemplateId={templateId}
-                onTemplateChange={handleTemplateChange}
-                resume={resume}
-                handlePersonalInfoChange={handlers.handlePersonalInfoChange}
-                onProfileImageChange={handleProfileImageChange}
-                handleExperienceChange={handlers.handleExperienceChange}
-                handleCurrentJobToggle={handlers.handleCurrentJobToggle}
-                addExperience={handlers.addExperience}
-                removeExperience={handlers.removeExperience}
-                handleEducationChange={handlers.handleEducationChange}
-                addEducation={handlers.addEducation}
-                removeEducation={handlers.removeEducation}
-                handleSkillsChange={handlers.handleSkillsChange}
-                handleProjectChange={handlers.handleProjectChange}
-                addProject={handlers.addProject}
-                removeProject={handlers.removeProject}
-                handleCustomizationChange={handlers.handleCustomizationChange}
-                onAIFeatureUpsell={handleAIFeatureUpsell}
-                isPremium={premium?.isPremium}
-                activeSections={activeSections}
-                hiddenSections={hiddenSections}
-                sectionTitles={{}}
-                onSectionsChange={handleSectionsChange}
-                onSectionTitleChange={() => {}}
-                onPopulateFromProfile={populateFromProfile}
-                hasProfileData={hasProfileData}
-                onPDFDataExtracted={handlePDFDataExtracted}
-              />
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 lg:h-[calc(100vh-12rem)]">
+            {/* Left Sidebar - Fixed Height with Internal Scroll */}
+            <div className="lg:col-span-3 flex flex-col gap-3 lg:h-full lg:overflow-hidden" data-tour="section-nav">
+              {/* Progress Indicator - Compact */}
+              <div className="flex-shrink-0">
+                <ProgressIndicator 
+                  resume={resume}
+                  onSectionClick={handleSectionChange}
+                />
+              </div>
+              
+              {/* Sidebar - Takes remaining space */}
+              <div className="flex-1 lg:min-h-0">
+                <ResumeBuilderSidebar
+                  activeSection={activeSection}
+                  onSectionChange={handleSectionChange}
+                  currentTemplateId={templateId}
+                  onTemplateChange={handleTemplateChange}
+                  resume={resume}
+                  handlePersonalInfoChange={handlers.handlePersonalInfoChange}
+                  onProfileImageChange={handleProfileImageChange}
+                  handleExperienceChange={handlers.handleExperienceChange}
+                  handleCurrentJobToggle={handlers.handleCurrentJobToggle}
+                  addExperience={handlers.addExperience}
+                  removeExperience={handlers.removeExperience}
+                  handleEducationChange={handlers.handleEducationChange}
+                  addEducation={handlers.addEducation}
+                  removeEducation={handlers.removeEducation}
+                  handleSkillsChange={handlers.handleSkillsChange}
+                  handleProjectChange={handlers.handleProjectChange}
+                  addProject={handlers.addProject}
+                  removeProject={handlers.removeProject}
+                  handleCustomizationChange={handlers.handleCustomizationChange}
+                  onAIFeatureUpsell={handleAIFeatureUpsell}
+                  isPremium={premium?.isPremium}
+                  activeSections={activeSections}
+                  hiddenSections={hiddenSections}
+                  sectionTitles={{}}
+                  onSectionsChange={handleSectionsChange}
+                  onSectionTitleChange={() => {}}
+                  onPopulateFromProfile={populateFromProfile}
+                  hasProfileData={hasProfileData}
+                  onPDFDataExtracted={handlePDFDataExtracted}
+                />
+              </div>
             </div>
 
-            <div className="lg:col-span-7" data-tour="preview">
+            {/* Right Preview - Fixed Height with Internal Scroll */}
+            <div className="lg:col-span-7 lg:h-full" data-tour="preview">
               <ResumePreviewSection
                 resume={resume}
                 templateId={templateId}

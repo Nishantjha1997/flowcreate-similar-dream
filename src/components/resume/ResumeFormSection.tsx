@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { PersonalInfoSection } from './PersonalInfoSection';
 import { ExperienceSection } from './ExperienceSection';
@@ -128,7 +127,7 @@ export const ResumeFormSection = ({
   };
 
   return (
-    <div className="rounded-md border bg-card p-3 md:p-4">
+    <div className="space-y-3">
       {renderSection()}
     </div>
   );
