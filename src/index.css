@@ -1,11 +1,13 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-mono: 'Space Mono', monospace;
   
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
@@ -32,6 +34,11 @@
   --chart-4: 43 74% 66%;
   --chart-5: 27 87% 67%;
   --radius: 0.75rem;
+  
+  /* Neo-brutalism specific variables (used when .neo-brutalism is active) */
+  --nb-border-width: 3px;
+  --nb-shadow-offset: 4px;
+  --nb-shadow-color: 0 0% 0%;
 }
 
 .dark {
@@ -61,6 +68,38 @@
   --chart-5: 340 75% 55%;
 }
 
+/* Neo-Brutalism Theme Override */
+.neo-brutalism {
+  --radius: 0;
+  --border: 0 0% 0%;
+  --nb-border-width: 3px;
+  --nb-shadow-offset: 5px;
+  
+  /* Bold, vibrant colors for neo-brutalism */
+  --primary: 51 100% 50%; /* Bright yellow */
+  --primary-foreground: 0 0% 0%;
+  --secondary: 280 100% 70%; /* Bright purple */
+  --secondary-foreground: 0 0% 0%;
+  --accent: 160 100% 50%; /* Bright cyan */
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 100% 50%; /* Bright red */
+  --destructive-foreground: 0 0% 100%;
+}
+
+.neo-brutalism.dark {
+  --background: 240 10% 10%;
+  --foreground: 0 0% 100%;
+  --card: 240 10% 15%;
+  --card-foreground: 0 0% 100%;
+  --primary: 51 100% 50%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 280 100% 70%;
+  --secondary-foreground: 0 0% 0%;
+  --muted: 240 10% 20%;
+  --muted-foreground: 0 0% 70%;
+  --border: 0 0% 100%;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -69,11 +108,141 @@
     @apply bg-background text-foreground font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  
+  /* Neo-brutalism base styles */
+  .neo-brutalism body {
+    font-family: var(--font-mono);
+  }
+}
+
+@layer components {
+  /* Neo-Brutalism Component Styles */
+  .nb-card {
+    @apply bg-card border-[3px] border-foreground;
+    box-shadow: 5px 5px 0px 0px hsl(var(--foreground));
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  
+  .nb-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0px 0px hsl(var(--foreground));
+  }
+  
+  .nb-button {
+    @apply font-bold uppercase tracking-wide border-[3px] border-foreground;
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  
+  .nb-button:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px 0px hsl(var(--foreground));
+  }
+  
+  .nb-button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px 0px hsl(var(--foreground));
+  }
+  
+  .nb-input {
+    @apply border-[3px] border-foreground bg-background;
+    box-shadow: 3px 3px 0px 0px hsl(var(--foreground));
+  }
+  
+  .nb-input:focus {
+    @apply outline-none ring-0;
+    box-shadow: 5px 5px 0px 0px hsl(var(--foreground));
+    transform: translate(-1px, -1px);
+  }
+  
+  .nb-badge {
+    @apply font-bold uppercase text-xs px-3 py-1 border-2 border-foreground;
+    box-shadow: 2px 2px 0px 0px hsl(var(--foreground));
+  }
+  
+  .nb-section {
+    @apply border-b-[4px] border-foreground;
+  }
+  
+  .nb-heading {
+    @apply font-bold uppercase tracking-tight;
+    text-shadow: 2px 2px 0px hsl(var(--muted-foreground) / 0.3);
+  }
+  
+  /* Hero specific neo-brutalism styles */
+  .nb-hero {
+    @apply relative overflow-hidden;
+    background: linear-gradient(135deg, 
+      hsl(51 100% 50%) 0%, 
+      hsl(280 100% 70%) 50%, 
+      hsl(160 100% 50%) 100%
+    );
+  }
+  
+  .nb-hero-dark {
+    background: linear-gradient(135deg, 
+      hsl(280 100% 30%) 0%, 
+      hsl(200 100% 20%) 50%, 
+      hsl(160 100% 25%) 100%
+    );
+  }
+  
+  /* Pattern overlays for neo-brutalism */
+  .nb-pattern-dots {
+    background-image: radial-gradient(circle, hsl(var(--foreground)) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .nb-pattern-grid {
+    background-image: 
+      linear-gradient(hsl(var(--foreground) / 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--foreground) / 0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  
+  .nb-pattern-stripes {
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      hsl(var(--foreground) / 0.05) 10px,
+      hsl(var(--foreground) / 0.05) 20px
+    );
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  
+  /* Neo-brutalism utilities */
+  .nb-shadow-sm {
+    box-shadow: 2px 2px 0px 0px hsl(var(--foreground));
+  }
+  
+  .nb-shadow {
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
+  }
+  
+  .nb-shadow-lg {
+    box-shadow: 6px 6px 0px 0px hsl(var(--foreground));
+  }
+  
+  .nb-shadow-xl {
+    box-shadow: 8px 8px 0px 0px hsl(var(--foreground));
+  }
+  
+  .nb-border {
+    border-width: 3px;
+  }
+  
+  .nb-border-thick {
+    border-width: 4px;
+  }
+  
+  .font-mono-nb {
+    font-family: var(--font-mono);
   }
 }
 
@@ -105,12 +274,41 @@
   }
 }
 
+@keyframes nb-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes nb-shake {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-2deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+}
+
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
 
 .animate-glow {
   animation: glow 2s ease-in-out infinite;
+}
+
+.animate-nb-bounce {
+  animation: nb-bounce 0.5s ease-in-out;
+}
+
+.animate-nb-shake {
+  animation: nb-shake 0.3s ease-in-out;
 }
 
 /* Glass morphism effects */
@@ -140,6 +338,18 @@
   border: 2px solid transparent;
 }
 
+/* Neo-brutalism gradient text */
+.nb-gradient-text {
+  background: linear-gradient(135deg, 
+    hsl(51 100% 50%) 0%, 
+    hsl(280 100% 70%) 50%, 
+    hsl(160 100% 50%) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -157,4 +367,16 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, #5a6fd8, #6a4190);
+}
+
+/* Neo-brutalism scrollbar */
+.neo-brutalism ::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border: 2px solid hsl(var(--foreground));
+  border-radius: 0;
+}
+
+.neo-brutalism ::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 0;
 }

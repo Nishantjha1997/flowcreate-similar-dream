@@ -11,7 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Settings, Palette, FileText, Plus, Edit, Trash2, Globe, Users, Shield } from "lucide-react";
+import { Settings, Palette, FileText, Plus, Edit, Trash2, Globe, Users, Shield, Sparkles } from "lucide-react";
+import { useDesignMode } from "@/hooks/useDesignMode";
 
 interface Feature {
   id: string;
@@ -24,6 +25,7 @@ interface Feature {
 
 export function WebsiteCustomization() {
   const { toast } = useToast();
+  const { designMode, setDesignMode, isNeoBrutalism } = useDesignMode();
   const [isLoading, setIsLoading] = useState(false);
   const [showAddFeatureDialog, setShowAddFeatureDialog] = useState(false);
   
@@ -177,13 +179,88 @@ export function WebsiteCustomization() {
       </CardHeader>
       
       <CardContent>
-        <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="design" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="design">Design</TabsTrigger>
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="content">Content</TabsTrigger>
             <TabsTrigger value="features">Features</TabsTrigger>
             <TabsTrigger value="branding">Branding</TabsTrigger>
           </TabsList>
+          
+          {/* Design Mode Tab - NEW */}
+          <TabsContent value="design" className="space-y-6">
+            <div className="space-y-6">
+              <div className="flex items-center gap-4 p-4 border rounded-lg bg-muted/30">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    Neo-Brutalism Design Mode
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Transform your entire website with bold, high-contrast neo-brutalism aesthetics featuring thick borders, hard shadows, and vibrant colors.
+                  </p>
+                </div>
+                <Switch
+                  checked={isNeoBrutalism}
+                  onCheckedChange={(checked) => {
+                    setDesignMode(checked ? 'neo-brutalism' : 'default');
+                    toast({
+                      title: checked ? "Neo-Brutalism Enabled" : "Default Design Restored",
+                      description: checked 
+                        ? "Your website now features bold neo-brutalism styling!" 
+                        : "Website restored to classic modern design."
+                    });
+                  }}
+                />
+              </div>
+              
+              {/* Design Mode Preview */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div 
+                  className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
+                    !isNeoBrutalism ? 'border-primary ring-2 ring-primary/20' : 'border-border hover:border-muted-foreground'
+                  }`}
+                  onClick={() => setDesignMode('default')}
+                >
+                  <h4 className="font-semibold mb-2">Default Modern</h4>
+                  <p className="text-sm text-muted-foreground mb-4">Clean, professional design with subtle shadows and rounded corners.</p>
+                  <div className="space-y-2">
+                    <div className="h-8 bg-primary rounded-md"></div>
+                    <div className="h-4 bg-muted rounded w-3/4"></div>
+                    <div className="h-4 bg-muted rounded w-1/2"></div>
+                  </div>
+                </div>
+                
+                <div 
+                  className={`p-6 cursor-pointer transition-all ${
+                    isNeoBrutalism 
+                      ? 'border-[3px] border-foreground ring-2 ring-primary/20' 
+                      : 'border-2 border-border hover:border-muted-foreground rounded-lg'
+                  }`}
+                  style={isNeoBrutalism ? { boxShadow: '5px 5px 0px 0px black' } : {}}
+                  onClick={() => setDesignMode('neo-brutalism')}
+                >
+                  <h4 className="font-bold mb-2 uppercase tracking-wide">Neo-Brutalism</h4>
+                  <p className="text-sm text-muted-foreground mb-4">Bold, high-contrast with thick borders and hard shadows.</p>
+                  <div className="space-y-2">
+                    <div className="h-8 bg-yellow-400 border-2 border-foreground" style={{ boxShadow: '3px 3px 0px 0px black' }}></div>
+                    <div className="h-4 bg-purple-400 border border-foreground w-3/4"></div>
+                    <div className="h-4 bg-cyan-400 border border-foreground w-1/2"></div>
+                  </div>
+                </div>
+              </div>
+              
+              {isNeoBrutalism && (
+                <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-500 rounded-none" style={{ boxShadow: '4px 4px 0px 0px hsl(51 100% 40%)' }}>
+                  <h4 className="font-bold uppercase text-yellow-800 dark:text-yellow-200">Neo-Brutalism Active</h4>
+                  <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                    All pages will display with bold borders, hard shadows, and vibrant accent colors. The change is applied site-wide instantly.
+                  </p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
           
           <TabsContent value="general" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
