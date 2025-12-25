@@ -1,5 +1,4 @@
 import { Check, AlertCircle } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { ResumeData } from '@/utils/types';
@@ -58,64 +57,40 @@ export function ProgressIndicator({ resume, onSectionClick }: ProgressIndicatorP
 
   const sections = getSectionStatus();
   const completedSections = sections.filter(s => s.completed).length;
-  const requiredSections = sections.filter(s => s.required).length;
-  const completedRequired = sections.filter(s => s.required && s.completed).length;
   const totalProgress = (completedSections / sections.length) * 100;
-  const requiredProgress = (completedRequired / requiredSections) * 100;
 
   return (
-    <Card className="mb-4">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold">Resume Completion</h3>
-          <Badge variant={requiredProgress === 100 ? "default" : "secondary"}>
-            {Math.round(totalProgress)}% Complete
-          </Badge>
-        </div>
-        
-        <Progress value={totalProgress} className="mb-4" />
-        
-        <div className="space-y-2">
-          {sections.map((section) => (
-            <div
-              key={section.key}
-              className="flex items-center justify-between p-2 rounded-lg border border-border/50 cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => onSectionClick(section.key)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  onSectionClick(section.key);
-                }
-              }}
-              aria-label={`Edit ${section.name} section`}
-            >
-              <div className="flex items-center gap-2">
-                {section.completed ? (
-                  <Check className="h-4 w-4 text-green-600" />
-                ) : (
-                  <AlertCircle className="h-4 w-4 text-muted-foreground" />
-                )}
-                <div>
-                  <span className="text-sm font-medium">{section.name}</span>
-                  {section.required && <span className="text-red-500 ml-1">*</span>}
-                  {!section.completed && (
-                    <p className="text-xs text-muted-foreground">{section.description}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {requiredProgress < 100 && (
-          <div className="mt-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-            <p className="text-xs text-yellow-700 dark:text-yellow-300">
-              Complete all required sections (*) to create a professional resume
-            </p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <div className="rounded-lg border bg-card p-3">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Progress</span>
+        <Badge variant={totalProgress === 100 ? "default" : "secondary"} className="text-[10px] h-5">
+          {Math.round(totalProgress)}%
+        </Badge>
+      </div>
+      
+      <Progress value={totalProgress} className="h-1.5 mb-2" />
+      
+      <div className="flex flex-wrap gap-1">
+        {sections.map((section) => (
+          <button
+            key={section.key}
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-colors ${
+              section.completed 
+                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+            onClick={() => onSectionClick(section.key)}
+          >
+            {section.completed ? (
+              <Check className="h-2.5 w-2.5" />
+            ) : (
+              <AlertCircle className="h-2.5 w-2.5" />
+            )}
+            <span>{section.name}</span>
+            {section.required && !section.completed && <span className="text-destructive">*</span>}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
