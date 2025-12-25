@@ -18,6 +18,7 @@ import { ImprovementPlans } from "@/components/admin/ImprovementPlans";
 import { ContentManagement } from "@/components/admin/ContentManagement";
 import { SecuritySettings } from "@/components/admin/SecuritySettings";
 import { AIManagement } from "@/components/admin/AIManagement";
+import { ATSManagement } from "@/components/admin/ATSManagement";
 
 const Admin = () => {
   const { user, isLoading } = useAuth();
@@ -97,33 +98,36 @@ const Admin = () => {
         
         <GlassCard variant="elevated" className="p-6">
           <Tabs defaultValue="registrations" className="w-full">
-            <TabsList className="grid w-full grid-cols-9 bg-white/50 backdrop-blur-sm border border-white/20">
-              <TabsTrigger value="registrations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
-                User Registrations
+            <TabsList className="grid w-full grid-cols-10 bg-white/50 backdrop-blur-sm border border-white/20">
+              <TabsTrigger value="registrations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
+                Registrations
               </TabsTrigger>
-              <TabsTrigger value="users" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
-                User Management
+              <TabsTrigger value="users" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
+                Users
               </TabsTrigger>
-              <TabsTrigger value="templates" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
+              <TabsTrigger value="ats" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
+                ATS
+              </TabsTrigger>
+              <TabsTrigger value="templates" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
                 Templates
               </TabsTrigger>
-              <TabsTrigger value="website" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
+              <TabsTrigger value="website" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
                 Website
               </TabsTrigger>
-              <TabsTrigger value="improvements" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
+              <TabsTrigger value="improvements" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
                 Improvements
               </TabsTrigger>
-              <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
-                Quick Actions
+              <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
+                Actions
               </TabsTrigger>
-              <TabsTrigger value="content" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
+              <TabsTrigger value="content" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
                 Content
               </TabsTrigger>
-              <TabsTrigger value="security" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
+              <TabsTrigger value="security" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
                 Security
               </TabsTrigger>
-              <TabsTrigger value="ai" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
-                AI Management
+              <TabsTrigger value="ai" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
+                AI
               </TabsTrigger>
             </TabsList>
             
@@ -137,6 +141,10 @@ const Admin = () => {
                 isLoading={loadingMembers} 
                 refetch={refetch} 
               />
+            </TabsContent>
+            
+            <TabsContent value="ats" className="mt-6">
+              <ATSManagement isAdmin={!!isAdmin} />
             </TabsContent>
             
             <TabsContent value="templates" className="mt-6">
