@@ -1,42 +1,57 @@
 
 import { Link } from 'react-router-dom';
+import { useDesignMode } from '@/hooks/useDesignMode';
 
 const Footer = () => {
+  const { isNeoBrutalism } = useDesignMode();
+
+  const linkClasses = isNeoBrutalism 
+    ? 'text-sm text-foreground font-bold uppercase tracking-wide hover:text-primary transition-colors'
+    : 'text-sm text-muted-foreground hover:text-foreground';
+
+  const headingClasses = isNeoBrutalism
+    ? 'text-sm font-black uppercase tracking-widest text-foreground border-b-2 border-foreground pb-2 mb-4'
+    : 'text-sm font-semibold uppercase tracking-wider text-foreground';
+
   return (
-    <footer className="bg-background border-t border-border">
+    <footer className={`${
+      isNeoBrutalism 
+        ? 'bg-background border-t-4 border-foreground' 
+        : 'bg-background border-t border-border'
+    }`}>
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
           <div className="col-span-1 sm:col-span-2 lg:col-span-2">
             <Link to="/" className="flex items-center">
-              <span className="text-2xl font-bold text-primary">Flow</span>
-              <span className="text-2xl font-bold text-foreground">Create</span>
+              <span className={`text-2xl font-bold ${isNeoBrutalism ? 'uppercase tracking-wider' : ''} text-primary`}>Flow</span>
+              <span className={`text-2xl font-bold ${isNeoBrutalism ? 'uppercase tracking-wider' : ''} text-foreground`}>Create</span>
             </Link>
-            <p className="mt-4 text-sm text-muted-foreground">
+            <p className={`mt-4 ${isNeoBrutalism ? 'text-sm text-foreground font-medium' : 'text-sm text-muted-foreground'}`}>
               Create professional resumes and cover letters online in minutes.
               Choose from our professionally-designed templates to build the perfect resume for your dream job.
             </p>
           </div>
           
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">Product</h3>
-            <ul className="mt-4 space-y-2">
+            <h3 className={headingClasses}>Product</h3>
+            <ul className={`${isNeoBrutalism ? '' : 'mt-4'} space-y-2`}>
               <li>
-                <Link to="/templates" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link to="/templates" className={linkClasses}>
                   Templates
                 </Link>
               </li>
               <li>
-                <Link to="/examples" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link to="/examples" className={linkClasses}>
                   Example Resumes
                 </Link>
               </li>
               <li>
-                <Link to="/features" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link to="/features" className={linkClasses}>
                   Features
                 </Link>
               </li>
               <li>
-                <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link to="/pricing" className={linkClasses}>
                   Pricing
                 </Link>
               </li>
@@ -44,20 +59,20 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">Resources</h3>
-            <ul className="mt-4 space-y-2">
+            <h3 className={headingClasses}>Resources</h3>
+            <ul className={`${isNeoBrutalism ? '' : 'mt-4'} space-y-2`}>
               <li>
-                <Link to="/blog" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link to="/blog" className={linkClasses}>
                   Blog
                 </Link>
               </li>
               <li>
-                <Link to="/help" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link to="/help" className={linkClasses}>
                   Help Center
                 </Link>
               </li>
               <li>
-                <Link to="/career-advice" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link to="/career-advice" className={linkClasses}>
                   Career Advice
                 </Link>
               </li>
@@ -65,25 +80,25 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">Company</h3>
-            <ul className="mt-4 space-y-2">
+            <h3 className={headingClasses}>Company</h3>
+            <ul className={`${isNeoBrutalism ? '' : 'mt-4'} space-y-2`}>
               <li>
-                <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link to="/about" className={linkClasses}>
                   About
                 </Link>
               </li>
               <li>
-                <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link to="/privacy" className={linkClasses}>
                   Privacy
                 </Link>
               </li>
               <li>
-                <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link to="/terms" className={linkClasses}>
                   Terms
                 </Link>
               </li>
               <li>
-                <Link to="/shipping-policy" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link to="/shipping-policy" className={linkClasses}>
                   Shipping Policy
                 </Link>
               </li>
@@ -92,7 +107,7 @@ const Footer = () => {
                   href="https://github.com/flowcreate/resume-builder" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-sm text-muted-foreground hover:text-foreground"
+                  className={linkClasses}
                 >
                   GitHub
                 </a>
@@ -101,8 +116,12 @@ const Footer = () => {
           </div>
         </div>
         
-        <div className="mt-12 border-t border-border pt-8">
-          <p className="text-sm text-center text-muted-foreground">
+        <div className={`mt-12 pt-8 ${
+          isNeoBrutalism 
+            ? 'border-t-2 border-foreground' 
+            : 'border-t border-border'
+        }`}>
+          <p className={`text-sm text-center ${isNeoBrutalism ? 'font-bold uppercase tracking-wide text-foreground' : 'text-muted-foreground'}`}>
             &copy; {new Date().getFullYear()} FlowCreate. All rights reserved. Open-source software.
           </p>
         </div>

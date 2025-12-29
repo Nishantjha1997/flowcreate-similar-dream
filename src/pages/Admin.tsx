@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { useAllMembers } from "@/hooks/useAllMembers";
 import { useUserProfiles } from "@/hooks/useUserProfiles";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { EnhancedSystemStats } from "@/components/admin/EnhancedSystemStats";
@@ -19,6 +19,8 @@ import { ContentManagement } from "@/components/admin/ContentManagement";
 import { SecuritySettings } from "@/components/admin/SecuritySettings";
 import { AIManagement } from "@/components/admin/AIManagement";
 import { ATSManagement } from "@/components/admin/ATSManagement";
+import { Button } from "@/components/ui/button";
+import { Home, ArrowLeft } from "lucide-react";
 
 const Admin = () => {
   const { user, isLoading } = useAuth();
@@ -76,17 +78,36 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-white to-purple-50/50 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-white to-purple-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         <GlassCard variant="elevated" className="p-8">
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Admin Dashboard
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              Complete website and user management system. Signed in as:{" "}
-              <span className="font-semibold text-blue-600">{user?.email}</span>
-            </p>
+          <div className="flex items-start justify-between">
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Admin Dashboard
+              </h1>
+              <p className="text-muted-foreground text-lg">
+                Complete website and user management system. Signed in as:{" "}
+                <span className="font-semibold text-blue-600">{user?.email}</span>
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link to="/">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Home className="h-4 w-4" />
+                  Main Site
+                </Button>
+              </Link>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => navigate(-1)}
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </Button>
+            </div>
           </div>
         </GlassCard>
 
@@ -98,7 +119,7 @@ const Admin = () => {
         
         <GlassCard variant="elevated" className="p-6">
           <Tabs defaultValue="registrations" className="w-full">
-            <TabsList className="grid w-full grid-cols-10 bg-white/50 backdrop-blur-sm border border-white/20">
+            <TabsList className="grid w-full grid-cols-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/20">
               <TabsTrigger value="registrations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
                 Registrations
               </TabsTrigger>

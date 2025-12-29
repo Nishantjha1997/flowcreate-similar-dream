@@ -1,11 +1,17 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export type DesignMode = 'default' | 'neo-brutalism';
+
+interface DesignModeSettingValue {
+  mode: DesignMode;
+}
 
 interface DesignModeContextType {
   designMode: DesignMode;
   setDesignMode: (mode: DesignMode) => void;
   isNeoBrutalism: boolean;
+  isLoading: boolean;
 }
 
 const DesignModeContext = createContext<DesignModeContextType | undefined>(undefined);
@@ -15,20 +21,88 @@ interface DesignModeProviderProps {
 }
 
 export function DesignModeProvider({ children }: DesignModeProviderProps) {
-  const [designMode, setDesignModeState] = useState<DesignMode>(() => {
-    // Check localStorage first
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('designMode') as DesignMode;
-      if (saved === 'neo-brutalism' || saved === 'default') {
-        return saved;
-      }
-    }
-    return 'default';
-  });
+  const [designMode, setDesignModeState] = useState<DesignMode>('default');
+  const [isLoading, setIsLoading] = useState(true);
 
-  const setDesignMode = (mode: DesignMode) => {
+  // Fetch design mode from database on mount
+  useEffect(() => {
+    const fetchDesignMode = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('site_settings')
+          .select('setting_value')
+          .eq('setting_key', 'design_mode')
+          .single();
+
+        if (error) {
+          console.error('Error fetching design mode:', error);
+          return;
+        }
+
+        const settingValue = data?.setting_value as unknown as DesignModeSettingValue | null;
+        if (settingValue?.mode) {
+          setDesignModeState(settingValue.mode);
+        }
+      } catch (error) {
+        console.error('Error fetching design mode:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDesignMode();
+
+    // Subscribe to realtime changes
+    const channel = supabase
+      .channel('site_settings_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'site_settings',
+          filter: 'setting_key=eq.design_mode'
+        },
+        (payload) => {
+          if (payload.new?.setting_value?.mode) {
+            setDesignModeState(payload.new.setting_value.mode as DesignMode);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const setDesignMode = async (mode: DesignMode) => {
+    // Optimistically update UI
     setDesignModeState(mode);
-    localStorage.setItem('designMode', mode);
+
+    try {
+      const { error } = await supabase
+        .from('site_settings')
+        .update({ setting_value: { mode } })
+        .eq('setting_key', 'design_mode');
+
+      if (error) {
+        console.error('Error updating design mode:', error);
+        // Revert on error - refetch from DB
+        const { data } = await supabase
+          .from('site_settings')
+          .select('setting_value')
+          .eq('setting_key', 'design_mode')
+          .single();
+        
+        const revertValue = data?.setting_value as unknown as DesignModeSettingValue | null;
+        if (revertValue?.mode) {
+          setDesignModeState(revertValue.mode);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating design mode:', error);
+    }
   };
 
   // Apply design mode class to document root
@@ -45,7 +119,8 @@ export function DesignModeProvider({ children }: DesignModeProviderProps) {
   const value: DesignModeContextType = {
     designMode,
     setDesignMode,
-    isNeoBrutalism: designMode === 'neo-brutalism'
+    isNeoBrutalism: designMode === 'neo-brutalism',
+    isLoading
   };
 
   return (
