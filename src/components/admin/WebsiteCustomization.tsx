@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,8 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Settings, Palette, FileText, Plus, Edit, Trash2, Globe, Users, Shield, Sparkles } from "lucide-react";
+import { Settings, Palette, FileText, Plus, Edit, Trash2, Globe, Users, Shield, Sparkles, Loader2 } from "lucide-react";
 import { useDesignMode } from "@/hooks/useDesignMode";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Feature {
   id: string;
@@ -23,14 +23,35 @@ interface Feature {
   category: string;
 }
 
+interface SiteSettings {
+  siteName: string;
+  tagline: string;
+  primaryColor: string;
+  secondaryColor: string;
+  logoUrl: string;
+  faviconUrl: string;
+  metaDescription: string;
+  metaKeywords: string;
+}
+
+interface AboutContent {
+  heroTitle: string;
+  heroSubtitle: string;
+  aboutTitle: string;
+  aboutDescription: string;
+  missionStatement: string;
+  teamDescription: string;
+}
+
 export function WebsiteCustomization() {
   const { toast } = useToast();
   const { designMode, setDesignMode, isNeoBrutalism } = useDesignMode();
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
   const [showAddFeatureDialog, setShowAddFeatureDialog] = useState(false);
   
   // Website settings state
-  const [websiteSettings, setWebsiteSettings] = useState({
+  const [websiteSettings, setWebsiteSettings] = useState<SiteSettings>({
     siteName: "Resume Builder Pro",
     tagline: "Create professional resumes in minutes",
     primaryColor: "#2563eb",
@@ -42,7 +63,7 @@ export function WebsiteCustomization() {
   });
 
   // About section state
-  const [aboutContent, setAboutContent] = useState({
+  const [aboutContent, setAboutContent] = useState<AboutContent>({
     heroTitle: "Build Your Perfect Resume",
     heroSubtitle: "Create professional, ATS-optimized resumes that get you noticed by employers",
     aboutTitle: "About Resume Builder Pro",
@@ -50,6 +71,38 @@ export function WebsiteCustomization() {
     missionStatement: "Our mission is to empower every job seeker with the tools they need to land their dream job.",
     teamDescription: "Our team consists of HR professionals, designers, and developers who understand what employers look for.",
   });
+
+  // Fetch settings from database on mount
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('site_settings')
+          .select('setting_key, setting_value');
+
+        if (error) throw error;
+
+        data?.forEach(setting => {
+          if (setting.setting_key === 'website_settings') {
+            const val = setting.setting_value as unknown as Partial<SiteSettings>;
+            if (val) setWebsiteSettings(prev => ({ ...prev, ...val }));
+          } else if (setting.setting_key === 'about_content') {
+            const val = setting.setting_value as unknown as Partial<AboutContent>;
+            if (val) setAboutContent(prev => ({ ...prev, ...val }));
+          } else if (setting.setting_key === 'features') {
+            const val = setting.setting_value as unknown as Feature[];
+            if (Array.isArray(val)) setFeatures(val);
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   // Features state
   const [features, setFeatures] = useState<Feature[]>([
@@ -111,14 +164,39 @@ export function WebsiteCustomization() {
     isEnabled: true
   });
 
+  const upsertSetting = async (key: string, value: any) => {
+    // Check if setting exists
+    const { data: existing } = await supabase
+      .from('site_settings')
+      .select('id')
+      .eq('setting_key', key)
+      .single();
+
+    if (existing) {
+      // Update existing
+      const { error } = await supabase
+        .from('site_settings')
+        .update({ setting_value: value, updated_at: new Date().toISOString() })
+        .eq('setting_key', key);
+      
+      if (error) throw error;
+    } else {
+      // Insert new
+      const { error } = await supabase
+        .from('site_settings')
+        .insert({ setting_key: key, setting_value: value });
+      
+      if (error) throw error;
+    }
+  };
+
   const handleSaveWebsiteSettings = async () => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast({ title: "Settings saved", description: "Website settings updated successfully." });
-    } catch (error) {
-      toast({ title: "Save failed", description: "Failed to save settings.", variant: "destructive" });
+      await upsertSetting('website_settings', websiteSettings);
+      toast({ title: "Settings saved", description: "Website settings updated successfully and applied to the site." });
+    } catch (error: any) {
+      toast({ title: "Save failed", description: error.message || "Failed to save settings.", variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -127,24 +205,32 @@ export function WebsiteCustomization() {
   const handleSaveAboutContent = async () => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast({ title: "Content saved", description: "About section updated successfully." });
-    } catch (error) {
-      toast({ title: "Save failed", description: "Failed to save content.", variant: "destructive" });
+      await upsertSetting('about_content', aboutContent);
+      toast({ title: "Content saved", description: "About section updated successfully and applied to the site." });
+    } catch (error: any) {
+      toast({ title: "Save failed", description: error.message || "Failed to save content.", variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleToggleFeature = (featureId: string) => {
-    setFeatures(prev => prev.map(f => 
+  const handleToggleFeature = async (featureId: string) => {
+    const updatedFeatures = features.map(f => 
       f.id === featureId ? { ...f, isEnabled: !f.isEnabled } : f
-    ));
-    toast({ title: "Feature updated", description: "Feature status changed successfully." });
+    );
+    setFeatures(updatedFeatures);
+    
+    try {
+      await upsertSetting('features', updatedFeatures);
+      toast({ title: "Feature updated", description: "Feature status changed and saved to database." });
+    } catch (error) {
+      // Revert on error
+      setFeatures(features);
+      toast({ title: "Update failed", description: "Failed to update feature status.", variant: "destructive" });
+    }
   };
 
-  const handleAddFeature = () => {
+  const handleAddFeature = async () => {
     if (!newFeature.name || !newFeature.description) {
       toast({ title: "Missing fields", description: "Please fill in all required fields.", variant: "destructive" });
       return;
@@ -155,16 +241,55 @@ export function WebsiteCustomization() {
       id: (features.length + 1).toString()
     };
 
-    setFeatures(prev => [...prev, feature]);
-    setNewFeature({ name: "", description: "", icon: "Star", category: "Core", isEnabled: true });
-    setShowAddFeatureDialog(false);
-    toast({ title: "Feature added", description: "New feature created successfully." });
+    const updatedFeatures = [...features, feature];
+    setFeatures(updatedFeatures);
+    
+    try {
+      await upsertSetting('features', updatedFeatures);
+      setNewFeature({ name: "", description: "", icon: "Star", category: "Core", isEnabled: true });
+      setShowAddFeatureDialog(false);
+      toast({ title: "Feature added", description: "New feature created and saved to database." });
+    } catch (error) {
+      setFeatures(features);
+      toast({ title: "Add failed", description: "Failed to add feature.", variant: "destructive" });
+    }
   };
 
-  const handleDeleteFeature = (featureId: string) => {
-    setFeatures(prev => prev.filter(f => f.id !== featureId));
-    toast({ title: "Feature deleted", description: "Feature removed successfully." });
+  const handleDeleteFeature = async (featureId: string) => {
+    const updatedFeatures = features.filter(f => f.id !== featureId);
+    setFeatures(updatedFeatures);
+    
+    try {
+      await upsertSetting('features', updatedFeatures);
+      toast({ title: "Feature deleted", description: "Feature removed and saved to database." });
+    } catch (error) {
+      setFeatures(features);
+      toast({ title: "Delete failed", description: "Failed to delete feature.", variant: "destructive" });
+    }
   };
+
+  const handleSaveBranding = async () => {
+    setIsLoading(true);
+    try {
+      await upsertSetting('website_settings', websiteSettings);
+      toast({ title: "Branding saved", description: "Color scheme updated successfully." });
+    } catch (error: any) {
+      toast({ title: "Save failed", description: error.message || "Failed to save branding.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isFetching) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center p-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <span className="ml-2 text-muted-foreground">Loading settings...</span>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -593,7 +718,7 @@ export function WebsiteCustomization() {
               </div>
             </div>
             
-            <Button onClick={handleSaveWebsiteSettings} disabled={isLoading}>
+            <Button onClick={handleSaveBranding} disabled={isLoading}>
               {isLoading ? "Saving..." : "Save Branding Settings"}
             </Button>
           </TabsContent>
