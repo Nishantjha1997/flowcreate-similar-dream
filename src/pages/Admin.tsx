@@ -20,12 +20,15 @@ import { SecuritySettings } from "@/components/admin/SecuritySettings";
 import { AIManagement } from "@/components/admin/AIManagement";
 import { ATSManagement } from "@/components/admin/ATSManagement";
 import { Button } from "@/components/ui/button";
-import { Home, ArrowLeft } from "lucide-react";
+import { Home, ArrowLeft, Shield } from "lucide-react";
+import { useDesignMode } from "@/hooks/useDesignMode";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 
 const Admin = () => {
   const { user, isLoading } = useAuth();
   const userId = user?.id;
   const navigate = useNavigate();
+  const { isNeoBrutalism } = useDesignMode();
 
   const { data: isAdmin, isLoading: loadingAdmin } = useAdminStatus(userId);
   const { data: members = [], isLoading: loadingMembers, refetch } = useAllMembers(!!isAdmin);
@@ -53,9 +56,13 @@ const Admin = () => {
 
   if (isLoading || loadingAdmin) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-white to-purple-50/50 p-8">
+      <div className={`min-h-screen p-8 ${
+        isNeoBrutalism 
+          ? 'bg-background' 
+          : 'bg-gradient-to-br from-blue-50/50 via-background to-purple-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900'
+      }`}>
         <div className="max-w-7xl mx-auto">
-          <GlassCard variant="elevated" className="p-8">
+          <GlassCard variant="elevated" neoBrutalism={isNeoBrutalism} className="p-8">
             <div className="space-y-6">
               <div className="space-y-3">
                 <Skeleton className="h-8 w-64" />
@@ -78,22 +85,44 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-white to-purple-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-8">
+    <div className={`min-h-screen p-8 ${
+      isNeoBrutalism 
+        ? 'bg-background' 
+        : 'bg-gradient-to-br from-blue-50/50 via-background to-purple-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900'
+    }`}>
       <div className="max-w-7xl mx-auto space-y-8">
-        <GlassCard variant="elevated" className="p-8">
-          <div className="flex items-start justify-between">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumbs className="mb-4" />
+        
+        <GlassCard variant="elevated" neoBrutalism={isNeoBrutalism} className="p-8">
+          <div className="flex items-start justify-between flex-wrap gap-4">
             <div className="space-y-4">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Admin Dashboard
-              </h1>
+              <div className="flex items-center gap-3">
+                <Shield className={`h-10 w-10 ${isNeoBrutalism ? 'text-primary' : 'text-blue-600'}`} />
+                <h1 className={`text-4xl font-bold ${
+                  isNeoBrutalism 
+                    ? 'uppercase tracking-wide text-foreground' 
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'
+                }`}>
+                  Admin Dashboard
+                </h1>
+              </div>
               <p className="text-muted-foreground text-lg">
                 Complete website and user management system. Signed in as:{" "}
-                <span className="font-semibold text-blue-600">{user?.email}</span>
+                <span className={`font-semibold ${isNeoBrutalism ? 'text-primary' : 'text-blue-600'}`}>{user?.email}</span>
               </p>
             </div>
             <div className="flex items-center gap-2">
               <Link to="/">
-                <Button variant="outline" size="sm" className="gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className={`gap-2 ${
+                    isNeoBrutalism 
+                      ? 'rounded-none border-2 border-foreground font-bold uppercase shadow-[3px_3px_0px_0px_hsl(var(--foreground))] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all' 
+                      : ''
+                  }`}
+                >
                   <Home className="h-4 w-4" />
                   Main Site
                 </Button>
@@ -102,7 +131,11 @@ const Admin = () => {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => navigate(-1)}
-                className="gap-2"
+                className={`gap-2 ${
+                  isNeoBrutalism 
+                    ? 'rounded-none border-2 border-foreground font-bold uppercase hover:bg-muted' 
+                    : ''
+                }`}
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back
@@ -117,39 +150,37 @@ const Admin = () => {
           isLoading={loadingMembers || loadingProfiles} 
         />
         
-        <GlassCard variant="elevated" className="p-6">
+        <GlassCard variant="elevated" neoBrutalism={isNeoBrutalism} className="p-6">
           <Tabs defaultValue="registrations" className="w-full">
-            <TabsList className="grid w-full grid-cols-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/20">
-              <TabsTrigger value="registrations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
-                Registrations
-              </TabsTrigger>
-              <TabsTrigger value="users" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
-                Users
-              </TabsTrigger>
-              <TabsTrigger value="ats" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
-                ATS
-              </TabsTrigger>
-              <TabsTrigger value="templates" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
-                Templates
-              </TabsTrigger>
-              <TabsTrigger value="website" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
-                Website
-              </TabsTrigger>
-              <TabsTrigger value="improvements" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
-                Improvements
-              </TabsTrigger>
-              <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
-                Actions
-              </TabsTrigger>
-              <TabsTrigger value="content" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
-                Content
-              </TabsTrigger>
-              <TabsTrigger value="security" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
-                Security
-              </TabsTrigger>
-              <TabsTrigger value="ai" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-xs">
-                AI
-              </TabsTrigger>
+            <TabsList className={`grid w-full grid-cols-10 ${
+              isNeoBrutalism 
+                ? 'bg-muted border-2 border-foreground rounded-none' 
+                : 'bg-muted/50 dark:bg-gray-800/50 backdrop-blur-sm border border-border/50'
+            }`}>
+              {[
+                { value: 'registrations', label: 'Registrations' },
+                { value: 'users', label: 'Users' },
+                { value: 'ats', label: 'ATS' },
+                { value: 'templates', label: 'Templates' },
+                { value: 'website', label: 'Website' },
+                { value: 'improvements', label: 'Improvements' },
+                { value: 'actions', label: 'Actions' },
+                { value: 'content', label: 'Content' },
+                { value: 'security', label: 'Security' },
+                { value: 'ai', label: 'AI' },
+              ].map(tab => (
+                <TabsTrigger 
+                  key={tab.value} 
+                  value={tab.value} 
+                  className={`text-xs ${
+                    isNeoBrutalism 
+                      ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground data-[state=active]:shadow-[2px_2px_0px_0px_hsl(var(--foreground))]' 
+                      : 'data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white'
+                  }`}
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
             </TabsList>
             
             <TabsContent value="registrations" className="mt-6">
