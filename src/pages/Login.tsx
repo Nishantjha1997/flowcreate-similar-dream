@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Home } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import Header from '@/components/Header';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface FormErrors {
@@ -112,8 +113,10 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-card rounded-lg shadow-lg p-8">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8 bg-card rounded-lg shadow-lg p-8">
         <div className="text-center">
           <h1 className="mt-6 text-3xl font-extrabold text-foreground">
             Sign in to your account
@@ -284,6 +287,7 @@ const Login = () => {
               Continue with Google
             </Button>
           </div>
+        </div>
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Mail } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import Header from '@/components/Header';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -50,8 +51,10 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-card rounded-lg shadow-lg p-8">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8 bg-card rounded-lg shadow-lg p-8">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-extrabold text-foreground">
             Forgot your password?
@@ -126,7 +129,8 @@ const ForgotPassword = () => {
               </Link>
             </div>
           </form>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
