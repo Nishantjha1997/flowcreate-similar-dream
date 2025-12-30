@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Users, Briefcase, TrendingUp, Clock, 
-  Plus, Search, Filter, MoreVertical, Settings
+  Plus, Search, Filter, MoreVertical, Settings, FileText, Home
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -128,7 +128,19 @@ const ATSDashboard = () => {
             <h1 className="text-3xl font-bold mb-2">{primaryOrg.name}</h1>
             <p className="text-muted-foreground">ATS Dashboard</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            <Link to="/">
+              <Button variant="ghost" size="sm">
+                <Home className="mr-2 h-4 w-4" />
+                Main Site
+              </Button>
+            </Link>
+            <Link to="/resume-builder">
+              <Button variant="ghost" size="sm">
+                <FileText className="mr-2 h-4 w-4" />
+                Resume Builder
+              </Button>
+            </Link>
             <Button variant="outline" onClick={() => navigate('/ats/settings')}>
               <Settings className="mr-2 h-4 w-4" />
               Settings

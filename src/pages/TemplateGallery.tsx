@@ -1,9 +1,11 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Edit3, Eye, Grid, List } from 'lucide-react';
+import { Download, Edit3, Eye, Grid, List, Home } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import TemplatePreviewModal from '@/components/templates/TemplatePreviewModal';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 const templateCategories = [
   'Modern', 
@@ -75,7 +77,9 @@ const TemplateGallery: React.FC = () => {
     : templates;
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="container mx-auto px-4 py-12">
       <div className="flex flex-col space-y-6 mb-12">
         <div className="flex justify-between items-center">
           <div>
@@ -178,13 +182,15 @@ const TemplateGallery: React.FC = () => {
         </p>
       )}
 
-      {selectedTemplate && (
-        <TemplatePreviewModal
-          isOpen={!!selectedTemplate}
-          onClose={() => setSelectedTemplate(null)}
-          template={selectedTemplate}
-        />
-      )}
+        {selectedTemplate && (
+          <TemplatePreviewModal
+            isOpen={!!selectedTemplate}
+            onClose={() => setSelectedTemplate(null)}
+            template={selectedTemplate}
+          />
+        )}
+      </div>
+      <Footer />
     </div>
   );
 };
