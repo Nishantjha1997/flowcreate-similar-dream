@@ -21,6 +21,7 @@ import { UserProfile } from '@/hooks/useUserProfile';
 interface ProfileInsightsProps {
   profile: UserProfile | null;
   completeness: number;
+  isNeoBrutalism?: boolean;
 }
 
 interface Insight {
@@ -32,7 +33,11 @@ interface Insight {
   actionable?: boolean;
 }
 
-export const ProfileInsights: React.FC<ProfileInsightsProps> = ({ profile, completeness }) => {
+export const ProfileInsights: React.FC<ProfileInsightsProps> = ({ 
+  profile, 
+  completeness,
+  isNeoBrutalism = false 
+}) => {
   
   const generateInsights = (): Insight[] => {
     const insights: Insight[] = [];
@@ -163,16 +168,52 @@ export const ProfileInsights: React.FC<ProfileInsightsProps> = ({ profile, compl
   const warningsCount = insights.filter(i => i.type === 'warning').length;
 
   const getInsightColor = (type: string) => {
+    if (isNeoBrutalism) {
+      switch (type) {
+        case 'strength': return 'text-foreground bg-green-200 border-2 border-foreground';
+        case 'improvement': return 'text-foreground bg-blue-200 border-2 border-foreground';
+        case 'opportunity': return 'text-foreground bg-yellow-200 border-2 border-foreground';
+        case 'warning': return 'text-foreground bg-red-200 border-2 border-foreground';
+        default: return 'text-foreground bg-muted border-2 border-foreground';
+      }
+    }
     switch (type) {
-      case 'strength': return 'text-green-700 bg-green-50 border-green-200';
-      case 'improvement': return 'text-blue-700 bg-blue-50 border-blue-200';
-      case 'opportunity': return 'text-yellow-700 bg-yellow-50 border-yellow-200';
-      case 'warning': return 'text-red-700 bg-red-50 border-red-200';
-      default: return 'text-gray-700 bg-gray-50 border-gray-200';
+      case 'strength': return 'text-green-700 bg-green-50 border-green-200 dark:text-green-300 dark:bg-green-950/30 dark:border-green-800';
+      case 'improvement': return 'text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-300 dark:bg-blue-950/30 dark:border-blue-800';
+      case 'opportunity': return 'text-yellow-700 bg-yellow-50 border-yellow-200 dark:text-yellow-300 dark:bg-yellow-950/30 dark:border-yellow-800';
+      case 'warning': return 'text-red-700 bg-red-50 border-red-200 dark:text-red-300 dark:bg-red-950/30 dark:border-red-800';
+      default: return 'text-muted-foreground bg-muted border-border';
+    }
+  };
+
+  const getStatColor = (type: string) => {
+    if (isNeoBrutalism) {
+      switch (type) {
+        case 'strength': return 'bg-green-300 border-2 border-foreground';
+        case 'improvement': return 'bg-blue-300 border-2 border-foreground';
+        case 'opportunity': return 'bg-yellow-300 border-2 border-foreground';
+        case 'warning': return 'bg-red-300 border-2 border-foreground';
+        default: return 'bg-muted border-2 border-foreground';
+      }
+    }
+    switch (type) {
+      case 'strength': return 'bg-green-50 border border-green-200 dark:bg-green-950/30 dark:border-green-800';
+      case 'improvement': return 'bg-blue-50 border border-blue-200 dark:bg-blue-950/30 dark:border-blue-800';
+      case 'opportunity': return 'bg-yellow-50 border border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-800';
+      case 'warning': return 'bg-red-50 border border-red-200 dark:bg-red-950/30 dark:border-red-800';
+      default: return 'bg-muted border border-border';
     }
   };
 
   const getPriorityBadge = (priority: string) => {
+    if (isNeoBrutalism) {
+      switch (priority) {
+        case 'high': return <Badge className="text-xs border-2 border-foreground bg-red-400 text-foreground font-bold">High</Badge>;
+        case 'medium': return <Badge className="text-xs border-2 border-foreground bg-yellow-400 text-foreground font-bold">Medium</Badge>;
+        case 'low': return <Badge className="text-xs border-2 border-foreground bg-muted text-foreground font-bold">Low</Badge>;
+        default: return null;
+      }
+    }
     switch (priority) {
       case 'high': return <Badge variant="destructive" className="text-xs">High</Badge>;
       case 'medium': return <Badge variant="secondary" className="text-xs">Medium</Badge>;
@@ -182,31 +223,31 @@ export const ProfileInsights: React.FC<ProfileInsightsProps> = ({ profile, compl
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className={isNeoBrutalism ? 'border-3 border-foreground shadow-[6px_6px_0px_0px_hsl(var(--foreground))]' : ''}>
+      <CardHeader className="pb-3">
+        <CardTitle className={`flex items-center gap-2 text-base ${isNeoBrutalism ? 'uppercase font-black' : ''}`}>
           <TrendingUp className="w-5 h-5" />
           Profile Insights
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Overview Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="text-center p-3 rounded-lg bg-green-50 border border-green-200">
-            <div className="text-lg font-bold text-green-700">{strengthsCount}</div>
-            <div className="text-xs text-green-600">Strengths</div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className={`text-center p-2 rounded-lg ${getStatColor('strength')}`}>
+            <div className={`text-lg font-bold ${isNeoBrutalism ? 'text-foreground' : 'text-green-700 dark:text-green-300'}`}>{strengthsCount}</div>
+            <div className={`text-xs ${isNeoBrutalism ? 'text-foreground font-medium' : 'text-green-600 dark:text-green-400'}`}>Strengths</div>
           </div>
-          <div className="text-center p-3 rounded-lg bg-blue-50 border border-blue-200">
-            <div className="text-lg font-bold text-blue-700">{improvementsCount}</div>
-            <div className="text-xs text-blue-600">Improvements</div>
+          <div className={`text-center p-2 rounded-lg ${getStatColor('improvement')}`}>
+            <div className={`text-lg font-bold ${isNeoBrutalism ? 'text-foreground' : 'text-blue-700 dark:text-blue-300'}`}>{improvementsCount}</div>
+            <div className={`text-xs ${isNeoBrutalism ? 'text-foreground font-medium' : 'text-blue-600 dark:text-blue-400'}`}>To Improve</div>
           </div>
-          <div className="text-center p-3 rounded-lg bg-yellow-50 border border-yellow-200">
-            <div className="text-lg font-bold text-yellow-700">{opportunitiesCount}</div>
-            <div className="text-xs text-yellow-600">Opportunities</div>
+          <div className={`text-center p-2 rounded-lg ${getStatColor('opportunity')}`}>
+            <div className={`text-lg font-bold ${isNeoBrutalism ? 'text-foreground' : 'text-yellow-700 dark:text-yellow-300'}`}>{opportunitiesCount}</div>
+            <div className={`text-xs ${isNeoBrutalism ? 'text-foreground font-medium' : 'text-yellow-600 dark:text-yellow-400'}`}>Opportunities</div>
           </div>
-          <div className="text-center p-3 rounded-lg bg-red-50 border border-red-200">
-            <div className="text-lg font-bold text-red-700">{warningsCount}</div>
-            <div className="text-xs text-red-600">Warnings</div>
+          <div className={`text-center p-2 rounded-lg ${getStatColor('warning')}`}>
+            <div className={`text-lg font-bold ${isNeoBrutalism ? 'text-foreground' : 'text-red-700 dark:text-red-300'}`}>{warningsCount}</div>
+            <div className={`text-xs ${isNeoBrutalism ? 'text-foreground font-medium' : 'text-red-600 dark:text-red-400'}`}>Warnings</div>
           </div>
         </div>
 
@@ -214,69 +255,46 @@ export const ProfileInsights: React.FC<ProfileInsightsProps> = ({ profile, compl
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium">Profile Strength</span>
-            <span className="text-sm text-muted-foreground">{completeness}%</span>
+            <span className={`text-sm font-bold ${isNeoBrutalism ? 'bg-primary text-primary-foreground px-2 py-0.5' : 'text-muted-foreground'}`}>
+              {completeness}%
+            </span>
           </div>
-          <Progress value={completeness} className="h-2" />
-          <div className="text-xs text-muted-foreground">
+          <Progress value={completeness} className={`h-2 ${isNeoBrutalism ? 'border border-foreground' : ''}`} />
+          <div className={`text-xs ${isNeoBrutalism ? 'font-medium' : 'text-muted-foreground'}`}>
             {completeness < 50 ? 'Needs significant improvement' :
              completeness < 80 ? 'Good progress, keep enhancing' :
              'Excellent profile strength'}
           </div>
         </div>
 
-        {/* Individual Insights */}
-        <div className="space-y-3 max-h-96 overflow-y-auto">
+        {/* Individual Insights - Show top 3 */}
+        <div className="space-y-2">
           {insights.length === 0 ? (
-            <Alert>
+            <Alert className={isNeoBrutalism ? 'border-2 border-foreground' : ''}>
               <CheckCircle2 className="h-4 w-4" />
               <AlertDescription>
                 Your profile looks great! No specific recommendations at this time.
               </AlertDescription>
             </Alert>
           ) : (
-            insights.map((insight, index) => (
+            insights.slice(0, 3).map((insight, index) => (
               <Alert key={index} className={getInsightColor(insight.type)}>
-                <div className="flex items-start justify-between w-full">
-                  <div className="flex items-start gap-2 flex-1">
-                    {insight.icon}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-sm">{insight.title}</span>
-                        {getPriorityBadge(insight.priority)}
-                      </div>
-                      <AlertDescription className="text-xs">
-                        {insight.description}
-                      </AlertDescription>
+                <div className="flex items-start gap-2">
+                  {insight.icon}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                      <span className={`font-medium text-sm ${isNeoBrutalism ? 'uppercase' : ''}`}>{insight.title}</span>
+                      {getPriorityBadge(insight.priority)}
                     </div>
+                    <AlertDescription className="text-xs">
+                      {insight.description}
+                    </AlertDescription>
                   </div>
-                  {insight.actionable && (
-                    <Button variant="ghost" size="sm" className="text-xs ml-2">
-                      Fix Now
-                    </Button>
-                  )}
                 </div>
               </Alert>
             ))
           )}
         </div>
-
-        {/* Quick Actions */}
-        {insights.some(i => i.actionable) && (
-          <div className="pt-3 border-t">
-            <div className="text-sm font-medium mb-2">Quick Actions</div>
-            <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" className="text-xs">
-                Complete Profile
-              </Button>
-              <Button variant="outline" size="sm" className="text-xs">
-                Add Experience
-              </Button>
-              <Button variant="outline" size="sm" className="text-xs">
-                Update Skills
-              </Button>
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   );
