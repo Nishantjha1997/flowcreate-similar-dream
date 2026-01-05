@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Upload, FileText, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Upload, FileText, Loader2, AlertCircle, CheckCircle2, Key } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfile } from '@/hooks/useUserProfile';
@@ -19,6 +19,7 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [extractedData, setExtractedData] = useState<Partial<UserProfile> | null>(null);
+  const [apiKeyMissing, setApiKeyMissing] = useState(false);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -40,6 +41,7 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
   const handleUpload = async (file: File) => {
     setUploading(true);
     setUploadSuccess(false);
+    setApiKeyMissing(false);
 
     try {
       const formData = new FormData();
@@ -50,6 +52,13 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
       });
 
       if (error) throw error;
+
+      // Check if API key is missing
+      if (data.requiresApiKey) {
+        setApiKeyMissing(true);
+        toast.error('AI resume parsing requires configuration. Please contact the administrator.');
+        return;
+      }
 
       if (data.success && data.data) {
         const extractedData = data.data;
@@ -114,7 +123,7 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
           Import from Resume
         </CardTitle>
         <CardDescription>
-          Upload your existing resume (PDF) to automatically fill your profile data
+          Upload your existing resume (PDF) to automatically fill your profile data using AI
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -144,7 +153,7 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
                     {uploading ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Processing...
+                        Processing with AI...
                       </>
                     ) : (
                       <>
@@ -167,10 +176,20 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
             </Alert>
           )}
 
+          {apiKeyMissing && (
+            <Alert className="border-orange-200 bg-orange-50">
+              <Key className="h-4 w-4 text-orange-600" />
+              <AlertDescription className="text-orange-800">
+                <strong>AI Parsing Not Configured:</strong> This feature requires a Gemini API key to be configured. 
+                Please contact the administrator to enable AI resume parsing, or manually enter your profile information.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              <strong>How it works:</strong> We use AI to extract information from your resume including 
+              <strong>How it works:</strong> We use Google Gemini AI to extract information from your resume including 
               personal details, work experience, education, skills, and projects. You can review and selectively 
               import the extracted data into your profile.
             </AlertDescription>

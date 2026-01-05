@@ -14,8 +14,18 @@ serve(async (req) => {
 
   try {
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
+    
+    // Better error handling for missing API key
     if (!GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY is not set')
+      console.log('GEMINI_API_KEY is not configured')
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: 'AI resume parsing is not configured. Please add GEMINI_API_KEY to enable this feature.',
+        requiresApiKey: true
+      }), {
+        status: 200, // Return 200 so we can handle gracefully on client
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
 
     // Parse the multipart form data

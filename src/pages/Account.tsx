@@ -600,12 +600,12 @@ const Account = () => {
                         <TabsTrigger 
                           key={tab.id}
                           value={tab.id}
-                          className={`flex items-center gap-2 px-3 sm:px-4 py-2.5 text-sm font-medium transition-all relative ${isNeoBrutalism ? 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground uppercase' : 'data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md'}`}
+                          className={`flex items-center gap-2 px-3 sm:px-4 py-2.5 text-sm font-medium transition-all duration-200 relative ${isNeoBrutalism ? 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground uppercase data-[state=active]:scale-105' : 'data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md data-[state=active]:scale-[1.02]'}`}
                         >
                           <div className="relative">
-                            <IconComponent className="w-4 h-4" />
+                            <IconComponent className="w-4 h-4 transition-transform duration-200 group-data-[state=active]:scale-110" />
                             {tab.isComplete && (
-                              <div className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${isNeoBrutalism ? 'bg-green-500 border border-foreground' : 'bg-green-500'}`} />
+                              <div className={`absolute -top-1 -right-1 w-2 h-2 rounded-full animate-pulse ${isNeoBrutalism ? 'bg-green-500 border border-foreground' : 'bg-green-500'}`} />
                             )}
                           </div>
                           <span className="hidden sm:inline">{tab.label}</span>
@@ -623,10 +623,10 @@ const Account = () => {
                   <span className="text-muted-foreground">Profile sections completed</span>
                   <span className="font-medium">{completedTabs}/{tabConfig.length}</span>
                 </div>
-                <Progress value={tabProgress} className={`h-2 ${isNeoBrutalism ? 'border border-foreground' : ''}`} />
+                <Progress value={tabProgress} className={`h-2 transition-all duration-500 ${isNeoBrutalism ? 'border border-foreground' : ''}`} />
               </div>
           
-              <TabsContent value="personal" className="mt-0 space-y-6">
+              <TabsContent value="personal" className="mt-0 space-y-6 animate-fade-in">
                 <PersonalInfoForm 
                   profile={mergedProfile} 
                   onUpdate={handleProfileUpdate}
@@ -634,7 +634,7 @@ const Account = () => {
                 />
               </TabsContent>
               
-              <TabsContent value="professional" className="mt-0">
+              <TabsContent value="professional" className="mt-0 animate-fade-in">
                 <ProfessionalInfoForm 
                   profile={mergedProfile} 
                   onUpdate={handleProfileUpdate}
@@ -642,7 +642,7 @@ const Account = () => {
                 />
               </TabsContent>
               
-              <TabsContent value="experience" className="mt-0">
+              <TabsContent value="experience" className="mt-0 animate-fade-in">
                 <WorkExperienceForm 
                   profile={mergedProfile} 
                   onUpdate={handleProfileUpdate}
@@ -650,7 +650,7 @@ const Account = () => {
                 />
               </TabsContent>
               
-              <TabsContent value="education" className="mt-0">
+              <TabsContent value="education" className="mt-0 animate-fade-in">
                 <EducationForm 
                   profile={mergedProfile} 
                   onUpdate={handleProfileUpdate}
@@ -658,7 +658,7 @@ const Account = () => {
                 />
               </TabsContent>
               
-              <TabsContent value="skills" className="mt-0 space-y-6">
+              <TabsContent value="skills" className="mt-0 space-y-6 animate-fade-in">
                 <AdvancedSkillsForm 
                   profile={mergedProfile} 
                   onUpdate={handleProfileUpdate}
@@ -671,7 +671,7 @@ const Account = () => {
                 />
               </TabsContent>
               
-              <TabsContent value="projects" className="mt-0">
+              <TabsContent value="projects" className="mt-0 animate-fade-in">
                 <ProjectsForm 
                   profile={mergedProfile} 
                   onUpdate={handleProfileUpdate}
@@ -679,7 +679,7 @@ const Account = () => {
                 />
               </TabsContent>
               
-              <TabsContent value="certifications" className="mt-0">
+              <TabsContent value="certifications" className="mt-0 animate-fade-in">
                 <CertificationsForm 
                   profile={mergedProfile} 
                   onUpdate={handleProfileUpdate}
@@ -687,7 +687,7 @@ const Account = () => {
                 />
               </TabsContent>
               
-              <TabsContent value="volunteer" className="mt-0">
+              <TabsContent value="volunteer" className="mt-0 animate-fade-in">
                 <VolunteerForm 
                   profile={mergedProfile} 
                   onUpdate={handleProfileUpdate}
@@ -695,7 +695,7 @@ const Account = () => {
                 />
               </TabsContent>
 
-              <TabsContent value="resumes" className="mt-0">
+              <TabsContent value="resumes" className="mt-0 animate-fade-in">
                 <Card className={isNeoBrutalism ? 'border-3 border-foreground shadow-[6px_6px_0px_0px_hsl(var(--foreground))]' : ''}>
                   <CardHeader>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -798,7 +798,7 @@ const Account = () => {
                 </Card>
               </TabsContent>
               
-              <TabsContent value="security" className="mt-0">
+              <TabsContent value="security" className="mt-0 animate-fade-in">
                 <Card className={isNeoBrutalism ? 'border-3 border-foreground shadow-[6px_6px_0px_0px_hsl(var(--foreground))]' : ''}>
                   <CardHeader>
                     <CardTitle className={`flex items-center gap-2 ${isNeoBrutalism ? 'uppercase font-black' : ''}`}>
