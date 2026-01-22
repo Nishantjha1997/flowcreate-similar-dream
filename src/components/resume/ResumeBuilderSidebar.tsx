@@ -9,6 +9,8 @@ import { SectionDragDropCustomizer } from '@/components/resume/SectionDragDropCu
 import { ResumeData } from '@/utils/types';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { CustomizationPanel } from '../CustomizationPanel';
+import { useDesignMode } from '@/hooks/useDesignMode';
+import { cn } from '@/lib/utils';
 import { 
   User, 
   Briefcase, 
@@ -18,7 +20,9 @@ import {
   Settings,
   Palette,
   Layout,
-  FileText
+  FileText,
+  Sparkles,
+  CheckCircle2
 } from 'lucide-react';
 
 interface ResumeBuilderSidebarProps {
@@ -76,6 +80,24 @@ const sections = [
   { id: 'projects', name: 'Projects', icon: BookOpen },
 ];
 
+// Helper to check section completion
+const isSectionComplete = (resume: ResumeData, sectionId: string): boolean => {
+  switch (sectionId) {
+    case 'personal':
+      return !!(resume.personal?.name && resume.personal?.email);
+    case 'experience':
+      return !!(resume.experience && resume.experience.length > 0 && resume.experience[0]?.title);
+    case 'education':
+      return !!(resume.education && resume.education.length > 0 && resume.education[0]?.school);
+    case 'skills':
+      return !!(resume.skills && resume.skills.length > 0);
+    case 'projects':
+      return !!(resume.projects && resume.projects.length > 0 && resume.projects[0]?.title);
+    default:
+      return false;
+  }
+};
+
 export const ResumeBuilderSidebar = ({
   activeSection,
   onSectionChange,
@@ -108,59 +130,76 @@ export const ResumeBuilderSidebar = ({
   onPDFDataExtracted
 }: ResumeBuilderSidebarProps) => {
   const [activeTab, setActiveTab] = useState('edit');
+  const { isNeoBrutalism } = useDesignMode();
+
+  const tabs = [
+    { id: 'edit', label: 'Edit', icon: FileText },
+    { id: 'templates', label: 'Themes', icon: Palette },
+    { id: 'layout', label: 'Layout', icon: Layout },
+  ];
 
   return (
-    <div className="flex flex-col h-full rounded-lg border bg-card overflow-hidden">
-      {/* Compact Tab Navigation */}
-      <div className="flex-shrink-0 border-b bg-muted/30">
-        <div className="grid grid-cols-3">
-          <button
-            className={`flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors border-b-2 ${
-              activeTab === 'edit' 
-                ? 'border-primary text-primary bg-background' 
-                : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
-            }`}
-            onClick={() => setActiveTab('edit')}
-          >
-            <FileText className="h-3.5 w-3.5" />
-            <span>Edit</span>
-          </button>
-          <button
-            className={`flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors border-b-2 ${
-              activeTab === 'templates' 
-                ? 'border-primary text-primary bg-background' 
-                : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
-            }`}
-            onClick={() => setActiveTab('templates')}
-          >
-            <Palette className="h-3.5 w-3.5" />
-            <span>Themes</span>
-          </button>
-          <button
-            className={`flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors border-b-2 ${
-              activeTab === 'layout' 
-                ? 'border-primary text-primary bg-background' 
-                : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
-            }`}
-            onClick={() => setActiveTab('layout')}
-          >
-            <Layout className="h-3.5 w-3.5" />
-            <span>Layout</span>
-          </button>
+    <div className={cn(
+      "flex flex-col h-full rounded-lg border bg-card overflow-hidden transition-all duration-300",
+      isNeoBrutalism && "border-2 border-foreground shadow-[4px_4px_0_0_hsl(var(--foreground))]"
+    )}>
+      {/* Tab Navigation with Animation */}
+      <div className={cn(
+        "flex-shrink-0 border-b bg-muted/30",
+        isNeoBrutalism && "border-b-2 border-foreground"
+      )}>
+        <div className="grid grid-cols-3 relative">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                className={cn(
+                  "flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-all duration-300 border-b-2 relative",
+                  isActive
+                    ? "border-primary text-primary bg-background"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                  isActive && "scale-[1.02]",
+                  isNeoBrutalism && isActive && "border-foreground bg-accent"
+                )}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                <Icon className={cn(
+                  "h-3.5 w-3.5 transition-transform duration-300",
+                  isActive && "scale-110"
+                )} />
+                <span>{tab.label}</span>
+                {isActive && (
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full animate-scale-in" />
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Scrollable Content Area */}
+      {/* Scrollable Content Area with Animation */}
       <ScrollArea className="flex-1">
-        <div className="p-3">
+        <div className="p-3 animate-fade-in">
           {activeTab === 'edit' && (
             <div className="space-y-3">
               {/* Section Navigation Header */}
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Sections</span>
+                <span className={cn(
+                  "text-xs font-medium text-muted-foreground uppercase tracking-wide",
+                  isNeoBrutalism && "font-bold text-foreground"
+                )}>Sections</span>
                 <Sheet>
                   <SheetTrigger asChild>
-                    <Button size="sm" variant="ghost" className="h-7 px-2 text-xs">
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      className={cn(
+                        "h-7 px-2 text-xs",
+                        isNeoBrutalism && "border border-foreground hover:bg-accent"
+                      )}
+                    >
                       <Settings className="h-3.5 w-3.5 mr-1" />
                       Style
                     </Button>
@@ -182,70 +221,102 @@ export const ResumeBuilderSidebar = ({
                 </Sheet>
               </div>
 
+              {/* Fill from Profile Button */}
+              {hasProfileData && onPopulateFromProfile && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "w-full h-8 text-xs gap-1.5 bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10 border-primary/30",
+                    isNeoBrutalism && "border-2 border-foreground shadow-[2px_2px_0_0_hsl(var(--foreground))] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                  )}
+                  onClick={onPopulateFromProfile}
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Fill from Profile
+                </Button>
+              )}
+
               {/* Section Navigation Pills */}
               <div className="flex flex-wrap gap-1.5">
-                {sections.map((section) => {
+                {sections.map((section, index) => {
                   const Icon = section.icon;
                   const isActive = activeSection === section.id;
+                  const isComplete = isSectionComplete(resume, section.id);
                   return (
                     <button
                       key={section.id}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                      className={cn(
+                        "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all duration-200 relative group",
                         isActive
-                          ? 'bg-primary text-primary-foreground shadow-sm'
-                          : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
-                      }`}
+                          ? "bg-primary text-primary-foreground shadow-sm scale-105"
+                          : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground hover:scale-102",
+                        isNeoBrutalism && isActive && "border-2 border-foreground shadow-[2px_2px_0_0_hsl(var(--foreground))]",
+                        isNeoBrutalism && !isActive && "border border-foreground/30"
+                      )}
+                      style={{ animationDelay: `${index * 50}ms` }}
                       onClick={() => onSectionChange(section.id)}
                     >
                       <Icon className="h-3.5 w-3.5" />
                       <span>{section.name}</span>
+                      {isComplete && !isActive && (
+                        <CheckCircle2 className="h-3 w-3 text-green-500 ml-0.5" />
+                      )}
                     </button>
                   );
                 })}
               </div>
 
-              <Separator />
+              <Separator className={isNeoBrutalism ? "bg-foreground/30" : ""} />
 
-              {/* Form Content */}
-              <ResumeFormSection
-                activeSection={activeSection}
-                resume={resume}
-                handlePersonalInfoChange={handlePersonalInfoChange}
-                onProfileImageChange={onProfileImageChange}
-                handleExperienceChange={handleExperienceChange}
-                handleCurrentJobToggle={handleCurrentJobToggle}
-                addExperience={addExperience}
-                removeExperience={removeExperience}
-                handleEducationChange={handleEducationChange}
-                addEducation={addEducation}
-                removeEducation={removeEducation}
-                handleSkillsChange={handleSkillsChange}
-                handleProjectChange={handleProjectChange}
-                addProject={addProject}
-                removeProject={removeProject}
-                handleCustomizationChange={handleCustomizationChange}
-                onAIFeatureUpsell={onAIFeatureUpsell}
-                isPremium={isPremium}
-                onPopulateFromProfile={onPopulateFromProfile}
-                hasProfileData={hasProfileData}
-                onPDFDataExtracted={onPDFDataExtracted}
-              />
+              {/* Form Content with Animation */}
+              <div className="animate-fade-in" key={activeSection}>
+                <ResumeFormSection
+                  activeSection={activeSection}
+                  resume={resume}
+                  handlePersonalInfoChange={handlePersonalInfoChange}
+                  onProfileImageChange={onProfileImageChange}
+                  handleExperienceChange={handleExperienceChange}
+                  handleCurrentJobToggle={handleCurrentJobToggle}
+                  addExperience={addExperience}
+                  removeExperience={removeExperience}
+                  handleEducationChange={handleEducationChange}
+                  addEducation={addEducation}
+                  removeEducation={removeEducation}
+                  handleSkillsChange={handleSkillsChange}
+                  handleProjectChange={handleProjectChange}
+                  addProject={addProject}
+                  removeProject={removeProject}
+                  handleCustomizationChange={handleCustomizationChange}
+                  onAIFeatureUpsell={onAIFeatureUpsell}
+                  isPremium={isPremium}
+                  onPopulateFromProfile={onPopulateFromProfile}
+                  hasProfileData={hasProfileData}
+                  onPDFDataExtracted={onPDFDataExtracted}
+                />
+              </div>
             </div>
           )}
 
           {activeTab === 'templates' && (
-            <div className="space-y-3">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Choose Template</span>
+            <div className="space-y-3 animate-fade-in">
+              <span className={cn(
+                "text-xs font-medium text-muted-foreground uppercase tracking-wide",
+                isNeoBrutalism && "font-bold text-foreground"
+              )}>Choose Template</span>
               
               <div className="grid grid-cols-2 gap-2">
-                {templates.map((template) => (
+                {templates.map((template, index) => (
                   <button
                     key={template.id}
-                    className={`relative text-left rounded-lg overflow-hidden border transition-all hover:shadow-md ${
+                    className={cn(
+                      "relative text-left rounded-lg overflow-hidden border transition-all duration-200 hover:shadow-md group",
                       currentTemplateId === template.id 
-                        ? 'ring-2 ring-primary border-primary' 
-                        : 'hover:border-muted-foreground/30'
-                    }`}
+                        ? "ring-2 ring-primary border-primary scale-[1.02]" 
+                        : "hover:border-muted-foreground/30 hover:scale-[1.01]",
+                      isNeoBrutalism && "border-2 border-foreground shadow-[3px_3px_0_0_hsl(var(--foreground))] hover:shadow-[1px_1px_0_0_hsl(var(--foreground))] hover:translate-x-[2px] hover:translate-y-[2px]"
+                    )}
+                    style={{ animationDelay: `${index * 30}ms` }}
                     onClick={() => onTemplateChange(template.id)}
                   >
                     <div className="aspect-[3/4] bg-gradient-to-br from-muted/50 to-muted overflow-hidden relative">
@@ -267,7 +338,10 @@ export const ResumeBuilderSidebar = ({
                         )}
                       </div>
                     </div>
-                    <div className="p-1.5 bg-background border-t">
+                    <div className={cn(
+                      "p-1.5 bg-background border-t",
+                      isNeoBrutalism && "border-t-2 border-foreground"
+                    )}>
                       <div className="text-[11px] font-medium truncate">{template.name}</div>
                       <div className="text-[10px] text-muted-foreground">{template.category}</div>
                     </div>
@@ -275,7 +349,10 @@ export const ResumeBuilderSidebar = ({
                 ))}
               </div>
 
-              <div className="p-2 bg-muted/30 rounded-md">
+              <div className={cn(
+                "p-2 bg-muted/30 rounded-md",
+                isNeoBrutalism && "border-2 border-foreground/50"
+              )}>
                 <p className="text-[10px] text-muted-foreground">
                   💡 <strong>ATS templates</strong> are optimized for applicant tracking systems
                 </p>
@@ -284,8 +361,11 @@ export const ResumeBuilderSidebar = ({
           )}
 
           {activeTab === 'layout' && (
-            <div className="space-y-3">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Section Order</span>
+            <div className="space-y-3 animate-fade-in">
+              <span className={cn(
+                "text-xs font-medium text-muted-foreground uppercase tracking-wide",
+                isNeoBrutalism && "font-bold text-foreground"
+              )}>Section Order</span>
               <SectionDragDropCustomizer
                 activeSections={activeSections}
                 hiddenSections={hiddenSections}
