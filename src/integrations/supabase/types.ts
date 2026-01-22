@@ -89,6 +89,42 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_events: {
+        Row: {
+          created_at: string | null
+          event_name: string
+          event_properties: Json | null
+          id: string
+          ip_address: unknown
+          page_url: string | null
+          session_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_name: string
+          event_properties?: Json | null
+          id?: string
+          ip_address?: unknown
+          page_url?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_name?: string
+          event_properties?: Json | null
+          id?: string
+          ip_address?: unknown
+          page_url?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       application_reviews: {
         Row: {
           application_id: string
@@ -977,6 +1013,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      usage_limits: {
+        Row: {
+          ai_requests: number
+          created_at: string | null
+          id: string
+          last_reset_at: string | null
+          resumes_created: number
+          templates_used: string[] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_requests?: number
+          created_at?: string | null
+          id?: string
+          last_reset_at?: string | null
+          resumes_created?: number
+          templates_used?: string[] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_requests?: number
+          created_at?: string | null
+          id?: string
+          last_reset_at?: string | null
+          resumes_created?: number
+          templates_used?: string[] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
