@@ -54,7 +54,7 @@ const ResumeBuilder = () => {
   });
   
   // Profile sync for auto-population
-  const { profile, populateFromProfile, hasProfileData } = useResumeProfileSync({
+  const { profile, populateFromProfile, hasProfileData, canFillFromProfile } = useResumeProfileSync({
     resume,
     setResume,
     shouldAutoPopulate: !isExample && !editResumeId && !resume.personal.name
@@ -191,6 +191,7 @@ const ResumeBuilder = () => {
                   onSectionTitleChange={() => {}}
                   onPopulateFromProfile={populateFromProfile}
                   hasProfileData={hasProfileData}
+                  canFillFromProfile={canFillFromProfile}
                   onPDFDataExtracted={handlePDFDataExtracted}
                 />
               </div>
