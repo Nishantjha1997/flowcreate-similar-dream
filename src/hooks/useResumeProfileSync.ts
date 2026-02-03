@@ -1,5 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useAuth } from '@/hooks/useAuth';
 import { ResumeData } from '@/utils/types';
 import { toast } from 'sonner';
 
@@ -14,6 +15,7 @@ export const useResumeProfileSync = ({
   setResume, 
   shouldAutoPopulate = false 
 }: UseResumeProfileSyncProps) => {
+  const { user } = useAuth();
   const { profile, isLoading, populateResumeFromProfile } = useUserProfile();
 
   // Auto-populate resume from profile on initial load
@@ -37,22 +39,35 @@ export const useResumeProfileSync = ({
   }, [profile, shouldAutoPopulate, resume.personal.name, setResume, populateResumeFromProfile]);
 
   const populateFromProfile = useCallback(() => {
+    // Check if user is logged in
+    if (!user) {
+      toast.error('Please log in to use this feature.');
+      return;
+    }
+
+    if (isLoading) {
+      toast.info('Loading profile data...');
+      return;
+    }
+
     if (!profile) {
-      toast.error('No profile data found. Please complete your profile first.');
+      toast.error('No profile found. Please complete your profile first in Account settings.');
       return;
     }
     
     const populatedData = populateResumeFromProfile(profile);
     
     // Check if there's actual data to populate
-    const hasData = populatedData.personal?.name || 
-                    populatedData.personal?.email || 
-                    (populatedData.experience && populatedData.experience.length > 0) ||
-                    (populatedData.education && populatedData.education.length > 0) ||
-                    (populatedData.skills && populatedData.skills.length > 0);
+    const hasPersonalData = populatedData.personal?.name || populatedData.personal?.email || populatedData.personal?.phone;
+    const hasExperience = populatedData.experience && populatedData.experience.length > 0;
+    const hasEducation = populatedData.education && populatedData.education.length > 0;
+    const hasSkills = populatedData.skills && populatedData.skills.length > 0;
+    const hasProjects = populatedData.projects && populatedData.projects.length > 0;
     
-    if (!hasData) {
-      toast.error('Your profile appears to be empty. Please add data to your profile first.');
+    const hasAnyData = hasPersonalData || hasExperience || hasEducation || hasSkills || hasProjects;
+    
+    if (!hasAnyData) {
+      toast.error('Your profile appears to be empty. Please add data to your profile first in Account settings.');
       return;
     }
     
@@ -91,22 +106,34 @@ export const useResumeProfileSync = ({
       }
     }));
     
-    toast.success('Resume populated from your profile!');
-  }, [profile, setResume, populateResumeFromProfile]);
+    // Show success with details
+    const importedSections = [];
+    if (hasPersonalData) importedSections.push('personal info');
+    if (hasExperience) importedSections.push('experience');
+    if (hasEducation) importedSections.push('education');
+    if (hasSkills) importedSections.push('skills');
+    if (hasProjects) importedSections.push('projects');
+    
+    toast.success(`Resume populated with: ${importedSections.join(', ')}`);
+  }, [user, profile, isLoading, setResume, populateResumeFromProfile]);
 
-  // Determine if profile has meaningful data
+  // User is logged in = can try to fill from profile (even if no data yet, will show helpful error)
+  const canFillFromProfile = !!user;
+  
+  // Determine if profile has meaningful data (for showing indicator)
   const hasProfileData = !isLoading && !!(
     profile?.full_name || 
     profile?.email ||
-    (profile?.work_experience && profile.work_experience.length > 0) ||
-    (profile?.education && profile.education.length > 0) ||
-    (profile?.technical_skills && profile.technical_skills.length > 0)
+    (profile?.work_experience && Array.isArray(profile.work_experience) && profile.work_experience.length > 0) ||
+    (profile?.education && Array.isArray(profile.education) && profile.education.length > 0) ||
+    (profile?.technical_skills && Array.isArray(profile.technical_skills) && profile.technical_skills.length > 0)
   );
 
   return {
     profile,
     isLoading,
     populateFromProfile,
-    hasProfileData
+    hasProfileData,
+    canFillFromProfile
   };
 };

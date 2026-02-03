@@ -54,6 +54,7 @@ interface ResumeBuilderSidebarProps {
   onSectionTitleChange: (sectionId: string, title: string) => void;
   onPopulateFromProfile?: () => void;
   hasProfileData?: boolean;
+  canFillFromProfile?: boolean;
   onPDFDataExtracted?: (data: Partial<ResumeData>) => void;
 }
 
@@ -127,6 +128,7 @@ export const ResumeBuilderSidebar = ({
   onSectionTitleChange,
   onPopulateFromProfile,
   hasProfileData,
+  canFillFromProfile,
   onPDFDataExtracted
 }: ResumeBuilderSidebarProps) => {
   const [activeTab, setActiveTab] = useState('edit');
@@ -221,19 +223,22 @@ export const ResumeBuilderSidebar = ({
                 </Sheet>
               </div>
 
-              {/* Fill from Profile Button */}
-              {hasProfileData && onPopulateFromProfile && (
+              {/* Fill from Profile Button - Show when user can fill (logged in) */}
+              {canFillFromProfile && onPopulateFromProfile && (
                 <Button
                   variant="outline"
                   size="sm"
                   className={cn(
-                    "w-full h-8 text-xs gap-1.5 bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10 border-primary/30",
+                    "w-full h-8 text-xs gap-1.5 border-primary/30",
+                    hasProfileData 
+                      ? "bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10"
+                      : "bg-muted/50 hover:bg-muted",
                     isNeoBrutalism && "border-2 border-foreground shadow-[2px_2px_0_0_hsl(var(--foreground))] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
                   )}
                   onClick={onPopulateFromProfile}
                 >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Fill from Profile
+                  <Sparkles className={cn("h-3.5 w-3.5", hasProfileData && "text-primary")} />
+                  {hasProfileData ? 'Fill from Profile' : 'Import from Profile'}
                 </Button>
               )}
 
