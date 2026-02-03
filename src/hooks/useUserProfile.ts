@@ -136,14 +136,31 @@ export const useUserProfile = () => {
       profileImage: profile.avatar_url || ''
     };
 
-    // Populate experience if available
+    // Populate experience if available - map profile fields to resume fields
     if (profile.work_experience && Array.isArray(profile.work_experience) && profile.work_experience.length > 0) {
-      populatedData.experience = profile.work_experience;
+      populatedData.experience = profile.work_experience.map((exp: any, index: number) => ({
+        id: index + 1,
+        title: exp.title || exp.position || '',
+        company: exp.company || exp.organization || '',
+        location: exp.location || '',
+        startDate: exp.startDate || exp.start_date || '',
+        endDate: exp.current ? 'Present' : (exp.endDate || exp.end_date || ''),
+        current: exp.current || false,
+        description: exp.description || ''
+      }));
     }
 
-    // Populate education if available
+    // Populate education if available - map profile fields to resume fields
     if (profile.education && Array.isArray(profile.education) && profile.education.length > 0) {
-      populatedData.education = profile.education;
+      populatedData.education = profile.education.map((edu: any, index: number) => ({
+        id: index + 1,
+        school: edu.school || edu.institution || edu.university || '',
+        degree: edu.degree || '',
+        field: edu.field || edu.major || edu.fieldOfStudy || '',
+        startDate: edu.startDate || edu.start_date || '',
+        endDate: edu.endDate || edu.end_date || '',
+        description: edu.description || edu.gpa ? `GPA: ${edu.gpa}` : ''
+      }));
     }
 
     // Populate skills if available
@@ -151,19 +168,36 @@ export const useUserProfile = () => {
       populatedData.skills = profile.technical_skills;
     }
 
-    // Populate projects if available
+    // Populate projects if available - map profile fields to resume fields
     if (profile.projects && Array.isArray(profile.projects) && profile.projects.length > 0) {
-      populatedData.projects = profile.projects;
+      populatedData.projects = profile.projects.map((proj: any, index: number) => ({
+        id: index + 1,
+        title: proj.title || proj.name || '',
+        description: proj.description || '',
+        link: proj.link || proj.url || '',
+        technologies: proj.technologies || proj.tech_stack || []
+      }));
     }
 
     // Populate certifications if available
     if (profile.certifications && Array.isArray(profile.certifications) && profile.certifications.length > 0) {
-      populatedData.certifications = profile.certifications;
+      populatedData.certifications = profile.certifications.map((cert: any) => ({
+        name: cert.name || cert.title || '',
+        issuer: cert.issuer || cert.organization || '',
+        date: cert.date || cert.issued_date || '',
+        url: cert.url || cert.credential_url || ''
+      }));
     }
 
     // Populate volunteer experience if available
     if (profile.volunteer_experience && Array.isArray(profile.volunteer_experience) && profile.volunteer_experience.length > 0) {
-      populatedData.volunteer = profile.volunteer_experience;
+      populatedData.volunteer = profile.volunteer_experience.map((vol: any) => ({
+        organization: vol.organization || vol.company || '',
+        role: vol.role || vol.title || '',
+        startDate: vol.startDate || vol.start_date || '',
+        endDate: vol.endDate || vol.end_date || '',
+        description: vol.description || ''
+      }));
     }
 
     // Populate languages if available
