@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
-import { FileText, Globe, Image, Settings, Save, Plus } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { FileText, Globe, Settings, Save, Plus, Loader2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface ContentSection {
   id: string;
@@ -18,84 +20,285 @@ interface ContentSection {
   lastUpdated: string;
 }
 
+interface LandingPageContent {
+  heroTitle: string;
+  heroSubtitle: string;
+  ctaButtonText: string;
+  featuresTitle: string;
+  testimonialsTitle: string;
+}
+
+interface SEOSettings {
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
+}
+
+const defaultLandingPageContent: LandingPageContent = {
+  heroTitle: "Build Your Perfect Resume",
+  heroSubtitle: "Create professional, ATS-optimized resumes that get you noticed by employers",
+  ctaButtonText: "Start Building",
+  featuresTitle: "Why Choose Our Resume Builder?",
+  testimonialsTitle: "Success Stories"
+};
+
+const defaultSeoSettings: SEOSettings = {
+  metaTitle: "Professional Resume Builder | Create ATS-Optimized Resumes",
+  metaDescription: "Build professional resumes with our easy-to-use resume builder. Choose from ATS-optimized templates and get hired faster.",
+  keywords: "resume builder, CV maker, professional resume, ATS resume, job application",
+  ogTitle: "Professional Resume Builder",
+  ogDescription: "Create stunning resumes that get you hired",
+  ogImage: ""
+};
+
+const defaultContentSections: ContentSection[] = [
+  {
+    id: "1",
+    title: "Privacy Policy",
+    content: "Your privacy is important to us...",
+    isVisible: true,
+    lastUpdated: new Date().toISOString().split('T')[0]
+  },
+  {
+    id: "2", 
+    title: "Terms of Service",
+    content: "By using our service, you agree to...",
+    isVisible: true,
+    lastUpdated: new Date().toISOString().split('T')[0]
+  },
+  {
+    id: "3",
+    title: "FAQ Section",
+    content: "Frequently asked questions...",
+    isVisible: true,
+    lastUpdated: new Date().toISOString().split('T')[0]
+  }
+];
+
 export const ContentManagement = () => {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
-  const [landingPageContent, setLandingPageContent] = useState({
-    heroTitle: "Build Your Perfect Resume",
-    heroSubtitle: "Create professional, ATS-optimized resumes that get you noticed by employers",
-    ctaButtonText: "Start Building",
-    featuresTitle: "Why Choose Our Resume Builder?",
-    testimonialsTitle: "Success Stories"
-  });
+  const [landingPageContent, setLandingPageContent] = useState<LandingPageContent>(defaultLandingPageContent);
+  const [seoSettings, setSeoSettings] = useState<SEOSettings>(defaultSeoSettings);
+  const [contentSections, setContentSections] = useState<ContentSection[]>(defaultContentSections);
 
-  const [seoSettings, setSeoSettings] = useState({
-    metaTitle: "Professional Resume Builder | Create ATS-Optimized Resumes",
-    metaDescription: "Build professional resumes with our easy-to-use resume builder. Choose from ATS-optimized templates and get hired faster.",
-    keywords: "resume builder, CV maker, professional resume, ATS resume, job application",
-    ogTitle: "Professional Resume Builder",
-    ogDescription: "Create stunning resumes that get you hired",
-    ogImage: ""
-  });
-
-  const [contentSections, setContentSections] = useState<ContentSection[]>([
-    {
-      id: "1",
-      title: "Privacy Policy",
-      content: "Your privacy is important to us...",
-      isVisible: true,
-      lastUpdated: "2024-01-15"
-    },
-    {
-      id: "2", 
-      title: "Terms of Service",
-      content: "By using our service, you agree to...",
-      isVisible: true,
-      lastUpdated: "2024-01-15"
-    },
-    {
-      id: "3",
-      title: "FAQ Section",
-      content: "Frequently asked questions...",
-      isVisible: true,
-      lastUpdated: "2024-01-15"
+  // Fetch landing page content
+  const { data: savedLandingContent, isLoading: isLoadingLanding } = useQuery({
+    queryKey: ['site-settings', 'landing_page_content'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'landing_page_content')
+        .single();
+      
+      if (error && error.code !== 'PGRST116') throw error;
+      return data?.setting_value as unknown as LandingPageContent | null;
     }
-  ]);
+  });
 
-  const handleSaveLandingPage = async () => {
-    setIsLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+  // Fetch SEO settings
+  const { data: savedSeoSettings, isLoading: isLoadingSeo } = useQuery({
+    queryKey: ['site-settings', 'seo_settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'seo_settings')
+        .single();
+      
+      if (error && error.code !== 'PGRST116') throw error;
+      return data?.setting_value as unknown as SEOSettings | null;
+    }
+  });
+
+  // Fetch content sections
+  const { data: savedContentSections, isLoading: isLoadingSections } = useQuery({
+    queryKey: ['site-settings', 'content_sections'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'content_sections')
+        .single();
+      
+      if (error && error.code !== 'PGRST116') throw error;
+      return data?.setting_value as unknown as ContentSection[] | null;
+    }
+  });
+
+  // Load saved data into state
+  useEffect(() => {
+    if (savedLandingContent) {
+      setLandingPageContent({ ...defaultLandingPageContent, ...savedLandingContent });
+    }
+  }, [savedLandingContent]);
+
+  useEffect(() => {
+    if (savedSeoSettings) {
+      setSeoSettings({ ...defaultSeoSettings, ...savedSeoSettings });
+    }
+  }, [savedSeoSettings]);
+
+  useEffect(() => {
+    if (savedContentSections) {
+      setContentSections(savedContentSections);
+    }
+  }, [savedContentSections]);
+
+  // Generic save mutation helper
+  const createSaveMutation = (settingKey: string) => useMutation({
+    mutationFn: async (settings: any) => {
+      const { data: existing } = await supabase
+        .from('site_settings')
+        .select('id')
+        .eq('setting_key', settingKey)
+        .single();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('site_settings')
+          .update({ setting_value: settings, updated_at: new Date().toISOString() })
+          .eq('setting_key', settingKey);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('site_settings')
+          .insert({ setting_key: settingKey, setting_value: settings });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['site-settings', settingKey] });
+    }
+  });
+
+  // Mutations
+  const saveLandingMutation = useMutation({
+    mutationFn: async (content: LandingPageContent) => {
+      const { data: existing } = await supabase
+        .from('site_settings')
+        .select('id')
+        .eq('setting_key', 'landing_page_content')
+        .single();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('site_settings')
+          .update({ setting_value: content as any, updated_at: new Date().toISOString() })
+          .eq('setting_key', 'landing_page_content');
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('site_settings')
+          .insert({ setting_key: 'landing_page_content', setting_value: content as any });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['site-settings', 'landing_page_content'] });
       toast({ title: "Success", description: "Landing page content updated successfully." });
-    } catch (error) {
-      toast({ title: "Error", description: "Failed to update content.", variant: "destructive" });
-    } finally {
-      setIsLoading(false);
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to update content.", variant: "destructive" });
     }
+  });
+
+  const saveSeoMutation = useMutation({
+    mutationFn: async (settings: SEOSettings) => {
+      const { data: existing } = await supabase
+        .from('site_settings')
+        .select('id')
+        .eq('setting_key', 'seo_settings')
+        .single();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('site_settings')
+          .update({ setting_value: settings as any, updated_at: new Date().toISOString() })
+          .eq('setting_key', 'seo_settings');
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('site_settings')
+          .insert({ setting_key: 'seo_settings', setting_value: settings as any });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['site-settings', 'seo_settings'] });
+      toast({ title: "Success", description: "SEO settings updated successfully." });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to update SEO settings.", variant: "destructive" });
+    }
+  });
+
+  const saveSectionsMutation = useMutation({
+    mutationFn: async (sections: ContentSection[]) => {
+      const { data: existing } = await supabase
+        .from('site_settings')
+        .select('id')
+        .eq('setting_key', 'content_sections')
+        .single();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('site_settings')
+          .update({ setting_value: sections as any, updated_at: new Date().toISOString() })
+          .eq('setting_key', 'content_sections');
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('site_settings')
+          .insert({ setting_key: 'content_sections', setting_value: sections as any });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['site-settings', 'content_sections'] });
+      toast({ title: "Success", description: "Content sections updated successfully." });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to update content sections.", variant: "destructive" });
+    }
+  });
+
+  const handleSaveLandingPage = () => {
+    saveLandingMutation.mutate(landingPageContent);
   };
 
-  const handleSaveSEO = async () => {
-    setIsLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast({ title: "Success", description: "SEO settings updated successfully." });
-    } catch (error) {
-      toast({ title: "Error", description: "Failed to update SEO settings.", variant: "destructive" });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSaveSEO = () => {
+    saveSeoMutation.mutate(seoSettings);
   };
 
   const toggleSectionVisibility = (sectionId: string) => {
-    setContentSections(prev => 
-      prev.map(section => 
-        section.id === sectionId 
-          ? { ...section, isVisible: !section.isVisible }
-          : section
-      )
+    const updatedSections = contentSections.map(section => 
+      section.id === sectionId 
+        ? { ...section, isVisible: !section.isVisible, lastUpdated: new Date().toISOString().split('T')[0] }
+        : section
     );
+    setContentSections(updatedSections);
+    saveSectionsMutation.mutate(updatedSections);
   };
+
+  const isLoading = isLoadingLanding || isLoadingSeo || isLoadingSections;
+  const isSaving = saveLandingMutation.isPending || saveSeoMutation.isPending || saveSectionsMutation.isPending;
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="w-6 h-6 animate-spin mr-2" />
+          <span>Loading content settings...</span>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -169,9 +372,9 @@ export const ContentManagement = () => {
               </div>
             </div>
             
-            <Button onClick={handleSaveLandingPage} disabled={isLoading}>
+            <Button onClick={handleSaveLandingPage} disabled={isSaving}>
               <Save className="w-4 h-4 mr-2" />
-              {isLoading ? "Saving..." : "Save Landing Page"}
+              {saveLandingMutation.isPending ? "Saving..." : "Save Landing Page"}
             </Button>
           </TabsContent>
           
@@ -250,9 +453,9 @@ export const ContentManagement = () => {
               </div>
             </div>
             
-            <Button onClick={handleSaveSEO} disabled={isLoading}>
+            <Button onClick={handleSaveSEO} disabled={isSaving}>
               <Globe className="w-4 h-4 mr-2" />
-              {isLoading ? "Saving..." : "Save SEO Settings"}
+              {saveSeoMutation.isPending ? "Saving..." : "Save SEO Settings"}
             </Button>
           </TabsContent>
           
@@ -280,6 +483,7 @@ export const ContentManagement = () => {
                         <Switch
                           checked={section.isVisible}
                           onCheckedChange={() => toggleSectionVisibility(section.id)}
+                          disabled={saveSectionsMutation.isPending}
                         />
                         <Button variant="outline" size="sm">
                           <Settings className="w-3 h-3" />
