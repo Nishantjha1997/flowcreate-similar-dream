@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,9 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import { Shield, Key, AlertTriangle, Eye, Settings, Users, Lock } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Shield, Key, AlertTriangle, Eye, Settings, Users, Lock, Loader2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface SecurityLog {
   id: string;
@@ -19,21 +21,156 @@ interface SecurityLog {
   status: 'success' | 'failed' | 'blocked';
 }
 
+interface SecuritySettingsData {
+  enableTwoFactor: boolean;
+  requireStrongPasswords: boolean;
+  enableAccountLockout: boolean;
+  maxLoginAttempts: number;
+  lockoutDuration: number;
+  enableIpWhitelist: boolean;
+  enableRateLimiting: boolean;
+  sessionTimeout: number;
+  enableAuditLog: boolean;
+  requireEmailVerification: boolean;
+}
+
+interface RateLimitSettingsData {
+  apiRequestsPerMinute: number;
+  loginAttemptsPerHour: number;
+  signupAttemptsPerHour: number;
+  resumeDownloadsPerHour: number;
+}
+
+const defaultSecuritySettings: SecuritySettingsData = {
+  enableTwoFactor: false,
+  requireStrongPasswords: true,
+  enableAccountLockout: true,
+  maxLoginAttempts: 5,
+  lockoutDuration: 30,
+  enableIpWhitelist: false,
+  enableRateLimiting: true,
+  sessionTimeout: 24,
+  enableAuditLog: true,
+  requireEmailVerification: true
+};
+
+const defaultRateLimitSettings: RateLimitSettingsData = {
+  apiRequestsPerMinute: 100,
+  loginAttemptsPerHour: 10,
+  signupAttemptsPerHour: 5,
+  resumeDownloadsPerHour: 20
+};
+
 export const SecuritySettings = () => {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
-  const [securitySettings, setSecuritySettings] = useState({
-    enableTwoFactor: false,
-    requireStrongPasswords: true,
-    enableAccountLockout: true,
-    maxLoginAttempts: 5,
-    lockoutDuration: 30,
-    enableIpWhitelist: false,
-    enableRateLimiting: true,
-    sessionTimeout: 24,
-    enableAuditLog: true,
-    requireEmailVerification: true
+  const [securitySettings, setSecuritySettings] = useState<SecuritySettingsData>(defaultSecuritySettings);
+  const [rateLimitSettings, setRateLimitSettings] = useState<RateLimitSettingsData>(defaultRateLimitSettings);
+
+  // Fetch security settings from database
+  const { data: savedSecuritySettings, isLoading: isLoadingSettings } = useQuery({
+    queryKey: ['site-settings', 'security_settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'security_settings')
+        .single();
+      
+      if (error && error.code !== 'PGRST116') throw error;
+      return data?.setting_value as unknown as SecuritySettingsData | null;
+    }
+  });
+
+  // Fetch rate limit settings from database
+  const { data: savedRateLimitSettings, isLoading: isLoadingRateLimits } = useQuery({
+    queryKey: ['site-settings', 'rate_limit_settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'rate_limit_settings')
+        .single();
+      
+      if (error && error.code !== 'PGRST116') throw error;
+      return data?.setting_value as unknown as RateLimitSettingsData | null;
+    }
+  });
+
+  // Load saved settings into state
+  useEffect(() => {
+    if (savedSecuritySettings) {
+      setSecuritySettings({ ...defaultSecuritySettings, ...savedSecuritySettings });
+    }
+  }, [savedSecuritySettings]);
+
+  useEffect(() => {
+    if (savedRateLimitSettings) {
+      setRateLimitSettings({ ...defaultRateLimitSettings, ...savedRateLimitSettings });
+    }
+  }, [savedRateLimitSettings]);
+
+  // Mutation for saving security settings
+  const saveSecurityMutation = useMutation({
+    mutationFn: async (settings: SecuritySettingsData) => {
+      const { data: existing } = await supabase
+        .from('site_settings')
+        .select('id')
+        .eq('setting_key', 'security_settings')
+        .single();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('site_settings')
+          .update({ setting_value: settings as any, updated_at: new Date().toISOString() })
+          .eq('setting_key', 'security_settings');
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('site_settings')
+          .insert({ setting_key: 'security_settings', setting_value: settings as any });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['site-settings', 'security_settings'] });
+      toast({ title: "Success", description: "Security settings updated successfully." });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to update security settings.", variant: "destructive" });
+    }
+  });
+
+  // Mutation for saving rate limit settings
+  const saveRateLimitMutation = useMutation({
+    mutationFn: async (settings: RateLimitSettingsData) => {
+      const { data: existing } = await supabase
+        .from('site_settings')
+        .select('id')
+        .eq('setting_key', 'rate_limit_settings')
+        .single();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('site_settings')
+          .update({ setting_value: settings as any, updated_at: new Date().toISOString() })
+          .eq('setting_key', 'rate_limit_settings');
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('site_settings')
+          .insert({ setting_key: 'rate_limit_settings', setting_value: settings as any });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['site-settings', 'rate_limit_settings'] });
+      toast({ title: "Success", description: "Rate limiting settings updated successfully." });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to update rate limits.", variant: "destructive" });
+    }
   });
 
   const [securityLogs] = useState<SecurityLog[]>([
@@ -66,35 +203,12 @@ export const SecuritySettings = () => {
     }
   ]);
 
-  const [rateLimitSettings, setRateLimitSettings] = useState({
-    apiRequestsPerMinute: 100,
-    loginAttemptsPerHour: 10,
-    signupAttemptsPerHour: 5,
-    resumeDownloadsPerHour: 20
-  });
-
-  const handleSaveSecuritySettings = async () => {
-    setIsLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast({ title: "Success", description: "Security settings updated successfully." });
-    } catch (error) {
-      toast({ title: "Error", description: "Failed to update security settings.", variant: "destructive" });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSaveSecuritySettings = () => {
+    saveSecurityMutation.mutate(securitySettings);
   };
 
-  const handleSaveRateLimits = async () => {
-    setIsLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast({ title: "Success", description: "Rate limiting settings updated successfully." });
-    } catch (error) {
-      toast({ title: "Error", description: "Failed to update rate limits.", variant: "destructive" });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSaveRateLimits = () => {
+    saveRateLimitMutation.mutate(rateLimitSettings);
   };
 
   const getStatusBadge = (status: string) => {
@@ -124,6 +238,20 @@ export const SecuritySettings = () => {
         return <Eye className="w-4 h-4" />;
     }
   };
+
+  const isLoading = isLoadingSettings || isLoadingRateLimits;
+  const isSaving = saveSecurityMutation.isPending || saveRateLimitMutation.isPending;
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="w-6 h-6 animate-spin mr-2" />
+          <span>Loading security settings...</span>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -291,9 +419,9 @@ export const SecuritySettings = () => {
               </div>
             </div>
             
-            <Button onClick={handleSaveSecuritySettings} disabled={isLoading}>
+            <Button onClick={handleSaveSecuritySettings} disabled={isSaving}>
               <Lock className="w-4 h-4 mr-2" />
-              {isLoading ? "Saving..." : "Save Security Settings"}
+              {saveSecurityMutation.isPending ? "Saving..." : "Save Security Settings"}
             </Button>
           </TabsContent>
           
@@ -397,9 +525,9 @@ export const SecuritySettings = () => {
               </div>
             </div>
             
-            <Button onClick={handleSaveRateLimits} disabled={isLoading}>
+            <Button onClick={handleSaveRateLimits} disabled={isSaving}>
               <Settings className="w-4 h-4 mr-2" />
-              {isLoading ? "Saving..." : "Save Rate Limits"}
+              {saveRateLimitMutation.isPending ? "Saving..." : "Save Rate Limits"}
             </Button>
           </TabsContent>
         </Tabs>

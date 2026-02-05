@@ -37,65 +37,60 @@ export function AddUserForm({ onUserAdded }: AddUserFormProps) {
       return;
     }
 
+    if (formData.password.length < 6) {
+      toast({
+        title: "Invalid password",
+        description: "Password must be at least 6 characters",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Create user via Supabase Admin API
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: formData.email,
-        password: formData.password,
-        email_confirm: true,
-        user_metadata: {
+      // Get current session token for authorization
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("Not authenticated");
+      }
+
+      // Call Edge Function to create user with service role
+      const response = await supabase.functions.invoke('admin-create-user', {
+        body: {
+          email: formData.email,
+          password: formData.password,
           firstName: formData.firstName,
-          lastName: formData.lastName
+          lastName: formData.lastName,
+          role: formData.role,
+          isPremium: formData.isPremium
         }
       });
 
-      if (authError) throw authError;
-
-      if (authData.user) {
-        // Add user role
-        const { error: roleError } = await supabase
-          .from("user_roles")
-          .insert({
-            user_id: authData.user.id,
-            role: formData.role as any
-          });
-
-        if (roleError) {
-          console.error("Role assignment error:", roleError);
-        }
-
-        // Add premium subscription if selected
-        if (formData.isPremium) {
-          const { error: subError } = await supabase
-            .from("subscriptions")
-            .insert({
-              user_id: authData.user.id,
-              is_premium: true
-            });
-
-          if (subError) {
-            console.error("Subscription error:", subError);
-          }
-        }
-
-        toast({
-          title: "User created successfully",
-          description: `${formData.firstName} ${formData.lastName} has been added to the platform`
-        });
-
-        // Reset form
-        setFormData({
-          email: "",
-          firstName: "",
-          lastName: "",
-          role: "user",
-          isPremium: false,
-          password: ""
-        });
-
-        onUserAdded();
+      if (response.error) {
+        throw new Error(response.error.message || 'Failed to create user');
       }
+
+      if (response.data?.error) {
+        throw new Error(response.data.error);
+      }
+
+      toast({
+        title: "User created successfully",
+        description: `${formData.firstName} ${formData.lastName} has been added to the platform`
+      });
+
+      // Reset form
+      setFormData({
+        email: "",
+        firstName: "",
+        lastName: "",
+        role: "user",
+        isPremium: false,
+        password: ""
+      });
+
+      onUserAdded();
     } catch (error: any) {
       console.error("Error creating user:", error);
       toast({
