@@ -123,86 +123,145 @@ export const useUserProfile = () => {
   // Auto-populate resume from profile
   const populateResumeFromProfile = (profile: UserProfile): Partial<ResumeData> => {
     const populatedData: Partial<ResumeData> = {};
-    
+
+    const normalizeString = (value: unknown): string => {
+      if (typeof value === 'string') return value;
+      if (value === null || value === undefined) return '';
+      return String(value);
+    };
+
+    const normalizeStringArray = (value: unknown): string[] => {
+      if (Array.isArray(value)) {
+        return value
+          .flatMap((item) => {
+            if (typeof item === 'string') return [item];
+            if (item && typeof item === 'object') {
+              const obj = item as any;
+              const candidate = obj.name ?? obj.skill ?? obj.technology ?? obj.title;
+              return candidate ? [String(candidate)] : [];
+            }
+            return [];
+          })
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+
+      if (typeof value === 'string') {
+        // Handle common legacy formats: "React, Node, SQL"
+        return value
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+
+      return [];
+    };
+
+    const normalizeLanguages = (value: unknown): Array<{ language: string; proficiency: string }> => {
+      if (!Array.isArray(value)) return [];
+
+      return value
+        .map((item) => {
+          if (typeof item === 'string') {
+            return { language: item.trim(), proficiency: 'Basic' };
+          }
+          if (item && typeof item === 'object') {
+            const obj = item as any;
+            const language = normalizeString(obj.language || obj.name).trim();
+            const proficiency = normalizeString(obj.proficiency || obj.level || 'Basic').trim();
+            if (!language) return null;
+            return { language, proficiency: proficiency || 'Basic' };
+          }
+          return null;
+        })
+        .filter(Boolean) as Array<{ language: string; proficiency: string }>;
+    };
+
     // Populate personal information
     populatedData.personal = {
-      name: profile.full_name || '',
-      email: profile.email || '',
-      phone: profile.phone || '',
-      address: profile.address || '',
-      linkedin: profile.linkedin_url || '',
-      website: profile.website_url || profile.portfolio_url || '',
-      summary: profile.professional_summary || '',
-      profileImage: profile.avatar_url || ''
+      name: normalizeString(profile.full_name).trim(),
+      email: normalizeString(profile.email).trim(),
+      phone: normalizeString(profile.phone).trim(),
+      address: normalizeString(profile.address).trim(),
+      linkedin: normalizeString(profile.linkedin_url).trim(),
+      website: normalizeString(profile.website_url || profile.portfolio_url).trim(),
+      summary: normalizeString(profile.professional_summary).trim(),
+      profileImage: normalizeString(profile.avatar_url).trim()
     };
 
     // Populate experience if available - map profile fields to resume fields
-    if (profile.work_experience && Array.isArray(profile.work_experience) && profile.work_experience.length > 0) {
+    if (Array.isArray(profile.work_experience) && profile.work_experience.length > 0) {
       populatedData.experience = profile.work_experience.map((exp: any, index: number) => ({
         id: index + 1,
-        title: exp.title || exp.position || '',
-        company: exp.company || exp.organization || '',
-        location: exp.location || '',
-        startDate: exp.startDate || exp.start_date || '',
-        endDate: exp.current ? 'Present' : (exp.endDate || exp.end_date || ''),
-        current: exp.current || false,
-        description: exp.description || ''
+        title: normalizeString(exp?.title || exp?.position).trim(),
+        company: normalizeString(exp?.company || exp?.organization).trim(),
+        location: normalizeString(exp?.location).trim(),
+        startDate: normalizeString(exp?.startDate || exp?.start_date).trim(),
+        endDate: exp?.current
+          ? 'Present'
+          : normalizeString(exp?.endDate || exp?.end_date).trim(),
+        current: !!exp?.current,
+        description: normalizeString(exp?.description).trim()
       }));
     }
 
     // Populate education if available - map profile fields to resume fields
-    if (profile.education && Array.isArray(profile.education) && profile.education.length > 0) {
+    if (Array.isArray(profile.education) && profile.education.length > 0) {
       populatedData.education = profile.education.map((edu: any, index: number) => ({
         id: index + 1,
-        school: edu.school || edu.institution || edu.university || '',
-        degree: edu.degree || '',
-        field: edu.field || edu.major || edu.fieldOfStudy || '',
-        startDate: edu.startDate || edu.start_date || '',
-        endDate: edu.endDate || edu.end_date || '',
-        description: edu.description || edu.gpa ? `GPA: ${edu.gpa}` : ''
+        school: normalizeString(edu?.school || edu?.institution || edu?.university).trim(),
+        degree: normalizeString(edu?.degree).trim(),
+        field: normalizeString(edu?.field || edu?.major || edu?.fieldOfStudy).trim(),
+        startDate: normalizeString(edu?.startDate || edu?.start_date).trim(),
+        endDate: normalizeString(edu?.endDate || edu?.end_date).trim(),
+        description: edu?.description
+          ? normalizeString(edu.description).trim()
+          : (edu?.gpa ? `GPA: ${normalizeString(edu.gpa).trim()}` : '')
       }));
     }
 
-    // Populate skills if available
-    if (profile.technical_skills && Array.isArray(profile.technical_skills) && profile.technical_skills.length > 0) {
-      populatedData.skills = profile.technical_skills;
+    // Populate skills if available (must be string[] for builder + templates)
+    const normalizedSkills = normalizeStringArray(profile.technical_skills);
+    if (normalizedSkills.length > 0) {
+      populatedData.skills = normalizedSkills;
     }
 
-    // Populate projects if available - map profile fields to resume fields
-    if (profile.projects && Array.isArray(profile.projects) && profile.projects.length > 0) {
+    // Populate projects if available - technologies MUST be string[] (templates call .map)
+    if (Array.isArray(profile.projects) && profile.projects.length > 0) {
       populatedData.projects = profile.projects.map((proj: any, index: number) => ({
         id: index + 1,
-        title: proj.title || proj.name || '',
-        description: proj.description || '',
-        link: proj.link || proj.url || '',
-        technologies: proj.technologies || proj.tech_stack || []
+        title: normalizeString(proj?.title || proj?.name).trim(),
+        description: normalizeString(proj?.description).trim(),
+        link: normalizeString(proj?.link || proj?.url).trim(),
+        technologies: normalizeStringArray(proj?.technologies ?? proj?.tech_stack ?? proj?.stack)
       }));
     }
 
     // Populate certifications if available
-    if (profile.certifications && Array.isArray(profile.certifications) && profile.certifications.length > 0) {
+    if (Array.isArray(profile.certifications) && profile.certifications.length > 0) {
       populatedData.certifications = profile.certifications.map((cert: any) => ({
-        name: cert.name || cert.title || '',
-        issuer: cert.issuer || cert.organization || '',
-        date: cert.date || cert.issued_date || '',
-        url: cert.url || cert.credential_url || ''
+        name: normalizeString(cert?.name || cert?.title).trim(),
+        issuer: normalizeString(cert?.issuer || cert?.organization).trim(),
+        date: normalizeString(cert?.date || cert?.issued_date).trim(),
+        url: normalizeString(cert?.url || cert?.credential_url).trim()
       }));
     }
 
     // Populate volunteer experience if available
-    if (profile.volunteer_experience && Array.isArray(profile.volunteer_experience) && profile.volunteer_experience.length > 0) {
+    if (Array.isArray(profile.volunteer_experience) && profile.volunteer_experience.length > 0) {
       populatedData.volunteer = profile.volunteer_experience.map((vol: any) => ({
-        organization: vol.organization || vol.company || '',
-        role: vol.role || vol.title || '',
-        startDate: vol.startDate || vol.start_date || '',
-        endDate: vol.endDate || vol.end_date || '',
-        description: vol.description || ''
+        organization: normalizeString(vol?.organization || vol?.company).trim(),
+        role: normalizeString(vol?.role || vol?.title).trim(),
+        startDate: normalizeString(vol?.startDate || vol?.start_date).trim(),
+        endDate: normalizeString(vol?.endDate || vol?.end_date).trim(),
+        description: normalizeString(vol?.description).trim()
       }));
     }
 
     // Populate languages if available
-    if (profile.languages && Array.isArray(profile.languages) && profile.languages.length > 0) {
-      populatedData.languages = profile.languages;
+    const normalizedLanguages = normalizeLanguages(profile.languages);
+    if (normalizedLanguages.length > 0) {
+      populatedData.languages = normalizedLanguages;
     }
 
     return populatedData;
