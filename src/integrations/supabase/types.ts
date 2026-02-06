@@ -829,6 +829,51 @@ export type Database = {
         }
         Relationships: []
       }
+      resume_templates: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_ats_optimized: boolean | null
+          is_featured: boolean | null
+          name: string
+          preview_url: string | null
+          template_key: string
+          updated_at: string | null
+          usage_count: number | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_ats_optimized?: boolean | null
+          is_featured?: boolean | null
+          name: string
+          preview_url?: string | null
+          template_key: string
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_ats_optimized?: boolean | null
+          is_featured?: boolean | null
+          name?: string
+          preview_url?: string | null
+          template_key?: string
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Relationships: []
+      }
       resumes: {
         Row: {
           created_at: string
