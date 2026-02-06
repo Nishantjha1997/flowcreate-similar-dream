@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import "https://deno.land/x/xhr@0.1.0/mod.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { checkRateLimit, rateLimitResponse } from '../_shared/rateLimiter.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,12 +11,34 @@ const corsHeaders = {
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_MIME_TYPES = ['application/pdf'];
 
+// Rate limit: 5 uploads per user per hour
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 60 * 60_000;
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
+    // Authenticate user
+    const authHeader = req.headers.get('Authorization');
+    let userId = 'anonymous';
+    if (authHeader) {
+      const supabase = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      );
+      const token = authHeader.replace('Bearer ', '');
+      const { data } = await supabase.auth.getUser(token);
+      if (data?.user) userId = data.user.id;
+    }
+
+    // Rate limit
+    const rl = checkRateLimit(`extract-resume:${userId}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
+    if (!rl.allowed) {
+      return rateLimitResponse(corsHeaders, rl.resetAt);
+    }
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
     
     if (!GEMINI_API_KEY) {

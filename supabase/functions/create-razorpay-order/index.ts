@@ -1,11 +1,15 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { checkRateLimit, rateLimitResponse } from '../_shared/rateLimiter.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
+
+// Rate limit: 5 requests per user per minute
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 60_000;
 
 // Server-side pricing constants (amounts in paise)
 const PLAN_PRICES: Record<string, number> = {
@@ -42,6 +46,12 @@ serve(async (req) => {
         JSON.stringify({ error: 'Unauthorized' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
       )
+    }
+
+    // Rate limit per user
+    const rl = checkRateLimit(`razorpay-order:${userData.user.id}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
+    if (!rl.allowed) {
+      return rateLimitResponse(corsHeaders, rl.resetAt);
     }
 
     // Validate planType and derive amount server-side
