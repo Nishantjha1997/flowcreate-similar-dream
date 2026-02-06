@@ -1,7 +1,8 @@
 
 import { useState } from 'react';
-import html2pdf from 'html2pdf.js';
 import { toast } from 'sonner';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 export const usePDFGenerator = (fileName: string = 'document') => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -15,37 +16,13 @@ export const usePDFGenerator = (fileName: string = 'document') => {
     setIsGenerating(true);
     toast.info("Generating PDF...", { duration: 3000 });
     
-    // Ultra high quality PDF options
-    const options = {
-      margin: [10, 10, 10, 10],
-      filename: fileName,
-      image: { type: 'jpeg', quality: 1.0 },
-      html2canvas: { 
-        scale: 5, // Higher scale for maximum resolution
-        useCORS: true,
-        logging: false,
-        letterRendering: true,
-        dpi: 600, // Higher DPI for print quality
-        removeContainer: false
-      },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'portrait',
-        compress: false, // Better quality with no compression
-        precision: 32 // Higher precision for better text rendering
-      }
-    };
-
     // Create a clone of the resume content for PDF generation
     const container = document.createElement('div');
     
-    // Find the proper resume content
     const resumeContent = element.querySelector('.resume-content') || 
                           element.querySelector('.resume-container') || 
                           element;
     
-    // Make sure we're getting the actual content
     if (!resumeContent) {
       toast.error("Could not find resume content to download.");
       setIsGenerating(false);
@@ -61,10 +38,9 @@ export const usePDFGenerator = (fileName: string = 'document') => {
     container.style.left = '-9999px';
     container.style.top = '-9999px';
     
-    // Apply styling to ensure proper rendering
     const resumeElement = container.firstElementChild as HTMLElement;
     if (resumeElement) {
-      resumeElement.style.transform = 'none'; // Remove any scaling
+      resumeElement.style.transform = 'none';
       resumeElement.style.width = '100%';
       resumeElement.style.height = 'auto';
       resumeElement.style.margin = '0';
@@ -76,29 +52,42 @@ export const usePDFGenerator = (fileName: string = 'document') => {
     
     document.body.appendChild(container);
 
-    // Add a slight delay to ensure container is rendered
-    setTimeout(() => {
-      html2pdf()
-        .from(container)
-        .set(options)
-        .save()
-        .then(() => {
-          setIsGenerating(false);
-          toast.success("Resume downloaded successfully!");
-          // Remove the temporary container
-          if (container.parentNode) {
-            document.body.removeChild(container);
-          }
-        })
-        .catch((error) => {
-          console.error("Error generating PDF:", error);
-          setIsGenerating(false);
-          toast.error("Error generating PDF. Please try again.");
-          // Remove the temporary container on error as well
-          if (container.parentNode) {
-            document.body.removeChild(container);
-          }
+    setTimeout(async () => {
+      try {
+        const canvas = await html2canvas(container, {
+          scale: 3,
+          useCORS: true,
+          logging: false,
         });
+        
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4',
+        });
+        
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+        const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+        const imgX = (pdfWidth - imgWidth * ratio) / 2;
+        
+        pdf.addImage(imgData, 'JPEG', imgX, 0, imgWidth * ratio, imgHeight * ratio);
+        pdf.save(fileName);
+        
+        setIsGenerating(false);
+        toast.success("Resume downloaded successfully!");
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        setIsGenerating(false);
+        toast.error("Error generating PDF. Please try again.");
+      } finally {
+        if (container.parentNode) {
+          document.body.removeChild(container);
+        }
+      }
     }, 300);
   };
 

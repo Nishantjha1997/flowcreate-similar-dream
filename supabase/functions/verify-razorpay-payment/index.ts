@@ -14,20 +14,39 @@ const PLAN_PRICES: Record<string, number> = {
   lifetime: 499900,
 } as const;
 
+function validatePaymentInput(body: unknown): { valid: true; data: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string } } | { valid: false; error: string } {
+  if (!body || typeof body !== 'object') {
+    return { valid: false, error: 'Invalid request body' };
+  }
+  const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = body as Record<string, unknown>;
+
+  if (typeof razorpay_payment_id !== 'string' || !/^pay_[a-zA-Z0-9]+$/.test(razorpay_payment_id)) {
+    return { valid: false, error: 'Invalid payment ID format' };
+  }
+  if (typeof razorpay_order_id !== 'string' || !/^order_[a-zA-Z0-9]+$/.test(razorpay_order_id)) {
+    return { valid: false, error: 'Invalid order ID format' };
+  }
+  if (typeof razorpay_signature !== 'string' || !/^[a-f0-9]{64}$/.test(razorpay_signature)) {
+    return { valid: false, error: 'Invalid signature format' };
+  }
+  return { valid: true, data: { razorpay_payment_id, razorpay_order_id, razorpay_signature } };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = await req.json()
-
-    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+    const body = await req.json()
+    const validation = validatePaymentInput(body)
+    if (!validation.valid) {
       return new Response(
-        JSON.stringify({ error: 'Missing required parameters' }),
+        JSON.stringify({ error: validation.error }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
       )
     }
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = validation.data
 
     const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET')
     if (!razorpayKeySecret) {
