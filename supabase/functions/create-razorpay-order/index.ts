@@ -7,6 +7,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Server-side pricing constants (amounts in paise)
+const PLAN_PRICES: Record<string, number> = {
+  monthly: 29900,   // ₹299
+  yearly: 249900,   // ₹2499
+  lifetime: 499900,  // ₹4999
+} as const;
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -14,7 +21,7 @@ serve(async (req) => {
   }
 
   try {
-    const { amount, currency = 'INR', receipt, planType } = await req.json()
+    const { planType } = await req.json()
 
     // Require authenticated user
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
@@ -37,10 +44,10 @@ serve(async (req) => {
       )
     }
 
-    // Validate input
-    if (!amount || amount < 100) {
+    // Validate planType and derive amount server-side
+    if (!planType || !(planType in PLAN_PRICES)) {
       return new Response(
-        JSON.stringify({ error: 'Invalid amount' }),
+        JSON.stringify({ error: 'Invalid plan type' }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400 
@@ -48,12 +55,14 @@ serve(async (req) => {
       )
     }
 
+    const amount = PLAN_PRICES[planType]
+
     const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID')
     const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET')
 
     if (!razorpayKeyId || !razorpayKeySecret) {
       return new Response(
-        JSON.stringify({ error: 'Razorpay credentials not configured' }),
+        JSON.stringify({ error: 'Payment service not configured' }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 500 
@@ -61,14 +70,15 @@ serve(async (req) => {
       )
     }
 
-    // Create Razorpay order
+    // Create Razorpay order with server-controlled amount
     const orderData = {
-      amount: amount, // amount in paise
-      currency: currency,
-      receipt: receipt || `order_${Date.now()}`,
+      amount: amount,
+      currency: 'INR',
+      receipt: `order_${Date.now()}`,
       notes: {
-        plan_type: planType || 'monthly',
-        user_id: userData.user.id
+        plan_type: planType,
+        user_id: userData.user.id,
+        expected_amount: amount
       }
     }
 
@@ -84,8 +94,7 @@ serve(async (req) => {
     })
 
     if (!response.ok) {
-      const errorData = await response.text()
-      console.error('Razorpay API error:', errorData)
+      console.error('Razorpay API error:', await response.text())
       return new Response(
         JSON.stringify({ error: 'Failed to create order' }),
         { 
