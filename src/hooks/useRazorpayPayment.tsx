@@ -41,12 +41,9 @@ export const useRazorpayPayment = () => {
     try {
       console.log('Initiating payment with options:', options);
 
-      // Create order via Supabase edge function
+      // Create order via Supabase edge function (amount is determined server-side)
       const { data: orderData, error: orderError } = await supabase.functions.invoke('create-razorpay-order', {
         body: {
-          amount: options.amount,
-          currency: options.currency || 'INR',
-          receipt: `order_${Date.now()}`,
           planType: options.planType || 'monthly'
         }
       });

@@ -1,33 +1,31 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { hmac } from "https://deno.land/x/hmac@v2.0.1/mod.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Server-side pricing constants (amounts in paise) - must match create-razorpay-order
+const PLAN_PRICES: Record<string, number> = {
+  monthly: 29900,
+  yearly: 249900,
+  lifetime: 499900,
+} as const;
+
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { razorpay_payment_id, razorpay_order_id, razorpay_signature, planType } = await req.json()
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = await req.json()
 
-    console.log('Payment verification request:', { razorpay_payment_id, razorpay_order_id, planType })
-
-    // Validate input
     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
-      console.error('Missing required parameters')
       return new Response(
         JSON.stringify({ error: 'Missing required parameters' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400 
-        }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
       )
     }
 
@@ -35,36 +33,33 @@ serve(async (req) => {
     if (!razorpayKeySecret) {
       console.error('Razorpay secret not configured')
       return new Response(
-        JSON.stringify({ error: 'Razorpay secret not configured' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500 
-        }
+        JSON.stringify({ error: 'Payment service not configured' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       )
     }
 
-    // Verify signature
-    const expectedSignature = hmac("sha256", razorpayKeySecret, `${razorpay_order_id}|${razorpay_payment_id}`, "utf8", "hex")
+    // Verify signature using Web Crypto API
+    const encoder = new TextEncoder()
+    const key = await crypto.subtle.importKey(
+      'raw', encoder.encode(razorpayKeySecret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+    )
+    const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(`${razorpay_order_id}|${razorpay_payment_id}`))
+    const expectedSignature = Array.from(new Uint8Array(signatureBuffer)).map(b => b.toString(16).padStart(2, '0')).join('')
     
     if (expectedSignature !== razorpay_signature) {
       console.error('Payment verification failed - signature mismatch')
       return new Response(
         JSON.stringify({ error: 'Payment verification failed' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400 
-        }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
       )
     }
 
-    console.log('Payment signature verified successfully')
-
-    // Initialize Supabase client
+    // Initialize Supabase client with service role
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Derive caller from Authorization header (do not trust client body)
+    // Derive caller from Authorization header
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 })
@@ -76,38 +71,28 @@ serve(async (req) => {
     }
     const callerUserId = userData.user.id
 
-    // Get payment details from Razorpay
+    // Get payment and order details from Razorpay
     const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID')
     const auth = btoa(`${razorpayKeyId}:${razorpayKeySecret}`)
     
-    const paymentResponse = await fetch(`https://api.razorpay.com/v1/payments/${razorpay_payment_id}`, {
-      headers: {
-        'Authorization': `Basic ${auth}`
-      }
-    })
+    const [paymentResponse, orderResponse] = await Promise.all([
+      fetch(`https://api.razorpay.com/v1/payments/${razorpay_payment_id}`, {
+        headers: { 'Authorization': `Basic ${auth}` }
+      }),
+      fetch(`https://api.razorpay.com/v1/orders/${razorpay_order_id}`, {
+        headers: { 'Authorization': `Basic ${auth}` }
+      })
+    ])
 
-    if (!paymentResponse.ok) {
-      console.error('Failed to fetch payment details from Razorpay')
+    if (!paymentResponse.ok || !orderResponse.ok) {
+      console.error('Failed to fetch payment/order details from Razorpay')
       return new Response(
-        JSON.stringify({ error: 'Failed to fetch payment details' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500 
-        }
+        JSON.stringify({ error: 'Failed to verify payment details' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       )
     }
 
     const paymentData = await paymentResponse.json()
-    console.log('Payment data from Razorpay:', paymentData)
-
-    // Fetch order details to bind to user and plan
-    const orderResponse = await fetch(`https://api.razorpay.com/v1/orders/${razorpay_order_id}`, {
-      headers: { 'Authorization': `Basic ${auth}` }
-    })
-    if (!orderResponse.ok) {
-      console.error('Failed to fetch order details from Razorpay')
-      return new Response(JSON.stringify({ error: 'Failed to fetch order details' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 })
-    }
     const orderData = await orderResponse.json()
 
     // Security checks
@@ -121,9 +106,20 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Order not owned by caller' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 })
     }
 
-    const effectivePlanType = orderData?.notes?.plan_type || planType || 'monthly'
+    // Derive plan type from order notes (server-side truth)
+    const effectivePlanType = orderData?.notes?.plan_type || 'monthly'
 
-    // Calculate subscription period based on effective plan type
+    // Validate payment amount matches expected plan price
+    const expectedAmount = PLAN_PRICES[effectivePlanType]
+    if (!expectedAmount || paymentData.amount !== expectedAmount) {
+      console.error(`Amount mismatch: paid ${paymentData.amount}, expected ${expectedAmount} for plan ${effectivePlanType}`)
+      return new Response(
+        JSON.stringify({ error: 'Payment amount does not match plan price' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      )
+    }
+
+    // Calculate subscription period
     const currentDate = new Date()
     const endDate = new Date()
     if (effectivePlanType === 'yearly') {
@@ -156,14 +152,9 @@ serve(async (req) => {
       console.error('Subscription update error:', subscriptionError)
       return new Response(
         JSON.stringify({ error: 'Failed to update subscription' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500 
-        }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       )
     }
-
-    console.log('Subscription updated successfully:', subscription)
 
     // Record payment (idempotent on razorpay_payment_id)
     const { error: paymentError } = await supabase
@@ -181,30 +172,21 @@ serve(async (req) => {
 
     if (paymentError) {
       console.error('Payment record error:', paymentError)
-      // Don't fail the entire process if payment recording fails
     }
-
-    console.log('Payment verification completed successfully')
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         message: 'Payment verified and subscription updated' 
       }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
 
   } catch (error) {
     console.error('Error verifying payment:', error)
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
   }
 })
