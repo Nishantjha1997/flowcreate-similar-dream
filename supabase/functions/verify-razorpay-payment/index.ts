@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { checkRateLimit, rateLimitResponse } from '../_shared/rateLimiter.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -89,6 +90,12 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 })
     }
     const callerUserId = userData.user.id
+
+    // Rate limit: 10 verification attempts per user per 5 minutes
+    const rl = checkRateLimit(`verify-payment:${callerUserId}`, 10, 5 * 60_000);
+    if (!rl.allowed) {
+      return rateLimitResponse(corsHeaders, rl.resetAt);
+    }
 
     // Get payment and order details from Razorpay
     const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID')

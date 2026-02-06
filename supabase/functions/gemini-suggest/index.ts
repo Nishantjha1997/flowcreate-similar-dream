@@ -1,7 +1,9 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { AIKeyManager } from "../_shared/aiKeyManager.ts";
+import { checkRateLimit, rateLimitResponse } from '../_shared/rateLimiter.ts';
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -20,6 +22,25 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
   try {
+    // Authenticate and rate limit
+    const authHeader = req.headers.get('Authorization');
+    let userId = 'anonymous';
+    if (authHeader) {
+      const supabase = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      );
+      const token = authHeader.replace('Bearer ', '');
+      const { data } = await supabase.auth.getUser(token);
+      if (data?.user) userId = data.user.id;
+    }
+
+    // Rate limit: 10 requests per user per hour
+    const rl = checkRateLimit(`gemini-suggest:${userId}`, 10, 60 * 60_000);
+    if (!rl.allowed) {
+      return rateLimitResponse(corsHeaders, rl.resetAt);
+    }
+
     const body = await req.json();
     const prompt = body?.prompt;
 
