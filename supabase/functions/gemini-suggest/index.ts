@@ -5,7 +5,9 @@ import { AIKeyManager } from "../_shared/aiKeyManager.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const FALLBACK_GEMINI_KEY = Deno.env.get("GEMINI_API_KEY"); // Fallback to env if DB fails
+const FALLBACK_GEMINI_KEY = Deno.env.get("GEMINI_API_KEY");
+
+const MAX_PROMPT_LENGTH = 5000;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,10 +20,27 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
   try {
-    const { prompt } = await req.json();
+    const body = await req.json();
+    const prompt = body?.prompt;
+
     if (!prompt || typeof prompt !== "string") {
       return new Response(
         JSON.stringify({ error: "Prompt is required." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (prompt.length > MAX_PROMPT_LENGTH) {
+      return new Response(
+        JSON.stringify({ error: `Prompt must be less than ${MAX_PROMPT_LENGTH} characters.` }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const trimmedPrompt = prompt.trim();
+    if (trimmedPrompt.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "Prompt cannot be empty." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -30,7 +49,6 @@ serve(async (req) => {
     const keyManager = new AIKeyManager(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     let GEMINI_API_KEY = await keyManager.getActiveKey('gemini');
     
-    // Fallback to environment variable if no DB key found
     if (!GEMINI_API_KEY) {
       console.log('[Gemini] No DB key found, using environment variable');
       GEMINI_API_KEY = FALLBACK_GEMINI_KEY;
@@ -50,7 +68,7 @@ serve(async (req) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
+          contents: [{ parts: [{ text: trimmedPrompt }] }],
           generationConfig: {
             temperature: 0.7,
             maxOutputTokens: 1000,
@@ -60,7 +78,6 @@ serve(async (req) => {
     );
     
     let apiData = await apiRequest.json();
-    console.log("[Gemini] API response", JSON.stringify(apiData));
     
     // If primary key failed, try fallback
     if (apiData.error && (apiData.error.status === 'PERMISSION_DENIED' || apiData.error.status === 'INVALID_ARGUMENT')) {
@@ -74,7 +91,7 @@ serve(async (req) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
+              contents: [{ parts: [{ text: trimmedPrompt }] }],
               generationConfig: {
                 temperature: 0.7,
                 maxOutputTokens: 1000,
@@ -83,12 +100,9 @@ serve(async (req) => {
           }
         );
         apiData = await apiRequest.json();
-        console.log("[Gemini] Fallback API response", JSON.stringify(apiData));
       }
     }
     
-    let errorDetail = apiData.error?.message || apiData.error || undefined;
-
     if (
       apiData &&
       apiData.candidates &&
@@ -99,21 +113,21 @@ serve(async (req) => {
         JSON.stringify({ suggestion: apiData.candidates[0].content.parts[0].text }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
-    } else if (errorDetail) {
+    } else if (apiData.error?.message || apiData.error) {
       return new Response(
-        JSON.stringify({ error: errorDetail }),
+        JSON.stringify({ error: "AI service temporarily unavailable" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     } else {
       return new Response(
-        JSON.stringify({ error: "No suggestion returned from Gemini. Raw response: " + JSON.stringify(apiData) }),
+        JSON.stringify({ error: "No suggestion returned from AI" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
   } catch (error) {
     console.log("[Gemini] Function error", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

@@ -6,8 +6,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_MIME_TYPES = ['application/pdf'];
+
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -15,7 +17,6 @@ serve(async (req) => {
   try {
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
     
-    // Better error handling for missing API key
     if (!GEMINI_API_KEY) {
       console.log('GEMINI_API_KEY is not configured')
       return new Response(JSON.stringify({ 
@@ -23,24 +24,41 @@ serve(async (req) => {
         error: 'AI resume parsing is not configured. Please add GEMINI_API_KEY to enable this feature.',
         requiresApiKey: true
       }), {
-        status: 200, // Return 200 so we can handle gracefully on client
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
-    // Parse the multipart form data
     const formData = await req.formData()
     const file = formData.get('file') as File
 
     if (!file) {
-      throw new Error('No file provided')
+      return new Response(JSON.stringify({ success: false, error: 'No file provided' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      return new Response(JSON.stringify({ success: false, error: 'File too large. Maximum size is 10MB.' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Validate MIME type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return new Response(JSON.stringify({ success: false, error: 'Invalid file type. Only PDF files are allowed.' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
 
     // Convert PDF to base64 for Gemini
     const arrayBuffer = await file.arrayBuffer()
     const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)))
 
-    // Use Gemini to extract structured data from the PDF
     const prompt = `You are a resume parser. Extract structured information from this resume PDF and return it as valid JSON.
 
 Return the data in this EXACT format (no additional text, only JSON):
@@ -127,47 +145,28 @@ Only return valid JSON. If a section is not found, use empty arrays or empty str
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Gemini API error:', errorText)
-      throw new Error(`Gemini API error: ${response.status} ${response.statusText}`)
+      throw new Error(`Gemini API error: ${response.status}`)
     }
 
     const aiResult = await response.json()
-    console.log('Gemini response:', JSON.stringify(aiResult, null, 2))
     
     if (!aiResult.candidates || !aiResult.candidates[0] || !aiResult.candidates[0].content) {
       throw new Error('Invalid response from Gemini API')
     }
     
     const extractedText = aiResult.candidates[0].content.parts[0].text
-    console.log('Extracted text:', extractedText)
 
-    // Parse the JSON response
     let extractedData
     try {
-      // Clean the response to ensure it's valid JSON
       const cleanedText = extractedText.replace(/```json|```/g, '').trim()
       extractedData = JSON.parse(cleanedText)
       
-      // Ensure skills is an array
       if (typeof extractedData.skills === 'string') {
         extractedData.skills = extractedData.skills.split(',').map((skill: string) => skill.trim()).filter(Boolean)
       }
-      
-      console.log('Parsed extracted data:', JSON.stringify(extractedData, null, 2))
-    } catch (e) {
-      console.error('Error parsing JSON:', e)
-      console.error('Raw text:', extractedText)
-      
-      // Fallback: try to extract basic info from text
+    } catch (_e) {
       extractedData = {
-        personal: {
-          name: "",
-          email: "",
-          phone: "",
-          address: "",
-          linkedin: "",
-          website: "",
-          summary: ""
-        },
+        personal: { name: "", email: "", phone: "", address: "", linkedin: "", website: "", summary: "" },
         experience: [],
         education: [],
         skills: [],
@@ -188,7 +187,7 @@ Only return valid JSON. If a section is not found, use empty arrays or empty str
     console.error('Error in extract-resume-data function:', error)
     return new Response(JSON.stringify({ 
       success: false, 
-      error: error.message 
+      error: 'Failed to extract resume data'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

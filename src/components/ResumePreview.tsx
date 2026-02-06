@@ -5,7 +5,8 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ResumeData } from '@/utils/types';
 import { Download, Eye, Printer, Share2, Mail, Link, Smartphone } from 'lucide-react';
 import { toast } from 'sonner';
-import html2pdf from 'html2pdf.js';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,42 +50,41 @@ export const ResumePreview = ({
     const element = resumeRef.current;
     const filename = `${resumeData.personal?.name || 'resume'}.pdf`;
     
-    // Ultra high quality PDF options
-    const options = {
-      margin: [10, 10, 10, 10],
-      filename: filename,
-      image: { type: 'jpeg', quality: 1.0 },
-      html2canvas: { 
-        scale: 5, 
-        useCORS: true,
-        logging: false,
-        letterRendering: true,
-        dpi: 600
-      },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'portrait',
-        compress: false, 
-        precision: 32
-      }
-    };
+    toast.info("Generating PDF...", { duration: 3000 });
 
     // Use setTimeout to allow the toast to show before the potentially heavy PDF operation
-    setTimeout(() => {
-      html2pdf()
-        .from(element)
-        .set(options)
-        .save()
-        .then(() => {
-          setIsGenerating(false);
-          toast.success("Resume downloaded successfully!");
-        })
-        .catch((error) => {
-          console.error("Error generating PDF:", error);
-          setIsGenerating(false);
-          toast.error("Error generating PDF. Please try again.");
+    setTimeout(async () => {
+      try {
+        const canvas = await html2canvas(element, {
+          scale: 3,
+          useCORS: true,
+          logging: false,
         });
+        
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4',
+        });
+        
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+        const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+        const imgX = (pdfWidth - imgWidth * ratio) / 2;
+        
+        pdf.addImage(imgData, 'JPEG', imgX, 0, imgWidth * ratio, imgHeight * ratio);
+        pdf.save(filename);
+        
+        setIsGenerating(false);
+        toast.success("Resume downloaded successfully!");
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        setIsGenerating(false);
+        toast.error("Error generating PDF. Please try again.");
+      }
     }, 300);
   };
 

@@ -7,6 +7,36 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const VALID_ROLES = ['admin', 'moderator', 'user'] as const;
+
+function validateCreateUserInput(body: unknown): { valid: true; data: { email: string; password: string; firstName: string; lastName: string; role: string; isPremium: boolean } } | { valid: false; error: string } {
+  if (!body || typeof body !== 'object') {
+    return { valid: false, error: 'Invalid request body' };
+  }
+  const { email, password, firstName, lastName, role, isPremium } = body as Record<string, unknown>;
+
+  if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) {
+    return { valid: false, error: 'Invalid email format' };
+  }
+  if (typeof password !== 'string' || password.length < 8 || password.length > 100) {
+    return { valid: false, error: 'Password must be 8-100 characters' };
+  }
+  if (typeof firstName !== 'string' || firstName.length < 1 || firstName.length > 50 || !/^[a-zA-Z\s'\-]+$/.test(firstName)) {
+    return { valid: false, error: 'Invalid first name (1-50 chars, letters only)' };
+  }
+  if (typeof lastName !== 'string' || lastName.length < 1 || lastName.length > 50 || !/^[a-zA-Z\s'\-]+$/.test(lastName)) {
+    return { valid: false, error: 'Invalid last name (1-50 chars, letters only)' };
+  }
+  if (typeof role !== 'string' || !VALID_ROLES.includes(role as typeof VALID_ROLES[number])) {
+    return { valid: false, error: `Invalid role. Must be one of: ${VALID_ROLES.join(', ')}` };
+  }
+  if (typeof isPremium !== 'boolean') {
+    return { valid: false, error: 'isPremium must be a boolean' };
+  }
+
+  return { valid: true, data: { email: email.trim(), password, firstName: firstName.trim(), lastName: lastName.trim(), role, isPremium } };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -58,7 +88,16 @@ serve(async (req) => {
       })
     }
 
-    const { email, password, firstName, lastName, role, isPremium } = await req.json()
+    // Validate input
+    const body = await req.json()
+    const validation = validateCreateUserInput(body)
+    if (!validation.valid) {
+      return new Response(JSON.stringify({ error: validation.error }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+    const { email, password, firstName, lastName, role, isPremium } = validation.data
 
     // Create user using admin client
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
@@ -101,7 +140,7 @@ serve(async (req) => {
 
       return new Response(JSON.stringify({ 
         success: true, 
-        user: authData.user 
+        user: { id: authData.user.id, email: authData.user.email }
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       })
@@ -113,7 +152,7 @@ serve(async (req) => {
     })
 
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })

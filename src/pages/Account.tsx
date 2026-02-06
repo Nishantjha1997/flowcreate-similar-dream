@@ -239,32 +239,27 @@ const Account = () => {
       
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      const options = {
-        margin: [10, 10, 10, 10],
-        filename: `${resumeName}.pdf`,
-        image: { type: 'jpeg', quality: 1.0 },
-        html2canvas: { 
-          scale: 5, 
-          useCORS: true,
-          logging: false,
-          letterRendering: true,
-          dpi: 600
-        },
-        jsPDF: { 
-          unit: 'mm', 
-          format: 'a4', 
-          orientation: 'portrait',
-          compress: false, 
-          precision: 32
-        }
-      };
 
-      const html2pdf = await import('html2pdf.js');
+
+      const html2canvasModule = await import('html2canvas');
+      const { jsPDF } = await import('jspdf');
       
-      await html2pdf.default()
-        .from(resumeElement)
-        .set(options)
-        .save();
+      const canvas = await html2canvasModule.default(resumeElement, {
+        scale: 3,
+        useCORS: true,
+        logging: false,
+      });
+      
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      pdf.addImage(imgData, 'JPEG', imgX, 0, imgWidth * ratio, imgHeight * ratio);
+      pdf.save(`${resumeName}.pdf`);
       
       root.unmount();
       if (tempContainer.parentNode) {
