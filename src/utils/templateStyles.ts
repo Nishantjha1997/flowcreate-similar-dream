@@ -435,7 +435,109 @@ export const templateStyles = {
     subsectionContent: "mt-4 text-slate-700 leading-relaxed",
     skillsContainer: "flex flex-wrap gap-3",
     skillBadge: "bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg",
-  }
+  },
+
+  // ATS Classic - Clean serif, no graphics
+  "ats-classic": {
+    container: "font-serif max-w-4xl mx-auto bg-white shadow-md",
+    header: "p-8 pb-4 border-b-2 border-gray-900",
+    headerName: "text-3xl font-bold text-gray-900 tracking-normal",
+    headerTitle: "text-lg mt-1 text-gray-600",
+    headerContact: "mt-3 flex flex-wrap gap-4 text-sm text-gray-600",
+    section: "px-8 py-4 border-b border-gray-100",
+    sectionTitle: "text-sm font-bold uppercase tracking-[0.2em] text-gray-900 mb-3 pb-1 border-b border-gray-300",
+    subsection: "mb-4",
+    subsectionTitle: "text-base font-bold flex justify-between text-gray-900",
+    subsectionDate: "text-gray-500 text-sm",
+    subsectionContent: "mt-2 text-gray-700 leading-relaxed text-sm",
+    skillsContainer: "flex flex-wrap gap-2",
+    skillBadge: "bg-gray-100 text-gray-700 px-3 py-1 rounded-sm text-xs border border-gray-200",
+  },
+
+  // ATS Modern - Subtle blue, clean sans-serif
+  "ats-modern": {
+    container: "font-sans max-w-4xl mx-auto bg-white shadow-md border-t-4 border-blue-600",
+    header: "p-8 pb-4 border-b border-gray-200",
+    headerName: "text-3xl font-bold text-gray-900",
+    headerTitle: "text-lg mt-1 text-gray-600",
+    headerContact: "mt-3 flex flex-wrap gap-4 text-sm text-gray-500",
+    section: "px-8 py-4 border-b border-gray-100",
+    sectionTitle: "text-sm font-bold uppercase tracking-widest text-blue-600 mb-3 pb-2 border-b-2 border-blue-100",
+    subsection: "mb-4",
+    subsectionTitle: "text-base font-semibold flex justify-between text-gray-900",
+    subsectionDate: "text-gray-500 text-sm",
+    subsectionContent: "mt-2 text-gray-700 leading-relaxed text-sm",
+    skillsContainer: "flex flex-wrap gap-2",
+    skillBadge: "bg-blue-50 text-blue-700 px-3 py-1 rounded text-xs border border-blue-200",
+  },
+
+  // ATS Executive - Senior leadership, authoritative
+  "ats-executive": {
+    container: "font-serif max-w-4xl mx-auto bg-white shadow-lg border-l-[5px] border-slate-900",
+    header: "p-10 pb-5 border-b-2 border-slate-900",
+    headerName: "text-4xl font-bold text-slate-900 tracking-wide",
+    headerTitle: "text-xl mt-2 text-slate-600",
+    headerContact: "mt-4 flex flex-wrap gap-5 text-sm text-slate-500",
+    section: "px-10 py-5 border-b border-slate-100",
+    sectionTitle: "text-base font-bold uppercase tracking-[0.25em] text-slate-900 mb-4 pb-2 border-b border-slate-300",
+    subsection: "mb-5",
+    subsectionTitle: "text-lg font-bold flex justify-between text-slate-900",
+    subsectionDate: "text-slate-500 italic text-sm",
+    subsectionContent: "mt-3 text-slate-700 leading-loose",
+    skillsContainer: "flex flex-wrap gap-3",
+    skillBadge: "bg-slate-100 text-slate-800 px-4 py-2 rounded-sm text-sm border border-slate-300",
+  },
+
+  // ATS Tech - Developer-friendly, clean
+  "ats-tech": {
+    container: "font-sans max-w-4xl mx-auto bg-white shadow-md border-t-[3px] border-emerald-600",
+    header: "p-8 pb-4 border-b border-gray-200",
+    headerName: "text-3xl font-bold text-emerald-900",
+    headerTitle: "text-lg mt-1 text-gray-600",
+    headerContact: "mt-3 flex flex-wrap gap-4 text-sm text-gray-500",
+    section: "px-8 py-4 border-b border-gray-100",
+    sectionTitle: "text-sm font-bold uppercase tracking-widest text-emerald-600 mb-3 pb-1 border-b-2 border-emerald-100",
+    subsection: "mb-4",
+    subsectionTitle: "text-base font-semibold flex justify-between text-gray-900",
+    subsectionDate: "text-gray-500 text-sm",
+    subsectionContent: "mt-2 text-gray-700 leading-relaxed text-sm",
+    skillsContainer: "flex flex-wrap gap-2",
+    skillBadge: "bg-emerald-50 text-emerald-700 px-3 py-1 rounded text-xs border border-emerald-200",
+  },
+
+  // ATS Minimal - Ultra clean
+  "ats-minimal": {
+    container: "font-sans max-w-4xl mx-auto bg-white shadow-sm",
+    header: "p-8 pb-3 border-b border-gray-200",
+    headerName: "text-2xl font-bold text-black",
+    headerTitle: "text-base mt-1 text-gray-500",
+    headerContact: "mt-2 flex flex-wrap gap-3 text-xs text-gray-500",
+    section: "px-8 py-3 border-b border-gray-50",
+    sectionTitle: "text-xs font-bold uppercase tracking-[0.2em] text-gray-500 mb-2 pb-1 border-b border-gray-200",
+    subsection: "mb-3",
+    subsectionTitle: "text-sm font-semibold flex justify-between text-gray-900",
+    subsectionDate: "text-gray-400 text-xs",
+    subsectionContent: "mt-1 text-gray-600 leading-relaxed text-xs",
+    skillsContainer: "flex flex-wrap gap-1",
+    skillBadge: "bg-gray-50 text-gray-600 px-2 py-1 rounded-sm text-xs",
+  },
+
+  // ATS Corporate - Polished corporate
+  "ats-corporate": {
+    container: "font-serif max-w-4xl mx-auto bg-white shadow-lg border-t-[5px] border-blue-800 border-b-2 border-b-blue-800",
+    header: "p-8 pb-4 border-b border-blue-100 text-center",
+    headerName: "text-3xl font-bold text-blue-900 tracking-normal",
+    headerTitle: "text-lg mt-1 text-blue-700",
+    headerContact: "mt-3 flex justify-center flex-wrap gap-4 text-sm text-slate-500",
+    section: "px-8 py-4 border-b border-gray-100",
+    sectionTitle: "text-sm font-bold uppercase tracking-[0.2em] text-blue-800 mb-3 pb-2 border-b-2 border-blue-200 text-center",
+    subsection: "mb-4",
+    subsectionTitle: "text-base font-semibold flex justify-between text-gray-900",
+    subsectionDate: "text-slate-500 italic text-sm",
+    subsectionContent: "mt-2 text-gray-700 leading-relaxed text-sm",
+    skillsContainer: "flex flex-wrap gap-2 justify-center",
+    skillBadge: "bg-blue-50 text-blue-800 px-3 py-1 rounded text-xs border border-blue-200",
+  },
 };
 
 export type TemplateStylesKey = keyof typeof templateStyles;
@@ -528,5 +630,11 @@ export const templateNameMap = {
   compact: "compact",
   "vp-leader": "vp-leader",
   pharma: "pharma",
-  marketing: "marketing"
+  marketing: "marketing",
+  "ats-classic": "ats-classic",
+  "ats-modern": "ats-modern",
+  "ats-executive": "ats-executive",
+  "ats-tech": "ats-tech",
+  "ats-minimal": "ats-minimal",
+  "ats-corporate": "ats-corporate",
 };
