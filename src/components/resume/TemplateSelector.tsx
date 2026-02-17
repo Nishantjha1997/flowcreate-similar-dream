@@ -148,6 +148,60 @@ const templates = [
     templateKey: "minimalist",
     featured: false,
     atsOptimized: true
+  },
+  {
+    id: "24",
+    name: "ATS Classic",
+    image: "https://images.unsplash.com/photo-1586281380117-5a60ae2050cc",
+    category: "ATS-Friendly",
+    templateKey: "ats-classic",
+    featured: true,
+    atsOptimized: true
+  },
+  {
+    id: "25",
+    name: "ATS Modern",
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+    category: "ATS-Friendly",
+    templateKey: "ats-modern",
+    featured: true,
+    atsOptimized: true
+  },
+  {
+    id: "26",
+    name: "ATS Executive",
+    image: "https://images.unsplash.com/photo-1586281380117-5a60ae2050cc",
+    category: "ATS-Friendly",
+    templateKey: "ats-executive",
+    featured: false,
+    atsOptimized: true
+  },
+  {
+    id: "27",
+    name: "ATS Tech",
+    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
+    category: "ATS-Friendly",
+    templateKey: "ats-tech",
+    featured: true,
+    atsOptimized: true
+  },
+  {
+    id: "28",
+    name: "ATS Minimal",
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+    category: "ATS-Friendly",
+    templateKey: "ats-minimal",
+    featured: false,
+    atsOptimized: true
+  },
+  {
+    id: "29",
+    name: "ATS Corporate",
+    image: "https://images.unsplash.com/photo-1586281380117-5a60ae2050cc",
+    category: "ATS-Friendly",
+    templateKey: "ats-corporate",
+    featured: false,
+    atsOptimized: true
   }
 ];
 
