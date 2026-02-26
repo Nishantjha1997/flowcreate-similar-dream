@@ -72,7 +72,23 @@ const ATSJobs = () => {
 
       if (jobsError) throw jobsError;
 
-      setJobs(jobsData || []);
+      // Fetch application counts per job
+      const jobIds = (jobsData || []).map(j => j.id);
+      let appCounts: Record<string, number> = {};
+      if (jobIds.length > 0) {
+        const { data: apps } = await supabase
+          .from('job_applications')
+          .select('job_id')
+          .in('job_id', jobIds);
+        (apps || []).forEach((a: any) => {
+          appCounts[a.job_id] = (appCounts[a.job_id] || 0) + 1;
+        });
+      }
+
+      setJobs((jobsData || []).map(j => ({
+        ...j,
+        _count: { applications: appCounts[j.id] || 0 },
+      })));
     } catch (error: any) {
       toast({
         title: "Error loading jobs",
