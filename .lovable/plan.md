@@ -1,298 +1,212 @@
 
-
-# Admin Dashboard - Production-Grade Completion Plan
+# Project Completion Plan — Admin Dashboard & ATS Module
 
 ## Executive Summary
 
-After reviewing all 14 admin components, I've identified several incomplete features, placeholder implementations, and missing production-grade functionality. This plan outlines the work needed to transform the admin dashboard into a fully functional, production-ready system.
+This plan tracks the full production-readiness of both the **Admin Dashboard** and the **ATS (Applicant Tracking System)** module. Items are marked ✅ (done), 🔧 (in progress), or ⬜ (todo).
 
 ---
 
-## Current State Analysis
+## Current State Summary
 
-### Fully Functional Components
+### Admin Dashboard
 | Component | Status | Notes |
 |-----------|--------|-------|
-| **UserManagement** | Working | Role changes, premium toggle, user deletion functional |
-| **ATSManagement** | Working | Organization CRUD, stats display, filtering working |
-| **AIManagement** | Working | API key management, primary/fallback, usage stats functional |
-| **EnhancedSystemStats** | Working | Real-time stats from database |
-| **UserRegistrations** | Partial | User list works, but "Add User" fails (uses client-side admin API) |
+| UserManagement | ✅ | Role changes, premium toggle, deletion via edge functions |
+| ATSManagement | ✅ | Organization CRUD, stats, filtering |
+| AIManagement | ✅ | API key management, primary/fallback, usage stats |
+| EnhancedSystemStats | ✅ | Real-time stats from database |
+| AdminAnalytics | ✅ | Platform-wide metrics: users, premium conversion, org growth |
+| AuditLogs | ✅ | Searchable activity feed from ats_activities table |
+| SecuritySettings | ⬜ | Local state only — not persisted to database |
+| ContentManagement | ⬜ | Uses setTimeout mock — no DB persistence |
+| ImprovementPlans | ⬜ | 100% hardcoded static data |
+| TemplateManagement | 🔧 | resume_templates table exists; hook may still be in-memory |
+| UserRegistrations | 🔧 | User list works; Add User uses edge function |
+| QuickActions | ⬜ | Limited actions available |
+| WebsiteCustomization | ⬜ | Saves settings but not applied site-wide |
 
-### Components with Placeholder/Incomplete Logic
-| Component | Issue | Impact |
-|-----------|-------|--------|
-| **SecuritySettings** | All settings are local state only - never persisted | High - security settings don't actually apply |
-| **ContentManagement** | Uses `setTimeout` mock, no database persistence | High - content changes are lost on refresh |
-| **ImprovementPlans** | 100% hardcoded static data | Low - just a roadmap display |
-| **QuickActions** | Limited functionality | Medium - basic but works |
-| **TemplateManagement** | Uses in-memory `useTemplates` hook, not DB | High - templates not persisted |
-
----
-
-## Detailed Improvement Plan
-
-### Phase 1: Critical Database Integrations (Priority: High)
-
-#### 1.1 Fix User Creation (AddUserForm)
-**Problem**: Uses `supabase.auth.admin.createUser()` which requires service role key and doesn't work from client-side.
-
-**Solution**:
-- Create an Edge Function `admin-create-user` (already exists but needs verification)
-- Update AddUserForm to call the Edge Function instead of direct client call
-- Add proper error handling and validation
-
-**Files to modify**:
-- `src/components/admin/AddUserForm.tsx`
-- `supabase/functions/admin-create-user/index.ts` (verify/fix)
-
-#### 1.2 Persist Security Settings
-**Problem**: SecuritySettings component only uses React state - settings vanish on refresh.
-
-**Solution**:
-- Store security settings in `site_settings` table with key `security_settings`
-- Load settings on component mount
-- Save to database on "Save" button click
-
-**Files to modify**:
-- `src/components/admin/SecuritySettings.tsx`
-
-#### 1.3 Persist Content Management Settings  
-**Problem**: ContentManagement uses mock `setTimeout` - nothing saves to database.
-
-**Solution**:
-- Integrate with `site_settings` table for landing page content, SEO settings
-- Add real database upsert operations
-- Display actual saved values from database
-
-**Files to modify**:
-- `src/components/admin/ContentManagement.tsx`
-
-#### 1.4 Template Management Database Integration
-**Problem**: `useTemplates` hook stores templates in memory only.
-
-**Solution**:
-- Create `resume_templates` table in database
-- Update useTemplates hook to use Supabase queries
-- Add RLS policies for admin-only management
-
-**Files to modify/create**:
-- `src/hooks/useTemplates.ts`
-- New migration for `resume_templates` table
+### ATS Module
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Organization onboarding | ✅ | Multi-step wizard, creates org + membership |
+| Job create/edit/publish | ✅ | Full form, status management, DB persistence |
+| Job listing & filtering | ✅ | Real applicant counts from DB |
+| Dashboard with live stats | ✅ | Active jobs, applications, interviews from DB |
+| Application detail & lifecycle | ✅ | Status transitions, reviews, interview scheduling |
+| Team management & invites | ✅ | Add members by email, role assignment |
+| Public job board | ✅ | ATSPublicJobs browsing published jobs |
+| Public application form | ✅ | ATSApply submits to job_applications |
+| Kanban pipeline (drag-drop) | ⬜ | ATSJobDetail shows stages but no DnD |
+| Interview calendar view | ⬜ | Interviews are scheduled but no calendar UI |
+| Email notifications | ⬜ | No notifications for status changes |
+| Talent pool management UI | ⬜ | Tables exist but no UI built |
+| Job offers management UI | ⬜ | Tables exist but no UI built |
 
 ---
 
-### Phase 2: Feature Completeness (Priority: Medium)
+## Phase 1: Critical Fixes (Priority: HIGH)
 
-#### 2.1 User Profiles - Fetch Real User Data
-**Problem**: `useUserProfiles` creates fake emails (`user-{id}@example.com`) because we can't access `auth.users` from client.
+### 1.1 ⬜ Persist Security Settings
+- Store in `site_settings` table with key `security_settings`
+- Load on mount, save on button click
+- **Files**: `src/components/admin/SecuritySettings.tsx`
 
-**Solution**:
-- Create Edge Function `admin-list-users` that uses service role to fetch real user emails/metadata
-- Update useUserProfiles to call this edge function
-- Display actual user emails and names
+### 1.2 ⬜ Persist Content Management
+- Replace `setTimeout` mock with `site_settings` upserts
+- Load saved content on mount
+- **Files**: `src/components/admin/ContentManagement.tsx`
 
-**Files to modify/create**:
-- New: `supabase/functions/admin-list-users/index.ts`
-- `src/hooks/useUserProfiles.ts`
-
-#### 2.2 Security Audit Logs - Real Data
-**Problem**: SecuritySettings shows hardcoded mock security logs.
-
-**Solution**:
-- Create `audit_logs` table to track admin actions
-- Add logging to admin actions (role changes, user creation, settings changes)
-- Display real audit logs in the Activity Monitoring tab
-
-**Files to modify/create**:
-- New migration for `audit_logs` table
-- `src/components/admin/SecuritySettings.tsx`
-- Add logging calls in UserManagement, AddUserForm, etc.
-
-#### 2.3 Export Users - Proper CSV with Real Data
-**Problem**: Export function exists but uses incomplete user data.
-
-**Solution**:
-- Fetch complete user data before export
-- Include all relevant fields (real email, profile data, subscription status)
-- Add date range filtering option
-
-**Files to modify**:
-- `src/components/admin/UserRegistrations.tsx`
-
-#### 2.4 Resend Verification Email
-**Problem**: `handleResendVerification` only shows a toast after fake delay - doesn't actually resend.
-
-**Solution**:
-- Create Edge Function to trigger verification email resend
-- Call edge function from the component
-- Show proper success/error feedback
-
-**Files to modify/create**:
-- New: `supabase/functions/admin-resend-verification/index.ts`
-- `src/components/admin/UserRegistrations.tsx`
+### 1.3 🔧 Template Management DB Integration
+- Verify `useTemplates` hook reads/writes to `resume_templates` table
+- **Files**: `src/hooks/useTemplates.ts`
 
 ---
 
-### Phase 3: UI/UX Polish (Priority: Low-Medium)
+## Phase 2: ATS Feature Completion (Priority: HIGH)
 
-#### 3.1 Improvement Plans - Make Dynamic
-**Problem**: ImprovementPlans is 100% hardcoded static content.
+### 2.1 ⬜ Kanban Pipeline with Drag-and-Drop
+- Add `react-beautiful-dnd` (already installed) to ATSJobDetail
+- Columns = pipeline_stages, cards = applications
+- Drag card between columns → update `current_stage_id`
+- Visual feedback with stage colors
+- **Files**: `src/pages/ats/ATSJobDetail.tsx`
 
-**Solution**:
-- Store improvement plans in `site_settings` or new `improvement_plans` table
-- Add CRUD interface for admins to manage roadmap items
-- Allow status/progress updates
+### 2.2 ⬜ Interview Calendar View
+- Add calendar/timeline view for scheduled interviews
+- Filter by date range, interviewer, status
+- Quick reschedule capability
+- **Files**: New `src/components/ats/InterviewCalendar.tsx`, update `ATSDashboard.tsx`
 
-**Files to modify**:
-- `src/components/admin/ImprovementPlans.tsx`
+### 2.3 ⬜ Talent Pool Management UI
+- CRUD for talent pools (tables already exist)
+- Add candidates from applications or manually
+- Tag-based organization, search/filter
+- **Files**: New `src/pages/ats/ATSTalentPools.tsx`
 
-#### 3.2 Website Customization - Apply Settings Site-Wide
-**Problem**: WebsiteCustomization saves settings but they're not applied to the actual website.
+### 2.4 ⬜ Job Offers Management UI
+- Create/send offers from application detail
+- Track offer status (draft → sent → accepted/rejected)
+- Salary, benefits, start date configuration
+- **Files**: New `src/components/ats/JobOfferForm.tsx`, update `ATSApplicationDetail.tsx`
 
-**Solution**:
-- Create a context/hook to fetch and apply site settings
-- Update Header, Footer, and Index components to use dynamic settings
-- Apply branding colors via CSS variables
-
-**Files to modify/create**:
-- New: `src/hooks/useSiteSettings.ts`
-- Update: `src/components/Header.tsx`, `src/components/Footer.tsx`, `src/pages/Index.tsx`
-
-#### 3.3 Quick Actions - Add More Useful Actions
-**Current**: Only has "Add Role" and "Grant Premium to All"
-
-**Add**:
-- Bulk delete inactive users
-- Reset all user sessions
-- Export all data as backup
-- Clear cache/force refresh
-- Send announcement email to all users
-
-**Files to modify**:
-- `src/components/admin/QuickActions.tsx`
-
-#### 3.4 Pagination and Search Improvements
-**Problem**: Large user lists load all data at once.
-
-**Solution**:
-- Implement server-side pagination
-- Add debounced search
-- Show loading states during filtering
-
-**Files to modify**:
-- `src/components/admin/UserRegistrations.tsx`
-- `src/components/admin/UserManagement.tsx`
+### 2.5 ⬜ Email Notifications (Edge Function)
+- Notify candidates on status changes
+- Notify interviewers on schedule
+- Notify team on new applications
+- **Files**: New `supabase/functions/send-notification/index.ts`
 
 ---
 
-### Phase 4: Production Hardening (Priority: High)
+## Phase 3: Admin Enhancements (Priority: MEDIUM)
 
-#### 4.1 Rate Limiting Enforcement
-**Problem**: Rate limit settings are saved but not enforced anywhere.
+### 3.1 ⬜ Real Audit Logs for Admin Actions
+- Current AuditLogs reads `ats_activities` — extend to track admin actions too
+- Create `audit_logs` table for admin-specific events (role changes, settings, user mgmt)
+- Log from UserManagement, SecuritySettings, ContentManagement
+- **Migration**: New `audit_logs` table
+- **Files**: `src/components/admin/AuditLogs.tsx`, admin components
 
-**Solution**:
-- Implement rate limiting in Edge Functions
-- Store limits in database and check against them
-- Return 429 responses when limits exceeded
+### 3.2 ⬜ Website Customization → Apply Site-Wide
+- Create `useSiteSettings` hook to fetch and apply branding
+- Update Header, Footer, Index to use dynamic settings
+- Apply colors via CSS variables
+- **Files**: New `src/hooks/useSiteSettings.ts`, `src/components/Header.tsx`, `src/components/Footer.tsx`
 
-#### 4.2 Real Activity Monitoring
-**Problem**: No real-time monitoring or alerting.
+### 3.3 ⬜ Enhanced Quick Actions
+- Add: Bulk operations, export data, clear cache, send announcements
+- **Files**: `src/components/admin/QuickActions.tsx`
 
-**Solution**:
-- Add WebSocket or polling for real-time stats
-- Implement alert thresholds (e.g., spike in failed logins)
-- Email notifications for critical events
+### 3.4 ⬜ User Management Pagination & Search
+- Server-side pagination for large user lists
+- Debounced search
+- **Files**: `src/components/admin/UserRegistrations.tsx`, `src/components/admin/UserManagement.tsx`
 
-#### 4.3 Confirm Destructive Actions
-**Problem**: Some destructive actions lack confirmation.
-
-**Solution**:
-- Ensure all delete/bulk operations have confirmation dialogs
-- Add "type to confirm" for critical actions (like delete organization)
-
----
-
-## Implementation Priority Order
-
-```text
-1. Fix User Creation Edge Function       [Critical - Core feature broken]
-2. Security Settings Persistence         [Critical - Security config]
-3. Content Management Persistence        [High - CMS functionality]
-4. Template Management Database          [High - Core feature]
-5. Real User Data via Edge Function      [Medium - Better UX]
-6. Audit Logs Implementation             [Medium - Compliance]
-7. Site Settings Application             [Medium - Branding]
-8. Pagination/Search                     [Low - Performance]
-9. Dynamic Improvement Plans             [Low - Nice-to-have]
-```
+### 3.5 ⬜ Dynamic Improvement Plans
+- Store roadmap items in `site_settings` or dedicated table
+- Admin CRUD for roadmap items with status tracking
+- **Files**: `src/components/admin/ImprovementPlans.tsx`
 
 ---
 
-## Database Changes Required
+## Phase 4: Production Hardening (Priority: HIGH before launch)
 
-### New Tables
+### 4.1 ⬜ Rate Limiting Enforcement
+- Implement in Edge Functions using `rateLimiter.ts`
+- Check limits from `site_settings` security config
+- Return 429 when exceeded
 
-**audit_logs**
-```sql
-CREATE TABLE audit_logs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id),
-  action TEXT NOT NULL,
-  entity_type TEXT NOT NULL,
-  entity_id UUID,
-  old_values JSONB,
-  new_values JSONB,
-  ip_address INET,
-  user_agent TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-```
+### 4.2 ⬜ Confirmation Dialogs for Destructive Actions
+- Type-to-confirm for org deletion, user deletion
+- Confirmation for bulk operations
+- **Files**: Various admin & ATS components
 
-**resume_templates** (if not using file-based templates)
-```sql
-CREATE TABLE resume_templates (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  template_key TEXT UNIQUE NOT NULL,
-  category TEXT NOT NULL,
-  description TEXT,
-  preview_url TEXT,
-  is_active BOOLEAN DEFAULT true,
-  is_featured BOOLEAN DEFAULT false,
-  is_ats_optimized BOOLEAN DEFAULT false,
-  usage_count INTEGER DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
-```
+### 4.3 ⬜ Real-Time Activity Monitoring
+- Supabase Realtime subscriptions for live dashboard updates
+- Alert thresholds for anomalies (spike in failed logins, etc.)
+
+### 4.4 ⬜ Proper Error Boundaries
+- Wrap each admin tab in error boundary
+- Graceful fallback UI for failed data loads
 
 ---
 
 ## Edge Functions Required
 
-| Function | Purpose |
-|----------|---------|
-| `admin-create-user` | Create users with service role (exists, verify) |
-| `admin-list-users` | Fetch user emails/metadata from auth.users |
-| `admin-resend-verification` | Trigger verification email resend |
-| `admin-delete-user` | Fully delete user from auth + all tables |
+| Function | Status | Purpose |
+|----------|--------|---------|
+| `admin-create-user` | ✅ | Create users with service role |
+| `admin-list-users` | ✅ | Fetch user emails/metadata from auth.users |
+| `create-razorpay-order` | ✅ | Payment processing |
+| `verify-razorpay-payment` | ✅ | Payment verification |
+| `gemini-suggest` | ✅ | AI resume suggestions |
+| `extract-resume-data` | ✅ | PDF parsing |
+| `send-notification` | ⬜ | Email notifications for ATS events |
+| `admin-resend-verification` | ⬜ | Trigger verification email resend |
 
 ---
 
-## Estimated Effort
+## Database Changes Required
 
-| Phase | Tasks | Effort |
+### New Tables Needed
+- `audit_logs` — Admin action tracking (role changes, settings, user mgmt)
+
+### Existing Tables (no changes needed)
+- `resume_templates` ✅ — Already exists
+- `talent_pools` ✅ — Already exists  
+- `talent_pool_candidates` ✅ — Already exists
+- `job_offers` ✅ — Already exists
+- `interviews` ✅ — Already exists
+- `ats_activities` ✅ — Already exists
+
+---
+
+## Implementation Priority Order
+
+```
+1. Kanban drag-drop pipeline          [High - Core ATS differentiator]
+2. Security Settings persistence      [High - Security config must persist]
+3. Content Management persistence     [High - CMS must work]
+4. Talent Pool UI                     [Medium - Tables ready, needs UI]
+5. Job Offers UI                      [Medium - Tables ready, needs UI]
+6. Interview Calendar                 [Medium - Better scheduling UX]
+7. Admin Audit Logs table             [Medium - Compliance]
+8. Site-wide customization apply      [Medium - Branding]
+9. Email notifications                [Medium - User engagement]
+10. Pagination/Search                 [Low - Performance at scale]
+11. Dynamic Improvement Plans         [Low - Nice-to-have]
+12. Rate Limiting enforcement         [Pre-launch - Security]
+13. Error boundaries                  [Pre-launch - Reliability]
+```
+
+---
+
+## Estimated Remaining Effort
+
+| Phase | Items | Effort |
 |-------|-------|--------|
-| Phase 1 | 4 critical fixes | ~8-12 hours |
-| Phase 2 | 4 feature completions | ~10-15 hours |
-| Phase 3 | 4 UI/UX improvements | ~6-10 hours |
-| Phase 4 | 3 production hardening | ~8-12 hours |
-| **Total** | **15 items** | **~32-49 hours** |
-
----
-
-## Recommendation
-
-Start with **Phase 1** items as they fix broken functionality. The user creation form and settings persistence are the most impactful fixes. Phase 4 should be completed before going to production to ensure security and reliability.
-
+| Phase 1: Critical Fixes | 3 items | ~4-6 hours |
+| Phase 2: ATS Completion | 5 items | ~15-20 hours |
+| Phase 3: Admin Enhancements | 5 items | ~10-15 hours |
+| Phase 4: Production Hardening | 4 items | ~8-12 hours |
+| **Total Remaining** | **17 items** | **~37-53 hours** |
