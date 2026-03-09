@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   ArrowLeft, Mail, Phone, Linkedin, Calendar,
-  FileText, Star, MessageSquare, Clock, Plus, Video, MapPin
+  FileText, Star, MessageSquare, Clock, Plus, Video, MapPin, Gift, DollarSign
 } from 'lucide-react';
 import Header from '@/components/Header';
 
