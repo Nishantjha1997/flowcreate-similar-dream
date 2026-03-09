@@ -88,19 +88,20 @@ const ATSApplicationDetail = () => {
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
   const [interviewForm, setInterviewForm] = useState({
-    title: '',
-    scheduled_at: '',
-    duration_minutes: '60',
-    interview_type: 'video',
-    meeting_link: '',
-    location: '',
-    notes: '',
+    title: '', scheduled_at: '', duration_minutes: '60', interview_type: 'video', meeting_link: '', location: '', notes: '',
   });
 
-  // Add note / review
+  // Review
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [reviewForm, setReviewForm] = useState({ rating: 0, feedback: '', recommendation: 'neutral' });
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  // Offer
+  const [isOfferOpen, setIsOfferOpen] = useState(false);
+  const [isCreatingOffer, setIsCreatingOffer] = useState(false);
+  const [offerForm, setOfferForm] = useState({
+    job_title: '', salary_amount: '', salary_currency: 'USD', benefits: '', start_date: '', expires_at: ''
+  });
 
   useEffect(() => {
     if (!user) { navigate('/ats/login'); return; }
@@ -162,16 +163,12 @@ const ATSApplicationDetail = () => {
     setIsScheduling(true);
     try {
       const { error } = await supabase.from('interviews').insert({
-        application_id: applicationId,
-        created_by: user.id,
-        title: interviewForm.title,
-        scheduled_at: interviewForm.scheduled_at,
+        application_id: applicationId, created_by: user.id,
+        title: interviewForm.title, scheduled_at: interviewForm.scheduled_at,
         duration_minutes: parseInt(interviewForm.duration_minutes),
         interview_type: interviewForm.interview_type || null,
-        meeting_link: interviewForm.meeting_link || null,
-        location: interviewForm.location || null,
-        notes: interviewForm.notes || null,
-        status: 'scheduled',
+        meeting_link: interviewForm.meeting_link || null, location: interviewForm.location || null,
+        notes: interviewForm.notes || null, status: 'scheduled',
       });
       if (error) throw error;
       toast({ title: "Interview scheduled!" });
@@ -180,9 +177,7 @@ const ATSApplicationDetail = () => {
       loadApplication();
     } catch (error: any) {
       toast({ title: "Error scheduling", description: error.message, variant: "destructive" });
-    } finally {
-      setIsScheduling(false);
-    }
+    } finally { setIsScheduling(false); }
   };
 
   const submitReview = async () => {
@@ -190,10 +185,8 @@ const ATSApplicationDetail = () => {
     setIsSubmittingReview(true);
     try {
       const { error } = await supabase.from('application_reviews').insert({
-        application_id: applicationId,
-        reviewer_id: user.id,
-        rating: reviewForm.rating || null,
-        feedback: reviewForm.feedback || null,
+        application_id: applicationId, reviewer_id: user.id,
+        rating: reviewForm.rating || null, feedback: reviewForm.feedback || null,
         recommendation: reviewForm.recommendation || null,
       });
       if (error) throw error;
@@ -203,8 +196,40 @@ const ATSApplicationDetail = () => {
       loadApplication();
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
-    } finally {
-      setIsSubmittingReview(false);
+    } finally { setIsSubmittingReview(false); }
+  };
+
+  const createOffer = async () => {
+    if (!applicationId || !user || !offerForm.job_title || !offerForm.salary_amount) return;
+    setIsCreatingOffer(true);
+    try {
+      const { error } = await supabase.from('job_offers').insert({
+        application_id: applicationId, created_by: user.id,
+        job_title: offerForm.job_title, salary_amount: parseInt(offerForm.salary_amount),
+        salary_currency: offerForm.salary_currency, benefits: offerForm.benefits || null,
+        start_date: offerForm.start_date || null, expires_at: offerForm.expires_at || null,
+        status: 'draft',
+      });
+      if (error) throw error;
+      toast({ title: "Offer created!" });
+      setIsOfferOpen(false);
+      loadApplication();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally { setIsCreatingOffer(false); }
+  };
+
+  const updateOfferStatus = async (offerId: string, newStatus: string) => {
+    try {
+      const updates: any = { status: newStatus };
+      if (newStatus === 'sent') updates.sent_at = new Date().toISOString();
+      if (newStatus === 'accepted' || newStatus === 'declined') updates.responded_at = new Date().toISOString();
+      const { error } = await supabase.from('job_offers').update(updates).eq('id', offerId);
+      if (error) throw error;
+      toast({ title: `Offer ${newStatus}` });
+      loadApplication();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   };
 
@@ -227,6 +252,16 @@ const ATSApplicationDetail = () => {
       </div>
     );
   }
+
+  const getOfferStatusColor = (status: string) => {
+    switch (status) {
+      case 'draft': return 'secondary' as const;
+      case 'sent': return 'default' as const;
+      case 'accepted': return 'default' as const;
+      case 'declined': return 'destructive' as const;
+      default: return 'secondary' as const;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -286,11 +321,12 @@ const ATSApplicationDetail = () => {
             </Card>
 
             <Tabs defaultValue="application" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="application">Application</TabsTrigger>
                 <TabsTrigger value="resume">Resume</TabsTrigger>
                 <TabsTrigger value="interviews">Interviews ({interviews.length})</TabsTrigger>
                 <TabsTrigger value="reviews">Reviews ({reviews.length})</TabsTrigger>
+                <TabsTrigger value="offers">Offers ({offers.length})</TabsTrigger>
               </TabsList>
 
               <TabsContent value="application" className="space-y-4">
@@ -336,12 +372,9 @@ const ATSApplicationDetail = () => {
                   </Button>
                 </div>
                 {interviews.length === 0 ? (
-                  <Card>
-                    <CardContent className="py-8 text-center text-muted-foreground">
-                      <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                      <p>No interviews scheduled yet</p>
-                    </CardContent>
-                  </Card>
+                  <Card><CardContent className="py-8 text-center text-muted-foreground">
+                    <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" /><p>No interviews scheduled yet</p>
+                  </CardContent></Card>
                 ) : (
                   interviews.map((interview) => (
                     <Card key={interview.id}>
@@ -350,26 +383,11 @@ const ATSApplicationDetail = () => {
                           <div>
                             <h4 className="font-semibold">{interview.title}</h4>
                             <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
-                              <span className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
-                                {new Date(interview.scheduled_at).toLocaleString()}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                {interview.duration_minutes} min
-                              </span>
-                              {interview.interview_type && (
-                                <span className="flex items-center gap-1">
-                                  <Video className="h-3 w-3" />
-                                  {interview.interview_type}
-                                </span>
-                              )}
+                              <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(interview.scheduled_at).toLocaleString()}</span>
+                              <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{interview.duration_minutes} min</span>
+                              {interview.interview_type && <span className="flex items-center gap-1"><Video className="h-3 w-3" />{interview.interview_type}</span>}
                             </div>
-                            {interview.meeting_link && (
-                              <a href={interview.meeting_link} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline mt-1 block">
-                                Join Meeting
-                              </a>
-                            )}
+                            {interview.meeting_link && <a href={interview.meeting_link} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline mt-1 block">Join Meeting</a>}
                             {interview.notes && <p className="text-sm text-muted-foreground mt-2">{interview.notes}</p>}
                           </div>
                           <Badge variant={interview.status === 'scheduled' ? 'default' : 'secondary'}>{interview.status}</Badge>
@@ -382,17 +400,12 @@ const ATSApplicationDetail = () => {
 
               <TabsContent value="reviews" className="space-y-4">
                 <div className="flex justify-end">
-                  <Button onClick={() => setIsReviewOpen(true)}>
-                    <Plus className="mr-2 h-4 w-4" /> Add Review
-                  </Button>
+                  <Button onClick={() => setIsReviewOpen(true)}><Plus className="mr-2 h-4 w-4" /> Add Review</Button>
                 </div>
                 {reviews.length === 0 ? (
-                  <Card>
-                    <CardContent className="py-8 text-center text-muted-foreground">
-                      <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                      <p>No reviews yet</p>
-                    </CardContent>
-                  </Card>
+                  <Card><CardContent className="py-8 text-center text-muted-foreground">
+                    <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" /><p>No reviews yet</p>
+                  </CardContent></Card>
                 ) : (
                   reviews.map((review) => (
                     <Card key={review.id}>
@@ -418,6 +431,46 @@ const ATSApplicationDetail = () => {
                   ))
                 )}
               </TabsContent>
+
+              <TabsContent value="offers" className="space-y-4">
+                <div className="flex justify-end">
+                  <Button onClick={() => setIsOfferOpen(true)}><Plus className="mr-2 h-4 w-4" /> Create Offer</Button>
+                </div>
+                {offers.length === 0 ? (
+                  <Card><CardContent className="py-8 text-center text-muted-foreground">
+                    <Gift className="h-12 w-12 mx-auto mb-3 opacity-50" /><p>No offers created yet</p>
+                  </CardContent></Card>
+                ) : (
+                  offers.map((offer) => (
+                    <Card key={offer.id}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="font-semibold">{offer.job_title}</h4>
+                            <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
+                              <span className="flex items-center gap-1"><DollarSign className="h-3 w-3" />{offer.salary_currency} {offer.salary_amount.toLocaleString()}</span>
+                              {offer.start_date && <span>Start: {new Date(offer.start_date).toLocaleDateString()}</span>}
+                            </div>
+                            {offer.benefits && <p className="text-sm text-muted-foreground mt-2">{offer.benefits}</p>}
+                          </div>
+                          <Badge variant={getOfferStatusColor(offer.status)}>{offer.status}</Badge>
+                        </div>
+                        <div className="flex gap-2 mt-3 pt-3 border-t">
+                          {offer.status === 'draft' && (
+                            <Button size="sm" onClick={() => updateOfferStatus(offer.id, 'sent')}>Send Offer</Button>
+                          )}
+                          {offer.status === 'sent' && (
+                            <>
+                              <Button size="sm" onClick={() => updateOfferStatus(offer.id, 'accepted')}>Mark Accepted</Button>
+                              <Button size="sm" variant="outline" onClick={() => updateOfferStatus(offer.id, 'declined')}>Mark Declined</Button>
+                            </>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </TabsContent>
             </Tabs>
           </div>
 
@@ -435,6 +488,9 @@ const ATSApplicationDetail = () => {
                 <Button className="w-full" variant="outline" onClick={() => setIsReviewOpen(true)}>
                   <MessageSquare className="mr-2 h-4 w-4" /> Add Review
                 </Button>
+                <Button className="w-full" variant="outline" onClick={() => setIsOfferOpen(true)}>
+                  <Gift className="mr-2 h-4 w-4" /> Create Offer
+                </Button>
               </CardContent>
             </Card>
 
@@ -442,9 +498,7 @@ const ATSApplicationDetail = () => {
               <CardHeader><CardTitle className="text-lg">Status</CardTitle></CardHeader>
               <CardContent>
                 <Select value={application.status} onValueChange={updateStatus}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="new">New</SelectItem>
                     <SelectItem value="reviewing">Reviewing</SelectItem>
@@ -469,55 +523,28 @@ const ATSApplicationDetail = () => {
             <DialogDescription>Set up an interview with {application.candidate_name}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Title *</Label>
-              <Input value={interviewForm.title} onChange={(e) => setInterviewForm({ ...interviewForm, title: e.target.value })} />
-            </div>
+            <div className="space-y-2"><Label>Title *</Label><Input value={interviewForm.title} onChange={(e) => setInterviewForm({ ...interviewForm, title: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Date & Time *</Label>
-                <Input type="datetime-local" value={interviewForm.scheduled_at} onChange={(e) => setInterviewForm({ ...interviewForm, scheduled_at: e.target.value })} />
-              </div>
-              <div className="space-y-2">
-                <Label>Duration (min)</Label>
+              <div className="space-y-2"><Label>Date & Time *</Label><Input type="datetime-local" value={interviewForm.scheduled_at} onChange={(e) => setInterviewForm({ ...interviewForm, scheduled_at: e.target.value })} /></div>
+              <div className="space-y-2"><Label>Duration</Label>
                 <Select value={interviewForm.duration_minutes} onValueChange={(v) => setInterviewForm({ ...interviewForm, duration_minutes: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="30">30 min</SelectItem>
-                    <SelectItem value="45">45 min</SelectItem>
-                    <SelectItem value="60">60 min</SelectItem>
-                    <SelectItem value="90">90 min</SelectItem>
-                  </SelectContent>
+                  <SelectContent><SelectItem value="30">30 min</SelectItem><SelectItem value="45">45 min</SelectItem><SelectItem value="60">60 min</SelectItem><SelectItem value="90">90 min</SelectItem></SelectContent>
                 </Select>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label>Interview Type</Label>
+            <div className="space-y-2"><Label>Interview Type</Label>
               <Select value={interviewForm.interview_type} onValueChange={(v) => setInterviewForm({ ...interviewForm, interview_type: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="video">Video Call</SelectItem>
-                  <SelectItem value="phone">Phone</SelectItem>
-                  <SelectItem value="in-person">In Person</SelectItem>
-                  <SelectItem value="technical">Technical</SelectItem>
-                  <SelectItem value="panel">Panel</SelectItem>
-                </SelectContent>
+                <SelectContent><SelectItem value="video">Video Call</SelectItem><SelectItem value="phone">Phone</SelectItem><SelectItem value="in-person">In Person</SelectItem><SelectItem value="technical">Technical</SelectItem><SelectItem value="panel">Panel</SelectItem></SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label>Meeting Link</Label>
-              <Input placeholder="https://meet.google.com/..." value={interviewForm.meeting_link} onChange={(e) => setInterviewForm({ ...interviewForm, meeting_link: e.target.value })} />
-            </div>
-            <div className="space-y-2">
-              <Label>Notes</Label>
-              <Textarea placeholder="Any additional notes..." value={interviewForm.notes} onChange={(e) => setInterviewForm({ ...interviewForm, notes: e.target.value })} rows={3} />
-            </div>
+            <div className="space-y-2"><Label>Meeting Link</Label><Input placeholder="https://meet.google.com/..." value={interviewForm.meeting_link} onChange={(e) => setInterviewForm({ ...interviewForm, meeting_link: e.target.value })} /></div>
+            <div className="space-y-2"><Label>Notes</Label><Textarea placeholder="Any additional notes..." value={interviewForm.notes} onChange={(e) => setInterviewForm({ ...interviewForm, notes: e.target.value })} rows={3} /></div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsScheduleOpen(false)}>Cancel</Button>
-            <Button onClick={scheduleInterview} disabled={isScheduling || !interviewForm.title || !interviewForm.scheduled_at}>
-              {isScheduling ? 'Scheduling...' : 'Schedule Interview'}
-            </Button>
+            <Button onClick={scheduleInterview} disabled={isScheduling || !interviewForm.title || !interviewForm.scheduled_at}>{isScheduling ? 'Scheduling...' : 'Schedule Interview'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -530,37 +557,55 @@ const ATSApplicationDetail = () => {
             <DialogDescription>Submit your evaluation of {application.candidate_name}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Rating</Label>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button key={star} onClick={() => setReviewForm({ ...reviewForm, rating: star })}>
-                    <Star className={`h-6 w-6 ${star <= reviewForm.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/30 hover:text-yellow-400'}`} />
-                  </button>
-                ))}
-              </div>
+            <div className="space-y-2"><Label>Rating</Label>
+              <div className="flex gap-1">{[1, 2, 3, 4, 5].map((star) => (
+                <button key={star} onClick={() => setReviewForm({ ...reviewForm, rating: star })}>
+                  <Star className={`h-6 w-6 ${star <= reviewForm.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/30 hover:text-yellow-400'}`} />
+                </button>
+              ))}</div>
             </div>
-            <div className="space-y-2">
-              <Label>Recommendation</Label>
+            <div className="space-y-2"><Label>Recommendation</Label>
               <Select value={reviewForm.recommendation} onValueChange={(v) => setReviewForm({ ...reviewForm, recommendation: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="hire">Hire</SelectItem>
-                  <SelectItem value="neutral">Neutral</SelectItem>
-                  <SelectItem value="reject">Reject</SelectItem>
-                </SelectContent>
+                <SelectContent><SelectItem value="hire">Hire</SelectItem><SelectItem value="neutral">Neutral</SelectItem><SelectItem value="reject">Reject</SelectItem></SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label>Feedback</Label>
-              <Textarea placeholder="Your detailed feedback..." value={reviewForm.feedback} onChange={(e) => setReviewForm({ ...reviewForm, feedback: e.target.value })} rows={4} />
-            </div>
+            <div className="space-y-2"><Label>Feedback</Label><Textarea placeholder="Your detailed feedback..." value={reviewForm.feedback} onChange={(e) => setReviewForm({ ...reviewForm, feedback: e.target.value })} rows={4} /></div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsReviewOpen(false)}>Cancel</Button>
-            <Button onClick={submitReview} disabled={isSubmittingReview}>
-              {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
-            </Button>
+            <Button onClick={submitReview} disabled={isSubmittingReview}>{isSubmittingReview ? 'Submitting...' : 'Submit Review'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Offer Dialog */}
+      <Dialog open={isOfferOpen} onOpenChange={setIsOfferOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Create Job Offer</DialogTitle>
+            <DialogDescription>Create an offer for {application.candidate_name}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2"><Label>Job Title *</Label><Input value={offerForm.job_title} onChange={(e) => setOfferForm({ ...offerForm, job_title: e.target.value })} /></div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2"><Label>Salary Amount *</Label><Input type="number" placeholder="80000" value={offerForm.salary_amount} onChange={(e) => setOfferForm({ ...offerForm, salary_amount: e.target.value })} /></div>
+              <div className="space-y-2"><Label>Currency</Label>
+                <Select value={offerForm.salary_currency} onValueChange={(v) => setOfferForm({ ...offerForm, salary_currency: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent><SelectItem value="USD">USD</SelectItem><SelectItem value="EUR">EUR</SelectItem><SelectItem value="GBP">GBP</SelectItem><SelectItem value="INR">INR</SelectItem></SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2"><Label>Benefits</Label><Textarea placeholder="Health insurance, 401k, PTO..." value={offerForm.benefits} onChange={(e) => setOfferForm({ ...offerForm, benefits: e.target.value })} rows={3} /></div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2"><Label>Start Date</Label><Input type="date" value={offerForm.start_date} onChange={(e) => setOfferForm({ ...offerForm, start_date: e.target.value })} /></div>
+              <div className="space-y-2"><Label>Offer Expires</Label><Input type="datetime-local" value={offerForm.expires_at} onChange={(e) => setOfferForm({ ...offerForm, expires_at: e.target.value })} /></div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsOfferOpen(false)}>Cancel</Button>
+            <Button onClick={createOffer} disabled={isCreatingOffer || !offerForm.job_title || !offerForm.salary_amount}>{isCreatingOffer ? 'Creating...' : 'Create Offer'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -99,6 +99,7 @@ const App = () => (
                       <Route path="/ats/settings" element={<ATSSettings />} />
                       <Route path="/ats/jobs/browse" element={<ATSPublicJobs />} />
                       <Route path="/ats/apply/:jobId" element={<ATSApply />} />
+                      <Route path="/ats/talent-pools" element={<ATSTalentPools />} />
                       
                       <Route path="*" element={<NotFound />} />
                     </Routes>
