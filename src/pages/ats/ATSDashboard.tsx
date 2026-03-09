@@ -231,6 +231,10 @@ const ATSDashboard = () => {
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </Button>
+            <Button variant="outline" onClick={() => navigate('/ats/talent-pools')}>
+              <FolderOpen className="mr-2 h-4 w-4" />
+              Talent Pools
+            </Button>
             <Button variant="outline" onClick={() => navigate('/ats/jobs')}>
               View All Jobs
             </Button>
