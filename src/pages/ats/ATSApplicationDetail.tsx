@@ -67,6 +67,7 @@ const ATSApplicationDetail = () => {
   const [application, setApplication] = useState<Application | null>(null);
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [offers, setOffers] = useState<Offer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [rating, setRating] = useState(0);
   
