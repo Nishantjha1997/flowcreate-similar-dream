@@ -120,7 +120,6 @@ const ATSJobDetail = () => {
 
       if (error) throw error;
 
-      // Refresh applications
       loadJobDetails();
       
       toast({
@@ -133,6 +132,27 @@ const ATSJobDetail = () => {
         description: error.message,
         variant: "destructive",
       });
+    }
+  };
+
+  const updateJobStatus = async (newStatus: string) => {
+    if (!jobId) return;
+    try {
+      const updates: any = { status: newStatus };
+      if (newStatus === 'published') updates.published_at = new Date().toISOString();
+      if (newStatus === 'closed') updates.closed_at = new Date().toISOString();
+
+      const { error } = await supabase
+        .from('jobs')
+        .update(updates)
+        .eq('id', jobId);
+
+      if (error) throw error;
+
+      setJob(prev => prev ? { ...prev, status: newStatus } : null);
+      toast({ title: `Job ${newStatus}`, description: `Job status changed to ${newStatus}` });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   };
 
@@ -191,9 +211,21 @@ const ATSJobDetail = () => {
               <Badge variant={job.status === 'published' ? 'default' : 'secondary'}>
                 {job.status}
               </Badge>
-              <Button variant="outline" onClick={() => navigate(`/ats/jobs/${jobId}/edit`)}>
-                Edit Job
-              </Button>
+              {job.status === 'draft' && (
+                <Button variant="default" onClick={() => updateJobStatus('published')}>
+                  Publish Job
+                </Button>
+              )}
+              {job.status === 'published' && (
+                <Button variant="outline" onClick={() => updateJobStatus('closed')}>
+                  Close Job
+                </Button>
+              )}
+              {job.status === 'closed' && (
+                <Button variant="outline" onClick={() => updateJobStatus('published')}>
+                  Reopen Job
+                </Button>
+              )}
             </div>
           </div>
         </div>

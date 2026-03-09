@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Users, Briefcase, TrendingUp, Clock, 
-  Plus, Search, Settings, FileText, Home, Eye, MapPin, MoreVertical, Calendar
+  Plus, Search, Settings, FileText, Home, Eye, MapPin, MoreVertical, Calendar, FolderOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -230,6 +230,10 @@ const ATSDashboard = () => {
             <Button variant="outline" onClick={() => navigate('/ats/settings')}>
               <Settings className="mr-2 h-4 w-4" />
               Settings
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/ats/talent-pools')}>
+              <FolderOpen className="mr-2 h-4 w-4" />
+              Talent Pools
             </Button>
             <Button variant="outline" onClick={() => navigate('/ats/jobs')}>
               View All Jobs
