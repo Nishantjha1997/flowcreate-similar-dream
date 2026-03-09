@@ -97,10 +97,11 @@ const ATSApplicationDetail = () => {
   const loadApplication = async () => {
     if (!applicationId) return;
     try {
-      const [appRes, intRes, revRes] = await Promise.all([
+      const [appRes, intRes, revRes, offRes] = await Promise.all([
         supabase.from('job_applications').select('*, job:jobs(id, title)').eq('id', applicationId).single(),
         supabase.from('interviews').select('*').eq('application_id', applicationId).order('scheduled_at', { ascending: false }),
         supabase.from('application_reviews').select('*').eq('application_id', applicationId).order('created_at', { ascending: false }),
+        supabase.from('job_offers').select('*').eq('application_id', applicationId).order('created_at', { ascending: false }),
       ]);
 
       if (appRes.error) throw appRes.error;
@@ -108,6 +109,10 @@ const ATSApplicationDetail = () => {
       setRating(appRes.data.rating || 0);
       setInterviews(intRes.data || []);
       setReviews(revRes.data || []);
+      setOffers(offRes.data || []);
+      if (appRes.data.job) {
+        setOfferForm(prev => ({ ...prev, job_title: appRes.data.job.title }));
+      }
     } catch (error: any) {
       toast({ title: "Error loading application", description: error.message, variant: "destructive" });
     } finally {
