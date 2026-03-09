@@ -191,9 +191,21 @@ const ATSJobDetail = () => {
               <Badge variant={job.status === 'published' ? 'default' : 'secondary'}>
                 {job.status}
               </Badge>
-              <Button variant="outline" onClick={() => navigate(`/ats/jobs/${jobId}/edit`)}>
-                Edit Job
-              </Button>
+              {job.status === 'draft' && (
+                <Button variant="default" onClick={() => updateJobStatus('published')}>
+                  Publish Job
+                </Button>
+              )}
+              {job.status === 'published' && (
+                <Button variant="outline" onClick={() => updateJobStatus('closed')}>
+                  Close Job
+                </Button>
+              )}
+              {job.status === 'closed' && (
+                <Button variant="outline" onClick={() => updateJobStatus('published')}>
+                  Reopen Job
+                </Button>
+              )}
             </div>
           </div>
         </div>
