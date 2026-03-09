@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Users, Briefcase, TrendingUp, Clock, 
-  Plus, Search, Settings, FileText, Home, Eye, MapPin, MoreVertical, Calendar
+  Plus, Search, Settings, FileText, Home, Eye, MapPin, MoreVertical, Calendar, FolderOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
