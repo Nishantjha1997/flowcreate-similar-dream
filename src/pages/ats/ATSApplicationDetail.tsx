@@ -58,6 +58,19 @@ interface Review {
   created_at: string;
 }
 
+interface Offer {
+  id: string;
+  job_title: string;
+  salary_amount: number;
+  salary_currency: string;
+  benefits: string | null;
+  start_date: string | null;
+  status: string;
+  created_at: string;
+  sent_at: string | null;
+  expires_at: string | null;
+}
+
 const ATSApplicationDetail = () => {
   const { applicationId } = useParams();
   const { user } = useAuth();
