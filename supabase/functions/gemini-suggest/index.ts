@@ -22,18 +22,29 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
   try {
-    // Authenticate and rate limit
+    // Authenticate - require valid auth token
     const authHeader = req.headers.get('Authorization');
-    let userId = 'anonymous';
-    if (authHeader) {
-      const supabase = createClient(
-        Deno.env.get('SUPABASE_URL') ?? '',
-        Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
-      const token = authHeader.replace('Bearer ', '');
-      const { data } = await supabase.auth.getUser(token);
-      if (data?.user) userId = data.user.id;
     }
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid or expired token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const userId = claimsData.claims.sub as string;
 
     // Rate limit: 10 requests per user per hour
     const rl = checkRateLimit(`gemini-suggest:${userId}`, 10, 60 * 60_000);
