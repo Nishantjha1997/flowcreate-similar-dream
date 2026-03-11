@@ -194,8 +194,9 @@ const Admin = () => {
             <TabsContent value="users" className="mt-6">
               <UserManagement 
                 members={members} 
-                isLoading={loadingMembers} 
-                refetch={refetch} 
+                userProfiles={userProfiles}
+                isLoading={loadingMembers || loadingProfiles} 
+                refetch={() => { refetch(); }} 
               />
             </TabsContent>
             
