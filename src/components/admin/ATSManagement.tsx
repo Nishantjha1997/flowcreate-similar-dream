@@ -93,6 +93,20 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
     enabled: isAdmin,
   });
 
+  // Fetch org members when details dialog is open
+  const { data: orgMembers = [], isLoading: loadingMembers, refetch: refetchMembers } = useQuery({
+    queryKey: ["admin-org-members", selectedOrg?.id],
+    queryFn: async () => {
+      if (!selectedOrg) return [];
+      const { data, error } = await supabase.functions.invoke('admin-add-org-member', {
+        body: { action: 'list', organizationId: selectedOrg.id }
+      });
+      if (error) throw error;
+      return data?.members || [];
+    },
+    enabled: !!selectedOrg && isDetailsOpen,
+  });
+
   const filteredOrgs = organizations.filter(org =>
     org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     org.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -119,19 +133,81 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
     }
     setIsCreating(true);
     try {
-      const { error } = await supabase.from("organizations").insert({
+      const { data: orgData, error } = await supabase.from("organizations").insert({
         name: newOrgName.trim(),
-        slug: newOrgSlug.trim().toLowerCase().replace(/\s+/g, "-"),
+        slug: newOrgSlug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-"),
         industry: newOrgIndustry.trim() || null,
-      });
+        description: newOrgDescription.trim() || null,
+        website_url: newOrgWebsite.trim() || null,
+        company_size: newOrgSize || null,
+      }).select().single();
       if (error) throw error;
+
+      // If owner email provided, add them as owner
+      if (newOrgOwnerEmail.trim() && orgData) {
+        try {
+          await supabase.functions.invoke('admin-add-org-member', {
+            body: { action: 'add', organizationId: orgData.id, email: newOrgOwnerEmail.trim(), role: 'owner' }
+          });
+        } catch (e: any) {
+          toast({ title: "Warning", description: `Org created but could not add owner: ${e.message}` });
+        }
+      }
+
       toast({ title: "Success", description: "Organization created successfully" });
       setIsCreateDialogOpen(false);
       setNewOrgName(""); setNewOrgSlug(""); setNewOrgIndustry("");
+      setNewOrgDescription(""); setNewOrgWebsite(""); setNewOrgSize(""); setNewOrgOwnerEmail("");
       refetch();
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally { setIsCreating(false); }
+  };
+
+  const handleAddMember = async () => {
+    if (!addMemberEmail.trim() || !selectedOrg) return;
+    setIsAddingMember(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-add-org-member', {
+        body: { action: 'add', organizationId: selectedOrg.id, email: addMemberEmail.trim(), role: addMemberRole }
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({ title: "Member added", description: `${addMemberEmail} added as ${addMemberRole}` });
+      setAddMemberEmail("");
+      refetchMembers();
+      refetch();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally { setIsAddingMember(false); }
+  };
+
+  const handleRemoveMember = async (memberId: string) => {
+    setRemovingMemberId(memberId);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-add-org-member', {
+        body: { action: 'remove', memberId }
+      });
+      if (error) throw error;
+      toast({ title: "Member removed" });
+      refetchMembers();
+      refetch();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally { setRemovingMemberId(null); }
+  };
+
+  const handleUpdateMemberRole = async (memberId: string, newRole: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-add-org-member', {
+        body: { action: 'update-role', memberId, role: newRole }
+      });
+      if (error) throw error;
+      toast({ title: "Role updated" });
+      refetchMembers();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    }
   };
 
   const handleDeleteOrganization = async (orgId: string) => {
