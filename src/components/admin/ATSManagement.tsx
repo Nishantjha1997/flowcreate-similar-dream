@@ -16,13 +16,14 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Building2, Briefcase, Users, FileText, Calendar, Gift, Search, Plus,
-  ExternalLink, Trash2, Eye, TrendingUp, MapPin,
+  ExternalLink, Trash2, Eye, TrendingUp, MapPin, UserPlus, UserMinus, Globe,
 } from "lucide-react";
 import { format } from "date-fns";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface ATSManagementProps {
   isAdmin: boolean;
