@@ -16,13 +16,14 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Building2, Briefcase, Users, FileText, Calendar, Gift, Search, Plus,
-  ExternalLink, Trash2, Eye, TrendingUp, MapPin,
+  ExternalLink, Trash2, Eye, TrendingUp, MapPin, UserPlus, UserMinus, Globe,
 } from "lucide-react";
 import { format } from "date-fns";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface ATSManagementProps {
   isAdmin: boolean;
@@ -31,6 +32,7 @@ interface ATSManagementProps {
 export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
   const { data: stats, isLoading: loadingStats } = useAdminATSStats(isAdmin);
   const { data: organizations = [], isLoading: loadingOrgs, refetch } = useAdminOrganizations(isAdmin);
+  const queryClient = useQueryClient();
   
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -41,7 +43,17 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
   const [newOrgName, setNewOrgName] = useState("");
   const [newOrgSlug, setNewOrgSlug] = useState("");
   const [newOrgIndustry, setNewOrgIndustry] = useState("");
+  const [newOrgDescription, setNewOrgDescription] = useState("");
+  const [newOrgWebsite, setNewOrgWebsite] = useState("");
+  const [newOrgSize, setNewOrgSize] = useState("");
+  const [newOrgOwnerEmail, setNewOrgOwnerEmail] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+
+  // Member management state
+  const [addMemberEmail, setAddMemberEmail] = useState("");
+  const [addMemberRole, setAddMemberRole] = useState("member");
+  const [isAddingMember, setIsAddingMember] = useState(false);
+  const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
 
   // Jobs tab
   const [jobSearch, setJobSearch] = useState("");
@@ -81,6 +93,20 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
     enabled: isAdmin,
   });
 
+  // Fetch org members when details dialog is open
+  const { data: orgMembers = [], isLoading: loadingMembers, refetch: refetchMembers } = useQuery({
+    queryKey: ["admin-org-members", selectedOrg?.id],
+    queryFn: async () => {
+      if (!selectedOrg) return [];
+      const { data, error } = await supabase.functions.invoke('admin-add-org-member', {
+        body: { action: 'list', organizationId: selectedOrg.id }
+      });
+      if (error) throw error;
+      return data?.members || [];
+    },
+    enabled: !!selectedOrg && isDetailsOpen,
+  });
+
   const filteredOrgs = organizations.filter(org =>
     org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     org.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -107,19 +133,81 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
     }
     setIsCreating(true);
     try {
-      const { error } = await supabase.from("organizations").insert({
+      const { data: orgData, error } = await supabase.from("organizations").insert({
         name: newOrgName.trim(),
-        slug: newOrgSlug.trim().toLowerCase().replace(/\s+/g, "-"),
+        slug: newOrgSlug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-"),
         industry: newOrgIndustry.trim() || null,
-      });
+        description: newOrgDescription.trim() || null,
+        website_url: newOrgWebsite.trim() || null,
+        company_size: newOrgSize || null,
+      }).select().single();
       if (error) throw error;
+
+      // If owner email provided, add them as owner
+      if (newOrgOwnerEmail.trim() && orgData) {
+        try {
+          await supabase.functions.invoke('admin-add-org-member', {
+            body: { action: 'add', organizationId: orgData.id, email: newOrgOwnerEmail.trim(), role: 'owner' }
+          });
+        } catch (e: any) {
+          toast({ title: "Warning", description: `Org created but could not add owner: ${e.message}` });
+        }
+      }
+
       toast({ title: "Success", description: "Organization created successfully" });
       setIsCreateDialogOpen(false);
       setNewOrgName(""); setNewOrgSlug(""); setNewOrgIndustry("");
+      setNewOrgDescription(""); setNewOrgWebsite(""); setNewOrgSize(""); setNewOrgOwnerEmail("");
       refetch();
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally { setIsCreating(false); }
+  };
+
+  const handleAddMember = async () => {
+    if (!addMemberEmail.trim() || !selectedOrg) return;
+    setIsAddingMember(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-add-org-member', {
+        body: { action: 'add', organizationId: selectedOrg.id, email: addMemberEmail.trim(), role: addMemberRole }
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({ title: "Member added", description: `${addMemberEmail} added as ${addMemberRole}` });
+      setAddMemberEmail("");
+      refetchMembers();
+      refetch();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally { setIsAddingMember(false); }
+  };
+
+  const handleRemoveMember = async (memberId: string) => {
+    setRemovingMemberId(memberId);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-add-org-member', {
+        body: { action: 'remove', memberId }
+      });
+      if (error) throw error;
+      toast({ title: "Member removed" });
+      refetchMembers();
+      refetch();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally { setRemovingMemberId(null); }
+  };
+
+  const handleUpdateMemberRole = async (memberId: string, newRole: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-add-org-member', {
+        body: { action: 'update-role', memberId, role: newRole }
+      });
+      if (error) throw error;
+      toast({ title: "Role updated" });
+      refetchMembers();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    }
   };
 
   const handleDeleteOrganization = async (orgId: string) => {
@@ -417,57 +505,157 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
 
       {/* Create Organization Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Create Organization</DialogTitle>
-            <DialogDescription>Add a new company to the ATS platform</DialogDescription>
+            <DialogTitle>Create Company Portal</DialogTitle>
+            <DialogDescription>Set up a new company account on the ATS platform</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
             <div className="space-y-2">
               <Label htmlFor="org-name">Company Name *</Label>
-              <Input id="org-name" value={newOrgName} onChange={(e) => { setNewOrgName(e.target.value); setNewOrgSlug(e.target.value.toLowerCase().replace(/\s+/g, "-")); }} placeholder="Acme Corporation" />
+              <Input id="org-name" value={newOrgName} onChange={(e) => { setNewOrgName(e.target.value); setNewOrgSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")); }} placeholder="Acme Corporation" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="org-slug">URL Slug *</Label>
               <Input id="org-slug" value={newOrgSlug} onChange={(e) => setNewOrgSlug(e.target.value)} placeholder="acme-corporation" />
               <p className="text-xs text-muted-foreground">Public URL: /careers/{newOrgSlug || "company-slug"}</p>
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="org-industry">Industry</Label>
+                <Input id="org-industry" value={newOrgIndustry} onChange={(e) => setNewOrgIndustry(e.target.value)} placeholder="Technology" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="org-size">Company Size</Label>
+                <Select value={newOrgSize} onValueChange={setNewOrgSize}>
+                  <SelectTrigger><SelectValue placeholder="Select size" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1-10">1-10</SelectItem>
+                    <SelectItem value="11-50">11-50</SelectItem>
+                    <SelectItem value="51-200">51-200</SelectItem>
+                    <SelectItem value="201-500">201-500</SelectItem>
+                    <SelectItem value="501-1000">501-1000</SelectItem>
+                    <SelectItem value="1000+">1000+</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
             <div className="space-y-2">
-              <Label htmlFor="org-industry">Industry</Label>
-              <Input id="org-industry" value={newOrgIndustry} onChange={(e) => setNewOrgIndustry(e.target.value)} placeholder="Technology" />
+              <Label htmlFor="org-website">Website</Label>
+              <Input id="org-website" value={newOrgWebsite} onChange={(e) => setNewOrgWebsite(e.target.value)} placeholder="https://acme.com" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="org-desc">Description</Label>
+              <Textarea id="org-desc" value={newOrgDescription} onChange={(e) => setNewOrgDescription(e.target.value)} placeholder="Brief company description..." rows={2} />
+            </div>
+            <div className="space-y-2 p-3 rounded-lg border border-primary/20 bg-primary/5">
+              <Label htmlFor="org-owner" className="flex items-center gap-2">
+                <UserPlus className="h-4 w-4" /> Owner Email (optional)
+              </Label>
+              <Input id="org-owner" type="email" value={newOrgOwnerEmail} onChange={(e) => setNewOrgOwnerEmail(e.target.value)} placeholder="owner@acme.com" />
+              <p className="text-xs text-muted-foreground">This user will be added as the organization owner. They must already have an account.</p>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleCreateOrganization} disabled={isCreating}>{isCreating ? "Creating..." : "Create Organization"}</Button>
+            <Button onClick={handleCreateOrganization} disabled={isCreating}>{isCreating ? "Creating..." : "Create Company Portal"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Organization Details Dialog */}
+      {/* Organization Details + Member Management Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
+              <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
                 {selectedOrg?.name.charAt(0)}
               </div>
               {selectedOrg?.name}
             </DialogTitle>
-            <DialogDescription>Organization details and statistics</DialogDescription>
+            <DialogDescription>Organization details, members, and statistics</DialogDescription>
           </DialogHeader>
           {selectedOrg && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-6">
+              {/* Stats */}
+              <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-lg bg-muted/50"><p className="text-sm text-muted-foreground">Slug</p><p className="font-medium">/{selectedOrg.slug}</p></div>
                 <div className="p-3 rounded-lg bg-muted/50"><p className="text-sm text-muted-foreground">Industry</p><p className="font-medium">{selectedOrg.industry || "Not set"}</p></div>
                 <div className="p-3 rounded-lg bg-muted/50"><p className="text-sm text-muted-foreground">Company Size</p><p className="font-medium">{selectedOrg.companySize || "Not set"}</p></div>
                 <div className="p-3 rounded-lg bg-muted/50"><p className="text-sm text-muted-foreground">Created</p><p className="font-medium">{format(new Date(selectedOrg.createdAt), "MMM d, yyyy")}</p></div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-4 rounded-lg bg-blue-50 dark:bg-blue-950/30"><p className="text-2xl font-bold text-blue-600">{selectedOrg.memberCount}</p><p className="text-sm text-muted-foreground">Members</p></div>
-                <div className="text-center p-4 rounded-lg bg-green-50 dark:bg-green-950/30"><p className="text-2xl font-bold text-green-600">{selectedOrg.jobCount}</p><p className="text-sm text-muted-foreground">Jobs</p></div>
-                <div className="text-center p-4 rounded-lg bg-purple-50 dark:bg-purple-950/30"><p className="text-2xl font-bold text-purple-600">{selectedOrg.applicationCount}</p><p className="text-sm text-muted-foreground">Applications</p></div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="text-center p-3 rounded-lg bg-muted/30 border border-border"><p className="text-2xl font-bold text-primary">{selectedOrg.memberCount}</p><p className="text-xs text-muted-foreground">Members</p></div>
+                <div className="text-center p-3 rounded-lg bg-muted/30 border border-border"><p className="text-2xl font-bold text-primary">{selectedOrg.jobCount}</p><p className="text-xs text-muted-foreground">Jobs</p></div>
+                <div className="text-center p-3 rounded-lg bg-muted/30 border border-border"><p className="text-2xl font-bold text-primary">{selectedOrg.applicationCount}</p><p className="text-xs text-muted-foreground">Applications</p></div>
+              </div>
+
+              {/* Member Management */}
+              <div className="space-y-3">
+                <h4 className="font-semibold flex items-center gap-2"><Users className="h-4 w-4" /> Team Members</h4>
+                
+                {/* Add Member */}
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <Input placeholder="user@email.com" type="email" value={addMemberEmail} onChange={(e) => setAddMemberEmail(e.target.value)} />
+                  </div>
+                  <Select value={addMemberRole} onValueChange={setAddMemberRole}>
+                    <SelectTrigger className="w-[120px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="owner">Owner</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="recruiter">Recruiter</SelectItem>
+                      <SelectItem value="member">Member</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button size="sm" onClick={handleAddMember} disabled={isAddingMember || !addMemberEmail.trim()}>
+                    <UserPlus className="h-4 w-4 mr-1" /> {isAddingMember ? "Adding..." : "Add"}
+                  </Button>
+                </div>
+
+                {/* Members List */}
+                {loadingMembers ? (
+                  <div className="space-y-2"><Skeleton className="h-10" /><Skeleton className="h-10" /></div>
+                ) : orgMembers.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">No members yet. Add the first member above.</p>
+                ) : (
+                  <div className="border border-border rounded-lg overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-muted/30">
+                          <TableHead className="text-xs">Email</TableHead>
+                          <TableHead className="text-xs">Role</TableHead>
+                          <TableHead className="text-xs">Joined</TableHead>
+                          <TableHead className="text-xs text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {orgMembers.map((member: any) => (
+                          <TableRow key={member.id}>
+                            <TableCell className="text-sm">{member.email}</TableCell>
+                            <TableCell>
+                              <Select defaultValue={member.role} onValueChange={(val) => handleUpdateMemberRole(member.id, val)}>
+                                <SelectTrigger className="w-[100px] h-7 text-xs"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="owner">Owner</SelectItem>
+                                  <SelectItem value="admin">Admin</SelectItem>
+                                  <SelectItem value="recruiter">Recruiter</SelectItem>
+                                  <SelectItem value="member">Member</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </TableCell>
+                            <TableCell className="text-xs text-muted-foreground">{format(new Date(member.joined_at), "MMM d, yyyy")}</TableCell>
+                            <TableCell className="text-right">
+                              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive h-7" disabled={removingMemberId === member.id} onClick={() => handleRemoveMember(member.id)}>
+                                <UserMinus className="h-3.5 w-3.5" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
               </div>
             </div>
           )}

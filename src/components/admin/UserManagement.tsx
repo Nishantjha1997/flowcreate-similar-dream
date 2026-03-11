@@ -8,34 +8,59 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { Search, Crown, Shield, Trash2, Users } from "lucide-react";
+import { Search, Crown, Shield, Trash2, Users, Mail } from "lucide-react";
 import { AddUserModal } from "./AddUserModal";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Skeleton } from "@/components/ui/loading-skeleton";
+import { format } from "date-fns";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+interface UserProfile {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  createdAt: string;
+  lastSignIn: string | null;
+  emailConfirmed: boolean;
+  status: string;
+  roles?: string[];
+  isPremium?: boolean;
+  avatarUrl?: string | null;
+}
 
 interface UserManagementProps {
   members: any[];
+  userProfiles: UserProfile[];
   isLoading: boolean;
   refetch: () => void;
 }
 
-export function UserManagement({ members, isLoading, refetch }: UserManagementProps) {
+export function UserManagement({ members, userProfiles, isLoading, refetch }: UserManagementProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [premiumFilter, setPremiumFilter] = useState("all");
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<UserProfile | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // If no members data, show loading or empty state
-  const actualMembers = Array.isArray(members) ? members : [];
+  // Use userProfiles (from edge function with full auth data) as primary source
+  const users = userProfiles.length > 0 ? userProfiles : [];
 
-  const filteredMembers = actualMembers.filter(member => {
-    const matchesSearch = member.user_id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === "all" || member.roles?.includes(roleFilter);
+  const filteredUsers = users.filter(user => {
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = user.email.toLowerCase().includes(searchLower) ||
+      user.firstName.toLowerCase().includes(searchLower) ||
+      user.lastName.toLowerCase().includes(searchLower) ||
+      user.id.toLowerCase().includes(searchLower);
+    const matchesRole = roleFilter === "all" || user.roles?.includes(roleFilter);
     const matchesPremium = premiumFilter === "all" || 
-      (premiumFilter === "premium" && member.is_premium) ||
-      (premiumFilter === "free" && !member.is_premium);
+      (premiumFilter === "premium" && user.isPremium) ||
+      (premiumFilter === "free" && !user.isPremium);
     
     return matchesSearch && matchesRole && matchesPremium;
   });
@@ -51,19 +76,12 @@ export function UserManagement({ members, isLoading, refetch }: UserManagementPr
       
       if (error) throw error;
       
-      toast({ 
-        title: "Success", 
-        description: "User promoted to premium.",
-        variant: "default"
-      });
+      toast({ title: "Success", description: "User promoted to premium." });
       refetch();
       queryClient.invalidateQueries({ queryKey: ["subscription-status"] });
+      queryClient.invalidateQueries({ queryKey: ["user-profiles"] });
     } catch (error: any) {
-      toast({ 
-        title: "Upgrade failed", 
-        description: error.message, 
-        variant: "destructive" 
-      });
+      toast({ title: "Upgrade failed", description: error.message, variant: "destructive" });
     }
   };
 
@@ -76,80 +94,48 @@ export function UserManagement({ members, isLoading, refetch }: UserManagementPr
       
       if (error) throw error;
       
-      toast({ 
-        title: "Success", 
-        description: "Premium access revoked.",
-        variant: "default"
-      });
+      toast({ title: "Success", description: "Premium access revoked." });
       refetch();
       queryClient.invalidateQueries({ queryKey: ["subscription-status"] });
+      queryClient.invalidateQueries({ queryKey: ["user-profiles"] });
     } catch (error: any) {
-      toast({ 
-        title: "Revoke failed", 
-        description: error.message, 
-        variant: "destructive" 
-      });
+      toast({ title: "Revoke failed", description: error.message, variant: "destructive" });
     }
   };
 
   const handleChangeRole = async (targetUserId: string, newRole: string) => {
     try {
-      // First remove existing roles
-      await supabase
-        .from("user_roles")
-        .delete()
-        .eq("user_id", targetUserId);
-
-      // Then add new role
+      await supabase.from("user_roles").delete().eq("user_id", targetUserId);
       const { error } = await supabase
         .from("user_roles")
-        .insert({
-          user_id: targetUserId,
-          role: newRole as any,
-        });
-
+        .insert({ user_id: targetUserId, role: newRole as any });
       if (error) throw error;
 
-      toast({ 
-        title: "Success", 
-        description: `User role updated to ${newRole}.`,
-        variant: "default"
-      });
+      toast({ title: "Success", description: `User role updated to ${newRole}.` });
       refetch();
+      queryClient.invalidateQueries({ queryKey: ["user-profiles"] });
     } catch (error: any) {
-      toast({ 
-        title: "Role update failed", 
-        description: error.message, 
-        variant: "destructive" 
-      });
+      toast({ title: "Role update failed", description: error.message, variant: "destructive" });
     }
   };
 
-  const handleRemoveUser = async (targetUserId: string) => {
-    if (!window.confirm(`Are you sure you want to remove this user (${targetUserId})? This will delete all their data.`)) {
-      return;
-    }
-
-    setRemovingId(targetUserId);
+  const handleDeleteUser = async () => {
+    if (!deleteTarget) return;
+    setRemovingId(deleteTarget.id);
     try {
-      // Remove user data in order
-      await supabase.from("user_roles").delete().eq("user_id", targetUserId);
-      await supabase.from("subscriptions").delete().eq("user_id", targetUserId);
-      await supabase.from("resumes").delete().eq("user_id", targetUserId);
-
-      toast({ 
-        title: "User data removed", 
-        description: "Data for user has been deleted from app database.",
-        variant: "default"
+      const { data, error } = await supabase.functions.invoke('admin-delete-user', {
+        body: { targetUserId: deleteTarget.id }
       });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast({ title: "User deleted", description: `${deleteTarget.email} has been permanently removed.` });
+      setDeleteTarget(null);
       refetch();
       queryClient.invalidateQueries();
     } catch (error: any) {
-      toast({
-        title: "Remove failed",
-        description: error.message || "Error removing user",
-        variant: "destructive"
-      });
+      toast({ title: "Delete failed", description: error.message, variant: "destructive" });
     } finally {
       setRemovingId(null);
     }
@@ -159,33 +145,31 @@ export function UserManagement({ members, isLoading, refetch }: UserManagementPr
     <GlassCard variant="elevated" className="p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            <Users className="w-6 h-6 text-blue-600" />
+          <h2 className="text-2xl font-bold flex items-center gap-3 text-foreground">
+            <Users className="w-6 h-6 text-primary" />
             User Management
           </h2>
-          <p className="text-gray-600 mt-2">
-            Manage users, roles, and premium memberships ({actualMembers.length} users found)
+          <p className="text-muted-foreground mt-2">
+            Manage users, roles, and premium memberships ({users.length} users found)
           </p>
         </div>
         <AddUserModal refetch={refetch} />
       </div>
 
-      {/* Enhanced Filters */}
-      <div className="flex gap-4 mb-6 p-4 rounded-xl bg-gradient-to-r from-gray-50/80 to-blue-50/80 border border-gray-200/50">
+      {/* Filters */}
+      <div className="flex gap-4 mb-6 p-4 rounded-xl bg-muted/50 border border-border">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search by user ID..."
+            placeholder="Search by name, email, or ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 bg-white/80 backdrop-blur-sm"
+            className="pl-10"
           />
         </div>
         <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger className="w-[140px] border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 bg-white/80 backdrop-blur-sm">
-            <SelectValue placeholder="Role" />
-          </SelectTrigger>
-          <SelectContent className="backdrop-blur-xl bg-white/95 border border-white/20">
+          <SelectTrigger className="w-[140px]"><SelectValue placeholder="Role" /></SelectTrigger>
+          <SelectContent>
             <SelectItem value="all">All Roles</SelectItem>
             <SelectItem value="admin">Admin</SelectItem>
             <SelectItem value="moderator">Moderator</SelectItem>
@@ -193,10 +177,8 @@ export function UserManagement({ members, isLoading, refetch }: UserManagementPr
           </SelectContent>
         </Select>
         <Select value={premiumFilter} onValueChange={setPremiumFilter}>
-          <SelectTrigger className="w-[140px] border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 bg-white/80 backdrop-blur-sm">
-            <SelectValue placeholder="Premium" />
-          </SelectTrigger>
-          <SelectContent className="backdrop-blur-xl bg-white/95 border border-white/20">
+          <SelectTrigger className="w-[140px]"><SelectValue placeholder="Premium" /></SelectTrigger>
+          <SelectContent>
             <SelectItem value="all">All Users</SelectItem>
             <SelectItem value="premium">Premium</SelectItem>
             <SelectItem value="free">Free</SelectItem>
@@ -204,22 +186,24 @@ export function UserManagement({ members, isLoading, refetch }: UserManagementPr
         </Select>
       </div>
 
-      {/* Enhanced Users Table */}
-      <div className="border border-gray-200/50 rounded-xl overflow-hidden backdrop-blur-sm bg-white/50">
+      {/* Users Table */}
+      <div className="border border-border rounded-xl overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gradient-to-r from-gray-50/80 to-blue-50/80 border-b border-gray-200/50">
-              <TableHead className="font-semibold text-gray-700">User ID</TableHead>
-              <TableHead className="font-semibold text-gray-700">Roles</TableHead>
-              <TableHead className="font-semibold text-gray-700">Premium</TableHead>
-              <TableHead className="font-semibold text-gray-700">Resumes</TableHead>
-              <TableHead className="font-semibold text-gray-700">Actions</TableHead>
+            <TableRow className="bg-muted/50">
+              <TableHead className="font-semibold">User</TableHead>
+              <TableHead className="font-semibold">Email</TableHead>
+              <TableHead className="font-semibold">Roles</TableHead>
+              <TableHead className="font-semibold">Premium</TableHead>
+              <TableHead className="font-semibold">Joined</TableHead>
+              <TableHead className="font-semibold">Last Sign In</TableHead>
+              <TableHead className="font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="py-8">
+                <TableCell colSpan={7} className="py-8">
                   <div className="space-y-3">
                     <Skeleton className="h-4 w-full" />
                     <Skeleton className="h-4 w-3/4" />
@@ -227,78 +211,87 @@ export function UserManagement({ members, isLoading, refetch }: UserManagementPr
                   </div>
                 </TableCell>
               </TableRow>
-            ) : filteredMembers.length === 0 ? (
+            ) : filteredUsers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-12">
-                  <div className="flex flex-col items-center gap-3 text-gray-500">
-                    <Users className="w-12 h-12 text-gray-300" />
+                <TableCell colSpan={7} className="text-center py-12">
+                  <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                    <Users className="w-12 h-12 opacity-50" />
                     <p className="text-lg font-medium">
-                      {actualMembers.length === 0 ? "No users found in the system" : "No users match your filters"}
+                      {users.length === 0 ? "No users found" : "No users match your filters"}
                     </p>
                   </div>
                 </TableCell>
               </TableRow>
             ) : (
-              filteredMembers.map((member) => (
-                <TableRow key={member.user_id} className="hover:bg-gray-50/50 transition-colors">
-                  <TableCell className="font-mono text-xs bg-gray-100/50 rounded p-2">
-                    {member.user_id.substring(0, 8)}...
+              filteredUsers.map((user) => (
+                <TableRow key={user.id} className="hover:bg-muted/30 transition-colors">
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-semibold">
+                        {user.firstName?.charAt(0) || user.email.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">
+                          {user.firstName} {user.lastName}
+                        </p>
+                        <p className="text-xs text-muted-foreground font-mono">{user.id.substring(0, 8)}...</p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1.5">
+                      <Mail className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-sm">{user.email}</span>
+                      {user.emailConfirmed && (
+                        <Badge variant="outline" className="text-xs ml-1 border-green-500 text-green-600">verified</Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      {member.roles?.map((role: string) => (
+                      {user.roles && user.roles.length > 0 ? user.roles.map((role: string) => (
                         <Badge 
                           key={role} 
                           variant={role === 'admin' ? 'destructive' : 'secondary'}
-                          className="shadow-sm"
                         >
                           {role === 'admin' && <Shield className="w-3 h-3 mr-1" />}
                           {role}
                         </Badge>
-                      )) || <Badge variant="outline" className="shadow-sm">user</Badge>}
+                      )) : <Badge variant="outline">user</Badge>}
                     </div>
                   </TableCell>
                   <TableCell>
-                    {member.is_premium ? (
-                      <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg">
+                    {user.isPremium ? (
+                      <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
                         <Crown className="w-3 h-3 mr-1" />
                         Premium
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="shadow-sm">Free</Badge>
+                      <Badge variant="outline">Free</Badge>
                     )}
                   </TableCell>
-                  <TableCell>
-                    <span className="text-sm font-medium text-gray-700">
-                      {member.resume_count || 0}
-                    </span>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {user.createdAt ? format(new Date(user.createdAt), "MMM d, yyyy") : '—'}
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {user.lastSignIn ? format(new Date(user.lastSignIn), "MMM d, yyyy HH:mm") : 'Never'}
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
-                      {!member.is_premium ? (
-                        <Button 
-                          size="sm" 
-                          onClick={() => handlePromoteToPremium(member.user_id)}
-                          className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 shadow-lg hover:shadow-xl transition-all duration-300"
-                        >
-                          <Crown className="w-3 h-3 mr-1" />
-                          Make Premium
+                    <div className="flex gap-2 items-center">
+                      {!user.isPremium ? (
+                        <Button size="sm" variant="outline" onClick={() => handlePromoteToPremium(user.id)}>
+                          <Crown className="w-3 h-3 mr-1" /> Premium
                         </Button>
                       ) : (
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => handleRevokePremium(member.user_id)}
-                          className="border-yellow-500 text-yellow-600 hover:bg-yellow-50"
-                        >
-                          Revoke Premium
+                        <Button size="sm" variant="outline" onClick={() => handleRevokePremium(user.id)}>
+                          Revoke
                         </Button>
                       )}
-                      <Select onValueChange={(role) => handleChangeRole(member.user_id, role)}>
-                        <SelectTrigger className="w-[100px] border-gray-200 focus:border-blue-500">
+                      <Select onValueChange={(role) => handleChangeRole(user.id, role)}>
+                        <SelectTrigger className="w-[100px] h-8 text-xs">
                           <SelectValue placeholder="Role" />
                         </SelectTrigger>
-                        <SelectContent className="backdrop-blur-xl bg-white/95 border border-white/20">
+                        <SelectContent>
                           <SelectItem value="user">User</SelectItem>
                           <SelectItem value="moderator">Moderator</SelectItem>
                           <SelectItem value="admin">Admin</SelectItem>
@@ -307,9 +300,8 @@ export function UserManagement({ members, isLoading, refetch }: UserManagementPr
                       <Button
                         size="sm"
                         variant="destructive"
-                        disabled={removingId === member.user_id}
-                        onClick={() => handleRemoveUser(member.user_id)}
-                        className="shadow-lg hover:shadow-xl transition-all duration-300"
+                        disabled={removingId === user.id}
+                        onClick={() => setDeleteTarget(user)}
                       >
                         <Trash2 className="w-3 h-3" />
                       </Button>
@@ -321,6 +313,28 @@ export function UserManagement({ members, isLoading, refetch }: UserManagementPr
           </TableBody>
         </Table>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Permanently Delete User?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete <strong>{deleteTarget?.email}</strong> and all their data 
+              (resumes, profiles, subscriptions, roles, org memberships). This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteUser}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {removingId ? "Deleting..." : "Delete Permanently"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </GlassCard>
   );
 }
