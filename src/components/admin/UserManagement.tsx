@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { Search, Crown, Shield, Trash2, Users, Mail, Calendar, Avatar } from "lucide-react";
+import { Search, Crown, Shield, Trash2, Users, Mail } from "lucide-react";
 import { AddUserModal } from "./AddUserModal";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Skeleton } from "@/components/ui/loading-skeleton";
