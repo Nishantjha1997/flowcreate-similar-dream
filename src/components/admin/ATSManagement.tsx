@@ -32,6 +32,7 @@ interface ATSManagementProps {
 export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
   const { data: stats, isLoading: loadingStats } = useAdminATSStats(isAdmin);
   const { data: organizations = [], isLoading: loadingOrgs, refetch } = useAdminOrganizations(isAdmin);
+  const queryClient = useQueryClient();
   
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -42,7 +43,17 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
   const [newOrgName, setNewOrgName] = useState("");
   const [newOrgSlug, setNewOrgSlug] = useState("");
   const [newOrgIndustry, setNewOrgIndustry] = useState("");
+  const [newOrgDescription, setNewOrgDescription] = useState("");
+  const [newOrgWebsite, setNewOrgWebsite] = useState("");
+  const [newOrgSize, setNewOrgSize] = useState("");
+  const [newOrgOwnerEmail, setNewOrgOwnerEmail] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+
+  // Member management state
+  const [addMemberEmail, setAddMemberEmail] = useState("");
+  const [addMemberRole, setAddMemberRole] = useState("member");
+  const [isAddingMember, setIsAddingMember] = useState(false);
+  const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
 
   // Jobs tab
   const [jobSearch, setJobSearch] = useState("");
