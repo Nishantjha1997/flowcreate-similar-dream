@@ -2,3 +2,9 @@ project_id = "tkhnxiqvghvejdulvmmx"
 
 [functions.admin-list-users]
 verify_jwt = false
+
+[functions.admin-delete-user]
+verify_jwt = false
+
+[functions.admin-add-org-member]
+verify_jwt = false
