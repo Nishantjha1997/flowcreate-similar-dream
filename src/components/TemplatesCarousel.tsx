@@ -32,11 +32,11 @@ const mockResumeData = {
 };
 
 const templates = [
-  { id: 1, name: "Modern Professional", category: "Professional", templateKey: "modern", description: "Clean, contemporary design" },
-  { id: 2, name: "Executive Classic", category: "Traditional", templateKey: "classic", description: "Timeless, elegant layout" },
-  { id: 3, name: "Creative Portfolio", category: "Design", templateKey: "creative", description: "Eye-catching for creatives" },
-  { id: 4, name: "Tech Specialist", category: "Technical", templateKey: "technical", description: "Optimized for tech roles" },
-  { id: 5, name: "Corporate Elite", category: "Professional", templateKey: "professional", description: "Refined for executives" }
+  { id: 1, name: "Modern Professional", category: "Professional", templateKey: "modern", description: "Clean, contemporary design", image: "/placeholder.svg" },
+  { id: 2, name: "Executive Classic", category: "Traditional", templateKey: "classic", description: "Timeless, elegant layout", image: "/placeholder.svg" },
+  { id: 3, name: "Creative Portfolio", category: "Design", templateKey: "creative", description: "Eye-catching for creatives", image: "/placeholder.svg" },
+  { id: 4, name: "Tech Specialist", category: "Technical", templateKey: "technical", description: "Optimized for tech roles", image: "/placeholder.svg" },
+  { id: 5, name: "Corporate Elite", category: "Professional", templateKey: "professional", description: "Refined for executives", image: "/placeholder.svg" }
 ];
 
 const TemplatesCarousel = () => {
