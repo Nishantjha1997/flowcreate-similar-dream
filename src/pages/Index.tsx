@@ -7,6 +7,7 @@ import CallToAction from '@/components/CallToAction';
 import Footer from '@/components/Footer';
 import { ScrollReveal } from '@/hooks/useScrollAnimation';
 
+
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
