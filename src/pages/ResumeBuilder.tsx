@@ -19,49 +19,40 @@ import { ProgressIndicator } from '@/components/ui/progress-indicator';
 import { templateNames } from '@/components/resume/ResumeData';
 import { ResumeData } from '@/utils/types';
 import { analytics, usePageTracking, useJourneyTracking } from '@/components/ui/analytics-tracker';
+import { Crown } from 'lucide-react';
 
 const ResumeBuilder = () => {
   const navigate = useNavigate();
   const resumeElementRef = useRef<HTMLDivElement>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   
-  // Custom hooks for data management
   const { resume, setResume, templateId, isExample, editResumeId, loadingExistingResume } = useResumeData();
   const handlers = useResumeHandlers(setResume);
   const { isSaving, handleSaveResume, handleAIFeatureUpsell, premium, resumeCount } = useResumeSave(editResumeId);
   const { activeSection, activeSections, hiddenSections, handleSectionChange, handleSectionsChange } = useSectionManagement();
   
-  // Analytics tracking
   usePageTracking();
   useJourneyTracking('resume_builder', activeSection);
   
-  // Profile image handler
   const handleProfileImageChange = (profileImage: string) => {
     setResume(prev => ({
       ...prev,
-      personal: {
-        ...prev.personal,
-        profileImage
-      }
+      personal: { ...prev.personal, profileImage }
     }));
   };
   
-  // Auto-save functionality
   const { saveStatus, lastSaved } = useAutoSave({
     resume,
     editResumeId,
     enabled: !!editResumeId || (!!resume.personal?.name && !!resume.personal?.email)
   });
   
-  // Profile sync for auto-population
   const { profile, populateFromProfile, hasProfileData, canFillFromProfile } = useResumeProfileSync({
     resume,
     setResume,
     shouldAutoPopulate: !isExample && !editResumeId && !resume.personal.name
   });
 
-  
-  // Check if user is new for onboarding
   useEffect(() => {
     const hasSeenOnboarding = localStorage.getItem('onboarding_completed');
     const isFirstEdit = !editResumeId && !isExample;
@@ -110,27 +101,37 @@ const ResumeBuilder = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="py-8">
-        <div className="container mx-auto px-4">
-          {/* FREE USER LIMITATION BANNER */}
+      <main className="pt-4 pb-8">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Premium Upgrade Banner */}
           {!premium?.isPremium && (
-            <div className="mb-5 bg-yellow-50 text-yellow-900 border-l-4 border-yellow-400 p-3 rounded flex items-center justify-between shadow">
-              <span>
-                Free users can only save 1 resume. You have {resumeCount || 0}/1 resume saved.{" "}
-                <b>Upgrade to Premium</b> for unlimited resumes and AI features!
-              </span>
+            <div className="mb-5 rounded-2xl bg-gradient-to-r from-muted/80 to-muted/40 border border-border/60 backdrop-blur-sm p-4 flex items-center justify-between animate-fade-in">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Crown className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    Free plan — {resumeCount || 0}/1 resume saved
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Upgrade for unlimited resumes and AI features
+                  </p>
+                </div>
+              </div>
               <button
-                className="ml-4 px-4 py-2 bg-primary text-white font-bold rounded shadow hover:bg-primary/90 transition-all"
+                className="px-5 py-2 text-sm font-medium rounded-full bg-foreground text-background hover:bg-foreground/90 transition-all duration-200"
                 onClick={() =>
-                  toast.info("Premium upgrade coming soon! Get unlimited resumes + AI features for ₹199/month")
+                  toast.info("Premium upgrade coming soon! Unlimited resumes + AI features for ₹199/month")
                 }
               >
-                Upgrade ₹199/month
+                Upgrade
               </button>
             </div>
           )}
 
-          <div className="flex items-center justify-between mb-4" data-tour="export">
+          {/* Header Row */}
+          <div className="flex items-center justify-between mb-5" data-tour="export">
             <ResumeHeaderSection 
               resumeElementRef={resumeElementRef}
               resumeName={resumeName}
@@ -149,18 +150,16 @@ const ResumeBuilder = () => {
             <AutoSaveIndicator status={saveStatus} lastSaved={lastSaved} />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 lg:h-[calc(100vh-12rem)]">
-            {/* Left Sidebar - Fixed Height with Internal Scroll */}
-            <div className="lg:col-span-3 flex flex-col gap-3 lg:h-full lg:overflow-hidden" data-tour="section-nav">
-              {/* Progress Indicator - Compact */}
+          {/* Main Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 lg:h-[calc(100vh-11rem)]">
+            {/* Left Sidebar */}
+            <div className="lg:col-span-3 flex flex-col gap-4 lg:h-full lg:overflow-hidden" data-tour="section-nav">
               <div className="flex-shrink-0">
                 <ProgressIndicator 
                   resume={resume}
                   onSectionClick={handleSectionChange}
                 />
               </div>
-              
-              {/* Sidebar - Takes remaining space */}
               <div className="flex-1 lg:min-h-0">
                 <ResumeBuilderSidebar
                   activeSection={activeSection}
@@ -197,7 +196,7 @@ const ResumeBuilder = () => {
               </div>
             </div>
 
-            {/* Right Preview - Fixed Height with Internal Scroll */}
+            {/* Right Preview */}
             <div className="lg:col-span-7 lg:h-full" data-tour="preview">
               <ResumePreviewSection
                 resume={resume}
@@ -212,7 +211,6 @@ const ResumeBuilder = () => {
         </div>
       </main>
       
-      {/* User Onboarding */}
       <UserOnboarding 
         isFirstVisit={showOnboarding}
         onComplete={() => setShowOnboarding(false)}
