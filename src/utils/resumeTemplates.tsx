@@ -759,7 +759,7 @@ const templateStyles: Record<string, TemplateStyles> = {
     itemDate: { fontSize: '13px', color: '#6b7280', marginBottom: '6px' },
     itemDescription: { fontSize: '14px', whiteSpace: 'pre-line', lineHeight: '1.65', color: '#374151' },
     skillsList: { display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' },
-    skill: { padding: '3px 10px', fontSize: '13px', backgroundColor: '#f3f4f6', color: '#374151', borderRadius: '2px', border: '1px solid '#e5e7eb' },
+    skill: { padding: '3px 10px', fontSize: '13px', backgroundColor: '#f3f4f6', color: '#374151', borderRadius: '2px', border: '1px solid #e5e7eb' },
   },
 
   // ATS Modern — Blue accent, clean sans
@@ -778,7 +778,7 @@ const templateStyles: Record<string, TemplateStyles> = {
     header: {
       marginBottom: '24px',
       paddingBottom: '16px',
-      borderBottom: '1px solid '#e5e7eb',
+      borderBottom: '1px solid #e5e7eb',
       display: 'flex',
       flexDirection: 'column',
     },
@@ -955,7 +955,7 @@ const templateStyles: Record<string, TemplateStyles> = {
     header: {
       marginBottom: '24px',
       paddingBottom: '18px',
-      borderBottom: '1px solid '#e5e7eb',
+      borderBottom: '1px solid #e5e7eb',
       display: 'flex',
       alignItems: 'center',
       gap: '20px',
@@ -1001,7 +1001,7 @@ const templateStyles: Record<string, TemplateStyles> = {
     name: { fontSize: '26px', fontWeight: 700, marginBottom: '4px', color: '#ecfdf5' },
     contact: { fontSize: '12px', display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '8px', color: '#a7f3d0' },
     section: { marginBottom: '20px' },
-    sectionTitle: { fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#064e3b', marginBottom: '10px', paddingBottom: '4px', borderBottom: '2px solid '#d1fae5' },
+    sectionTitle: { fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#064e3b', marginBottom: '10px', paddingBottom: '4px', borderBottom: '2px solid #d1fae5' },
     sectionContent: { marginTop: '8px' },
     item: { marginBottom: '14px' },
     itemTitle: { fontSize: '14px', fontWeight: 600, color: '#111827', marginBottom: '2px' },
@@ -1027,7 +1027,7 @@ const templateStyles: Record<string, TemplateStyles> = {
     header: {
       marginBottom: '22px',
       paddingBottom: '14px',
-      borderBottom: '2px solid '#374151',
+      borderBottom: '2px solid #374151',
       display: 'flex',
       flexDirection: 'column',
     },
@@ -1035,7 +1035,7 @@ const templateStyles: Record<string, TemplateStyles> = {
     name: { fontSize: '28px', fontWeight: 700, color: '#111827', marginBottom: '4px' },
     contact: { fontSize: '13px', display: 'flex', flexWrap: 'wrap', gap: '14px', marginTop: '6px', color: '#4b5563' },
     section: { marginBottom: '20px' },
-    sectionTitle: { fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#374151', marginBottom: '10px', paddingBottom: '4px', borderBottom: '1px solid '#d1d5db' },
+    sectionTitle: { fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#374151', marginBottom: '10px', paddingBottom: '4px', borderBottom: '1px solid #d1d5db' },
     sectionContent: { marginTop: '8px' },
     item: { marginBottom: '16px' },
     itemTitle: { fontSize: '15px', fontWeight: 600, color: '#111827', marginBottom: '2px' },
@@ -1043,7 +1043,7 @@ const templateStyles: Record<string, TemplateStyles> = {
     itemDate: { fontSize: '12px', color: '#6b7280', marginBottom: '5px' },
     itemDescription: { fontSize: '14px', whiteSpace: 'pre-line', lineHeight: '1.6', color: '#374151' },
     skillsList: { display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' },
-    skill: { padding: '4px 12px', fontSize: '12px', backgroundColor: '#f3f4f6', color: '#374151', borderRadius: '3px', border: '1px solid '#e5e7eb' },
+    skill: { padding: '4px 12px', fontSize: '12px', backgroundColor: '#f3f4f6', color: '#374151', borderRadius: '3px', border: '1px solid #e5e7eb' },
   },
 };
 
