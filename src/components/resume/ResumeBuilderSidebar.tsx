@@ -142,12 +142,12 @@ export const ResumeBuilderSidebar = ({
 
   return (
     <div className={cn(
-      "flex flex-col h-full rounded-lg border bg-card overflow-hidden transition-all duration-300",
-      isNeoBrutalism && "border-2 border-foreground shadow-[4px_4px_0_0_hsl(var(--foreground))]"
+      "flex flex-col h-full rounded-2xl border border-border/60 bg-card overflow-hidden transition-all duration-300",
+      isNeoBrutalism && "border-2 border-foreground shadow-[4px_4px_0_0_hsl(var(--foreground))] rounded-none"
     )}>
       {/* Tab Navigation with Animation */}
       <div className={cn(
-        "flex-shrink-0 border-b bg-muted/30",
+        "flex-shrink-0 border-b border-border/40 bg-muted/10",
         isNeoBrutalism && "border-b-2 border-foreground"
       )}>
         <div className="grid grid-cols-3 relative">
