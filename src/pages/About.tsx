@@ -25,6 +25,7 @@ const About = () => {
           
           <div className="max-w-3xl mx-auto">
             <div className="prose prose-lg mx-auto">
+              <ScrollReveal delay={50}>
               <h2 className="text-3xl font-bold mt-12 mb-6">Our Mission</h2>
               <p className="text-lg mb-6">
                 FlowCreate was born from a simple belief: creating a professional resume shouldn't cost money or require design skills. 
