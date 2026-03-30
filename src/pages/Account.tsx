@@ -863,6 +863,7 @@ const Account = () => {
             </Tabs>
           </div>
         </div>
+        </ScrollReveal>
 
         {/* Mobile Profile Insights */}
         <div className="lg:hidden mt-8">
