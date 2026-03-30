@@ -150,11 +150,13 @@ const Admin = () => {
           </GlassCard>
         </ScrollReveal>
 
-        <EnhancedSystemStats 
-          members={members} 
-          userProfiles={userProfiles}
-          isLoading={loadingMembers || loadingProfiles} 
-        />
+        <ScrollReveal delay={100}>
+          <EnhancedSystemStats 
+            members={members} 
+            userProfiles={userProfiles}
+            isLoading={loadingMembers || loadingProfiles} 
+          />
+        </ScrollReveal>
         
         <GlassCard variant="elevated" neoBrutalism={isNeoBrutalism} className="p-6">
           <Tabs defaultValue="registrations" className="w-full">
