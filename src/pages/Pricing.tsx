@@ -325,6 +325,7 @@ const Pricing = () => {
               </div>
             </div>
           </div>
+          </ScrollReveal>
 
           {/* Still have questions */}
           <div className="max-w-3xl mx-auto mt-20 text-center">
