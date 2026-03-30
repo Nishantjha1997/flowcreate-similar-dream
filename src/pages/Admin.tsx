@@ -158,6 +158,7 @@ const Admin = () => {
           />
         </ScrollReveal>
         
+        <ScrollReveal delay={150}>
         <GlassCard variant="elevated" neoBrutalism={isNeoBrutalism} className="p-6">
           <Tabs defaultValue="registrations" className="w-full">
             <TabsList className={`grid w-full grid-cols-12 ${
