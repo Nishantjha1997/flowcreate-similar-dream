@@ -1,4 +1,5 @@
 import Header from '@/components/Header';
+import { ScrollReveal } from '@/hooks/useScrollAnimation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, HelpCircle, ArrowRight } from 'lucide-react';
