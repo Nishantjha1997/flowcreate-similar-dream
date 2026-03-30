@@ -4,6 +4,7 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Github, Heart, Code, Users, Coffee, ArrowRight, User, Mail } from 'lucide-react';
+import { ScrollReveal } from '@/hooks/useScrollAnimation';
 
 const About = () => {
   return (
@@ -11,7 +12,7 @@ const About = () => {
       <Header />
       <main className="py-16">
         <div className="container mx-auto px-4">
-          {/* Hero Section */}
+          <ScrollReveal>
           <div className="max-w-3xl mx-auto text-center mb-16">
             <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl mb-6">
               About FlowCreate
@@ -20,9 +21,11 @@ const About = () => {
               A free, open-source resume building platform designed to make professional resume creation accessible to everyone.
             </p>
           </div>
+          </ScrollReveal>
           
           <div className="max-w-3xl mx-auto">
             <div className="prose prose-lg mx-auto">
+              <ScrollReveal delay={50}>
               <h2 className="text-3xl font-bold mt-12 mb-6">Our Mission</h2>
               <p className="text-lg mb-6">
                 FlowCreate was born from a simple belief: creating a professional resume shouldn't cost money or require design skills. 
@@ -34,7 +37,9 @@ const About = () => {
                 That's why FlowCreate is and will always remain completely free, with no paywalls, no premium tiers, 
                 and no hidden limitations.
               </p>
+              </ScrollReveal>
 
+              <ScrollReveal delay={100}>
               <div className="bg-muted rounded-lg p-8 my-10">
                 <h3 className="text-2xl font-semibold mb-4 text-center">Our Core Values</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
@@ -61,7 +66,9 @@ const About = () => {
                   </div>
                 </div>
               </div>
+              </ScrollReveal>
 
+              <ScrollReveal delay={100}>
               <h2 className="text-3xl font-bold mt-12 mb-6">Our Story</h2>
               <p className="text-lg mb-6">
                 FlowCreate began as a passion project by a small team of developers and designers who were frustrated with 
@@ -78,6 +85,7 @@ const About = () => {
                 professional resume creation accessible to everyone. Our open-source codebase allows developers from 
                 around the world to contribute features, fix bugs, and help improve the platform for all users.
               </p>
+              </ScrollReveal>
 
               <h2 className="text-3xl font-bold mt-12 mb-6">How We're Funded</h2>
               <p className="text-lg mb-6">

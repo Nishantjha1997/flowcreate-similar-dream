@@ -1,6 +1,7 @@
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { ScrollReveal } from '@/hooks/useScrollAnimation';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { 
@@ -74,6 +75,7 @@ const Features = () => {
         {/* Hero Section */}
         <section className="py-20 bg-muted">
           <div className="container mx-auto px-4">
+            <ScrollReveal>
             <div className="max-w-3xl mx-auto text-center">
               <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
                 Powerful Features to Create Standout Resumes
@@ -95,6 +97,7 @@ const Features = () => {
                 </Link>
               </div>
             </div>
+            </ScrollReveal>
           </div>
         </section>
 
@@ -103,13 +106,15 @@ const Features = () => {
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {features.map((feature, index) => (
-                <div key={index} className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow">
+                <ScrollReveal key={index} delay={index * 50} direction="up">
+                <div className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow">
                   <div className="mb-4">
                     {feature.icon}
                   </div>
                   <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
                   <p className="text-muted-foreground">{feature.description}</p>
                 </div>
+                </ScrollReveal>
               ))}
             </div>
           </div>
@@ -118,6 +123,7 @@ const Features = () => {
         {/* How It Works */}
         <section className="py-20 bg-muted">
           <div className="container mx-auto px-4">
+            <ScrollReveal>
             <div className="max-w-3xl mx-auto text-center mb-16">
               <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                 How It Works
@@ -126,6 +132,7 @@ const Features = () => {
                 Create a professional resume in just a few simple steps
               </p>
             </div>
+            </ScrollReveal>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               <div className="text-center">

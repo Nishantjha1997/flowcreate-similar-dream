@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ScrollReveal } from '@/hooks/useScrollAnimation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -385,6 +386,7 @@ const Account = () => {
         <Breadcrumbs items={breadcrumbItems} className="mb-6" />
 
         {/* Profile Header Card */}
+        <ScrollReveal>
         <Card className={`mb-8 overflow-hidden ${isNeoBrutalism ? 'border-4 border-foreground shadow-[8px_8px_0px_0px_hsl(var(--foreground))]' : 'border shadow-sm'}`}>
           <div className={`h-24 sm:h-32 ${isNeoBrutalism ? 'bg-primary' : 'bg-gradient-to-r from-primary/20 via-primary/10 to-background'}`} />
           <CardContent className="relative pb-6">
@@ -432,6 +434,7 @@ const Account = () => {
             </div>
           </CardContent>
         </Card>
+        </ScrollReveal>
 
         {/* Persistent Auto-Save Indicator */}
         <div className={`flex items-center justify-between mb-4 p-3 rounded-lg ${isNeoBrutalism ? 'border-2 border-foreground bg-muted' : 'bg-muted/50'}`}>
@@ -467,6 +470,7 @@ const Account = () => {
         </div>
 
         {/* Quick Action Cards */}
+        <ScrollReveal delay={100}>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           <Link to="/resume-builder">
             <Card className={`h-full transition-all hover:scale-[1.02] cursor-pointer ${isNeoBrutalism ? 'border-3 border-foreground hover:shadow-[6px_6px_0px_0px_hsl(var(--foreground))] hover:-translate-y-1' : 'hover:shadow-md'}`}>
@@ -536,6 +540,7 @@ const Account = () => {
             </CardContent>
           </Card>
         </div>
+        </ScrollReveal>
 
         {/* Extracted Data Notification */}
         {extractedProfileData && (
@@ -564,6 +569,7 @@ const Account = () => {
         )}
 
         {/* Main Content Grid */}
+        <ScrollReveal delay={150}>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Left Sidebar - Profile Overview */}
           <div className="lg:col-span-1 space-y-6">
@@ -857,6 +863,7 @@ const Account = () => {
             </Tabs>
           </div>
         </div>
+        </ScrollReveal>
 
         {/* Mobile Profile Insights */}
         <div className="lg:hidden mt-8">

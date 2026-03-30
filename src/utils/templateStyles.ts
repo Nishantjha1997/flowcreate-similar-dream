@@ -538,6 +538,74 @@ export const templateStyles = {
     skillsContainer: "flex flex-wrap gap-2 justify-center",
     skillBadge: "bg-blue-50 text-blue-800 px-3 py-1 rounded text-xs border border-blue-200",
   },
+
+  // Apple — Ultra-clean, SF Pro inspired, precision whitespace
+  apple: {
+    container: "font-sans max-w-4xl mx-auto bg-white shadow-sm",
+    header: "p-10 pb-6 border-b border-gray-200",
+    headerName: "text-3xl font-semibold text-[#1d1d1f] tracking-tight",
+    headerTitle: "text-lg mt-1 text-[#86868b] font-normal",
+    headerContact: "mt-4 flex flex-wrap gap-5 text-sm text-[#86868b]",
+    section: "px-10 py-5 border-b border-gray-100",
+    sectionTitle: "text-xs font-semibold uppercase tracking-[0.15em] text-[#86868b] mb-4 pb-2",
+    subsection: "mb-5",
+    subsectionTitle: "text-base font-semibold flex justify-between text-[#1d1d1f]",
+    subsectionDate: "text-[#86868b] text-sm",
+    subsectionContent: "mt-2 text-[#424245] leading-relaxed text-sm",
+    skillsContainer: "flex flex-wrap gap-2",
+    skillBadge: "bg-[#f5f5f7] text-[#1d1d1f] px-4 py-1.5 rounded-full text-xs",
+  },
+
+  // Apple Dark — Dark mode Apple aesthetic
+  "apple-dark": {
+    container: "font-sans max-w-4xl mx-auto bg-[#1d1d1f] text-[#f5f5f7] shadow-lg",
+    header: "p-10 pb-6 border-b border-[#424245]",
+    headerName: "text-3xl font-semibold text-[#f5f5f7] tracking-tight",
+    headerTitle: "text-lg mt-1 text-[#86868b] font-normal",
+    headerContact: "mt-4 flex flex-wrap gap-5 text-sm text-[#86868b]",
+    section: "px-10 py-5 border-b border-[#2d2d30]",
+    sectionTitle: "text-xs font-semibold uppercase tracking-[0.15em] text-[#86868b] mb-4 pb-2",
+    subsection: "mb-5",
+    subsectionTitle: "text-base font-semibold flex justify-between text-[#f5f5f7]",
+    subsectionDate: "text-[#86868b] text-sm",
+    subsectionContent: "mt-2 text-[#a1a1a6] leading-relaxed text-sm",
+    skillsContainer: "flex flex-wrap gap-2",
+    skillBadge: "bg-[#2d2d30] text-[#f5f5f7] px-4 py-1.5 rounded-full text-xs",
+  },
+
+  // Facebook — Classic FB blue, rounded, social feel
+  facebook: {
+    container: "font-sans max-w-4xl mx-auto bg-white shadow-md border-t-4 border-[#1877f2]",
+    header: "p-8 pb-5 border-b border-[#dadde1]",
+    headerName: "text-3xl font-bold text-[#1c1e21]",
+    headerTitle: "text-lg mt-1 text-[#65676b]",
+    headerContact: "mt-3 flex flex-wrap gap-4 text-sm text-[#65676b]",
+    section: "px-8 py-4 border-b border-[#f0f2f5]",
+    sectionTitle: "text-sm font-bold uppercase tracking-wider text-[#1877f2] mb-3 pb-2 border-b-2 border-[#e4e6eb]",
+    subsection: "mb-4 pl-4 border-l-3 border-[#1877f2]",
+    subsectionTitle: "text-base font-semibold flex justify-between text-[#1c1e21]",
+    subsectionDate: "text-[#65676b] text-sm",
+    subsectionContent: "mt-2 text-[#050505] leading-relaxed text-sm",
+    skillsContainer: "flex flex-wrap gap-2",
+    skillBadge: "bg-[#e7f3ff] text-[#1877f2] px-4 py-1.5 rounded-full text-xs",
+  },
+
+  // Meta — Modern rebrand gradient aesthetic
+  meta: {
+    container: "font-sans max-w-4xl mx-auto bg-white shadow-md",
+    header: "p-8 pb-5 border-b-2 border-transparent bg-gradient-to-r from-[#0668E1] via-[#1877F2] to-[#00C2FF] bg-clip-padding",
+    headerName: "text-3xl font-bold text-[#1c1e21]",
+    headerTitle: "text-lg mt-1 text-[#65676b]",
+    headerContact: "mt-3 flex flex-wrap gap-4 text-sm text-[#65676b]",
+    section: "px-8 py-4 border-b border-[#e4e6eb]",
+    sectionTitle: "text-sm font-bold uppercase tracking-wider text-[#0668E1] mb-3 pb-2 border-b border-[#e4e6eb]",
+    subsection: "mb-5",
+    subsectionTitle: "text-base font-semibold flex justify-between text-[#1c1e21]",
+    subsectionDate: "text-[#65676b] text-sm",
+    subsectionContent: "mt-2 text-[#1c1e21] leading-relaxed text-sm",
+    skillsContainer: "flex flex-wrap gap-2",
+    skillBadge: "bg-[#f0f2f5] text-[#0668E1] px-4 py-1.5 rounded-lg text-xs border border-[#e4e6eb]",
+  },
 };
 
 export type TemplateStylesKey = keyof typeof templateStyles;
@@ -631,6 +699,10 @@ export const templateNameMap = {
   "vp-leader": "vp-leader",
   pharma: "pharma",
   marketing: "marketing",
+  apple: "apple",
+  "apple-dark": "apple-dark",
+  facebook: "facebook",
+  meta: "meta",
   "ats-classic": "ats-classic",
   "ats-modern": "ats-modern",
   "ats-executive": "ats-executive",
