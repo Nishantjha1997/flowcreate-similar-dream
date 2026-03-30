@@ -1180,7 +1180,7 @@ const templateStyles: Record<string, TemplateStyles> = {
       height: '100%',
       padding: '40px 44px',
       backgroundColor: '#ffffff',
-      boxSizing: 'border-box',
+      boxSizing: 'border-box' as const,
       borderTop: '4px solid #1877f2',
     },
     header: {
