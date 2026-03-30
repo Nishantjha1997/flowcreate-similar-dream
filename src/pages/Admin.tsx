@@ -94,8 +94,9 @@ const Admin = () => {
         : 'bg-gradient-to-br from-blue-50/50 via-background to-purple-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900'
     }`}>
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Breadcrumb Navigation */}
-        <Breadcrumbs className="mb-4" />
+        <ScrollReveal>
+          <Breadcrumbs className="mb-4" />
+        </ScrollReveal>
         
         <GlassCard variant="elevated" neoBrutalism={isNeoBrutalism} className="p-8">
           <div className="flex items-start justify-between flex-wrap gap-4">
