@@ -359,5 +359,17 @@ export const templateNames: Record<string, string> = {
   "10": "medical",
   "12": "academic",
   "19": "executive",
-  "21": "ats-pro"
+  "21": "ats-pro",
+  "22": "apple",
+  "23": "apple-dark",
+  "24": "facebook",
+  "25": "meta",
+  "26": "ats-classic",
+  "27": "ats-modern",
+  "28": "ats-executive",
+  "29": "ats-tech",
+  "30": "ats-minimal",
+  "31": "ats-corporate",
+  "32": "minimalist",
+  "33": "bold",
 };
