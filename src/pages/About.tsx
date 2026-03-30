@@ -4,6 +4,7 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Github, Heart, Code, Users, Coffee, ArrowRight, User, Mail } from 'lucide-react';
+import { ScrollReveal } from '@/hooks/useScrollAnimation';
 
 const About = () => {
   return (
