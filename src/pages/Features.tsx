@@ -123,6 +123,7 @@ const Features = () => {
         {/* How It Works */}
         <section className="py-20 bg-muted">
           <div className="container mx-auto px-4">
+            <ScrollReveal>
             <div className="max-w-3xl mx-auto text-center mb-16">
               <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                 How It Works
@@ -131,6 +132,7 @@ const Features = () => {
                 Create a professional resume in just a few simple steps
               </p>
             </div>
+            </ScrollReveal>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               <div className="text-center">
