@@ -37,7 +37,9 @@ const About = () => {
                 That's why FlowCreate is and will always remain completely free, with no paywalls, no premium tiers, 
                 and no hidden limitations.
               </p>
+              </ScrollReveal>
 
+              <ScrollReveal delay={100}>
               <div className="bg-muted rounded-lg p-8 my-10">
                 <h3 className="text-2xl font-semibold mb-4 text-center">Our Core Values</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
