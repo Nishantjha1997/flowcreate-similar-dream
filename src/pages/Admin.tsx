@@ -248,6 +248,7 @@ const Admin = () => {
             </TabsContent>
           </Tabs>
         </GlassCard>
+        </ScrollReveal>
       </div>
     </div>
   );
