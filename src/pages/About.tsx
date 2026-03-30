@@ -85,6 +85,7 @@ const About = () => {
                 professional resume creation accessible to everyone. Our open-source codebase allows developers from 
                 around the world to contribute features, fix bugs, and help improve the platform for all users.
               </p>
+              </ScrollReveal>
 
               <h2 className="text-3xl font-bold mt-12 mb-6">How We're Funded</h2>
               <p className="text-lg mb-6">
