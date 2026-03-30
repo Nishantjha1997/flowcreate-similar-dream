@@ -66,7 +66,9 @@ const About = () => {
                   </div>
                 </div>
               </div>
+              </ScrollReveal>
 
+              <ScrollReveal delay={100}>
               <h2 className="text-3xl font-bold mt-12 mb-6">Our Story</h2>
               <p className="text-lg mb-6">
                 FlowCreate began as a passion project by a small team of developers and designers who were frustrated with 
