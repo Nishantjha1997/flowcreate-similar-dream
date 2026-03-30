@@ -569,6 +569,7 @@ const Account = () => {
         )}
 
         {/* Main Content Grid */}
+        <ScrollReveal delay={150}>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Left Sidebar - Profile Overview */}
           <div className="lg:col-span-1 space-y-6">
