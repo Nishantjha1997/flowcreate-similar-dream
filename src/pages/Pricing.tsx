@@ -64,6 +64,7 @@ const Pricing = () => {
       <Header />
       <main className="py-16">
         <div className="container mx-auto px-4">
+          <ScrollReveal>
           <div className="max-w-3xl mx-auto text-center mb-12">
             <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary mb-4">
               Pricing
@@ -75,6 +76,8 @@ const Pricing = () => {
               FlowCreate is free for 1 resume, with Premium plans for unlimited resumes and power users.
             </p>
           </div>
+          </ScrollReveal>
+          <ScrollReveal delay={100}>
           <div className="max-w-7xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             {/* Test Plan */}
             <div className="rounded-xl border-2 border-orange-500 bg-orange-50 shadow-lg overflow-hidden flex flex-col">
