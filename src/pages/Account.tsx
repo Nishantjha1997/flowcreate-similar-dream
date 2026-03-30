@@ -434,6 +434,7 @@ const Account = () => {
             </div>
           </CardContent>
         </Card>
+        </ScrollReveal>
 
         {/* Persistent Auto-Save Indicator */}
         <div className={`flex items-center justify-between mb-4 p-3 rounded-lg ${isNeoBrutalism ? 'border-2 border-foreground bg-muted' : 'bg-muted/50'}`}>
