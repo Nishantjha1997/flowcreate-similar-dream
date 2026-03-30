@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { ScrollReveal } from "@/hooks/useScrollAnimation";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { useAllMembers } from "@/hooks/useAllMembers";
 import { useUserProfiles } from "@/hooks/useUserProfiles";
