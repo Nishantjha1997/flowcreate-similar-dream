@@ -540,6 +540,7 @@ const Account = () => {
             </CardContent>
           </Card>
         </div>
+        </ScrollReveal>
 
         {/* Extracted Data Notification */}
         {extractedProfileData && (
