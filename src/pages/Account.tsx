@@ -470,6 +470,7 @@ const Account = () => {
         </div>
 
         {/* Quick Action Cards */}
+        <ScrollReveal delay={100}>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           <Link to="/resume-builder">
             <Card className={`h-full transition-all hover:scale-[1.02] cursor-pointer ${isNeoBrutalism ? 'border-3 border-foreground hover:shadow-[6px_6px_0px_0px_hsl(var(--foreground))] hover:-translate-y-1' : 'hover:shadow-md'}`}>
