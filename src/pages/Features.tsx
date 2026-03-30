@@ -75,6 +75,7 @@ const Features = () => {
         {/* Hero Section */}
         <section className="py-20 bg-muted">
           <div className="container mx-auto px-4">
+            <ScrollReveal>
             <div className="max-w-3xl mx-auto text-center">
               <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
                 Powerful Features to Create Standout Resumes
@@ -96,6 +97,7 @@ const Features = () => {
                 </Link>
               </div>
             </div>
+            </ScrollReveal>
           </div>
         </section>
 
