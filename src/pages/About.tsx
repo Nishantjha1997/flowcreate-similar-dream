@@ -12,7 +12,7 @@ const About = () => {
       <Header />
       <main className="py-16">
         <div className="container mx-auto px-4">
-          {/* Hero Section */}
+          <ScrollReveal>
           <div className="max-w-3xl mx-auto text-center mb-16">
             <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl mb-6">
               About FlowCreate
@@ -21,6 +21,7 @@ const About = () => {
               A free, open-source resume building platform designed to make professional resume creation accessible to everyone.
             </p>
           </div>
+          </ScrollReveal>
           
           <div className="max-w-3xl mx-auto">
             <div className="prose prose-lg mx-auto">
