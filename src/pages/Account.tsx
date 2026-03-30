@@ -386,6 +386,7 @@ const Account = () => {
         <Breadcrumbs items={breadcrumbItems} className="mb-6" />
 
         {/* Profile Header Card */}
+        <ScrollReveal>
         <Card className={`mb-8 overflow-hidden ${isNeoBrutalism ? 'border-4 border-foreground shadow-[8px_8px_0px_0px_hsl(var(--foreground))]' : 'border shadow-sm'}`}>
           <div className={`h-24 sm:h-32 ${isNeoBrutalism ? 'bg-primary' : 'bg-gradient-to-r from-primary/20 via-primary/10 to-background'}`} />
           <CardContent className="relative pb-6">
