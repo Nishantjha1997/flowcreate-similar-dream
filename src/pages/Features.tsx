@@ -1,6 +1,7 @@
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { ScrollReveal } from '@/hooks/useScrollAnimation';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { 
