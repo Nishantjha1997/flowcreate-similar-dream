@@ -75,6 +75,10 @@
   --chart-5: 340 75% 55%;
   
   --section-alt: 0 0% 6%;
+  --surface-dark: 0 0% 7%;
+  --surface-dark-foreground: 0 0% 98%;
+  --surface-elevated: 0 0% 6%;
+  --surface-mid: 0 0% 12%;
 }
 
 /* Neo-Brutalism Theme Override */
