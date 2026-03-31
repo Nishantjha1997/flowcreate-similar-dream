@@ -39,34 +39,46 @@ const HeroSection = () => {
     );
   }
 
-  // Apple-inspired hero
+  // Apple-inspired dark hero — materialistic
   return (
-    <section className="relative overflow-hidden bg-background">
-      <div className="container mx-auto px-4 pt-20 pb-16 md:pt-32 md:pb-24 lg:pt-40 lg:pb-32 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Overline */}
-          <p className="text-primary font-medium text-sm md:text-base mb-4 animate-apple-fade-in-up tracking-wide">
-            AI-Powered Resume Builder
-          </p>
+    <section className="relative overflow-hidden bg-[hsl(var(--surface-dark))]">
+      {/* Subtle gradient mesh */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-primary/[0.08] rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-primary/[0.05] rounded-full blur-[100px]" />
+      </div>
 
-          {/* Main headline — Apple style large centered text */}
-          <h1 className="apple-headline-lg mb-6 animate-apple-fade-in-up-delay-1 text-balance">
+      {/* Fine grain texture overlay */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
+      }} />
+
+      <div className="container mx-auto px-4 pt-24 pb-20 md:pt-36 md:pb-28 lg:pt-44 lg:pb-36 relative z-10">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Overline badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.08] border border-white/[0.1] mb-8 animate-apple-fade-in-up backdrop-blur-sm">
+            <div className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-white/70 text-xs font-medium tracking-wide">AI-Powered Resume Builder</span>
+          </div>
+
+          {/* Main headline */}
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-none text-white mb-6 animate-apple-fade-in-up-delay-1" style={{ letterSpacing: '-0.03em' }}>
             Your resume.{' '}
-            <span className="text-muted-foreground">Perfected.</span>
+            <span className="text-white/40">Perfected.</span>
           </h1>
 
           {/* Subheadline */}
-          <p className="apple-subheadline mx-auto mb-10 animate-apple-fade-in-up-delay-2">
+          <p className="text-lg md:text-xl text-white/50 font-normal leading-relaxed mx-auto mb-12 max-w-[42rem] animate-apple-fade-in-up-delay-2">
             Create stunning, ATS-optimized resumes with intelligent AI suggestions. 
             Stand out to employers and land your dream job.
           </p>
 
-          {/* CTA Buttons — Apple pill style */}
+          {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-apple-fade-in-up-delay-3">
             <Link to="/resume-builder">
               <Button 
                 size="lg" 
-                className="rounded-full px-8 h-12 text-base font-normal bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 shadow-none"
+                className="rounded-full px-8 h-12 text-base font-normal bg-white text-[hsl(var(--surface-dark))] hover:bg-white/90 transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.1)]"
               >
                 Start Building
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -76,23 +88,23 @@ const HeroSection = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="rounded-full px-8 h-12 text-base font-normal border-border/60 text-primary hover:bg-primary/5 transition-all duration-300"
+                className="rounded-full px-8 h-12 text-base font-normal border-white/20 text-white hover:bg-white/10 transition-all duration-300"
               >
                 View Templates
               </Button>
             </Link>
           </div>
 
-          {/* Trust indicators */}
-          <div className="mt-16 md:mt-20 animate-apple-fade-in-up-delay-3">
-            <p className="text-xs text-muted-foreground uppercase tracking-widest mb-6">
+          {/* Trust indicators on dark */}
+          <div className="mt-20 md:mt-24 animate-apple-fade-in-up-delay-3">
+            <p className="text-[10px] text-white/30 uppercase tracking-[0.2em] mb-6">
               Trusted by professionals at
             </p>
             <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
               {['Google', 'Microsoft', 'Amazon', 'Adobe', 'Meta'].map((company) => (
                 <span 
                   key={company} 
-                  className="text-lg md:text-xl font-semibold text-foreground/20 hover:text-foreground/40 transition-colors duration-500"
+                  className="text-lg md:text-xl font-semibold text-white/[0.12] hover:text-white/[0.25] transition-colors duration-500"
                 >
                   {company}
                 </span>
@@ -101,9 +113,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-
-      {/* Subtle gradient orb for depth */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/[0.03] rounded-full blur-3xl pointer-events-none" />
     </section>
   );
 };

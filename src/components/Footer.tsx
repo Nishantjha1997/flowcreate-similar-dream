@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { useDesignMode } from '@/hooks/useDesignMode';
 
@@ -33,58 +32,35 @@ const Footer = () => {
     );
   }
 
-  // Apple-inspired footer
+  // Dark materialistic footer
   const footerSections = [
-    {
-      title: 'Product',
-      links: [
-        { to: '/templates', label: 'Templates' },
-        { to: '/examples', label: 'Example Resumes' },
-        { to: '/features', label: 'Features' },
-        { to: '/pricing', label: 'Pricing' },
-      ]
-    },
-    {
-      title: 'Resources',
-      links: [
-        { to: '/blog', label: 'Blog' },
-        { to: '/help', label: 'Help Center' },
-        { to: '/career-advice', label: 'Career Advice' },
-      ]
-    },
-    {
-      title: 'Company',
-      links: [
-        { to: '/about', label: 'About' },
-        { to: '/privacy', label: 'Privacy Policy' },
-        { to: '/terms', label: 'Terms of Use' },
-        { to: '/shipping-policy', label: 'Shipping Policy' },
-      ]
-    }
+    { title: 'Product', links: [{ to: '/templates', label: 'Templates' }, { to: '/examples', label: 'Example Resumes' }, { to: '/features', label: 'Features' }, { to: '/pricing', label: 'Pricing' }] },
+    { title: 'Resources', links: [{ to: '/blog', label: 'Blog' }, { to: '/help', label: 'Help Center' }, { to: '/career-advice', label: 'Career Advice' }] },
+    { title: 'Company', links: [{ to: '/about', label: 'About' }, { to: '/privacy', label: 'Privacy Policy' }, { to: '/terms', label: 'Terms of Use' }, { to: '/shipping-policy', label: 'Shipping Policy' }] }
   ];
 
   return (
-    <footer className="bg-section-alt border-t border-border/50">
+    <footer className="bg-[hsl(var(--surface-dark))] border-t border-white/[0.06]">
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
           <div className="col-span-2 lg:col-span-2 mb-4">
             <Link to="/" className="inline-block mb-4">
-              <span className="text-lg font-semibold tracking-apple-tight text-foreground">FlowCreate</span>
+              <span className="text-lg font-semibold tracking-tight text-white">FlowCreate</span>
             </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
+            <p className="text-sm text-white/40 leading-relaxed max-w-xs">
               Create professional resumes and cover letters online in minutes with AI-powered tools.
             </p>
           </div>
           
           {footerSections.map((section) => (
             <div key={section.title}>
-              <h3 className="text-xs font-semibold text-foreground mb-4">{section.title}</h3>
+              <h3 className="text-xs font-semibold text-white/70 mb-4">{section.title}</h3>
               <ul className="space-y-2.5">
                 {section.links.map((link) => (
                   <li key={link.to}>
                     <Link 
                       to={link.to} 
-                      className="text-xs text-muted-foreground hover:text-foreground transition-colors duration-300"
+                      className="text-xs text-white/35 hover:text-white/70 transition-colors duration-300"
                     >
                       {link.label}
                     </Link>
@@ -95,8 +71,8 @@ const Footer = () => {
           ))}
         </div>
         
-        <div className="mt-12 pt-6 border-t border-border/50">
-          <p className="text-xs text-muted-foreground text-center">
+        <div className="mt-12 pt-6 border-t border-white/[0.06]">
+          <p className="text-xs text-white/25 text-center">
             Copyright &copy; {new Date().getFullYear()} FlowCreate. All rights reserved.
           </p>
         </div>

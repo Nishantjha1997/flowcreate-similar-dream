@@ -2,54 +2,14 @@ import { CheckCircle, Edit3, FileText, Layout, Shield, Zap, Award, Bot } from 'l
 import { useDesignMode } from '@/hooks/useDesignMode';
 
 const features = [
-  {
-    title: "ATS-Optimized",
-    description: "Templates designed to pass Applicant Tracking Systems and reach hiring managers.",
-    icon: Layout,
-    nbColor: "bg-[#3B82F6]"
-  },
-  {
-    title: "AI Assistant",
-    description: "Smart suggestions to improve your content and highlight achievements effectively.",
-    icon: Bot,
-    nbColor: "bg-[#A855F7]"
-  },
-  {
-    title: "Easy Customization",
-    description: "Personalize your resume with intuitive drag-and-drop. No design skills needed.",
-    icon: Edit3,
-    nbColor: "bg-[#22C55E]"
-  },
-  {
-    title: "Expert Content",
-    description: "Industry-specific suggestions written and approved by hiring managers.",
-    icon: CheckCircle,
-    nbColor: "bg-[#14B8A6]"
-  },
-  {
-    title: "Multiple Formats",
-    description: "Download as PDF, DOCX, or TXT to use with any application system.",
-    icon: FileText,
-    nbColor: "bg-[#F97316]"
-  },
-  {
-    title: "Privacy Protected",
-    description: "Your personal data is fully encrypted and never shared with third parties.",
-    icon: Shield,
-    nbColor: "bg-[#EF4444]"
-  },
-  {
-    title: "Quick & Easy",
-    description: "Build and download your professional resume in less than 15 minutes.",
-    icon: Zap,
-    nbColor: "bg-[#F59E0B]"
-  },
-  {
-    title: "Achievement Focused",
-    description: "Tools to help you quantify and showcase accomplishments that stand out.",
-    icon: Award,
-    nbColor: "bg-[#6366F1]"
-  },
+  { title: "ATS-Optimized", description: "Templates designed to pass Applicant Tracking Systems and reach hiring managers.", icon: Layout, nbColor: "bg-[#3B82F6]" },
+  { title: "AI Assistant", description: "Smart suggestions to improve your content and highlight achievements effectively.", icon: Bot, nbColor: "bg-[#A855F7]" },
+  { title: "Easy Customization", description: "Personalize your resume with intuitive drag-and-drop. No design skills needed.", icon: Edit3, nbColor: "bg-[#22C55E]" },
+  { title: "Expert Content", description: "Industry-specific suggestions written and approved by hiring managers.", icon: CheckCircle, nbColor: "bg-[#14B8A6]" },
+  { title: "Multiple Formats", description: "Download as PDF, DOCX, or TXT to use with any application system.", icon: FileText, nbColor: "bg-[#F97316]" },
+  { title: "Privacy Protected", description: "Your personal data is fully encrypted and never shared with third parties.", icon: Shield, nbColor: "bg-[#EF4444]" },
+  { title: "Quick & Easy", description: "Build and download your professional resume in less than 15 minutes.", icon: Zap, nbColor: "bg-[#F59E0B]" },
+  { title: "Achievement Focused", description: "Tools to help you quantify and showcase accomplishments that stand out.", icon: Award, nbColor: "bg-[#6366F1]" },
 ];
 
 const FeaturesSection = () => {
@@ -63,9 +23,7 @@ const FeaturesSection = () => {
             <h2 className="text-4xl font-black tracking-tight text-foreground uppercase mb-4" style={{ textShadow: '3px 3px 0px hsl(var(--muted-foreground) / 0.3)' }}>
               Everything You Need
             </h2>
-            <p className="text-xl text-foreground/80 font-mono">
-              All the tools to help you get noticed by employers
-            </p>
+            <p className="text-xl text-foreground/80 font-mono">All the tools to help you get noticed by employers</p>
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {features.map((feature, index) => (
@@ -83,9 +41,9 @@ const FeaturesSection = () => {
     );
   }
 
-  // Apple-inspired features
+  // Materialistic Apple — elevated grey cards on light surface
   return (
-    <section className="apple-section bg-section-alt">
+    <section className="apple-section bg-[hsl(var(--surface-elevated))]">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto text-center mb-16 md:mb-20">
           <h2 className="apple-headline mb-5">
@@ -96,16 +54,17 @@ const FeaturesSection = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
           {features.map((feature, index) => (
             <div 
               key={index} 
-              className="group rounded-2xl bg-background p-7 transition-all duration-500 hover:shadow-lg hover:-translate-y-1"
+              className="group rounded-2xl bg-background p-7 transition-all duration-500 hover:shadow-lg hover:-translate-y-1 border border-border/40"
+              style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)' }}
             >
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/15 transition-colors duration-500">
-                <feature.icon className="h-5 w-5 text-primary" />
+              <div className="h-10 w-10 rounded-xl bg-[hsl(var(--surface-dark))] flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-500">
+                <feature.icon className="h-5 w-5 text-white" />
               </div>
-              <h3 className="font-semibold text-foreground text-base mb-2 tracking-apple-tight">
+              <h3 className="font-semibold text-foreground text-base mb-2 tracking-tight">
                 {feature.title}
               </h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
