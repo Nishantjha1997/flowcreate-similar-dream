@@ -8,26 +8,14 @@ import TemplateCustomizationModal from "@/components/templates/TemplateCustomiza
 const ResumeTemplate = lazy(() => import('@/utils/resumeTemplates'));
 
 const mockResumeData = {
-  personal: {
-    name: "John Smith",
-    email: "john.smith@email.com",
-    phone: "(555) 123-4567",
-    address: "New York, NY",
-    summary: "Experienced software engineer with 5+ years developing scalable web applications. Passionate about creating efficient solutions and leading development teams.",
-    website: "johndoe.com",
-    linkedin: "linkedin.com/in/johnsmith"
-  },
+  personal: { name: "John Smith", email: "john.smith@email.com", phone: "(555) 123-4567", address: "New York, NY", summary: "Experienced software engineer with 5+ years developing scalable web applications. Passionate about creating efficient solutions and leading development teams.", website: "johndoe.com", linkedin: "linkedin.com/in/johnsmith" },
   experience: [
     { id: 1, title: "Senior Software Engineer", company: "Tech Corp", location: "New York, NY", startDate: "2022-01", endDate: "Present", current: true, description: "Led development of microservices architecture serving 1M+ users. Improved application performance by 40% through optimization." },
     { id: 2, title: "Software Engineer", company: "StartupXYZ", location: "San Francisco, CA", startDate: "2020-03", endDate: "2021-12", current: false, description: "Built responsive web applications using React and Node.js. Implemented automated testing reducing bugs by 60%." }
   ],
-  education: [
-    { id: 1, degree: "Bachelor of Science in Computer Science", school: "University of Technology", field: "Computer Science", location: "Boston, MA", startDate: "2016-08", endDate: "2020-05", description: "GPA: 3.8/4.0" }
-  ],
+  education: [{ id: 1, degree: "Bachelor of Science in Computer Science", school: "University of Technology", field: "Computer Science", location: "Boston, MA", startDate: "2016-08", endDate: "2020-05", description: "GPA: 3.8/4.0" }],
   skills: ["JavaScript", "React", "Node.js", "Python", "AWS"],
-  projects: [
-    { id: 1, title: "E-commerce Platform", description: "Full-stack e-commerce solution with payment integration", technologies: ["React", "Node.js", "MongoDB", "Stripe"], link: "github.com/johnsmith/ecommerce" }
-  ],
+  projects: [{ id: 1, title: "E-commerce Platform", description: "Full-stack e-commerce solution with payment integration", technologies: ["React", "Node.js", "MongoDB", "Stripe"], link: "github.com/johnsmith/ecommerce" }],
   customization: { primaryColor: '#2563eb', secondaryColor: '#6b7280', fontSize: 'medium' as const, spacing: 'normal' as const }
 };
 
@@ -68,7 +56,7 @@ const TemplatesCarousel = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="absolute -left-4 md:-left-12 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-sm hover:bg-background hover:shadow-md transition-all"
+            className="absolute -left-4 md:-left-12 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-[hsl(var(--surface-dark))] text-white hover:bg-[hsl(var(--surface-dark))]/90 border-0 shadow-lg transition-all"
             onClick={prevSlide}
             disabled={currentIndex === 0}
           >
@@ -78,7 +66,7 @@ const TemplatesCarousel = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="absolute -right-4 md:-right-12 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-sm hover:bg-background hover:shadow-md transition-all"
+            className="absolute -right-4 md:-right-12 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-[hsl(var(--surface-dark))] text-white hover:bg-[hsl(var(--surface-dark))]/90 border-0 shadow-lg transition-all"
             onClick={nextSlide}
             disabled={currentIndex >= maxIndex}
           >
@@ -92,7 +80,7 @@ const TemplatesCarousel = () => {
             >
               {templates.map((template) => (
                 <div key={template.id} className="w-1/3 flex-shrink-0 px-2.5">
-                  <div className="group relative overflow-hidden rounded-2xl bg-section-alt transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
+                  <div className="group relative overflow-hidden rounded-2xl bg-[hsl(var(--surface-mid))] border border-border/30 transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
                     <div className="aspect-[3/4] overflow-hidden cursor-pointer bg-white p-3" onClick={() => setPreviewId(template.id)}>
                       <div className="h-full w-full bg-white rounded-lg shadow-sm overflow-hidden">
                         <div style={{ transform: 'scale(0.85)', transformOrigin: 'top left', width: '117.6%', height: '117.6%' }}>
@@ -103,20 +91,20 @@ const TemplatesCarousel = () => {
                       </div>
                       
                       {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-[2px]">
-                        <Button className="rounded-full px-6 bg-background text-foreground hover:bg-background/90 shadow-lg">
+                      <div className="absolute inset-0 bg-[hsl(var(--surface-dark))]/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-[2px]">
+                        <Button className="rounded-full px-6 bg-white text-[hsl(var(--surface-dark))] hover:bg-white/90 shadow-lg">
                           Preview
                         </Button>
                       </div>
                     </div>
                     
-                    <div className="p-5">
+                    <div className="p-5 bg-background">
                       <span className="text-xs text-primary font-medium">{template.category}</span>
-                      <h3 className="text-sm font-semibold text-foreground mt-1 mb-1 tracking-apple-tight">{template.name}</h3>
+                      <h3 className="text-sm font-semibold text-foreground mt-1 mb-1 tracking-tight">{template.name}</h3>
                       <p className="text-xs text-muted-foreground mb-4">{template.description}</p>
                       
                       <Button
-                        className="w-full rounded-full h-9 text-xs font-normal"
+                        className="w-full rounded-full h-9 text-xs font-normal bg-[hsl(var(--surface-dark))] text-white hover:bg-[hsl(var(--surface-dark))]/90"
                         onClick={() => setCustomizeId(template.id)}
                       >
                         Use Template

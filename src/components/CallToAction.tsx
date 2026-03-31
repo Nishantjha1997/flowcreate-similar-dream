@@ -1,4 +1,3 @@
-
 import { ArrowRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -26,36 +25,10 @@ const CallToAction = () => {
   }, []);
 
   const plans = [
-    {
-      name: "Free",
-      price: isIndianUser ? "₹0" : "$0",
-      description: "Perfect for getting started",
-      features: ["1 resume template", "Basic customization", "PDF download", "Email support"],
-      popular: false
-    },
-    {
-      name: "Pro",
-      price: isIndianUser ? "₹199" : "$2.99",
-      period: "/mo",
-      description: "Everything for job hunting",
-      features: ["All premium templates", "AI-powered suggestions", "Multiple formats", "Priority support", "Cover letter builder", "ATS optimization"],
-      popular: true
-    },
-    {
-      name: "Annual",
-      price: isIndianUser ? "₹1,999" : "$19.99",
-      period: "/yr",
-      description: "Best value — save 44%",
-      features: ["Everything in Pro", "2 months free", "Priority support", "Advanced features", "Version history"],
-      popular: false
-    },
-    {
-      name: "Lifetime",
-      price: isIndianUser ? "₹2,500" : "$29.99",
-      description: "One-time payment",
-      features: ["Everything in Pro", "Future template updates", "Advanced customization", "Portfolio builder", "Interview prep", "Lifetime updates"],
-      popular: false
-    }
+    { name: "Free", price: isIndianUser ? "₹0" : "$0", description: "Perfect for getting started", features: ["1 resume template", "Basic customization", "PDF download", "Email support"], popular: false },
+    { name: "Pro", price: isIndianUser ? "₹199" : "$2.99", period: "/mo", description: "Everything for job hunting", features: ["All premium templates", "AI-powered suggestions", "Multiple formats", "Priority support", "Cover letter builder", "ATS optimization"], popular: true },
+    { name: "Annual", price: isIndianUser ? "₹1,999" : "$19.99", period: "/yr", description: "Best value — save 44%", features: ["Everything in Pro", "2 months free", "Priority support", "Advanced features", "Version history"], popular: false },
+    { name: "Lifetime", price: isIndianUser ? "₹2,500" : "$29.99", description: "One-time payment", features: ["Everything in Pro", "Future template updates", "Advanced customization", "Portfolio builder", "Interview prep", "Lifetime updates"], popular: false }
   ];
 
   if (loading) {
@@ -87,9 +60,7 @@ const CallToAction = () => {
                 <h3 className="text-xl font-black uppercase mb-1">{plan.name}</h3>
                 <p className="text-sm text-muted-foreground font-mono mb-3">{plan.description}</p>
                 <div className="text-3xl font-black mb-4">{plan.price}{plan.period && <span className="text-base font-bold">{plan.period}</span>}</div>
-                <ul className="space-y-2 mb-6">
-                  {plan.features.map((f, i) => (<li key={i} className="flex items-center text-sm"><Check className="h-4 w-4 mr-2 flex-shrink-0" />{f}</li>))}
-                </ul>
+                <ul className="space-y-2 mb-6">{plan.features.map((f, i) => (<li key={i} className="flex items-center text-sm"><Check className="h-4 w-4 mr-2 flex-shrink-0" />{f}</li>))}</ul>
                 <Link to="/register"><Button className="w-full rounded-none border-2 border-foreground font-bold uppercase shadow-[3px_3px_0px_0px_hsl(var(--foreground))] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all" variant={plan.popular ? 'default' : 'outline'}>Get Started</Button></Link>
               </div>
             ))}
@@ -99,20 +70,20 @@ const CallToAction = () => {
     );
   }
 
-  // Apple-inspired pricing
+  // Materialistic Apple pricing — light section with elevated cards
   return (
-    <section className="apple-section bg-section-alt">
+    <section className="apple-section bg-[hsl(var(--surface-elevated))]">
       <div className="container mx-auto px-4">
-        {/* Stats row */}
-        <div className="max-w-3xl mx-auto grid grid-cols-3 gap-8 mb-20 md:mb-24">
+        {/* Stats row — dark inset cards */}
+        <div className="max-w-3xl mx-auto grid grid-cols-3 gap-4 mb-20 md:mb-24">
           {[
             { value: '2M+', label: 'Resumes Created' },
             { value: '95%', label: 'Success Rate' },
             { value: '24/7', label: 'Expert Support' }
           ].map(({ value, label }) => (
-            <div key={label} className="text-center">
-              <div className="text-3xl md:text-4xl font-semibold text-foreground tracking-apple-tight mb-1">{value}</div>
-              <div className="text-sm text-muted-foreground">{label}</div>
+            <div key={label} className="text-center rounded-2xl bg-[hsl(var(--surface-dark))] py-8 px-4">
+              <div className="text-3xl md:text-4xl font-semibold text-white tracking-tight mb-1">{value}</div>
+              <div className="text-xs text-white/50">{label}</div>
             </div>
           ))}
         </div>
@@ -130,9 +101,10 @@ const CallToAction = () => {
               key={index} 
               className={`relative rounded-2xl p-6 transition-all duration-500 ${
                 plan.popular 
-                  ? 'bg-foreground text-background ring-1 ring-foreground shadow-2xl scale-[1.02]' 
-                  : 'bg-background ring-1 ring-border hover:shadow-lg hover:-translate-y-1'
+                  ? 'bg-[hsl(var(--surface-dark))] text-white ring-1 ring-white/10 shadow-2xl scale-[1.02]' 
+                  : 'bg-background ring-1 ring-border/50 hover:shadow-lg hover:-translate-y-1'
               }`}
+              style={!plan.popular ? { boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)' } : undefined}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-medium">
@@ -140,22 +112,22 @@ const CallToAction = () => {
                 </div>
               )}
               <div className="mb-5">
-                <h3 className={`text-lg font-semibold tracking-apple-tight mb-1 ${plan.popular ? 'text-background' : 'text-foreground'}`}>
+                <h3 className={`text-lg font-semibold tracking-tight mb-1 ${plan.popular ? 'text-white' : 'text-foreground'}`}>
                   {plan.name}
                 </h3>
-                <p className={`text-xs ${plan.popular ? 'text-background/60' : 'text-muted-foreground'}`}>
+                <p className={`text-xs ${plan.popular ? 'text-white/50' : 'text-muted-foreground'}`}>
                   {plan.description}
                 </p>
               </div>
-              <div className={`text-3xl font-semibold tracking-apple-tight mb-6 ${plan.popular ? 'text-background' : 'text-foreground'}`}>
+              <div className={`text-3xl font-semibold tracking-tight mb-6 ${plan.popular ? 'text-white' : 'text-foreground'}`}>
                 {plan.price}
-                {plan.period && <span className={`text-sm font-normal ${plan.popular ? 'text-background/60' : 'text-muted-foreground'}`}>{plan.period}</span>}
+                {plan.period && <span className={`text-sm font-normal ${plan.popular ? 'text-white/50' : 'text-muted-foreground'}`}>{plan.period}</span>}
               </div>
               <ul className="space-y-3 mb-6">
                 {plan.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-start gap-2.5">
                     <Check className={`h-4 w-4 mt-0.5 flex-shrink-0 ${plan.popular ? 'text-primary' : 'text-primary'}`} />
-                    <span className={`text-sm ${plan.popular ? 'text-background/80' : 'text-muted-foreground'}`}>{feature}</span>
+                    <span className={`text-sm ${plan.popular ? 'text-white/70' : 'text-muted-foreground'}`}>{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -163,7 +135,7 @@ const CallToAction = () => {
                 <Button 
                   className={`w-full rounded-full h-10 text-sm font-normal transition-all duration-300 ${
                     plan.popular 
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                      ? 'bg-white text-[hsl(var(--surface-dark))] hover:bg-white/90' 
                       : 'bg-transparent border border-border text-foreground hover:bg-muted'
                   }`}
                   variant={plan.popular ? 'default' : 'outline'}
@@ -175,18 +147,18 @@ const CallToAction = () => {
           ))}
         </div>
 
-        {/* Final CTA */}
-        <div className="max-w-2xl mx-auto text-center mt-20 md:mt-24">
-          <h3 className="text-2xl md:text-3xl font-semibold text-foreground tracking-apple-tight mb-4">
+        {/* Final CTA — dark band */}
+        <div className="mt-20 md:mt-24 rounded-3xl bg-[hsl(var(--surface-dark))] p-12 md:p-16 text-center">
+          <h3 className="text-2xl md:text-3xl font-semibold text-white tracking-tight mb-4">
             Ready to build your perfect resume?
           </h3>
-          <p className="text-muted-foreground mb-8">
+          <p className="text-white/50 mb-8 max-w-md mx-auto">
             Join millions of professionals who've landed their dream jobs.
           </p>
           <Link to="/resume-builder">
             <Button 
               size="lg" 
-              className="rounded-full px-8 h-12 text-base font-normal bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300"
+              className="rounded-full px-8 h-12 text-base font-normal bg-white text-[hsl(var(--surface-dark))] hover:bg-white/90 transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.1)]"
             >
               Start Building Now
               <ArrowRight className="ml-2 h-4 w-4" />

@@ -35,8 +35,12 @@
   --chart-5: 340 75% 55%;
   --radius: 0.875rem;
   
-  /* Apple section bg */
+  /* Apple section surfaces */
   --section-alt: 240 5% 96%;
+  --surface-dark: 0 0% 7%;
+  --surface-dark-foreground: 0 0% 98%;
+  --surface-elevated: 0 0% 97%;
+  --surface-mid: 0 0% 93%;
   
   /* Neo-brutalism specific variables (used when .neo-brutalism is active) */
   --nb-border-width: 3px;
@@ -71,6 +75,10 @@
   --chart-5: 340 75% 55%;
   
   --section-alt: 0 0% 6%;
+  --surface-dark: 0 0% 7%;
+  --surface-dark-foreground: 0 0% 98%;
+  --surface-elevated: 0 0% 6%;
+  --surface-mid: 0 0% 12%;
 }
 
 /* Neo-Brutalism Theme Override */
