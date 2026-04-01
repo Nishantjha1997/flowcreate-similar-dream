@@ -74,14 +74,13 @@ const templates = [
 ];
 
 const sections = [
-  { id: 'personal', name: 'Personal Info', icon: User },
+  { id: 'personal', name: 'Personal', icon: User },
   { id: 'experience', name: 'Experience', icon: Briefcase },
   { id: 'education', name: 'Education', icon: GraduationCap },
   { id: 'skills', name: 'Skills', icon: Award },
   { id: 'projects', name: 'Projects', icon: BookOpen },
 ];
 
-// Helper to check section completion
 const isSectionComplete = (resume: ResumeData, sectionId: string): boolean => {
   switch (sectionId) {
     case 'personal':
@@ -142,15 +141,15 @@ export const ResumeBuilderSidebar = ({
 
   return (
     <div className={cn(
-      "flex flex-col h-full rounded-2xl border border-border/60 bg-card overflow-hidden transition-all duration-300",
+      "flex flex-col h-full rounded-2xl border border-border/50 bg-card overflow-hidden transition-all duration-300 shadow-sm",
       isNeoBrutalism && "border-2 border-foreground shadow-[4px_4px_0_0_hsl(var(--foreground))] rounded-none"
     )}>
-      {/* Tab Navigation with Animation */}
+      {/* Tab Navigation */}
       <div className={cn(
-        "flex-shrink-0 border-b border-border/40 bg-muted/10",
+        "flex-shrink-0 border-b border-border/30",
         isNeoBrutalism && "border-b-2 border-foreground"
       )}>
-        <div className="grid grid-cols-3 relative">
+        <div className="grid grid-cols-3">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -158,22 +157,21 @@ export const ResumeBuilderSidebar = ({
               <button
                 key={tab.id}
                 className={cn(
-                  "flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-all duration-300 border-b-2 relative",
+                  "flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-all duration-200 relative",
                   isActive
-                    ? "border-primary text-primary bg-background"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50",
-                  isActive && "scale-[1.02]",
-                  isNeoBrutalism && isActive && "border-foreground bg-accent"
+                    ? "text-foreground bg-background"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/30",
+                  isNeoBrutalism && isActive && "bg-accent"
                 )}
                 onClick={() => setActiveTab(tab.id)}
               >
                 <Icon className={cn(
-                  "h-3.5 w-3.5 transition-transform duration-300",
+                  "h-3.5 w-3.5 transition-transform duration-200",
                   isActive && "scale-110"
                 )} />
                 <span>{tab.label}</span>
                 {isActive && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full animate-scale-in" />
+                  <span className="absolute bottom-0 inset-x-4 h-0.5 bg-foreground rounded-full" />
                 )}
               </button>
             );
@@ -181,28 +179,22 @@ export const ResumeBuilderSidebar = ({
         </div>
       </div>
 
-      {/* Scrollable Content Area with Animation */}
+      {/* Content */}
       <ScrollArea className="flex-1">
-        <div className="p-3 animate-fade-in">
+        <div className="p-3">
           {activeTab === 'edit' && (
             <div className="space-y-3">
-              {/* Section Navigation Header */}
+              {/* Header */}
               <div className="flex items-center justify-between">
-                <span className={cn(
-                  "text-xs font-medium text-muted-foreground uppercase tracking-wide",
-                  isNeoBrutalism && "font-bold text-foreground"
-                )}>Sections</span>
+                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Sections</span>
                 <Sheet>
                   <SheetTrigger asChild>
                     <Button 
                       size="sm" 
                       variant="ghost" 
-                      className={cn(
-                        "h-7 px-2 text-xs",
-                        isNeoBrutalism && "border border-foreground hover:bg-accent"
-                      )}
+                      className="h-7 px-2.5 text-[11px] text-muted-foreground hover:text-foreground"
                     >
-                      <Settings className="h-3.5 w-3.5 mr-1" />
+                      <Settings className="h-3 w-3 mr-1" />
                       Style
                     </Button>
                   </SheetTrigger>
@@ -223,28 +215,28 @@ export const ResumeBuilderSidebar = ({
                 </Sheet>
               </div>
 
-              {/* Fill from Profile Button - Show when user can fill (logged in) */}
+              {/* Fill from Profile */}
               {canFillFromProfile && onPopulateFromProfile && (
                 <Button
                   variant="outline"
                   size="sm"
                   className={cn(
-                    "w-full h-8 text-xs gap-1.5 border-primary/30",
+                    "w-full h-8 text-xs gap-1.5 rounded-xl border-primary/20 hover:border-primary/40 transition-all duration-200",
                     hasProfileData 
-                      ? "bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10"
-                      : "bg-muted/50 hover:bg-muted",
-                    isNeoBrutalism && "border-2 border-foreground shadow-[2px_2px_0_0_hsl(var(--foreground))] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                      ? "bg-primary/5 hover:bg-primary/10 text-primary"
+                      : "bg-muted/30 hover:bg-muted/50",
+                    isNeoBrutalism && "border-2 border-foreground shadow-[2px_2px_0_0_hsl(var(--foreground))]"
                   )}
                   onClick={onPopulateFromProfile}
                 >
-                  <Sparkles className={cn("h-3.5 w-3.5", hasProfileData && "text-primary")} />
+                  <Sparkles className="h-3.5 w-3.5" />
                   {hasProfileData ? 'Fill from Profile' : 'Import from Profile'}
                 </Button>
               )}
 
-              {/* Section Navigation Pills */}
+              {/* Section Pills */}
               <div className="flex flex-wrap gap-1.5">
-                {sections.map((section, index) => {
+                {sections.map((section) => {
                   const Icon = section.icon;
                   const isActive = activeSection === section.id;
                   const isComplete = isSectionComplete(resume, section.id);
@@ -252,17 +244,15 @@ export const ResumeBuilderSidebar = ({
                     <button
                       key={section.id}
                       className={cn(
-                        "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all duration-200 relative group",
+                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200",
                         isActive
-                          ? "bg-primary text-primary-foreground shadow-sm scale-105"
-                          : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground hover:scale-102",
-                        isNeoBrutalism && isActive && "border-2 border-foreground shadow-[2px_2px_0_0_hsl(var(--foreground))]",
-                        isNeoBrutalism && !isActive && "border border-foreground/30"
+                          ? "bg-foreground text-background shadow-sm"
+                          : "bg-muted/40 text-muted-foreground hover:bg-muted/70 hover:text-foreground",
+                        isNeoBrutalism && isActive && "border-2 border-foreground shadow-[2px_2px_0_0_hsl(var(--foreground))]"
                       )}
-                      style={{ animationDelay: `${index * 50}ms` }}
                       onClick={() => onSectionChange(section.id)}
                     >
-                      <Icon className="h-3.5 w-3.5" />
+                      <Icon className="h-3 w-3" />
                       <span>{section.name}</span>
                       {isComplete && !isActive && (
                         <CheckCircle2 className="h-3 w-3 text-green-500 ml-0.5" />
@@ -272,9 +262,9 @@ export const ResumeBuilderSidebar = ({
                 })}
               </div>
 
-              <Separator className={isNeoBrutalism ? "bg-foreground/30" : ""} />
+              <Separator className="bg-border/30" />
 
-              {/* Form Content with Animation */}
+              {/* Form Content */}
               <div className="animate-fade-in" key={activeSection}>
                 <ResumeFormSection
                   activeSection={activeSection}
@@ -305,33 +295,29 @@ export const ResumeBuilderSidebar = ({
 
           {activeTab === 'templates' && (
             <div className="space-y-3 animate-fade-in">
-              <span className={cn(
-                "text-xs font-medium text-muted-foreground uppercase tracking-wide",
-                isNeoBrutalism && "font-bold text-foreground"
-              )}>Choose Template</span>
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Choose Template</span>
               
               <div className="grid grid-cols-2 gap-2">
-                {templates.map((template, index) => (
+                {templates.map((template) => (
                   <button
                     key={template.id}
                     className={cn(
-                      "relative text-left rounded-lg overflow-hidden border transition-all duration-200 hover:shadow-md group",
+                      "relative text-left rounded-xl overflow-hidden border transition-all duration-200 hover:shadow-md group",
                       currentTemplateId === template.id 
-                        ? "ring-2 ring-primary border-primary scale-[1.02]" 
-                        : "hover:border-muted-foreground/30 hover:scale-[1.01]",
-                      isNeoBrutalism && "border-2 border-foreground shadow-[3px_3px_0_0_hsl(var(--foreground))] hover:shadow-[1px_1px_0_0_hsl(var(--foreground))] hover:translate-x-[2px] hover:translate-y-[2px]"
+                        ? "ring-2 ring-foreground border-foreground" 
+                        : "border-border/40 hover:border-border",
+                      isNeoBrutalism && "border-2 border-foreground shadow-[3px_3px_0_0_hsl(var(--foreground))]"
                     )}
-                    style={{ animationDelay: `${index * 30}ms` }}
                     onClick={() => onTemplateChange(template.id)}
                   >
-                    <div className="aspect-[3/4] bg-gradient-to-br from-muted/50 to-muted overflow-hidden relative">
+                    <div className="aspect-[3/4] bg-muted/30 overflow-hidden relative">
                       <ResumeTemplatePreview 
                         templateKey={template.templateKey}
                         className="w-full h-full scale-[0.6] origin-top-left"
                       />
                       {currentTemplateId === template.id && (
-                        <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
-                          <Badge variant="default" className="text-[10px]">Active</Badge>
+                        <div className="absolute inset-0 bg-foreground/5 flex items-center justify-center">
+                          <Badge className="text-[10px] bg-foreground text-background">Active</Badge>
                         </div>
                       )}
                       <div className="absolute top-1 left-1 flex gap-0.5">
@@ -339,27 +325,24 @@ export const ResumeBuilderSidebar = ({
                           <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">⭐</Badge>
                         )}
                         {template.atsOptimized && (
-                          <Badge className="text-[9px] px-1 py-0 h-4 bg-green-500/90">ATS</Badge>
+                          <Badge className="text-[9px] px-1 py-0 h-4 bg-green-500/90 text-white border-0">ATS</Badge>
                         )}
                       </div>
                     </div>
                     <div className={cn(
-                      "p-1.5 bg-background border-t",
+                      "p-1.5 bg-background border-t border-border/30",
                       isNeoBrutalism && "border-t-2 border-foreground"
                     )}>
-                      <div className="text-[11px] font-medium truncate">{template.name}</div>
+                      <div className="text-[11px] font-semibold truncate text-foreground">{template.name}</div>
                       <div className="text-[10px] text-muted-foreground">{template.category}</div>
                     </div>
                   </button>
                 ))}
               </div>
 
-              <div className={cn(
-                "p-2 bg-muted/30 rounded-md",
-                isNeoBrutalism && "border-2 border-foreground/50"
-              )}>
+              <div className="p-2.5 bg-muted/20 rounded-xl border border-border/30">
                 <p className="text-[10px] text-muted-foreground">
-                  💡 <strong>ATS templates</strong> are optimized for applicant tracking systems
+                  💡 <strong className="text-foreground">ATS templates</strong> are optimized for applicant tracking systems
                 </p>
               </div>
             </div>
@@ -367,10 +350,7 @@ export const ResumeBuilderSidebar = ({
 
           {activeTab === 'layout' && (
             <div className="space-y-3 animate-fade-in">
-              <span className={cn(
-                "text-xs font-medium text-muted-foreground uppercase tracking-wide",
-                isNeoBrutalism && "font-bold text-foreground"
-              )}>Section Order</span>
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Section Order</span>
               <SectionDragDropCustomizer
                 activeSections={activeSections}
                 hiddenSections={hiddenSections}

@@ -19,7 +19,7 @@ import { ProgressIndicator } from '@/components/ui/progress-indicator';
 import { templateNames } from '@/components/resume/ResumeData';
 import { ResumeData } from '@/utils/types';
 import { analytics, usePageTracking, useJourneyTracking } from '@/components/ui/analytics-tracker';
-import { Crown } from 'lucide-react';
+import { Crown, Zap } from 'lucide-react';
 
 const ResumeBuilder = () => {
   const navigate = useNavigate();
@@ -99,28 +99,28 @@ const ResumeBuilder = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted/30">
       <Header />
-      <main className="pt-4 pb-8">
+      <main className="pt-3 pb-6">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           {/* Premium Upgrade Banner */}
           {!premium?.isPremium && (
-            <div className="mb-5 rounded-2xl bg-gradient-to-r from-muted/80 to-muted/40 border border-border/60 backdrop-blur-sm p-4 flex items-center justify-between animate-fade-in">
+            <div className="mb-4 rounded-2xl bg-gradient-to-r from-primary/5 via-primary/3 to-transparent border border-border/40 backdrop-blur-sm px-5 py-3 flex items-center justify-between animate-fade-in">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Crown className="h-4 w-4 text-primary" />
+                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center">
+                  <Zap className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">
-                    Free plan — {resumeCount || 0}/1 resume saved
+                  <p className="text-sm font-semibold text-foreground tracking-tight">
+                    Free plan · {resumeCount || 0}/1 resume
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Upgrade for unlimited resumes and AI features
+                    Unlock unlimited resumes, AI features & premium templates
                   </p>
                 </div>
               </div>
               <button
-                className="px-5 py-2 text-sm font-medium rounded-full bg-foreground text-background hover:bg-foreground/90 transition-all duration-200"
+                className="px-5 py-2 text-xs font-semibold rounded-full bg-foreground text-background hover:bg-foreground/90 transition-all duration-200 shadow-sm hover:shadow-md"
                 onClick={() =>
                   toast.info("Premium upgrade coming soon! Unlimited resumes + AI features for ₹199/month")
                 }
@@ -131,7 +131,7 @@ const ResumeBuilder = () => {
           )}
 
           {/* Header Row */}
-          <div className="flex items-center justify-between mb-5" data-tour="export">
+          <div className="flex items-center justify-between mb-4" data-tour="export">
             <ResumeHeaderSection 
               resumeElementRef={resumeElementRef}
               resumeName={resumeName}
@@ -151,9 +151,9 @@ const ResumeBuilder = () => {
           </div>
 
           {/* Main Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 lg:h-[calc(100vh-11rem)]">
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 lg:h-[calc(100vh-10rem)]">
             {/* Left Sidebar */}
-            <div className="lg:col-span-3 flex flex-col gap-4 lg:h-full lg:overflow-hidden" data-tour="section-nav">
+            <div className="lg:col-span-3 flex flex-col gap-3 lg:h-full lg:overflow-hidden" data-tour="section-nav">
               <div className="flex-shrink-0">
                 <ProgressIndicator 
                   resume={resume}
