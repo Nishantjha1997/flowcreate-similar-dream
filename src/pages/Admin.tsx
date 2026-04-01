@@ -103,7 +103,7 @@ const Admin = () => {
             <div className="flex items-start justify-between flex-wrap gap-4">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <Shield className={`h-10 w-10 ${isNeoBrutalism ? 'text-primary' : 'text-blue-600'}`} />
+                  <Shield className={`h-10 w-10 ${isNeoBrutalism ? 'text-primary' : 'text-primary'}`} />
                   <h1 className={`text-4xl font-bold ${
                     isNeoBrutalism 
                       ? 'uppercase tracking-wide text-foreground' 
