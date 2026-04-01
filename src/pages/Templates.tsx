@@ -334,16 +334,16 @@ const Templates = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[hsl(var(--surface-elevated))]">
       <Header />
       <main className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-              World-Class Resume Templates
+            <h1 className="apple-headline-lg mb-4">
+              Resume Templates
             </h1>
-            <p className="mt-4 text-xl text-muted-foreground">
-              Choose from our collection of {templates.length}+ professionally designed templates for every industry
+            <p className="apple-subheadline mx-auto">
+              Choose from {templates.length}+ professionally designed templates for every industry.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-4">
               <Badge variant="secondary" className="flex items-center gap-1">
