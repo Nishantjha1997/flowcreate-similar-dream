@@ -467,11 +467,11 @@ const Templates = () => {
             </div>
           )}
 
-          <div className="mt-16 text-center">
-            <h2 className="text-2xl font-bold mb-4">Can't find the perfect template?</h2>
-            <p className="text-muted-foreground mb-6">Our AI can help customize any template to match your specific needs</p>
+          <div className="mt-20 rounded-3xl bg-[hsl(var(--surface-dark))] p-12 md:p-16 text-center">
+            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-4 text-[hsl(var(--surface-dark-foreground))]">Can't find the perfect template?</h2>
+            <p className="text-[hsl(var(--surface-dark-foreground))]/50 mb-8 max-w-md mx-auto">Our AI can help customize any template to match your specific needs.</p>
             <Link to="/resume-builder">
-              <Button size="lg">Start Building Your Resume</Button>
+              <Button size="lg" className="rounded-full px-8 h-12 text-base font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg">Start Building Your Resume</Button>
             </Link>
           </div>
         </div>
