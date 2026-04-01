@@ -1,7 +1,6 @@
-import { Check, AlertCircle } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
+import { Check, Circle } from 'lucide-react';
 import { ResumeData } from '@/utils/types';
+import { cn } from '@/lib/utils';
 
 interface ProgressIndicatorProps {
   resume: ResumeData;
@@ -12,54 +11,77 @@ interface SectionStatus {
   name: string;
   key: string;
   completed: boolean;
-  required: boolean;
-  description: string;
 }
 
 export function ProgressIndicator({ resume, onSectionClick }: ProgressIndicatorProps) {
-  const getSectionStatus = (): SectionStatus[] => [
-    { name: 'Personal', key: 'personal', completed: !!(resume.personal?.name && resume.personal?.email), required: true, description: 'Name and contact' },
-    { name: 'Experience', key: 'experience', completed: !!(resume.experience?.length > 0), required: true, description: 'Work history' },
-    { name: 'Education', key: 'education', completed: !!(resume.education?.length > 0), required: true, description: 'Education' },
-    { name: 'Skills', key: 'skills', completed: !!(resume.skills?.length > 0), required: true, description: 'Skills' },
-    { name: 'Projects', key: 'projects', completed: !!(resume.projects?.length > 0), required: false, description: 'Projects' },
+  const sections: SectionStatus[] = [
+    { name: 'Personal', key: 'personal', completed: !!(resume.personal?.name && resume.personal?.email) },
+    { name: 'Experience', key: 'experience', completed: !!(resume.experience?.length > 0) },
+    { name: 'Education', key: 'education', completed: !!(resume.education?.length > 0) },
+    { name: 'Skills', key: 'skills', completed: !!(resume.skills?.length > 0) },
+    { name: 'Projects', key: 'projects', completed: !!(resume.projects?.length > 0) },
   ];
 
-  const sections = getSectionStatus();
-  const completedSections = sections.filter(s => s.completed).length;
-  const totalProgress = (completedSections / sections.length) * 100;
+  const completedCount = sections.filter(s => s.completed).length;
+  const totalProgress = (completedCount / sections.length) * 100;
 
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-4">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-medium text-muted-foreground tracking-wide">Progress</span>
-        <span className="text-xs font-semibold text-foreground tabular-nums">{Math.round(totalProgress)}%</span>
+    <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-sm">
+      {/* Progress header */}
+      <div className="flex items-center justify-between mb-2.5">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-foreground tracking-tight">{completedCount}/{sections.length} Complete</span>
+        </div>
+        <span className={cn(
+          "text-[11px] font-bold tabular-nums px-2 py-0.5 rounded-full",
+          totalProgress === 100
+            ? "bg-green-500/10 text-green-600"
+            : "bg-muted text-muted-foreground"
+        )}>
+          {Math.round(totalProgress)}%
+        </span>
       </div>
       
-      <div className="h-1 bg-muted rounded-full overflow-hidden mb-3">
+      {/* Progress bar */}
+      <div className="h-1.5 bg-muted/60 rounded-full overflow-hidden mb-3">
         <div 
-          className="h-full bg-foreground rounded-full transition-all duration-500 ease-out"
+          className={cn(
+            "h-full rounded-full transition-all duration-700 ease-out",
+            totalProgress === 100 ? "bg-green-500" : "bg-foreground"
+          )}
           style={{ width: `${totalProgress}%` }}
         />
       </div>
       
-      <div className="flex flex-wrap gap-1.5">
-        {sections.map((section) => (
+      {/* Section steps – horizontal stepper */}
+      <div className="flex items-center gap-1">
+        {sections.map((section, i) => (
           <button
             key={section.key}
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all duration-200 ${
-              section.completed 
-                ? 'bg-foreground/10 text-foreground' 
-                : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-            }`}
+            className={cn(
+              "flex-1 flex flex-col items-center gap-1 py-1.5 rounded-lg transition-all duration-200 group",
+              "hover:bg-muted/60"
+            )}
             onClick={() => onSectionClick(section.key)}
           >
-            {section.completed ? (
-              <Check className="h-2.5 w-2.5" />
-            ) : (
-              <span className="h-2.5 w-2.5 rounded-full border border-current" />
-            )}
-            <span>{section.name}</span>
+            <div className={cn(
+              "h-5 w-5 rounded-full flex items-center justify-center transition-all duration-300",
+              section.completed
+                ? "bg-foreground text-background scale-100"
+                : "border-2 border-muted-foreground/30 group-hover:border-foreground/50"
+            )}>
+              {section.completed ? (
+                <Check className="h-3 w-3" />
+              ) : (
+                <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30 group-hover:bg-foreground/50 transition-colors" />
+              )}
+            </div>
+            <span className={cn(
+              "text-[10px] font-medium transition-colors",
+              section.completed ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+            )}>
+              {section.name}
+            </span>
           </button>
         ))}
       </div>
