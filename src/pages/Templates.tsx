@@ -334,16 +334,16 @@ const Templates = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[hsl(var(--surface-elevated))]">
       <Header />
       <main className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-              World-Class Resume Templates
+            <h1 className="apple-headline-lg mb-4">
+              Resume Templates
             </h1>
-            <p className="mt-4 text-xl text-muted-foreground">
-              Choose from our collection of {templates.length}+ professionally designed templates for every industry
+            <p className="apple-subheadline mx-auto">
+              Choose from {templates.length}+ professionally designed templates for every industry.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-4">
               <Badge variant="secondary" className="flex items-center gap-1">
@@ -410,8 +410,8 @@ const Templates = () => {
           
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredTemplates.map((template) => (
-              <Card key={template.id} className="overflow-hidden h-full transition-all duration-300 hover:shadow-lg template-card group">
-                <div className="relative aspect-[3/4] overflow-hidden bg-gray-50">
+              <Card key={template.id} className="overflow-hidden h-full transition-all duration-500 hover:shadow-xl hover:-translate-y-1 rounded-2xl border border-border/40 bg-background group">
+                <div className="relative aspect-[3/4] overflow-hidden bg-muted/50">
                   <ResumeTemplatePreview 
                     templateKey={template.templateKey}
                     className="w-full h-full transform transition-transform duration-500 group-hover:scale-105"
@@ -467,11 +467,11 @@ const Templates = () => {
             </div>
           )}
 
-          <div className="mt-16 text-center">
-            <h2 className="text-2xl font-bold mb-4">Can't find the perfect template?</h2>
-            <p className="text-muted-foreground mb-6">Our AI can help customize any template to match your specific needs</p>
+          <div className="mt-20 rounded-3xl bg-[hsl(var(--surface-dark))] p-12 md:p-16 text-center">
+            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-4 text-[hsl(var(--surface-dark-foreground))]">Can't find the perfect template?</h2>
+            <p className="text-[hsl(var(--surface-dark-foreground))]/50 mb-8 max-w-md mx-auto">Our AI can help customize any template to match your specific needs.</p>
             <Link to="/resume-builder">
-              <Button size="lg">Start Building Your Resume</Button>
+              <Button size="lg" className="rounded-full px-8 h-12 text-base font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg">Start Building Your Resume</Button>
             </Link>
           </div>
         </div>

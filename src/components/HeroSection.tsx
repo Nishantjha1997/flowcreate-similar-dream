@@ -78,7 +78,7 @@ const HeroSection = () => {
             <Link to="/resume-builder">
               <Button 
                 size="lg" 
-                className="rounded-full px-8 h-12 text-base font-normal bg-white text-[hsl(var(--surface-dark))] hover:bg-white/90 transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.1)]"
+                className="rounded-full px-8 h-12 text-base font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 shadow-lg"
               >
                 Start Building
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -88,7 +88,7 @@ const HeroSection = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="rounded-full px-8 h-12 text-base font-normal border-white/20 text-white hover:bg-white/10 transition-all duration-300"
+                className="rounded-full px-8 h-12 text-base font-medium border-white/25 text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300"
               >
                 View Templates
               </Button>
