@@ -91,8 +91,8 @@ const TemplatesCarousel = () => {
                       </div>
                       
                       {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-[hsl(var(--surface-dark))]/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-[2px]">
-                        <Button className="rounded-full px-6 bg-white text-[hsl(var(--surface-dark))] hover:bg-white/90 shadow-lg">
+                      <div className="absolute inset-0 bg-foreground/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-[2px]">
+                        <Button className="rounded-full px-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg">
                           Preview
                         </Button>
                       </div>
