@@ -59,11 +59,11 @@ const Admin = () => {
 
   if (isLoading || loadingAdmin) {
     return (
-      <div className={`min-h-screen p-8 ${
-        isNeoBrutalism 
-          ? 'bg-background' 
-          : 'bg-gradient-to-br from-blue-50/50 via-background to-purple-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900'
-      }`}>
+    <div className={`min-h-screen p-8 ${
+      isNeoBrutalism 
+        ? 'bg-background' 
+        : 'bg-[hsl(var(--surface-elevated))]'
+    }`}>
         <div className="max-w-7xl mx-auto">
           <GlassCard variant="elevated" neoBrutalism={isNeoBrutalism} className="p-8">
             <div className="space-y-6">
