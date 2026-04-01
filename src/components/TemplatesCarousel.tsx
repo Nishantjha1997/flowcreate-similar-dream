@@ -56,7 +56,7 @@ const TemplatesCarousel = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="absolute -left-4 md:-left-12 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-[hsl(var(--surface-dark))] text-white hover:bg-[hsl(var(--surface-dark))]/90 border-0 shadow-lg transition-all"
+            className="absolute -left-4 md:-left-12 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-foreground text-background hover:bg-foreground/90 border-0 shadow-lg transition-all"
             onClick={prevSlide}
             disabled={currentIndex === 0}
           >
@@ -66,7 +66,7 @@ const TemplatesCarousel = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="absolute -right-4 md:-right-12 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-[hsl(var(--surface-dark))] text-white hover:bg-[hsl(var(--surface-dark))]/90 border-0 shadow-lg transition-all"
+            className="absolute -right-4 md:-right-12 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-foreground text-background hover:bg-foreground/90 border-0 shadow-lg transition-all"
             onClick={nextSlide}
             disabled={currentIndex >= maxIndex}
           >
