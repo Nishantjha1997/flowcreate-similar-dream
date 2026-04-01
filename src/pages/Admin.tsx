@@ -186,8 +186,8 @@ const Admin = () => {
                   className={`text-xs ${
                     isNeoBrutalism 
                       ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground data-[state=active]:shadow-[2px_2px_0px_0px_hsl(var(--foreground))]' 
-                      : 'data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white'
-                  } data-[state=active]:bg-primary data-[state=active]:text-primary-foreground`}
+                      : 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground'
+                  }`}
                 >
                   {tab.label}
                 </TabsTrigger>
