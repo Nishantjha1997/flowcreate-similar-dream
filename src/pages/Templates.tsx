@@ -411,7 +411,7 @@ const Templates = () => {
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredTemplates.map((template) => (
               <Card key={template.id} className="overflow-hidden h-full transition-all duration-300 hover:shadow-lg template-card group">
-                <div className="relative aspect-[3/4] overflow-hidden bg-gray-50">
+                <div className="relative aspect-[3/4] overflow-hidden bg-muted/50">
                   <ResumeTemplatePreview 
                     templateKey={template.templateKey}
                     className="w-full h-full transform transition-transform duration-500 group-hover:scale-105"
