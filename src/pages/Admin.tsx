@@ -114,7 +114,7 @@ const Admin = () => {
                 </div>
                 <p className="text-muted-foreground text-lg">
                   Complete website and user management system. Signed in as:{" "}
-                  <span className={`font-semibold ${isNeoBrutalism ? 'text-primary' : 'text-blue-600'}`}>{user?.email}</span>
+                  <span className={`font-semibold ${isNeoBrutalism ? 'text-primary' : 'text-primary'}`}>{user?.email}</span>
                 </p>
               </div>
               <div className="flex items-center gap-2">
