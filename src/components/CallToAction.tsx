@@ -133,9 +133,9 @@ const CallToAction = () => {
               </ul>
               <Link to="/register">
                 <Button 
-                  className={`w-full rounded-full h-10 text-sm font-normal transition-all duration-300 ${
+                  className={`w-full rounded-full h-10 text-sm font-medium transition-all duration-300 ${
                     plan.popular 
-                      ? 'bg-white text-[hsl(var(--surface-dark))] hover:bg-white/90' 
+                      ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
                       : 'bg-transparent border border-border text-foreground hover:bg-muted'
                   }`}
                   variant={plan.popular ? 'default' : 'outline'}
