@@ -104,7 +104,7 @@ const TemplatesCarousel = () => {
                       <p className="text-xs text-muted-foreground mb-4">{template.description}</p>
                       
                       <Button
-                        className="w-full rounded-full h-9 text-xs font-normal bg-[hsl(var(--surface-dark))] text-white hover:bg-[hsl(var(--surface-dark))]/90"
+                        className="w-full rounded-full h-9 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90"
                         onClick={() => setCustomizeId(template.id)}
                       >
                         Use Template
