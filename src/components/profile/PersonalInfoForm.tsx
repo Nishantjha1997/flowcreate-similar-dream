@@ -344,5 +344,6 @@ export const PersonalInfoForm = ({ profile, onUpdate, isNeoBrutalism = false }: 
         </div>
       </CardContent>
     </Card>
+    </>
   );
 };
