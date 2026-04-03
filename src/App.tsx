@@ -101,6 +101,7 @@ const App = () => (
                       <Route path="/ats/jobs/browse" element={<ATSPublicJobs />} />
                       <Route path="/ats/apply/:jobId" element={<ATSApply />} />
                       <Route path="/ats/talent-pools" element={<ATSTalentPools />} />
+                      <Route path="/ats/candidates" element={<ATSCandidateDiscovery />} />
                       
                       <Route path="*" element={<NotFound />} />
                     </Routes>
