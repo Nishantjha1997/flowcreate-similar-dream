@@ -325,13 +325,13 @@ export const PersonalInfoForm = ({ profile, onUpdate, isNeoBrutalism = false }: 
     </Card>
 
     {/* Candidate Discovery Opt-in */}
-    <Card className={cardClass}>
+    <Card className={isNeoBrutalism ? 'border-3 border-foreground shadow-[6px_6px_0px_0px_hsl(var(--foreground))]' : ''}>
       <CardContent className="pt-6">
         <div className="flex items-center justify-between">
           <div className="flex items-start gap-3">
             <UserCheck className="h-5 w-5 text-primary mt-0.5" />
             <div>
-              <Label className={labelClass}>Make Profile Discoverable</Label>
+              <Label>Make Profile Discoverable</Label>
               <p className="text-xs text-muted-foreground mt-1">
                 Allow companies to find your profile based on skills and experience. Your email and phone remain private.
               </p>
@@ -339,7 +339,7 @@ export const PersonalInfoForm = ({ profile, onUpdate, isNeoBrutalism = false }: 
           </div>
           <Switch
             checked={profile?.is_discoverable || false}
-            onCheckedChange={(checked) => handleInputChange('is_discoverable', checked)}
+            onCheckedChange={(checked) => onUpdate({ is_discoverable: checked })}
           />
         </div>
       </CardContent>
