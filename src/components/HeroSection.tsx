@@ -88,7 +88,7 @@ const HeroSection = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="rounded-full px-8 h-12 text-base font-medium border-white/25 text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300"
+                className="rounded-full px-8 h-12 text-base font-medium border-foreground/25 text-foreground hover:bg-foreground/10 transition-all duration-300"
               >
                 View Templates
               </Button>
