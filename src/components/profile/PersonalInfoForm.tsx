@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { AvatarUploader } from '@/components/AvatarUploader';
 import { UserProfile } from '@/hooks/useUserProfile';
-import { User, Mail, Phone, MapPin, Globe, Linkedin, CheckCircle2, AlertCircle } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Globe, Linkedin, CheckCircle2, AlertCircle, UserCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PersonalInfoFormProps {
