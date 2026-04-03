@@ -737,6 +737,7 @@ export type Database = {
           github_url: string | null
           id: string
           industry: string | null
+          is_discoverable: boolean | null
           languages: Json | null
           last_resume_sync: string | null
           linkedin_url: string | null
@@ -773,6 +774,7 @@ export type Database = {
           github_url?: string | null
           id?: string
           industry?: string | null
+          is_discoverable?: boolean | null
           languages?: Json | null
           last_resume_sync?: string | null
           linkedin_url?: string | null
@@ -809,6 +811,7 @@ export type Database = {
           github_url?: string | null
           id?: string
           industry?: string | null
+          is_discoverable?: boolean | null
           languages?: Json | null
           last_resume_sync?: string | null
           linkedin_url?: string | null
@@ -1112,7 +1115,90 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      discoverable_candidates: {
+        Row: {
+          avatar_url: string | null
+          certifications: Json | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          current_position: string | null
+          education: Json | null
+          experience_level: string | null
+          full_name: string | null
+          github_url: string | null
+          id: string | null
+          industry: string | null
+          languages: Json | null
+          linkedin_url: string | null
+          portfolio_url: string | null
+          professional_summary: string | null
+          profile_completeness: number | null
+          projects: Json | null
+          soft_skills: Json | null
+          state: string | null
+          technical_skills: Json | null
+          updated_at: string | null
+          user_id: string | null
+          website_url: string | null
+          work_experience: Json | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          certifications?: Json | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          current_position?: string | null
+          education?: Json | null
+          experience_level?: string | null
+          full_name?: string | null
+          github_url?: string | null
+          id?: string | null
+          industry?: string | null
+          languages?: Json | null
+          linkedin_url?: string | null
+          portfolio_url?: string | null
+          professional_summary?: string | null
+          profile_completeness?: number | null
+          projects?: Json | null
+          soft_skills?: Json | null
+          state?: string | null
+          technical_skills?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+          website_url?: string | null
+          work_experience?: Json | null
+        }
+        Update: {
+          avatar_url?: string | null
+          certifications?: Json | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          current_position?: string | null
+          education?: Json | null
+          experience_level?: string | null
+          full_name?: string | null
+          github_url?: string | null
+          id?: string | null
+          industry?: string | null
+          languages?: Json | null
+          linkedin_url?: string | null
+          portfolio_url?: string | null
+          professional_summary?: string | null
+          profile_completeness?: number | null
+          projects?: Json | null
+          soft_skills?: Json | null
+          state?: string | null
+          technical_skills?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+          website_url?: string | null
+          work_experience?: Json | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calculate_profile_completeness: {
