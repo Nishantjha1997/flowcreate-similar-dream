@@ -44,6 +44,7 @@ const ATSSettings = lazy(() => import("./pages/ats/ATSSettings"));
 const ATSPublicJobs = lazy(() => import("./pages/ats/ATSPublicJobs"));
 const ATSApply = lazy(() => import("./pages/ats/ATSApply"));
 const ATSTalentPools = lazy(() => import("./pages/ats/ATSTalentPools"));
+const ATSCandidateDiscovery = lazy(() => import("./pages/ats/ATSCandidateDiscovery"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
