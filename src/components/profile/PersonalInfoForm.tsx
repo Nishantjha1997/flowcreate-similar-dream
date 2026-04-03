@@ -127,6 +127,7 @@ export const PersonalInfoForm = ({ profile, onUpdate, isNeoBrutalism = false }: 
   };
 
   return (
+    <>
     <Card className={isNeoBrutalism ? 'border-3 border-foreground shadow-[6px_6px_0px_0px_hsl(var(--foreground))]' : ''}>
       <CardHeader>
         <CardTitle className={`flex items-center gap-2 ${isNeoBrutalism ? 'uppercase font-black' : ''}`}>
