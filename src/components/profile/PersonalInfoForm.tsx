@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { AvatarUploader } from '@/components/AvatarUploader';
 import { UserProfile } from '@/hooks/useUserProfile';
-import { User, Mail, Phone, MapPin, Globe, Linkedin, CheckCircle2, AlertCircle } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Globe, Linkedin, CheckCircle2, AlertCircle, UserCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PersonalInfoFormProps {
@@ -126,6 +127,7 @@ export const PersonalInfoForm = ({ profile, onUpdate, isNeoBrutalism = false }: 
   };
 
   return (
+    <>
     <Card className={isNeoBrutalism ? 'border-3 border-foreground shadow-[6px_6px_0px_0px_hsl(var(--foreground))]' : ''}>
       <CardHeader>
         <CardTitle className={`flex items-center gap-2 ${isNeoBrutalism ? 'uppercase font-black' : ''}`}>
@@ -321,5 +323,27 @@ export const PersonalInfoForm = ({ profile, onUpdate, isNeoBrutalism = false }: 
         </div>
       </CardContent>
     </Card>
+
+    {/* Candidate Discovery Opt-in */}
+    <Card className={isNeoBrutalism ? 'border-3 border-foreground shadow-[6px_6px_0px_0px_hsl(var(--foreground))]' : ''}>
+      <CardContent className="pt-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-start gap-3">
+            <UserCheck className="h-5 w-5 text-primary mt-0.5" />
+            <div>
+              <Label>Make Profile Discoverable</Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Allow companies to find your profile based on skills and experience. Your email and phone remain private.
+              </p>
+            </div>
+          </div>
+          <Switch
+            checked={profile?.is_discoverable || false}
+            onCheckedChange={(checked) => onUpdate({ is_discoverable: checked })}
+          />
+        </div>
+      </CardContent>
+    </Card>
+    </>
   );
 };

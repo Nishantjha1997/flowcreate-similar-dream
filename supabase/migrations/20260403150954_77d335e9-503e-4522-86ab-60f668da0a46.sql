@@ -1,0 +1,5 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_discoverable boolean DEFAULT false;
+
+CREATE OR REPLACE VIEW public.discoverable_candidates WITH (security_invoker = on) AS SELECT p.id, p.user_id, p.full_name, p.current_position, p.industry, p.experience_level, p.professional_summary, p.technical_skills, p.soft_skills, p.city, p.state, p.country, p.education, p.work_experience, p.certifications, p.projects, p.languages, p.avatar_url, p.linkedin_url, p.github_url, p.portfolio_url, p.website_url, p.profile_completeness, p.created_at, p.updated_at FROM public.profiles p WHERE p.is_discoverable = true AND p.full_name IS NOT NULL AND p.full_name != '';
+
+CREATE POLICY "Org members can view discoverable candidates" ON public.profiles FOR SELECT USING (is_discoverable = true AND EXISTS (SELECT 1 FROM public.organization_members WHERE user_id = auth.uid()));

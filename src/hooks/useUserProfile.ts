@@ -52,6 +52,7 @@ export interface UserProfile {
   profile_completeness?: number;
   last_resume_sync?: string;
   auto_sync_enabled?: boolean;
+  is_discoverable?: boolean;
   
   created_at: string;
   updated_at: string;
@@ -74,7 +75,7 @@ export const useUserProfile = () => {
         .maybeSingle();
       
       if (error) throw error;
-      return data as UserProfile | null;
+      return data as unknown as UserProfile | null;
     },
     enabled: !!user?.id
   });
