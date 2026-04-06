@@ -138,10 +138,8 @@ const Templates = () => {
               >
                 {category === "Technology" && <Code className="h-4 w-4 mr-1" />}
                 {category === "Creative" && <Palette className="h-4 w-4 mr-1" />}
-                {category === "Healthcare" && <Heart className="h-4 w-4 mr-1" />}
-                {category === "Education" && <GraduationCap className="h-4 w-4 mr-1" />}
                 {category === "Executive" && <Building2 className="h-4 w-4 mr-1" />}
-                {category === "Sales" && <Users className="h-4 w-4 mr-1" />}
+                {category === "Corporate" && <Briefcase className="h-4 w-4 mr-1" />}
                 {category}
               </Button>
             ))}
