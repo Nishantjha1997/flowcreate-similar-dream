@@ -7,7 +7,6 @@ interface ResumeTemplatePreviewProps {
   className?: string;
 }
 
-// Mock data for template previews
 const mockResumeData: ResumeData = {
   personal: {
     name: 'Alex Johnson',
