@@ -59,18 +59,13 @@ interface ResumeBuilderSidebarProps {
 }
 
 const templates = [
-  { id: "1", name: "Executive Modern", category: "Professional", templateKey: "modern", featured: true, atsOptimized: true },
-  { id: "2", name: "Corporate Classic", category: "Professional", templateKey: "classic", featured: false, atsOptimized: true },
-  { id: "3", name: "Business Elite", category: "Professional", templateKey: "professional", featured: false, atsOptimized: true },
-  { id: "4", name: "Software Engineer Pro", category: "Technology", templateKey: "technical", featured: true, atsOptimized: true },
-  { id: "5", name: "DevOps Specialist", category: "Technology", templateKey: "developer", featured: false, atsOptimized: true },
-  { id: "6", name: "Data Scientist", category: "Technology", templateKey: "data-scientist", featured: true, atsOptimized: true },
-  { id: "7", name: "Creative Portfolio", category: "Creative", templateKey: "creative", featured: true, atsOptimized: false },
-  { id: "8", name: "UI/UX Designer", category: "Creative", templateKey: "elegant", featured: false, atsOptimized: false },
-  { id: "10", name: "Medical Professional", category: "Healthcare", templateKey: "medical", featured: true, atsOptimized: true },
-  { id: "12", name: "Academic Researcher", category: "Education", templateKey: "academic", featured: true, atsOptimized: true },
-  { id: "19", name: "C-Level Executive", category: "Executive", templateKey: "executive", featured: true, atsOptimized: true },
-  { id: "21", name: "ATS Optimized Pro", category: "ATS-Friendly", templateKey: "ats-pro", featured: true, atsOptimized: true }
+  { id: "1", name: "Clean Slate", category: "Minimal", templateKey: "clean-slate", featured: true, atsOptimized: true },
+  { id: "2", name: "Executive Serif", category: "Executive", templateKey: "executive-serif", featured: true, atsOptimized: true },
+  { id: "3", name: "Sidebar Modern", category: "Creative", templateKey: "sidebar-modern", featured: true, atsOptimized: true },
+  { id: "4", name: "Tech Engineer", category: "Technology", templateKey: "tech-engineer", featured: true, atsOptimized: true },
+  { id: "5", name: "Coral Creative", category: "Creative", templateKey: "coral-creative", featured: true, atsOptimized: true },
+  { id: "6", name: "Navy Professional", category: "Corporate", templateKey: "navy-professional", featured: true, atsOptimized: true },
+  { id: "7", name: "Emerald Minimal", category: "Minimal", templateKey: "emerald-minimal", featured: true, atsOptimized: true },
 ];
 
 const sections = [

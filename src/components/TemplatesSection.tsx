@@ -8,46 +8,11 @@ import TemplateCustomizationModal from "@/components/templates/TemplateCustomiza
 import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 
 const templates = [
-  {
-    id: 1,
-    name: "Modern Professional",
-    image: "https://images.unsplash.com/photo-1586281380117-5a60ae2050cc",
-    category: "Professional",
-    templateKey: "modern",
-    description: "Clean, sleek design with contemporary elements"
-  },
-  {
-    id: 2,
-    name: "Executive Classic",
-    image: "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e",
-    category: "Traditional",
-    templateKey: "classic",
-    description: "Traditional layout that stands the test of time"
-  },
-  {
-    id: 3,
-    name: "Creative Portfolio",
-    image: "https://images.unsplash.com/photo-1626785774573-4b799315345d", 
-    category: "Design",
-    templateKey: "creative",
-    description: "Eye-catching design for creative professionals"
-  },
-  {
-    id: 4,
-    name: "Tech Specialist",
-    image: "https://images.unsplash.com/photo-1593720213428-28a5b9e94613",
-    category: "Technical",
-    templateKey: "technical",
-    description: "Optimized for tech and engineering fields"
-  },
-  {
-    id: 5,
-    name: "Corporate Elite",
-    image: "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e",
-    category: "Professional",
-    templateKey: "professional",
-    description: "Polished and refined for executive positions"
-  },
+  { id: 1, name: "Clean Slate", category: "Minimal", templateKey: "clean-slate", description: "Ultra-clean with blue accent — perfect for any industry" },
+  { id: 2, name: "Executive Serif", category: "Executive", templateKey: "executive-serif", description: "Prestigious serif for C-level and leadership roles" },
+  { id: 3, name: "Sidebar Modern", category: "Creative", templateKey: "sidebar-modern", description: "Purple accent with modern geometric feel" },
+  { id: 4, name: "Tech Engineer", category: "Technology", templateKey: "tech-engineer", description: "Dark header, monospace — built for developers" },
+  { id: 5, name: "Coral Creative", category: "Creative", templateKey: "coral-creative", description: "Warm coral tones for designers and creatives" },
 ];
 
 const TemplatesSection = () => {
