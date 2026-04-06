@@ -1,18 +1,16 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
-import { Search, Star, CheckCircle, Award, Briefcase, Code, Palette, Heart, GraduationCap, Building2, Users, Zap } from 'lucide-react';
+import { Search, Star, CheckCircle, Award, Briefcase, Code, Palette, Building2, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { ResumeData } from '@/utils/resumeAdapterUtils';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 
-// Updated Templates with Enhanced Variety and Creative Designs
 const templates = [
   {
     id: 1, name: "Clean Slate", category: "Minimal", templateKey: "clean-slate",
