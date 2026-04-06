@@ -48,7 +48,7 @@ export const ResumeVisualPreview = ({
     <div ref={resumeRef} className="resume-content">
       <ResumeTemplate 
         data={resume} 
-        templateName={templateNames[templateId] || 'modern'}
+        templateName={templateNames[templateId] || 'clean-slate'}
         sectionOrder={getOrderedSections()}
         hiddenSections={hiddenSections}
       />
@@ -71,7 +71,7 @@ export const EnhancedResumePreview = ({
       previewComponent={
         <ResumeTemplate 
           data={resume} 
-          templateName={templateNames[templateId] || 'modern'}
+          templateName={templateNames[templateId] || 'clean-slate'}
           sectionOrder={sectionOrder}
           hiddenSections={hiddenSections}
         />

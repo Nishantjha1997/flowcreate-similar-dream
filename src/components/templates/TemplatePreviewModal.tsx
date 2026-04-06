@@ -2,7 +2,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Download, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
+import { ResumeTemplatePreview } from "@/components/ResumeTemplatePreview";
 
 interface TemplatePreviewModalProps {
   isOpen: boolean;
@@ -11,8 +12,9 @@ interface TemplatePreviewModalProps {
     id: number;
     name: string;
     description: string;
-    image: string;
     category: string;
+    templateKey?: string;
+    image?: string;
   };
   onCustomize?: (templateId: number) => void;
 }
@@ -27,20 +29,14 @@ const TemplatePreviewModal = ({ isOpen, onClose, template, onCustomize }: Templa
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <div className="aspect-[3/4] relative rounded-lg overflow-hidden">
-              <img 
-                src={template.image} 
-                alt={template.name} 
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="flex-1">
-                <Eye className="mr-2 h-4 w-4" /> Preview PDF
-              </Button>
-              <Button variant="outline" size="sm" className="flex-1">
-                <Download className="mr-2 h-4 w-4" /> Download Sample
-              </Button>
+            <div className="aspect-[3/4] relative rounded-lg overflow-hidden border bg-white">
+              {template.templateKey ? (
+                <ResumeTemplatePreview templateKey={template.templateKey} className="w-full h-full" />
+              ) : template.image ? (
+                <img src={template.image} alt={template.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-muted-foreground">Preview</div>
+              )}
             </div>
           </div>
           
@@ -51,31 +47,29 @@ const TemplatePreviewModal = ({ isOpen, onClose, template, onCustomize }: Templa
             </div>
             
             <div>
-              <h3 className="font-semibold mb-2">Features</h3>
-              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                <li>ATS-friendly formatting</li>
-                <li>Professional typography</li>
-                <li>Customizable sections</li>
-                <li>Mobile-responsive design</li>
-              </ul>
+              <h3 className="font-semibold mb-2">Category</h3>
+              <span className="inline-block px-3 py-1 bg-muted rounded-full text-sm">{template.category}</span>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-2">Best for</h3>
-              <p className="text-muted-foreground">
-                {template.category} roles and professionals looking for a {template.category.toLowerCase()} approach.
-              </p>
+              <h3 className="font-semibold mb-2">Features</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">✓ ATS-Optimized layout</li>
+                <li className="flex items-center gap-2">✓ Customizable colors & fonts</li>
+                <li className="flex items-center gap-2">✓ Drag & drop section reorder</li>
+                <li className="flex items-center gap-2">✓ PDF export ready</li>
+              </ul>
             </div>
-
-            <div className="flex flex-col gap-3">
+            
+            <div className="flex flex-col gap-2 pt-4">
+              <Link to={`/resume-builder?template=${template.id}`}>
+                <Button className="w-full">Use This Template</Button>
+              </Link>
               {onCustomize && (
-                <Button className="w-full" onClick={() => onCustomize(template.id)}>
-                  Customize &amp; Use Template
+                <Button variant="outline" className="w-full" onClick={() => onCustomize(template.id)}>
+                  Customize First
                 </Button>
               )}
-              <Link to={`/resume-builder?template=${template.id}`} className="block">
-                <Button variant="outline" className="w-full">Use this template without customization</Button>
-              </Link>
             </div>
           </div>
         </div>
@@ -85,4 +79,3 @@ const TemplatePreviewModal = ({ isOpen, onClose, template, onCustomize }: Templa
 };
 
 export default TemplatePreviewModal;
-

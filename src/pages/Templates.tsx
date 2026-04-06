@@ -1,316 +1,55 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
-import { Search, Star, CheckCircle, Award, Briefcase, Code, Palette, Heart, GraduationCap, Building2, Users, Zap } from 'lucide-react';
+import { Search, Star, CheckCircle, Award, Briefcase, Code, Palette, Building2, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { ResumeData } from '@/utils/resumeAdapterUtils';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 
-// Updated Templates with Enhanced Variety and Creative Designs
 const templates = [
-  // Professional Templates - Enhanced with variety
   {
-    id: 1,
-    name: "Executive Modern",
-    image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
-    category: "Professional",
-    templateKey: "modern",
-    featured: true,
-    popular: true,
-    atsOptimized: true,
-    description: "Cutting-edge professional template with gradient headers and modern typography, perfect for tech executives."
+    id: 1, name: "Clean Slate", category: "Minimal", templateKey: "clean-slate",
+    featured: true, popular: true, atsOptimized: true,
+    description: "Ultra-clean single-column layout with blue accent line. Maximum whitespace, perfect for any industry."
   },
   {
-    id: 2,
-    name: "Corporate Classic",
-    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
-    category: "Professional",
-    templateKey: "classic",
-    featured: false,
-    popular: true,
-    atsOptimized: true,
-    description: "Sophisticated traditional design with elegant typography, ideal for finance and legal professionals."
+    id: 2, name: "Executive Serif", category: "Executive", templateKey: "executive-serif",
+    featured: true, popular: true, atsOptimized: true,
+    description: "Prestigious serif typography with centered header and double-border. Ideal for C-level and senior leadership."
   },
   {
-    id: 3,
-    name: "Business Elite",
-    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
-    category: "Professional",
-    templateKey: "professional",
-    featured: false,
-    popular: true,
-    atsOptimized: true,
-    description: "Premium corporate template with clean lines and professional aesthetics for all industries."
-  },
-  
-  // Technology Templates - Enhanced designs
-  {
-    id: 4,
-    name: "Software Engineer Pro",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
-    category: "Technology",
-    templateKey: "technical",
-    featured: true,
-    popular: false,
-    atsOptimized: true,
-    description: "Matrix-inspired dark theme with terminal aesthetics, perfect for software engineers and developers."
+    id: 3, name: "Sidebar Modern", category: "Creative", templateKey: "sidebar-modern",
+    featured: true, popular: true, atsOptimized: true,
+    description: "Bold purple accent bar with rounded skill badges and geometric feel. Great for marketing and branding roles."
   },
   {
-    id: 5,
-    name: "DevOps Specialist",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475",
-    category: "Technology",
-    templateKey: "developer",
-    featured: false,
-    popular: true,
-    atsOptimized: true,
-    description: "Code-focused design with emerald accents and mono fonts, ideal for DevOps and system engineers."
+    id: 4, name: "Tech Engineer", category: "Technology", templateKey: "tech-engineer",
+    featured: true, popular: true, atsOptimized: true,
+    description: "Dark header band with monospace font and cyan accents. Built for developers, DevOps, and engineers."
   },
   {
-    id: 6,
-    name: "Data Scientist",
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
-    category: "Technology",
-    templateKey: "data-scientist",
-    featured: true,
-    popular: false,
-    atsOptimized: true,
-    description: "Purple-themed analytical design with structured layouts for data scientists and researchers."
-  },
-  
-  // Creative & Design Templates - Bold new designs
-  {
-    id: 7,
-    name: "Creative Portfolio",
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6", 
-    category: "Creative",
-    templateKey: "creative",
-    featured: true,
-    popular: false,
-    atsOptimized: false,
-    description: "Vibrant gradient design with rounded corners and creative flair for designers and artists."
+    id: 5, name: "Coral Creative", category: "Creative", templateKey: "coral-creative",
+    featured: true, popular: false, atsOptimized: true,
+    description: "Warm coral/rose tones with rounded elements and creative left-border items. Perfect for designers."
   },
   {
-    id: 8,
-    name: "UI/UX Designer",
-    image: "https://images.unsplash.com/photo-1434494878577-86c23bcb06b9",
-    category: "Creative",
-    templateKey: "elegant",
-    featured: false,
-    popular: true,
-    atsOptimized: false,
-    description: "Rose-themed sophisticated design with elegant typography for UI/UX designers."
+    id: 6, name: "Navy Professional", category: "Corporate", templateKey: "navy-professional",
+    featured: true, popular: true, atsOptimized: true,
+    description: "Navy authority with strong borders and filled skill badges. For finance, consulting, and management."
   },
   {
-    id: 9,
-    name: "Graphic Artist",
-    image: "https://images.unsplash.com/photo-1626785774573-4b799315345d",
-    category: "Creative",
-    templateKey: "artistic",
-    featured: false,
-    popular: false,
-    atsOptimized: false,
-    description: "Bold artistic template with amber gradients and dynamic layouts for graphic artists."
+    id: 7, name: "Emerald Minimal", category: "Minimal", templateKey: "emerald-minimal",
+    featured: true, popular: false, atsOptimized: true,
+    description: "Earthy emerald/teal tones with generous whitespace. Great for healthcare, education, and sustainability."
   },
-  
-  // Healthcare Templates - New professional medical designs
-  {
-    id: 10,
-    name: "Medical Professional",
-    image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56",
-    category: "Healthcare",
-    templateKey: "medical",
-    featured: true,
-    popular: true,
-    atsOptimized: true,
-    description: "Teal-themed healthcare template with clean design for doctors and medical professionals."
-  },
-  {
-    id: 11,
-    name: "Pharmaceutical Specialist",
-    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f",
-    category: "Healthcare",
-    templateKey: "pharma",
-    featured: false,
-    popular: false,
-    atsOptimized: true,
-    description: "Blue-accented professional design for pharmaceutical and research professionals."
-  },
-  
-  // Education & Academia Templates - Enhanced academic styling
-  {
-    id: 12,
-    name: "Academic Researcher",
-    image: "https://images.unsplash.com/photo-1568667256549-094345857637",
-    category: "Education",
-    templateKey: "academic",
-    featured: true,
-    popular: false,
-    atsOptimized: true,
-    description: "Indigo-themed scholarly design with traditional elements for professors and researchers."
-  },
-  {
-    id: 13,
-    name: "Teacher Professional",
-    image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b",
-    category: "Education",
-    templateKey: "teacher",
-    featured: false,
-    popular: true,
-    atsOptimized: true,
-    description: "Green-accented educational template perfect for teachers and education professionals."
-  },
-  
-  // Sales & Marketing Templates - Dynamic and energetic
-  {
-    id: 14,
-    name: "Sales Executive",
-    image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf",
-    category: "Sales",
-    templateKey: "sales",
-    featured: true,
-    popular: true,
-    atsOptimized: true,
-    description: "High-energy orange gradient design that showcases results and achievements for sales professionals."
-  },
-  {
-    id: 15,
-    name: "Marketing Manager",
-    image: "https://images.unsplash.com/photo-1553484771-371a605b060b",
-    category: "Marketing",
-    templateKey: "marketing",
-    featured: false,
-    popular: true,
-    atsOptimized: true,
-    description: "Pink-to-purple gradient design with creative elements for marketing professionals."
-  },
-  {
-    id: 16,
-    name: "Digital Marketing Specialist",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f",
-    category: "Marketing",
-    templateKey: "digital-marketing",
-    featured: true,
-    popular: false,
-    atsOptimized: true,
-    description: "Multi-colored gradient backdrop with modern design for digital marketing experts."
-  },
-  
-  // Finance & Consulting Templates - Professional with distinction
-  {
-    id: 17,
-    name: "Financial Analyst",
-    image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f",
-    category: "Finance",
-    templateKey: "finance",
-    featured: false,
-    popular: true,
-    atsOptimized: true,
-    description: "Emerald-themed professional template emphasizing trust and analytical skills."
-  },
-  {
-    id: 18,
-    name: "Management Consultant",
-    image: "https://images.unsplash.com/photo-1551836022-deb4988cc6c0",
-    category: "Consulting",
-    templateKey: "consultant",
-    featured: true,
-    popular: false,
-    atsOptimized: true,
-    description: "Dark sophisticated header with clean layouts for strategic consultants and advisors."
-  },
-  
-  // Executive & Leadership Templates - Premium designs
-  {
-    id: 19,
-    name: "C-Level Executive",
-    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
-    category: "Executive",
-    templateKey: "executive",
-    featured: true,
-    popular: false,
-    atsOptimized: true,
-    description: "Premium executive template with elegant typography and sophisticated styling."
-  },
-  {
-    id: 20,
-    name: "VP Leadership",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
-    category: "Executive",
-    templateKey: "vp-leader",
-    featured: false,
-    popular: true,
-    atsOptimized: true,
-    description: "Navy blue executive template with bold typography for senior leadership roles."
-  },
-  
-  // ATS-Optimized Simple Templates - Clean and scannable
-  {
-    id: 21,
-    name: "ATS Optimized Pro",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
-    category: "ATS-Friendly",
-    templateKey: "ats-pro",
-    featured: true,
-    popular: true,
-    atsOptimized: true,
-    description: "Specifically designed for ATS systems with clean formatting and optimal keyword placement."
-  },
-  {
-    id: 22,
-    name: "Simple & Clean",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
-    category: "ATS-Friendly",
-    templateKey: "compact",
-    featured: false,
-    popular: true,
-    atsOptimized: true,
-    description: "Compact space-efficient layout optimized for both ATS systems and human readers."
-  },
-  {
-    id: 23,
-    name: "Minimal ATS",
-    image: "https://images.unsplash.com/photo-1586281380117-5a60ae2050cc",
-    category: "ATS-Friendly",
-    templateKey: "minimalist",
-    featured: false,
-    popular: false,
-    atsOptimized: true,
-    description: "Ultra-clean minimalist design with optimal ATS parsing and maximum readability."
-  },
-  
-  // Startup & Entrepreneurship Templates - Modern and dynamic
-  {
-    id: 24,
-    name: "Startup Founder",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
-    category: "Startup",
-    templateKey: "startup",
-    featured: true,
-    popular: false,
-    atsOptimized: false,
-    description: "Violet-to-cyan gradient design perfect for entrepreneurs and startup professionals."
-  },
-  {
-    id: 25,
-    name: "Product Manager",
-    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
-    category: "Product",
-    templateKey: "product-manager",
-    featured: false,
-    popular: true,
-    atsOptimized: true,
-    description: "Cyan-themed modern template highlighting product launches and user metrics."
-  }
 ];
 
-const categories = ["All", "Professional", "Technology", "Creative", "Healthcare", "Education", "Sales", "Marketing", "Finance", "Consulting", "Executive", "ATS-Friendly", "Startup", "Product"];
+const categories = ["All", "Minimal", "Executive", "Creative", "Technology", "Corporate"];
 
 const Templates = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -399,10 +138,8 @@ const Templates = () => {
               >
                 {category === "Technology" && <Code className="h-4 w-4 mr-1" />}
                 {category === "Creative" && <Palette className="h-4 w-4 mr-1" />}
-                {category === "Healthcare" && <Heart className="h-4 w-4 mr-1" />}
-                {category === "Education" && <GraduationCap className="h-4 w-4 mr-1" />}
                 {category === "Executive" && <Building2 className="h-4 w-4 mr-1" />}
-                {category === "Sales" && <Users className="h-4 w-4 mr-1" />}
+                {category === "Corporate" && <Briefcase className="h-4 w-4 mr-1" />}
                 {category}
               </Button>
             ))}

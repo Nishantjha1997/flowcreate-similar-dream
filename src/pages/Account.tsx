@@ -231,7 +231,7 @@ const Account = () => {
       root.render(
         React.createElement(ResumeTemplate, {
           data: resumeData,
-          templateName: templateNames[resume.template_id] || 'modern'
+          templateName: templateNames[resume.template_id] || 'clean-slate'
         })
       );
       

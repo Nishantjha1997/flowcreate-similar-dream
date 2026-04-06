@@ -20,11 +20,11 @@ const mockResumeData = {
 };
 
 const templates = [
-  { id: 1, name: "Modern Professional", category: "Professional", templateKey: "modern", description: "Clean, contemporary design", image: "/placeholder.svg" },
-  { id: 2, name: "Executive Classic", category: "Traditional", templateKey: "classic", description: "Timeless, elegant layout", image: "/placeholder.svg" },
-  { id: 3, name: "Creative Portfolio", category: "Design", templateKey: "creative", description: "Eye-catching for creatives", image: "/placeholder.svg" },
-  { id: 4, name: "Tech Specialist", category: "Technical", templateKey: "technical", description: "Optimized for tech roles", image: "/placeholder.svg" },
-  { id: 5, name: "Corporate Elite", category: "Professional", templateKey: "professional", description: "Refined for executives", image: "/placeholder.svg" }
+  { id: 1, name: "Clean Slate", category: "Minimal", templateKey: "clean-slate", description: "Ultra-clean, any industry", image: "/placeholder.svg" },
+  { id: 2, name: "Executive Serif", category: "Executive", templateKey: "executive-serif", description: "Prestigious serif layout", image: "/placeholder.svg" },
+  { id: 3, name: "Sidebar Modern", category: "Creative", templateKey: "sidebar-modern", description: "Modern purple accent", image: "/placeholder.svg" },
+  { id: 4, name: "Tech Engineer", category: "Technology", templateKey: "tech-engineer", description: "Developer-focused dark header", image: "/placeholder.svg" },
+  { id: 5, name: "Coral Creative", category: "Creative", templateKey: "coral-creative", description: "Warm coral for creatives", image: "/placeholder.svg" },
 ];
 
 const TemplatesCarousel = () => {
