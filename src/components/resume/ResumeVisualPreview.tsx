@@ -71,7 +71,7 @@ export const EnhancedResumePreview = ({
       previewComponent={
         <ResumeTemplate 
           data={resume} 
-          templateName={templateNames[templateId] || 'modern'}
+          templateName={templateNames[templateId] || 'clean-slate'}
           sectionOrder={sectionOrder}
           hiddenSections={hiddenSections}
         />
