@@ -193,6 +193,19 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
     supportsPhoto: false,
     defaultAccent: '#374151',
   },
+  {
+    key: 'elegant-contrast',
+    legacyIds: [],
+    name: 'Elegant Contrast',
+    category: 'Executive',
+    description: 'Serif display name, thin gold hairlines, small-caps titles. Understated luxury.',
+    layout: 'single',
+    atsOptimized: true,
+    featured: false,
+    premium: true,
+    supportsPhoto: false,
+    defaultAccent: '#b45309',
+  },
 ];
 
 // ─── Dev-time consistency guard ───────────────────────────────────────────────
