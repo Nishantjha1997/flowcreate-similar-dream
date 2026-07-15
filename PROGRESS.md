@@ -1,5 +1,5 @@
 # Overhaul Progress
-## Current task: P4-T4
+## Current task: P4-T5
 ## Completed
 - P0-T1: Baseline verified; progress tracker created
 - P1-T1: Created supabase/functions/_shared/aiProviders.ts (callTextModel + getAnyActiveKey)
@@ -35,6 +35,7 @@
 - P4-T1: Add one-click accent color presets to customizer panel
 - P4-T2: Add font pairing presets and wire to adapter/renderer
 - P4-T3: Expose density and line-height controls as segmented tabs
+- P4-T4: Add photo visibility and shape controls
 
 ## Blocked / conflicts found
 (none)

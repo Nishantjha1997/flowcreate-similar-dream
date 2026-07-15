@@ -117,6 +117,21 @@ const applyCustomization = (
     if (styles.itemDescription) styles.itemDescription.lineHeight = mappedLh;
   }
   
+  if (customization.showPhoto === false) {
+    if (styles.profilePhoto) {
+      styles.profilePhoto.display = 'none';
+    }
+  } else if (customization.photoShape) {
+    if (styles.profilePhoto) {
+      const shapeMap = {
+        circle: '50%',
+        rounded: '12px',
+        square: '0px',
+      };
+      styles.profilePhoto.borderRadius = shapeMap[customization.photoShape] || styles.profilePhoto.borderRadius;
+    }
+  }
+  
   return styles;
 };
 

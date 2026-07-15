@@ -54,6 +54,7 @@ export interface ResumeData {
     lineHeight?: 'tight' | 'normal' | 'relaxed';
     layoutType?: 'standard' | 'compact' | 'minimal' | 'creative';
     showPhoto?: boolean;
+    photoShape?: 'circle' | 'rounded' | 'square';
     profileImage?: {
       src: string | null;
       size: number;
@@ -122,6 +123,7 @@ export const adaptResumeData = (data: ResumeData): TypesResumeData => {
       lineHeight: data.customization?.lineHeight,
       layoutType: data.customization?.layoutType,
       showPhoto: data.customization?.showPhoto,
+      photoShape: data.customization?.photoShape,
       profileImage: data.customization?.profileImage,
       sectionTitles: data.customization?.sectionTitles,
       headingFont: data.customization?.headingFont,
@@ -186,6 +188,7 @@ export const reverseAdaptResumeData = (data: TypesResumeData): Partial<ResumeDat
       sectionMargins: data.customization?.sectionMargins,
       lineHeight: data.customization?.lineHeight,
       showPhoto: data.customization?.showPhoto,
+      photoShape: data.customization?.photoShape,
       layoutType: data.customization?.layoutType,
       profileImage: data.customization?.profileImage,
       sectionTitles: data.customization?.sectionTitles,

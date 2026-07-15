@@ -9,6 +9,7 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { ColorPicker } from './ColorPicker';
 import { ResumeData } from '@/utils/types';
+import { getTemplate, resolveTemplateKey } from '@/templates/registry';
 import { AvatarUploader } from './AvatarUploader';
 import { SectionDragDropCustomizer } from '@/components/resume/SectionDragDropCustomizer';
 import { 
@@ -142,6 +143,9 @@ export const CustomizationPanel = ({
     customization.hiddenSections || []
   );
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  
+  const templateDef = getTemplate(resolveTemplateKey(resumeData.selectedTemplate));
+  const supportsPhoto = templateDef?.supportsPhoto !== false;
   
   const handleColorChange = (colorType: 'primaryColor' | 'secondaryColor' | 'accentColor' | 'textColor' | 'backgroundColor', color: string) => {
     onCustomizationChange({
@@ -833,23 +837,51 @@ export const CustomizationPanel = ({
                   </RadioGroup>
                 </div>
                 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Label htmlFor="show-photo" className="cursor-pointer">Show Profile Photo</Label>
-                    <Switch 
-                      id="show-photo" 
-                      checked={customization.showPhoto} 
-                      onCheckedChange={handleShowPhotoChange}
-                    />
-                  </div>
-                </div>
-                
-                {customization.showPhoto && (
-                  <div>
-                    <AvatarUploader 
-                      onImageChange={handleImageChange}
-                      currentImage={customization.profileImage}
-                    />
+                {supportsPhoto && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Label htmlFor="show-photo" className="cursor-pointer">Show Profile Photo</Label>
+                        <Switch 
+                          id="show-photo" 
+                          checked={customization.showPhoto !== false} 
+                          onCheckedChange={handleShowPhotoChange}
+                        />
+                      </div>
+                    </div>
+                    
+                    {customization.showPhoto !== false && (
+                      <div className="space-y-4">
+                        <div>
+                          <AvatarUploader 
+                            onImageChange={handleImageChange}
+                            currentImage={customization.profileImage}
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label className="block mb-2">Photo Shape</Label>
+                          <RadioGroup 
+                            value={customization.photoShape || 'circle'}
+                            onValueChange={(value) => onCustomizationChange({...customization, photoShape: value as 'circle'|'rounded'|'square'})}
+                            className="grid grid-cols-3 gap-2"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="circle" id="photo-circle" />
+                              <Label htmlFor="photo-circle" className="font-normal">Circle</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="rounded" id="photo-rounded" />
+                              <Label htmlFor="photo-rounded" className="font-normal">Rounded</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="square" id="photo-square" />
+                              <Label htmlFor="photo-square" className="font-normal">Square</Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
