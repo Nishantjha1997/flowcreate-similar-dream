@@ -32,6 +32,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Profile Components
 import { ProfileCompletenessCard } from '@/components/profile/ProfileCompletenessCard';
@@ -725,11 +726,26 @@ const Account = () => {
                   </CardHeader>
                   <CardContent>
                     {loadingResumes ? (
-                      <div className="text-center py-8">
-                        <div className="animate-pulse flex flex-col items-center gap-3">
-                          <div className="h-16 w-full max-w-md bg-muted rounded-lg" />
-                          <div className="h-16 w-full max-w-md bg-muted rounded-lg" />
-                        </div>
+                      <div className="space-y-4">
+                        {Array.from({ length: 2 }).map((_, i) => (
+                          <div 
+                            key={i} 
+                            className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg border ${isNeoBrutalism ? 'border-2 border-foreground' : ''}`}
+                          >
+                            <div className="flex items-center gap-4 w-full sm:w-auto">
+                              <Skeleton className="h-10 w-10 rounded-lg flex-shrink-0" />
+                              <div className="space-y-2 w-48">
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-3 w-3/4" />
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Skeleton className="h-8 w-16" />
+                              <Skeleton className="h-8 w-24" />
+                              <Skeleton className="h-8 w-16" />
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     ) : savedResumes && savedResumes.length > 0 ? (
                       <div className="space-y-4">
@@ -780,16 +796,18 @@ const Account = () => {
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center py-12">
-                        <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">No resumes yet</h3>
-                        <p className="text-muted-foreground mb-4">
-                          Create your first resume to get started
+                      <div className="text-center py-16 px-4 border-2 border-dashed border-border/60 rounded-2xl bg-muted/10">
+                        <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                          <FileText className="w-6 h-6 text-primary" />
+                        </div>
+                        <h3 className="text-lg font-bold tracking-tight mb-2">No Resumes Saved</h3>
+                        <p className="text-muted-foreground text-sm max-w-sm mx-auto mb-6">
+                          Ready to land your dream job? Create your first professional, ATS-optimized resume in minutes.
                         </p>
                         <Link to="/resume-builder">
-                          <Button className={isNeoBrutalism ? 'border-2 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground))]' : ''}>
+                          <Button className={isNeoBrutalism ? 'border-2 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground))]' : 'shadow-sm'}>
                             <Plus className="w-4 h-4 mr-2" />
-                            Create Resume
+                            Create your first resume
                           </Button>
                         </Link>
                       </div>
