@@ -1,8 +1,9 @@
 # Overhaul Progress
-## Current task: P1-T2
+## Current task: P1-T3
 ## Completed
 - P0-T1: Baseline verified; progress tracker created
 - P1-T1: Created supabase/functions/_shared/aiProviders.ts (callTextModel + getAnyActiveKey)
+- P1-T2: Updated gemini-suggest to route through any active provider; env GEMINI_API_KEY as fallback; gemini fallback-key retry preserved; response shape unchanged
 ## Blocked / conflicts found
 (none)
 ## Baseline notes
