@@ -6,6 +6,7 @@ import { ResumeData } from '@/utils/types';
 import { useAuth } from "@/hooks/useAuth";
 import { usePremiumStatus } from "@/hooks/usePremiumStatus";
 import { useResumeCount } from "@/hooks/useResumeLimit";
+import { useEntitlements } from "@/hooks/useEntitlements";
 import { resolveTemplateKey } from '@/templates/registry';
 
 export const useResumeSave = (editResumeId?: string | null) => {
@@ -15,6 +16,7 @@ export const useResumeSave = (editResumeId?: string | null) => {
 
   const { data: premium, isLoading: loadingPremium } = usePremiumStatus(userId);
   const { data: resumeCount, isLoading: loadingCount, refetch: refetchResumeCount } = useResumeCount(userId);
+  const { data: entitlements } = useEntitlements(userId);
 
   const handleSaveResume = async (resume: ResumeData) => {
     if (!userId) {
@@ -48,9 +50,17 @@ export const useResumeSave = (editResumeId?: string | null) => {
           toast.success("Resume updated successfully!");
         }
       } else {
-        // Create new resume - Check limits for free users
-        if (!premium?.isPremium && resumeCount >= 1) {
-          toast.error("Free users can only save 1 resume. Please delete your existing resume or upgrade to Premium to save more.");
+        // Create new resume - enforce the plan's resume limit (-1 = unlimited).
+        // Entitlements come from the subscription_plans catalog; if they
+        // haven't loaded yet, fall back to the legacy premium check so
+        // premium users are never blocked by a slow query.
+        const maxResumes = entitlements?.limits.max_resumes ?? (premium?.isPremium ? -1 : 1);
+        if (maxResumes !== -1 && resumeCount >= maxResumes) {
+          toast.error(
+            maxResumes === 1
+              ? "The free plan includes 1 saved resume. Upgrade on the Pricing page for unlimited resumes, or delete your existing one."
+              : `Your plan allows ${maxResumes} saved resumes. Upgrade on the Pricing page for more.`
+          );
           return;
         }
 
@@ -81,7 +91,7 @@ export const useResumeSave = (editResumeId?: string | null) => {
 
   const handleAIFeatureUpsell = () => {
     if (!premium?.isPremium) {
-      toast.info("AI features are available with Premium! Upgrade for just ₹199/month to unlock AI-powered resume suggestions.");
+      toast.info("AI-powered suggestions are a Premium feature. See the Pricing page to upgrade and unlock them.");
     }
   };
 
