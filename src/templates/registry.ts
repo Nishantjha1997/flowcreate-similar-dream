@@ -180,6 +180,19 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
     supportsPhoto: false,
     defaultAccent: '#ea580c',
   },
+  {
+    key: 'compact-ats',
+    legacyIds: ['ats-basic', 'compact', 'ats-pro'],
+    name: 'Compact ATS',
+    category: 'ATS-Friendly',
+    description: 'Maximum one-page density and parser compatibility. Zero decoration. Free.',
+    layout: 'single',
+    atsOptimized: true,
+    featured: true,
+    premium: false,
+    supportsPhoto: false,
+    defaultAccent: '#374151',
+  },
 ];
 
 // ─── Dev-time consistency guard ───────────────────────────────────────────────

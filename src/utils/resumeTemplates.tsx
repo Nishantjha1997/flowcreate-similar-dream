@@ -865,6 +865,62 @@ const templateStyles: Record<string, TemplateStyles> = {
     skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '8px', marginTop: '8px' },
     skill: { padding: '4px 14px', fontSize: '12px', backgroundColor: '#fff7ed', color: '#9a3412', borderRadius: '3px', border: '1px solid #fed7aa' },
   },
+
+  // ─── 13. COMPACT ATS (free) ──────────────────────────────────
+  // Maximum single-page density and parser compatibility: Arial,
+  // bold-only hierarchy, zero color, comma-style plain skills.
+  'compact-ats': {
+    container: {
+      fontFamily: "Arial, Helvetica, sans-serif",
+      color: '#111827',
+      lineHeight: '1.45',
+      maxWidth: '100%',
+      height: '100%',
+      padding: '24px 28px',
+      backgroundColor: '#ffffff',
+      boxSizing: 'border-box' as const,
+    },
+    header: {
+      marginBottom: '14px',
+      paddingBottom: '10px',
+      borderBottom: '1px solid #111827',
+      display: 'flex',
+      flexDirection: 'column' as const,
+    },
+    profilePhoto: { width: '0px', height: '0px', display: 'none' },
+    name: {
+      fontSize: '22px',
+      fontWeight: 700,
+      marginBottom: '2px',
+      color: '#000000',
+      letterSpacing: '0em',
+    },
+    contact: {
+      fontSize: '11px',
+      display: 'flex',
+      flexWrap: 'wrap' as const,
+      gap: '10px',
+      marginTop: '4px',
+      color: '#374151',
+    },
+    section: { marginBottom: '14px' },
+    sectionTitle: {
+      fontSize: '12px',
+      fontWeight: 700,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '0.5px',
+      color: '#000000',
+      marginBottom: '6px',
+    },
+    sectionContent: { marginTop: '4px' },
+    item: { marginBottom: '10px' },
+    itemTitle: { fontSize: '13px', fontWeight: 700, color: '#000000', marginBottom: '1px' },
+    itemSubtitle: { fontSize: '12px', fontWeight: 400, color: '#374151' },
+    itemDate: { fontSize: '11px', color: '#4b5563', marginBottom: '3px' },
+    itemDescription: { fontSize: '12px', whiteSpace: 'pre-line' as const, lineHeight: '1.45', color: '#1f2937' },
+    skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '4px', marginTop: '4px' },
+    skill: { padding: '0px 6px 0px 0px', fontSize: '12px', backgroundColor: 'transparent', color: '#1f2937', border: 'none' },
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════
