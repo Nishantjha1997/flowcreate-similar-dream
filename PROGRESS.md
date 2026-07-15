@@ -1,11 +1,12 @@
 # Overhaul Progress
-## Current task: P1-GATE (Phase 1 complete — needs deploy+verify before push)
+## Current task: P2-T2
 ## Completed
 - P0-T1: Baseline verified; progress tracker created
 - P1-T1: Created supabase/functions/_shared/aiProviders.ts (callTextModel + getAnyActiveKey)
 - P1-T2: Updated gemini-suggest to route through any active provider; env GEMINI_API_KEY as fallback; gemini fallback-key retry preserved; response shape unchanged
 - P1-T3: extract-resume-data: Gemini→multimodal path unchanged; non-Gemini→unpdf text extraction + callTextModel; no-key error message updated; scanned-PDF detection added
 - P1-T4: Updated AI copy in PDFUploader, PDFResumeUploader, AIManagement to reference Gemini/DeepSeek/OpenAI
+- P2-T1: Created src/templates/registry.ts with TemplateDefinition, TEMPLATE_REGISTRY (7 templates), resolveTemplateKey, getTemplate
 ## Blocked / conflicts found
 (none)
 ## Baseline notes
