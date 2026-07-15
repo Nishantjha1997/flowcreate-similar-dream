@@ -1,6 +1,7 @@
 import { CSSProperties } from 'react';
 import { ResumeData as TypesResumeData } from './types';
 import { ResumeData, reverseAdaptResumeData } from './resumeAdapterUtils';
+import { TEMPLATE_REGISTRY, resolveTemplateKey } from '@/templates/registry';
 
 export type TemplateStyles = {
   container: CSSProperties;
@@ -675,15 +676,14 @@ export const templateMockData: Record<string, ResumeData> = {
 // TEMPLATE NAME MAPPING (template selector ID → template key)
 // ═══════════════════════════════════════════════════════════════
 
-export const templateNames: Record<string, string> = {
-  "1": "clean-slate",
-  "2": "executive-serif",
-  "3": "sidebar-modern",
-  "4": "tech-engineer",
-  "5": "coral-creative",
-  "6": "navy-professional",
-  "7": "emerald-minimal",
-};
+// Derived from the registry — do NOT hand-edit this mapping;
+// add/remove templates via src/templates/registry.ts instead.
+export const templateNames: Record<string, string> = Object.fromEntries(
+  TEMPLATE_REGISTRY.flatMap((t) => [
+    [t.key, t.key],
+    ...t.legacyIds.map((id) => [id, t.key]),
+  ])
+);
 
 // ═══════════════════════════════════════════════════════════════
 // EXAMPLE RESUMES (for template gallery previews)
@@ -710,7 +710,8 @@ const ResumeTemplate = ({
     data.education.length > 0 && 'institution' in data.education[0];
   
   const resumeData = isTypesResumeData ? reverseAdaptResumeData(data as TypesResumeData) as ResumeData : data as ResumeData;
-  const baseStyles = templateStyles[templateName] || templateStyles['clean-slate'];
+  const resolvedKey = resolveTemplateKey(templateName);
+  const baseStyles = templateStyles[resolvedKey] || templateStyles['clean-slate'];
   const styles = applyCustomization(baseStyles, resumeData.customization);
 
   const headerContent = (

@@ -73,12 +73,12 @@ export const exampleResumes: Record<string, ResumeData> = {
   },
 };
 
-export const templateNames: Record<string, string> = {
-  "1": "clean-slate",
-  "2": "executive-serif",
-  "3": "sidebar-modern",
-  "4": "tech-engineer",
-  "5": "coral-creative",
-  "6": "navy-professional",
-  "7": "emerald-minimal",
-};
+import { TEMPLATE_REGISTRY } from '@/templates/registry';
+
+export const templateNames: Record<string, string> = Object.fromEntries(
+  TEMPLATE_REGISTRY.flatMap((t) => [
+    [t.key, t.key],
+    ...t.legacyIds.map((id) => [id, t.key]),
+  ])
+);
+

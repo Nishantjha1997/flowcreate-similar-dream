@@ -3,6 +3,7 @@ import { FileText } from 'lucide-react';
 import { ResumePreview } from '@/components/ResumePreview';
 import ResumeTemplate from '@/utils/resumeTemplates';
 import { ResumeData, adaptResumeData } from '@/utils/resumeAdapterUtils';
+import { resolveTemplateKey } from '@/templates/registry';
 
 interface ResumeVisualPreviewProps {
   resume: ResumeData;
@@ -48,7 +49,7 @@ export const ResumeVisualPreview = ({
     <div ref={resumeRef} className="resume-content">
       <ResumeTemplate 
         data={resume} 
-        templateName={templateNames[templateId] || 'clean-slate'}
+        templateName={resolveTemplateKey(templateId)}
         sectionOrder={getOrderedSections()}
         hiddenSections={hiddenSections}
       />
@@ -71,7 +72,7 @@ export const EnhancedResumePreview = ({
       previewComponent={
         <ResumeTemplate 
           data={resume} 
-          templateName={templateNames[templateId] || 'clean-slate'}
+          templateName={resolveTemplateKey(templateId)}
           sectionOrder={sectionOrder}
           hiddenSections={hiddenSections}
         />

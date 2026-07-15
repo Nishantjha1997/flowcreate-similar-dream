@@ -6,6 +6,7 @@ import { ResumeData } from '@/utils/types';
 import { useAuth } from "@/hooks/useAuth";
 import { usePremiumStatus } from "@/hooks/usePremiumStatus";
 import { useResumeCount } from "@/hooks/useResumeLimit";
+import { resolveTemplateKey } from '@/templates/registry';
 
 export const useResumeSave = (editResumeId?: string | null) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -35,6 +36,7 @@ export const useResumeSave = (editResumeId?: string | null) => {
           .from("resumes")
           .update({
             resume_data: resume as unknown as Json,
+            template_id: resolveTemplateKey(resume.selectedTemplate),
             updated_at: new Date().toISOString()
           })
           .eq('id', editResumeId)
@@ -59,6 +61,7 @@ export const useResumeSave = (editResumeId?: string | null) => {
             {
               user_id: userId,
               resume_data: resume as unknown as Json,
+              template_id: resolveTemplateKey(resume.selectedTemplate),
             }
           ]);
 

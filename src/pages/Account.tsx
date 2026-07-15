@@ -25,8 +25,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { ResumeData } from '@/utils/types';
 import { usePDFGenerator } from '@/hooks/usePDFGenerator';
-import ResumeTemplate from '@/utils/resumeTemplates';
-import { templateNames } from '@/components/resume/ResumeData';
+import { resolveTemplateKey } from '@/templates/registry';
 import { Breadcrumbs, BreadcrumbItem } from '@/components/ui/breadcrumbs';
 import { useDesignMode } from '@/hooks/useDesignMode';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -231,7 +230,7 @@ const Account = () => {
       root.render(
         React.createElement(ResumeTemplate, {
           data: resumeData,
-          templateName: templateNames[resume.template_id] || 'clean-slate'
+          templateName: resolveTemplateKey(resume.template_id)
         })
       );
       
