@@ -167,6 +167,19 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
     supportsPhoto: false,
     defaultAccent: '#dc2626',
   },
+  {
+    key: 'warm-humanist',
+    legacyIds: [],
+    name: 'Warm Humanist',
+    category: 'Creative',
+    description: 'Warm serif typography with terracotta accents and generous spacing.',
+    layout: 'single',
+    atsOptimized: true,
+    featured: false,
+    premium: true,
+    supportsPhoto: false,
+    defaultAccent: '#ea580c',
+  },
 ];
 
 // ─── Dev-time consistency guard ───────────────────────────────────────────────
