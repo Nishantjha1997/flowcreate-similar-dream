@@ -105,7 +105,16 @@ const applyCustomization = (
   }
 
   if (customization.lineHeight) {
-    if (styles.itemDescription) styles.itemDescription.lineHeight = customization.lineHeight;
+    const lhMap: Record<string, string> = {
+      tight: '1.4',
+      normal: '1.6',
+      relaxed: '1.8',
+      '1.4': '1.4',
+      '1.6': '1.6',
+      '1.8': '1.8',
+    };
+    const mappedLh = lhMap[customization.lineHeight] || customization.lineHeight;
+    if (styles.itemDescription) styles.itemDescription.lineHeight = mappedLh;
   }
   
   return styles;

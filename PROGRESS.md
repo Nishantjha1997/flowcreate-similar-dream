@@ -1,5 +1,5 @@
 # Overhaul Progress
-## Current task: P4-T3
+## Current task: P4-T4
 ## Completed
 - P0-T1: Baseline verified; progress tracker created
 - P1-T1: Created supabase/functions/_shared/aiProviders.ts (callTextModel + getAnyActiveKey)
@@ -34,6 +34,7 @@
 - P7-GATE: get_user_entitlements verified live (owner → lifetime / max_resumes -1 / premium_templates true); tsc + build pass; pushed
 - P4-T1: Add one-click accent color presets to customizer panel
 - P4-T2: Add font pairing presets and wire to adapter/renderer
+- P4-T3: Expose density and line-height controls as segmented tabs
 
 ## Blocked / conflicts found
 (none)

@@ -643,24 +643,17 @@ export const CustomizationPanel = ({
               <div className="space-y-6">
                 <div>
                   <Label className="block mb-2">Content Spacing</Label>
-                  <RadioGroup 
+                  <Tabs 
                     value={customization.spacing || 'normal'}
                     onValueChange={(value) => handleSpacingChange(value as 'compact' | 'normal' | 'spacious')}
-                    className="grid grid-cols-3 gap-2"
+                    className="w-full"
                   >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="compact" id="spacing-compact" />
-                      <Label htmlFor="spacing-compact" className="font-normal">Compact</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="normal" id="spacing-normal" />
-                      <Label htmlFor="spacing-normal" className="font-normal">Normal</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="spacious" id="spacing-spacious" />
-                      <Label htmlFor="spacing-spacious" className="font-normal">Spacious</Label>
-                    </div>
-                  </RadioGroup>
+                    <TabsList className="grid grid-cols-3 w-full">
+                      <TabsTrigger value="compact">Compact</TabsTrigger>
+                      <TabsTrigger value="normal">Normal</TabsTrigger>
+                      <TabsTrigger value="spacious">Spacious</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
                 </div>
                 
                 <div>
@@ -687,24 +680,17 @@ export const CustomizationPanel = ({
                 
                 <div>
                   <Label className="block mb-2">Line Spacing</Label>
-                  <RadioGroup 
+                  <Tabs 
                     value={customization.lineHeight || 'normal'}
                     onValueChange={(value) => onCustomizationChange({...customization, lineHeight: value as 'tight' | 'normal' | 'relaxed'})}
-                    className="grid grid-cols-3 gap-2"
+                    className="w-full"
                   >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="tight" id="line-tight" />
-                      <Label htmlFor="line-tight" className="font-normal">Tight</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="normal" id="line-normal" />
-                      <Label htmlFor="line-normal" className="font-normal">Normal</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="relaxed" id="line-relaxed" />
-                      <Label htmlFor="line-relaxed" className="font-normal">Relaxed</Label>
-                    </div>
-                  </RadioGroup>
+                    <TabsList className="grid grid-cols-3 w-full">
+                      <TabsTrigger value="tight">1.4 (Tight)</TabsTrigger>
+                      <TabsTrigger value="normal">1.6 (Normal)</TabsTrigger>
+                      <TabsTrigger value="relaxed">1.8 (Relaxed)</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
                 </div>
 
                 <div>
