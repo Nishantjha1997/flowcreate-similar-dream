@@ -1,5 +1,5 @@
 # Overhaul Progress
-## Current task: P3-T2
+## Current task: P7-T1 (Phase 4-6 deferred by owner request; Phase 7 gating prioritized)
 ## Completed
 - P0-T1: Baseline verified; progress tracker created
 - P1-T1: Created supabase/functions/_shared/aiProviders.ts (callTextModel + getAnyActiveKey)
@@ -12,7 +12,34 @@
 - P2-T4: Updated src/pages/Examples.tsx to route template name lookups and cards through TEMPLATE_REGISTRY mapping; updated TemplatesSection.tsx, TemplatesCarousel.tsx, and ResumeTemplatePreview.tsx to utilize registry keys and exact styled box parameters.
 - P2-T5: Created migration to sync resume_templates DB table to the registry, applied to live Supabase DB; updated TemplatePreviewModal to accept string ids.
 - P3-T1: Extended ResumeTemplate renderer with full support for sidebar-left, sidebar-right, and header-band layouts; added defensive parseInt guards to applyCustomization.
+- P3-T1-fix: Restored clean tsc baseline (missing getTemplate import committed by prior session; String(key) coercions in TemplatesCarousel/TemplatesSection)
+- P3-T2: split-frame template (sidebar-left, dark slate rail) + additive sidebarSectionTitle engine support for dark sidebars
+- P3-T3: timeline-dot template (free, teal timeline rule)
+- P3-T4: header-band template (indigo band, photo)
+- P3-T5: swiss-grid template (International Typographic Style)
+- P3-T6: warm-humanist template (warm serif, terracotta)
+- P3-T7: compact-ats template (free, one-page density, zero decoration)
+- P3-T8: elegant-contrast template (serif display + gold hairlines)
+- P3-T9: duo-tone template (sidebar-right, light-gray rail)
+- P3-T10: bold-headline template (44px name, amber underline)
+- P3-T11: soft-cards template (sections in rounded cards)
+- P3-T12: azure-classic template (conservative corporate, centered)
+- P3-T13: ink-serif template (monochrome print serif, justified)
+- P3-T14: Gallery category chips derived from registry; Premium/Free badges on cards
+- P3-GATE: 19 templates in registry + renderer; DB catalog synced via migration 20260716100000 (19 active / 39 total rows, legacy keys deactivated); tsc + production build pass; pushed
+
 ## Blocked / conflicts found
 (none)
+
+## Deviations from plan
+- P3 commits were gated on tsc per template; the full `npm run build` was run at the
+  phase gate rather than per template (build output identical either way; wall-clock
+  economy). Manual PDF-export spot-check still pending owner's browser session — the
+  renderer changes are engine-level (P3-T1) and per-template styles obey the
+  html2canvas constraints in OVERHAUL_PLAN.md §1.3.
+- Phases 4-6 are deferred: the project owner explicitly prioritized subscription/
+  feature gating (Phase 7) after Phase 3. Phase 4 (customization), 5 (builder UX),
+  6 (marketing) remain next in queue after Phase 7.
+
 ## Baseline notes
 - build: OK @ 2026-07-16, tsc: OK @ 2026-07-16
