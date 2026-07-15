@@ -29,55 +29,72 @@ const applyCustomization = (
 ): TemplateStyles => {
   if (!customization) return baseStyles;
 
-  const styles = {...baseStyles};
+  // Deep clone to prevent modifying template definitions
+  const styles: TemplateStyles = JSON.parse(JSON.stringify(baseStyles));
   
   if (customization.primaryColor) {
-    styles.name = {...styles.name, color: customization.primaryColor};
-    styles.sectionTitle = {...styles.sectionTitle, color: customization.primaryColor};
-    if (styles.skill?.backgroundColor && styles.skill.backgroundColor !== 'transparent') {
-      styles.skill = {...styles.skill, backgroundColor: customization.primaryColor, color: '#fff'};
-    } else {
-      styles.skill = {...styles.skill, borderColor: customization.primaryColor, color: customization.primaryColor};
+    if (styles.name) styles.name.color = customization.primaryColor;
+    if (styles.sectionTitle) styles.sectionTitle.color = customization.primaryColor;
+    if (styles.skill) {
+      if (styles.skill.backgroundColor && styles.skill.backgroundColor !== 'transparent') {
+        styles.skill.backgroundColor = customization.primaryColor;
+        styles.skill.color = '#fff';
+      } else {
+        styles.skill.borderColor = customization.primaryColor;
+        styles.skill.color = customization.primaryColor;
+      }
     }
   }
   
   if (customization.secondaryColor) {
-    styles.itemSubtitle = {...styles.itemSubtitle, color: customization.secondaryColor};
+    if (styles.itemSubtitle) styles.itemSubtitle.color = customization.secondaryColor;
   }
   
   if (customization.accentColor) {
-    styles.sectionTitle = {...styles.sectionTitle, borderBottomColor: customization.accentColor};
+    if (styles.sectionTitle) styles.sectionTitle.borderBottomColor = customization.accentColor;
   }
   
   if (customization.textColor) {
-    styles.itemDescription = {...styles.itemDescription, color: customization.textColor};
-    styles.contact = {...styles.contact, color: customization.textColor};
+    if (styles.itemDescription) styles.itemDescription.color = customization.textColor;
+    if (styles.contact) styles.contact.color = customization.textColor;
   }
   
   if (customization.backgroundColor) {
-    styles.container = {...styles.container, backgroundColor: customization.backgroundColor};
+    if (styles.container) styles.container.backgroundColor = customization.backgroundColor;
   }
   
   if (customization.fontSize) {
     const m = customization.fontSize === 'small' ? 0.9 : customization.fontSize === 'large' ? 1.1 : 1;
-    styles.name = {...styles.name, fontSize: `${parseInt(styles.name.fontSize as string) * m}px`};
-    styles.itemTitle = {...styles.itemTitle, fontSize: `${parseInt(styles.itemTitle.fontSize as string) * m}px`};
-    styles.itemSubtitle = {...styles.itemSubtitle, fontSize: `${parseInt(styles.itemSubtitle.fontSize as string) * m}px`};
-    styles.itemDescription = {...styles.itemDescription, fontSize: `${parseInt(styles.itemDescription.fontSize as string) * m}px`};
+    const getNewFontSize = (val: string | number | undefined, multiplier: number, fallback: number): string => {
+      if (!val) return `${fallback * multiplier}px`;
+      const num = parseInt(String(val));
+      if (isNaN(num)) return `${fallback * multiplier}px`;
+      return `${num * multiplier}px`;
+    };
+    if (styles.name) styles.name.fontSize = getNewFontSize(styles.name.fontSize, m, 28);
+    if (styles.itemTitle) styles.itemTitle.fontSize = getNewFontSize(styles.itemTitle.fontSize, m, 14);
+    if (styles.itemSubtitle) styles.itemSubtitle.fontSize = getNewFontSize(styles.itemSubtitle.fontSize, m, 12);
+    if (styles.itemDescription) styles.itemDescription.fontSize = getNewFontSize(styles.itemDescription.fontSize, m, 12);
   }
   
   if (customization.fontFamily && customization.fontFamily !== 'default') {
-    styles.container = {...styles.container, fontFamily: customization.fontFamily};
+    if (styles.container) styles.container.fontFamily = customization.fontFamily;
   }
   
   if (customization.spacing) {
     const m = customization.spacing === 'compact' ? 0.75 : customization.spacing === 'spacious' ? 1.25 : 1;
-    styles.section = {...styles.section, marginBottom: `${parseInt(styles.section.marginBottom as string) * m}px`};
-    styles.item = {...styles.item, marginBottom: `${parseInt(styles.item.marginBottom as string) * m}px`};
+    const getNewSpacing = (val: string | number | undefined, multiplier: number, fallback: number): string => {
+      if (!val) return `${fallback * multiplier}px`;
+      const num = parseInt(String(val));
+      if (isNaN(num)) return `${fallback * multiplier}px`;
+      return `${num * multiplier}px`;
+    };
+    if (styles.section) styles.section.marginBottom = getNewSpacing(styles.section.marginBottom, m, 24);
+    if (styles.item) styles.item.marginBottom = getNewSpacing(styles.item.marginBottom, m, 16);
   }
 
   if (customization.lineHeight) {
-    styles.itemDescription = {...styles.itemDescription, lineHeight: customization.lineHeight};
+    if (styles.itemDescription) styles.itemDescription.lineHeight = customization.lineHeight;
   }
   
   return styles;
@@ -838,6 +855,45 @@ const ResumeTemplate = ({
 
   const defaultOrder = ["summary", "experience", "education", "skills", "projects"];
   const useOrder = sectionOrder && sectionOrder.length > 0 ? sectionOrder : defaultOrder;
+
+  const templateDef = getTemplate(resolvedKey);
+  const layout = templateDef.layout;
+
+  if (layout === 'sidebar-left' || layout === 'sidebar-right') {
+    const isLeft = layout === 'sidebar-left';
+    return (
+      <div style={{ display: 'flex', flexDirection: isLeft ? 'row' : 'row-reverse', ...styles.container }}>
+        <aside style={styles.sidebar}>
+          {resumeData.personal.profileImage && styles.profilePhoto && (styles.profilePhoto as any).display !== 'none' && (
+            <img src={resumeData.personal.profileImage} alt={`${resumeData.personal.name || 'Profile'}`} style={styles.profilePhoto}/>
+          )}
+          <div style={styles.contact}>
+            {resumeData.personal.email && <div style={{ display: 'block', marginBottom: '6px' }}>{resumeData.personal.email}</div>}
+            {resumeData.personal.phone && <div style={{ display: 'block', marginBottom: '6px' }}>{resumeData.personal.phone}</div>}
+            {resumeData.personal.address && <div style={{ display: 'block', marginBottom: '6px' }}>{resumeData.personal.address}</div>}
+            {resumeData.personal.website && <div style={{ display: 'block', marginBottom: '6px' }}>{resumeData.personal.website}</div>}
+            {resumeData.personal.linkedin && <div style={{ display: 'block', marginBottom: '6px' }}>{resumeData.personal.linkedin}</div>}
+          </div>
+          {renderSection('skills')}
+        </aside>
+        <div style={styles.mainContent}>
+          <div style={styles.header}>
+            <div style={styles.name}>{resumeData.personal.name || 'Your Name'}</div>
+          </div>
+          {useOrder.filter(k => k !== 'skills').map((sectionKey) => renderSection(sectionKey))}
+        </div>
+      </div>
+    );
+  }
+
+  if (layout === 'header-band') {
+    return (
+      <div style={styles.container}>
+        <div style={styles.header}>{headerContent}</div>
+        <div style={styles.mainContent}>{useOrder.map((sectionKey) => renderSection(sectionKey))}</div>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.container}>
