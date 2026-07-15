@@ -628,6 +628,66 @@ const templateStyles: Record<string, TemplateStyles> = {
     skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '6px', marginTop: '8px' },
     skill: { padding: '4px 10px', fontSize: '11.5px', backgroundColor: '#334155', color: '#e2e8f0', borderRadius: '4px', border: '1px solid #475569' },
   },
+
+  // ─── 9. TIMELINE DOT (free) ──────────────────────────────────
+  // Single column; experience/education items sit on a teal timeline
+  // rule with accented dates. Approachable and modern.
+  'timeline-dot': {
+    container: {
+      fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
+      color: '#1f2937',
+      lineHeight: '1.6',
+      maxWidth: '100%',
+      height: '100%',
+      padding: '46px 50px',
+      backgroundColor: '#ffffff',
+      boxSizing: 'border-box' as const,
+    },
+    header: {
+      marginBottom: '26px',
+      paddingBottom: '18px',
+      borderBottom: '2px solid #14b8a6',
+      display: 'flex',
+      flexDirection: 'column' as const,
+    },
+    profilePhoto: { width: '0px', height: '0px', display: 'none' },
+    name: {
+      fontSize: '30px',
+      fontWeight: 700,
+      marginBottom: '4px',
+      color: '#0f766e',
+      letterSpacing: '-0.02em',
+    },
+    contact: {
+      fontSize: '13px',
+      display: 'flex',
+      flexWrap: 'wrap' as const,
+      gap: '14px',
+      marginTop: '8px',
+      color: '#6b7280',
+    },
+    section: { marginBottom: '22px' },
+    sectionTitle: {
+      fontSize: '12px',
+      fontWeight: 700,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '2px',
+      color: '#0f766e',
+      marginBottom: '10px',
+    },
+    sectionContent: { marginTop: '8px' },
+    item: {
+      marginBottom: '16px',
+      paddingLeft: '16px',
+      borderLeft: '2px solid #99f6e4',
+    },
+    itemTitle: { fontSize: '15px', fontWeight: 600, color: '#111827', marginBottom: '2px' },
+    itemSubtitle: { fontSize: '13.5px', fontWeight: 500, color: '#0d9488' },
+    itemDate: { fontSize: '12px', fontWeight: 600, color: '#14b8a6', marginBottom: '5px' },
+    itemDescription: { fontSize: '13.5px', whiteSpace: 'pre-line' as const, lineHeight: '1.6', color: '#374151' },
+    skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '6px', marginTop: '8px' },
+    skill: { padding: '4px 12px', fontSize: '11.5px', backgroundColor: '#f0fdfa', color: '#0f766e', borderRadius: '9999px', border: '1px solid #99f6e4' },
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════

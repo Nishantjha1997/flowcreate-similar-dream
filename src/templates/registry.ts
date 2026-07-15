@@ -128,6 +128,19 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
     supportsPhoto: true,
     defaultAccent: '#38bdf8',
   },
+  {
+    key: 'timeline-dot',
+    legacyIds: [],
+    name: 'Timeline',
+    category: 'Professional',
+    description: 'Experience entries on a teal timeline rule with accented dates. Free.',
+    layout: 'single',
+    atsOptimized: true,
+    featured: true,
+    premium: false,
+    supportsPhoto: false,
+    defaultAccent: '#14b8a6',
+  },
 ];
 
 // ─── Dev-time consistency guard ───────────────────────────────────────────────
