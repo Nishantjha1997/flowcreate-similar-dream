@@ -1,5 +1,5 @@
 # Overhaul Progress
-## Current task: P7-T1 (Phase 4-6 deferred by owner request; Phase 7 gating prioritized)
+## Current task: P4-T1 (Phase 7 complete; resume plan order at Phase 4 customization)
 ## Completed
 - P0-T1: Baseline verified; progress tracker created
 - P1-T1: Created supabase/functions/_shared/aiProviders.ts (callTextModel + getAnyActiveKey)
@@ -27,6 +27,11 @@
 - P3-T13: ink-serif template (monochrome print serif, justified)
 - P3-T14: Gallery category chips derived from registry; Premium/Free badges on cards
 - P3-GATE: 19 templates in registry + renderer; DB catalog synced via migration 20260716100000 (19 active / 39 total rows, legacy keys deactivated); tsc + production build pass; pushed
+- P7-T1: useEntitlements hook (get_user_entitlements RPC, react-query, free-tier fallback on error)
+- P7-T2: useResumeSave enforces limits.max_resumes (-1 = unlimited; legacy premium fallback while loading); upsell copy no longer hardcodes a price
+- P7-T3: TemplateSelector rewritten registry-driven (fixes P2-T3 leftover hardcoded array) with premium lock overlays + upgrade dialog linking /pricing
+- P7-T4: gemini-suggest meters usage_limits.ai_requests against plan cap (0 = premium-only 403, finite cap = 429 when exhausted, -1 = unlimited; 30-day rolling reset; best-effort increment); deployed
+- P7-GATE: get_user_entitlements verified live (owner → lifetime / max_resumes -1 / premium_templates true); tsc + build pass; pushed
 
 ## Blocked / conflicts found
 (none)
@@ -37,9 +42,14 @@
   economy). Manual PDF-export spot-check still pending owner's browser session — the
   renderer changes are engine-level (P3-T1) and per-template styles obey the
   html2canvas constraints in OVERHAUL_PLAN.md §1.3.
-- Phases 4-6 are deferred: the project owner explicitly prioritized subscription/
-  feature gating (Phase 7) after Phase 3. Phase 4 (customization), 5 (builder UX),
-  6 (marketing) remain next in queue after Phase 7.
+- Phases 4-6 were deferred: the project owner explicitly prioritized subscription/
+  feature gating (Phase 7) after Phase 3. Phase 7 is now complete; the queue
+  resumes at Phase 4 (customization), then 5 (builder UX), 6 (marketing), 8, 9.
+- P7 known limitation (accepted by plan): premium template gating is client-side.
+  A free user can still reach a premium template via the /resume-builder?template=
+  URL parameter; rendering is client-side so this leaks no data, and saving still
+  enforces the resume-count limit. Revisit if premium templates become the primary
+  conversion driver.
 
 ## Baseline notes
 - build: OK @ 2026-07-16, tsc: OK @ 2026-07-16
