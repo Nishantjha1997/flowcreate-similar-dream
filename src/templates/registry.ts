@@ -245,6 +245,19 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
     supportsPhoto: false,
     defaultAccent: '#6366f1',
   },
+  {
+    key: 'azure-classic',
+    legacyIds: ['government', 'finance', 'legal'],
+    name: 'Azure Classic',
+    category: 'Professional',
+    description: 'Conservative centered layout with azure titles. Safe for any corporate role.',
+    layout: 'single',
+    atsOptimized: true,
+    featured: false,
+    premium: true,
+    supportsPhoto: false,
+    defaultAccent: '#1d4ed8',
+  },
 ];
 
 // ─── Dev-time consistency guard ───────────────────────────────────────────────

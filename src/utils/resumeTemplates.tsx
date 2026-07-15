@@ -1186,6 +1186,67 @@ const templateStyles: Record<string, TemplateStyles> = {
     skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '6px', marginTop: '6px' },
     skill: { padding: '4px 12px', fontSize: '11.5px', backgroundColor: '#ffffff', color: '#4f46e5', borderRadius: '8px', border: '1px solid #c7d2fe' },
   },
+
+  // ─── 18. AZURE CLASSIC (premium) ─────────────────────────────
+  // Conservative corporate: centered name over a thin double rule,
+  // azure section titles, right-aligned-feel dates. Safe everywhere.
+  'azure-classic': {
+    container: {
+      fontFamily: "Calibri, 'Segoe UI', Arial, sans-serif",
+      color: '#1f2937',
+      lineHeight: '1.55',
+      maxWidth: '100%',
+      height: '100%',
+      padding: '44px 50px',
+      backgroundColor: '#ffffff',
+      boxSizing: 'border-box' as const,
+    },
+    header: {
+      marginBottom: '26px',
+      paddingBottom: '16px',
+      borderBottom: '3px double #1d4ed8',
+      display: 'flex',
+      flexDirection: 'column' as const,
+      alignItems: 'center',
+      textAlign: 'center' as const,
+    },
+    profilePhoto: { width: '0px', height: '0px', display: 'none' },
+    name: {
+      fontSize: '28px',
+      fontWeight: 700,
+      marginBottom: '4px',
+      color: '#1e3a8a',
+      letterSpacing: '0.02em',
+    },
+    contact: {
+      fontSize: '12.5px',
+      display: 'flex',
+      flexWrap: 'wrap' as const,
+      gap: '14px',
+      marginTop: '8px',
+      color: '#4b5563',
+      justifyContent: 'center',
+    },
+    section: { marginBottom: '22px' },
+    sectionTitle: {
+      fontSize: '13px',
+      fontWeight: 700,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '1.5px',
+      color: '#1d4ed8',
+      marginBottom: '10px',
+      paddingBottom: '4px',
+      borderBottom: '1px solid #bfdbfe',
+    },
+    sectionContent: { marginTop: '8px' },
+    item: { marginBottom: '16px' },
+    itemTitle: { fontSize: '15px', fontWeight: 700, color: '#111827', marginBottom: '2px' },
+    itemSubtitle: { fontSize: '13.5px', fontWeight: 500, color: '#1d4ed8' },
+    itemDate: { fontSize: '12px', fontStyle: 'italic' as const, color: '#6b7280', marginBottom: '5px' },
+    itemDescription: { fontSize: '13.5px', whiteSpace: 'pre-line' as const, lineHeight: '1.55', color: '#374151' },
+    skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '6px', marginTop: '8px' },
+    skill: { padding: '4px 12px', fontSize: '11.5px', backgroundColor: '#eff6ff', color: '#1e40af', borderRadius: '3px', border: '1px solid #bfdbfe' },
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════
