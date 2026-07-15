@@ -1,5 +1,5 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, SUPABASE_FUNCTIONS_URL } from "@/integrations/supabase/client";
 
 /**
  * Enhanced utility to request resume enhancements from Gemini API via Supabase Edge Function.
@@ -37,7 +37,7 @@ export async function fetchGeminiSuggestions(request: SuggestionRequest): Promis
   const suggestionPromises = prompts.map(async (prompt) => {
     try {
       const response = await fetch(
-        "https://tkhnxiqvghvejdulvmmx.functions.supabase.co/gemini-suggest",
+        `${SUPABASE_FUNCTIONS_URL}/gemini-suggest`,
         {
           method: "POST",
           headers,
