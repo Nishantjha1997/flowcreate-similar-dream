@@ -1062,6 +1062,66 @@ const templateStyles: Record<string, TemplateStyles> = {
     skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '6px', marginTop: '8px' },
     skill: { padding: '4px 10px', fontSize: '11.5px', backgroundColor: '#ffffff', color: '#0369a1', borderRadius: '6px', border: '1px solid #bae6fd' },
   },
+
+  // ─── 16. BOLD HEADLINE (premium) ─────────────────────────────
+  // Oversized 800-weight name over a thick amber underline block;
+  // chunky uppercase section titles. Confident and modern.
+  'bold-headline': {
+    container: {
+      fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
+      color: '#1f2937',
+      lineHeight: '1.6',
+      maxWidth: '100%',
+      height: '100%',
+      padding: '46px 50px',
+      backgroundColor: '#ffffff',
+      boxSizing: 'border-box' as const,
+    },
+    header: {
+      marginBottom: '28px',
+      paddingBottom: '18px',
+      borderBottom: '6px solid #f59e0b',
+      display: 'flex',
+      flexDirection: 'column' as const,
+    },
+    profilePhoto: { width: '0px', height: '0px', display: 'none' },
+    name: {
+      fontSize: '44px',
+      fontWeight: 800,
+      marginBottom: '4px',
+      color: '#111827',
+      letterSpacing: '-0.03em',
+      lineHeight: '1.05',
+    },
+    contact: {
+      fontSize: '13px',
+      display: 'flex',
+      flexWrap: 'wrap' as const,
+      gap: '16px',
+      marginTop: '10px',
+      color: '#6b7280',
+    },
+    section: { marginBottom: '24px' },
+    sectionTitle: {
+      fontSize: '14px',
+      fontWeight: 800,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '1px',
+      color: '#111827',
+      marginBottom: '10px',
+      paddingBottom: '4px',
+      borderBottom: '3px solid #f59e0b',
+      display: 'inline-block',
+    },
+    sectionContent: { marginTop: '8px' },
+    item: { marginBottom: '17px' },
+    itemTitle: { fontSize: '16px', fontWeight: 700, color: '#111827', marginBottom: '2px' },
+    itemSubtitle: { fontSize: '14px', fontWeight: 500, color: '#b45309' },
+    itemDate: { fontSize: '12.5px', color: '#9ca3af', marginBottom: '5px' },
+    itemDescription: { fontSize: '13.5px', whiteSpace: 'pre-line' as const, lineHeight: '1.6', color: '#374151' },
+    skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '7px', marginTop: '8px' },
+    skill: { padding: '5px 13px', fontSize: '12px', fontWeight: 600, backgroundColor: '#fffbeb', color: '#92400e', borderRadius: '4px', border: '1.5px solid #fcd34d' },
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════

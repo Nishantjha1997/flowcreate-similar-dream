@@ -219,6 +219,19 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
     supportsPhoto: true,
     defaultAccent: '#0ea5e9',
   },
+  {
+    key: 'bold-headline',
+    legacyIds: [],
+    name: 'Bold Headline',
+    category: 'Creative',
+    description: 'Oversized name over a thick amber underline; chunky uppercase titles.',
+    layout: 'single',
+    atsOptimized: true,
+    featured: false,
+    premium: true,
+    supportsPhoto: false,
+    defaultAccent: '#f59e0b',
+  },
 ];
 
 // ─── Dev-time consistency guard ───────────────────────────────────────────────
