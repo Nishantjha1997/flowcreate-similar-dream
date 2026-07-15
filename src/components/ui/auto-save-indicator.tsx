@@ -26,22 +26,22 @@ export function AutoSaveIndicator({ status, lastSaved, className }: AutoSaveIndi
       case 'saving':
         return 'Saving...';
       case 'saved':
-        return 'Saved';
+        return lastSaved ? `Saved · ${formatTime(lastSaved)}` : 'Saved';
       case 'error':
-        return 'Save failed';
+        return 'Save failed (retry)';
       default:
-        return lastSaved ? `Last saved ${getTimeAgo(lastSaved)}` : 'Auto-save enabled';
+        return lastSaved ? `Saved · ${formatTime(lastSaved)}` : 'Auto-save enabled';
     }
   };
 
   const getColorClass = () => {
     switch (status) {
       case 'saving':
-        return 'text-blue-600';
+        return 'text-blue-600 dark:text-blue-400';
       case 'saved':
-        return 'text-green-600';
+        return 'text-green-600 dark:text-green-400';
       case 'error':
-        return 'text-red-600';
+        return 'text-red-600 dark:text-red-400';
       default:
         return 'text-muted-foreground';
     }
@@ -71,4 +71,8 @@ function getTimeAgo(date: Date): string {
     const days = Math.floor(diffInSeconds / 86400);
     return `${days}d ago`;
   }
+}
+
+function formatTime(date: Date): string {
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }

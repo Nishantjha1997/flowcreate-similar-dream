@@ -4,6 +4,7 @@ import { Download, Share2, Save, Loader2 } from 'lucide-react';
 import { EnhancedResumePreview } from '@/components/resume/ResumeVisualPreview';
 import { ResumeData } from '@/utils/types';
 import { cn } from '@/lib/utils';
+import { AutoSaveIndicator } from '@/components/ui/auto-save-indicator';
 
 interface ResumeHeaderSectionProps {
   resumeElementRef: React.RefObject<HTMLDivElement>;
@@ -19,6 +20,8 @@ interface ResumeHeaderSectionProps {
   templateNames: Record<string, string>;
   sectionOrder: string[];
   hiddenSections: string[];
+  saveStatus?: 'idle' | 'saving' | 'saved' | 'error';
+  lastSaved?: Date | null;
 }
 
 export const ResumeHeaderSection = ({
@@ -34,13 +37,18 @@ export const ResumeHeaderSection = ({
   templateId,
   templateNames,
   sectionOrder,
-  hiddenSections
+  hiddenSections,
+  saveStatus,
+  lastSaved
 }: ResumeHeaderSectionProps) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 w-full">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-          {isEditing ? 'Edit Resume' : 'Resume Builder'}
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span>{isEditing ? 'Edit Resume' : 'Resume Builder'}</span>
+          {saveStatus && (
+            <AutoSaveIndicator status={saveStatus} lastSaved={lastSaved} className="text-xs font-normal" />
+          )}
         </h1>
         <p className="text-xs text-muted-foreground mt-0.5">
           {isEditing ? 'Update your professional resume' : 'Create a professional resume in minutes'}

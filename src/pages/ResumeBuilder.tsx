@@ -147,8 +147,9 @@ const ResumeBuilder = () => {
               templateNames={templateNames}
               sectionOrder={activeSections}
               hiddenSections={hiddenSections}
+              saveStatus={saveStatus}
+              lastSaved={lastSaved}
             />
-            <AutoSaveIndicator status={saveStatus} lastSaved={lastSaved} />
           </div>
 
           {/* Mobile Tab Switcher */}

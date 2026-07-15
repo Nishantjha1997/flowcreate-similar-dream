@@ -1,5 +1,5 @@
 # Overhaul Progress
-## Current task: P5-T5
+## Current task: Phase 5 Stop Gate
 ## Completed
 - P0-T1: Baseline verified; progress tracker created
 - P1-T1: Created supabase/functions/_shared/aiProviders.ts (callTextModel + getAnyActiveKey)
@@ -41,6 +41,7 @@
 - P5-T2: Show page-break indicators in preview
 - P5-T3: Make builder usable on mobile with edit/preview tabs
 - P5-T4: Consistent skeletons and empty states
+- P5-T5: Visible autosave status in builder header
 
 ## Blocked / conflicts found
 (none)
