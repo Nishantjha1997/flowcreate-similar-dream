@@ -2,6 +2,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { checkRateLimit, rateLimitResponse } from '../_shared/rateLimiter.ts'
+import { getPaymentGatewayKeys } from '../_shared/paymentKeyManager.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -58,8 +59,15 @@ serve(async (req) => {
     }
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = validation.data
 
-    const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET')
-    if (!razorpayKeySecret) {
+    // Initialize Supabase client with service role (needed both to read
+    // Admin > Payments keys and to write subscriptions/payments later)
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    const { keyId: razorpayKeyId, keySecret: razorpayKeySecret } =
+      await getPaymentGatewayKeys(supabaseUrl, supabaseKey, 'razorpay')
+    if (!razorpayKeyId || !razorpayKeySecret) {
       console.error('Razorpay secret not configured')
       return new Response(
         JSON.stringify({ error: 'Payment service not configured' }),
@@ -83,11 +91,6 @@ serve(async (req) => {
       )
     }
 
-    // Initialize Supabase client with service role
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseKey)
-
     // Derive caller from Authorization header
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
@@ -107,7 +110,6 @@ serve(async (req) => {
     }
 
     // Get payment and order details from Razorpay
-    const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID')
     const auth = btoa(`${razorpayKeyId}:${razorpayKeySecret}`)
     
     const [paymentResponse, orderResponse] = await Promise.all([

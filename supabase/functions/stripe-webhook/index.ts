@@ -21,8 +21,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext'
+import { getPaymentGatewayKeys } from '../_shared/paymentKeyManager.ts'
 
 const cryptoProvider = Stripe.createSubtleCryptoProvider()
+
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
+const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -31,10 +35,7 @@ const json = (body: unknown, status = 200) =>
   })
 
 function adminClient(): SupabaseClient {
-  return createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-  )
+  return createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
 }
 
 async function notify(
@@ -76,8 +77,10 @@ async function findUserBySubscription(
 }
 
 serve(async (req) => {
-  const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
-  const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
+  // Checks Admin > Payments (payment_gateway_keys) first, falls back to
+  // STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET if not configured there.
+  const { keySecret: stripeKey, webhookSecret } =
+    await getPaymentGatewayKeys(SUPABASE_URL, SERVICE_ROLE_KEY, 'stripe')
   if (!stripeKey || !webhookSecret) return json({ error: 'Not configured' }, 500)
 
   const signature = req.headers.get('stripe-signature')

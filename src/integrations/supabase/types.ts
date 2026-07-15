@@ -10,7 +10,32 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
+    PostgrestVersion: "14.5"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -91,7 +116,7 @@ export type Database = {
       }
       analytics_events: {
         Row: {
-          created_at: string | null
+          created_at: string
           event_name: string
           event_properties: Json | null
           id: string
@@ -102,7 +127,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           event_name: string
           event_properties?: Json | null
           id?: string
@@ -113,7 +138,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           event_name?: string
           event_properties?: Json | null
           id?: string
@@ -129,7 +154,7 @@ export type Database = {
         Row: {
           application_id: string
           created_at: string
-          criteria_scores: Json | null
+          criteria_scores: Json
           feedback: string | null
           id: string
           rating: number | null
@@ -140,7 +165,7 @@ export type Database = {
         Insert: {
           application_id: string
           created_at?: string
-          criteria_scores?: Json | null
+          criteria_scores?: Json
           feedback?: string | null
           id?: string
           rating?: number | null
@@ -151,7 +176,7 @@ export type Database = {
         Update: {
           application_id?: string
           created_at?: string
-          criteria_scores?: Json | null
+          criteria_scores?: Json
           feedback?: string | null
           id?: string
           rating?: number | null
@@ -176,7 +201,7 @@ export type Database = {
           entity_id: string
           entity_type: string
           id: string
-          metadata: Json | null
+          metadata: Json
           organization_id: string
           user_id: string
         }
@@ -186,7 +211,7 @@ export type Database = {
           entity_id: string
           entity_type: string
           id?: string
-          metadata?: Json | null
+          metadata?: Json
           organization_id: string
           user_id: string
         }
@@ -196,7 +221,7 @@ export type Database = {
           entity_id?: string
           entity_type?: string
           id?: string
-          metadata?: Json | null
+          metadata?: Json
           organization_id?: string
           user_id?: string
         }
@@ -209,6 +234,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: unknown
+          new_values: Json | null
+          old_values: Json | null
+          resource_id: string | null
+          resource_type: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          new_values?: Json | null
+          old_values?: Json | null
+          resource_id?: string | null
+          resource_type: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          new_values?: Json | null
+          old_values?: Json | null
+          resource_id?: string | null
+          resource_type?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       departments: {
         Row: {
@@ -242,6 +306,39 @@ export type Database = {
           },
         ]
       }
+      feature_flags: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_enabled: boolean
+          name: string
+          plan_requirements: string[]
+          rollout_percentage: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_enabled?: boolean
+          name: string
+          plan_requirements?: string[]
+          rollout_percentage?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_enabled?: boolean
+          name?: string
+          plan_requirements?: string[]
+          rollout_percentage?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       interviews: {
         Row: {
           application_id: string
@@ -251,7 +348,7 @@ export type Database = {
           feedback: string | null
           id: string
           interview_type: string | null
-          interviewers: string[] | null
+          interviewers: string[]
           location: string | null
           meeting_link: string | null
           notes: string | null
@@ -268,7 +365,7 @@ export type Database = {
           feedback?: string | null
           id?: string
           interview_type?: string | null
-          interviewers?: string[] | null
+          interviewers?: string[]
           location?: string | null
           meeting_link?: string | null
           notes?: string | null
@@ -285,7 +382,7 @@ export type Database = {
           feedback?: string | null
           id?: string
           interview_type?: string | null
-          interviewers?: string[] | null
+          interviewers?: string[]
           location?: string | null
           meeting_link?: string | null
           notes?: string | null
@@ -304,11 +401,87 @@ export type Database = {
           },
         ]
       }
+      invoices: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          due_date: string | null
+          id: string
+          invoice_number: string
+          organization_id: string | null
+          paid_at: string | null
+          payment_id: string | null
+          pdf_url: string | null
+          status: string
+          subscription_id: string | null
+          tax_amount: number
+          total_amount: number
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          due_date?: string | null
+          id?: string
+          invoice_number?: string
+          organization_id?: string | null
+          paid_at?: string | null
+          payment_id?: string | null
+          pdf_url?: string | null
+          status?: string
+          subscription_id?: string | null
+          tax_amount?: number
+          total_amount: number
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          due_date?: string | null
+          id?: string
+          invoice_number?: string
+          organization_id?: string | null
+          paid_at?: string | null
+          payment_id?: string | null
+          pdf_url?: string | null
+          status?: string
+          subscription_id?: string | null
+          tax_amount?: number
+          total_amount?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_applications: {
         Row: {
           ai_match_score: number | null
           ai_summary: string | null
-          application_data: Json | null
+          application_data: Json
           assigned_to: string | null
           candidate_email: string
           candidate_linkedin: string | null
@@ -324,13 +497,13 @@ export type Database = {
           resume_url: string | null
           source: string | null
           status: string
-          tags: string[] | null
+          tags: string[]
           updated_at: string
         }
         Insert: {
           ai_match_score?: number | null
           ai_summary?: string | null
-          application_data?: Json | null
+          application_data?: Json
           assigned_to?: string | null
           candidate_email: string
           candidate_linkedin?: string | null
@@ -346,13 +519,13 @@ export type Database = {
           resume_url?: string | null
           source?: string | null
           status?: string
-          tags?: string[] | null
+          tags?: string[]
           updated_at?: string
         }
         Update: {
           ai_match_score?: number | null
           ai_summary?: string | null
-          application_data?: Json | null
+          application_data?: Json
           assigned_to?: string | null
           candidate_email?: string
           candidate_linkedin?: string | null
@@ -368,7 +541,7 @@ export type Database = {
           resume_url?: string | null
           source?: string | null
           status?: string
-          tags?: string[] | null
+          tags?: string[]
           updated_at?: string
         }
         Relationships: [
@@ -465,19 +638,19 @@ export type Database = {
           department_id: string | null
           description: string
           experience_level: string | null
-          hiring_managers: string[] | null
+          hiring_managers: string[]
           id: string
           job_type: string | null
           location: string | null
           organization_id: string
           published_at: string | null
-          recruiters: string[] | null
+          recruiters: string[]
           requirements: string | null
           responsibilities: string | null
-          salary_currency: string | null
+          salary_currency: string
           salary_max: number | null
           salary_min: number | null
-          settings: Json | null
+          settings: Json
           status: string
           title: string
           updated_at: string
@@ -489,19 +662,19 @@ export type Database = {
           department_id?: string | null
           description: string
           experience_level?: string | null
-          hiring_managers?: string[] | null
+          hiring_managers?: string[]
           id?: string
           job_type?: string | null
           location?: string | null
           organization_id: string
           published_at?: string | null
-          recruiters?: string[] | null
+          recruiters?: string[]
           requirements?: string | null
           responsibilities?: string | null
-          salary_currency?: string | null
+          salary_currency?: string
           salary_max?: number | null
           salary_min?: number | null
-          settings?: Json | null
+          settings?: Json
           status?: string
           title: string
           updated_at?: string
@@ -513,19 +686,19 @@ export type Database = {
           department_id?: string | null
           description?: string
           experience_level?: string | null
-          hiring_managers?: string[] | null
+          hiring_managers?: string[]
           id?: string
           job_type?: string | null
           location?: string | null
           organization_id?: string
           published_at?: string | null
-          recruiters?: string[] | null
+          recruiters?: string[]
           requirements?: string | null
           responsibilities?: string | null
-          salary_currency?: string | null
+          salary_currency?: string
           salary_max?: number | null
           salary_min?: number | null
-          settings?: Json | null
+          settings?: Json
           status?: string
           title?: string
           updated_at?: string
@@ -547,6 +720,87 @@ export type Database = {
           },
         ]
       }
+      notification_preferences: {
+        Row: {
+          ats_interview_scheduled: boolean
+          ats_new_application: boolean
+          ats_offer_updates: boolean
+          billing_alerts: boolean
+          created_at: string
+          email_enabled: boolean
+          id: string
+          in_app_enabled: boolean
+          marketing_emails: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ats_interview_scheduled?: boolean
+          ats_new_application?: boolean
+          ats_offer_updates?: boolean
+          billing_alerts?: boolean
+          created_at?: string
+          email_enabled?: boolean
+          id?: string
+          in_app_enabled?: boolean
+          marketing_emails?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ats_interview_scheduled?: boolean
+          ats_new_application?: boolean
+          ats_offer_updates?: boolean
+          billing_alerts?: boolean
+          created_at?: string
+          email_enabled?: boolean
+          id?: string
+          in_app_enabled?: boolean
+          marketing_emails?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          action_url: string | null
+          body: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          metadata: Json
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          body?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          metadata?: Json
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          body?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          metadata?: Json
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       organization_members: {
         Row: {
           created_at: string
@@ -565,7 +819,7 @@ export type Database = {
           invited_by?: string | null
           joined_at?: string
           organization_id: string
-          role: string
+          role?: string
           user_id: string
         }
         Update: {
@@ -588,6 +842,75 @@ export type Database = {
           },
         ]
       }
+      organization_subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          organization_id: string
+          plan_id: string | null
+          provider: string | null
+          razorpay_subscription_id: string | null
+          seats: number
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          organization_id: string
+          plan_id?: string | null
+          provider?: string | null
+          razorpay_subscription_id?: string | null
+          seats?: number
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          organization_id?: string
+          plan_id?: string | null
+          provider?: string | null
+          razorpay_subscription_id?: string | null
+          seats?: number
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_subscriptions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           company_size: string | null
@@ -597,7 +920,7 @@ export type Database = {
           industry: string | null
           logo_url: string | null
           name: string
-          settings: Json | null
+          settings: Json
           slug: string
           updated_at: string
           website_url: string | null
@@ -610,7 +933,7 @@ export type Database = {
           industry?: string | null
           logo_url?: string | null
           name: string
-          settings?: Json | null
+          settings?: Json
           slug: string
           updated_at?: string
           website_url?: string | null
@@ -623,10 +946,49 @@ export type Database = {
           industry?: string | null
           logo_url?: string | null
           name?: string
-          settings?: Json | null
+          settings?: Json
           slug?: string
           updated_at?: string
           website_url?: string | null
+        }
+        Relationships: []
+      }
+      payment_gateway_keys: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          is_live: boolean
+          key_id: string | null
+          key_secret: string | null
+          last_used: string | null
+          provider: string
+          updated_at: string
+          webhook_secret: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_live?: boolean
+          key_id?: string | null
+          key_secret?: string | null
+          last_used?: string | null
+          provider: string
+          updated_at?: string
+          webhook_secret?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_live?: boolean
+          key_id?: string | null
+          key_secret?: string | null
+          last_used?: string | null
+          provider?: string
+          updated_at?: string
+          webhook_secret?: string | null
         }
         Relationships: []
       }
@@ -637,11 +999,14 @@ export type Database = {
           currency: string
           id: string
           payment_method: string | null
-          razorpay_order_id: string
-          razorpay_payment_id: string
+          provider: string
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
           status: string
+          stripe_checkout_session_id: string | null
+          stripe_payment_intent_id: string | null
           subscription_id: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           amount: number
@@ -649,11 +1014,14 @@ export type Database = {
           currency?: string
           id?: string
           payment_method?: string | null
-          razorpay_order_id: string
-          razorpay_payment_id: string
+          provider?: string
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
           status: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
           subscription_id?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           amount?: number
@@ -661,11 +1029,14 @@ export type Database = {
           currency?: string
           id?: string
           payment_method?: string | null
-          razorpay_order_id?: string
-          razorpay_payment_id?: string
+          provider?: string
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
           status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
           subscription_id?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -679,31 +1050,31 @@ export type Database = {
       }
       pipeline_stages: {
         Row: {
-          color: string | null
+          color: string
           created_at: string
           description: string | null
           id: string
-          is_default: boolean | null
+          is_default: boolean
           job_id: string
           name: string
           stage_order: number
         }
         Insert: {
-          color?: string | null
+          color?: string
           created_at?: string
           description?: string | null
           id?: string
-          is_default?: boolean | null
+          is_default?: boolean
           job_id: string
           name: string
           stage_order: number
         }
         Update: {
-          color?: string | null
+          color?: string
           created_at?: string
           description?: string | null
           id?: string
-          is_default?: boolean | null
+          is_default?: boolean
           job_id?: string
           name?: string
           stage_order?: number
@@ -720,160 +1091,160 @@ export type Database = {
       }
       profiles: {
         Row: {
-          achievements: Json | null
+          achievements: Json
           address: string | null
-          auto_sync_enabled: boolean | null
+          auto_sync_enabled: boolean
           avatar_url: string | null
-          certifications: Json | null
+          certifications: Json
           city: string | null
           country: string | null
           created_at: string
           current_position: string | null
           date_of_birth: string | null
-          education: Json | null
+          education: Json
           email: string | null
           experience_level: string | null
           full_name: string | null
           github_url: string | null
           id: string
           industry: string | null
-          is_discoverable: boolean | null
-          languages: Json | null
+          is_discoverable: boolean
+          languages: Json
           last_resume_sync: string | null
           linkedin_url: string | null
           phone: string | null
           portfolio_url: string | null
           postal_code: string | null
           professional_summary: string | null
-          profile_completeness: number | null
-          projects: Json | null
-          soft_skills: Json | null
+          profile_completeness: number
+          projects: Json
+          soft_skills: Json
           state: string | null
-          technical_skills: Json | null
+          technical_skills: Json
           updated_at: string
           user_id: string
-          volunteer_experience: Json | null
+          volunteer_experience: Json
           website_url: string | null
-          work_experience: Json | null
+          work_experience: Json
         }
         Insert: {
-          achievements?: Json | null
+          achievements?: Json
           address?: string | null
-          auto_sync_enabled?: boolean | null
+          auto_sync_enabled?: boolean
           avatar_url?: string | null
-          certifications?: Json | null
+          certifications?: Json
           city?: string | null
           country?: string | null
           created_at?: string
           current_position?: string | null
           date_of_birth?: string | null
-          education?: Json | null
+          education?: Json
           email?: string | null
           experience_level?: string | null
           full_name?: string | null
           github_url?: string | null
           id?: string
           industry?: string | null
-          is_discoverable?: boolean | null
-          languages?: Json | null
+          is_discoverable?: boolean
+          languages?: Json
           last_resume_sync?: string | null
           linkedin_url?: string | null
           phone?: string | null
           portfolio_url?: string | null
           postal_code?: string | null
           professional_summary?: string | null
-          profile_completeness?: number | null
-          projects?: Json | null
-          soft_skills?: Json | null
+          profile_completeness?: number
+          projects?: Json
+          soft_skills?: Json
           state?: string | null
-          technical_skills?: Json | null
+          technical_skills?: Json
           updated_at?: string
           user_id: string
-          volunteer_experience?: Json | null
+          volunteer_experience?: Json
           website_url?: string | null
-          work_experience?: Json | null
+          work_experience?: Json
         }
         Update: {
-          achievements?: Json | null
+          achievements?: Json
           address?: string | null
-          auto_sync_enabled?: boolean | null
+          auto_sync_enabled?: boolean
           avatar_url?: string | null
-          certifications?: Json | null
+          certifications?: Json
           city?: string | null
           country?: string | null
           created_at?: string
           current_position?: string | null
           date_of_birth?: string | null
-          education?: Json | null
+          education?: Json
           email?: string | null
           experience_level?: string | null
           full_name?: string | null
           github_url?: string | null
           id?: string
           industry?: string | null
-          is_discoverable?: boolean | null
-          languages?: Json | null
+          is_discoverable?: boolean
+          languages?: Json
           last_resume_sync?: string | null
           linkedin_url?: string | null
           phone?: string | null
           portfolio_url?: string | null
           postal_code?: string | null
           professional_summary?: string | null
-          profile_completeness?: number | null
-          projects?: Json | null
-          soft_skills?: Json | null
+          profile_completeness?: number
+          projects?: Json
+          soft_skills?: Json
           state?: string | null
-          technical_skills?: Json | null
+          technical_skills?: Json
           updated_at?: string
           user_id?: string
-          volunteer_experience?: Json | null
+          volunteer_experience?: Json
           website_url?: string | null
-          work_experience?: Json | null
+          work_experience?: Json
         }
         Relationships: []
       }
       resume_templates: {
         Row: {
           category: string
-          created_at: string | null
+          created_at: string
           description: string | null
           id: string
-          is_active: boolean | null
-          is_ats_optimized: boolean | null
-          is_featured: boolean | null
+          is_active: boolean
+          is_ats_optimized: boolean
+          is_featured: boolean
           name: string
           preview_url: string | null
           template_key: string
-          updated_at: string | null
-          usage_count: number | null
+          updated_at: string
+          usage_count: number
         }
         Insert: {
           category: string
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           id?: string
-          is_active?: boolean | null
-          is_ats_optimized?: boolean | null
-          is_featured?: boolean | null
+          is_active?: boolean
+          is_ats_optimized?: boolean
+          is_featured?: boolean
           name: string
           preview_url?: string | null
           template_key: string
-          updated_at?: string | null
-          usage_count?: number | null
+          updated_at?: string
+          usage_count?: number
         }
         Update: {
           category?: string
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           id?: string
-          is_active?: boolean | null
-          is_ats_optimized?: boolean | null
-          is_featured?: boolean | null
+          is_active?: boolean
+          is_ats_optimized?: boolean
+          is_featured?: boolean
           name?: string
           preview_url?: string | null
           template_key?: string
-          updated_at?: string | null
-          usage_count?: number | null
+          updated_at?: string
+          usage_count?: number
         }
         Relationships: []
       }
@@ -882,7 +1253,7 @@ export type Database = {
           created_at: string
           id: string
           resume_data: Json
-          template_id: string | null
+          template_id: string
           updated_at: string
           user_id: string
         }
@@ -890,7 +1261,7 @@ export type Database = {
           created_at?: string
           id?: string
           resume_data: Json
-          template_id?: string | null
+          template_id?: string
           updated_at?: string
           user_id: string
         }
@@ -898,7 +1269,7 @@ export type Database = {
           created_at?: string
           id?: string
           resume_data?: Json
-          template_id?: string | null
+          template_id?: string
           updated_at?: string
           user_id?: string
         }
@@ -928,50 +1299,136 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_plans: {
+        Row: {
+          billing_interval: string
+          created_at: string
+          description: string | null
+          display_order: number
+          features: Json
+          id: string
+          is_active: boolean
+          is_public: boolean
+          limits: Json
+          name: string
+          price_inr: number
+          price_usd: number
+          product: string
+          razorpay_plan_id: string | null
+          slug: string
+          stripe_price_id: string | null
+          trial_days: number
+          updated_at: string
+        }
+        Insert: {
+          billing_interval: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          features?: Json
+          id?: string
+          is_active?: boolean
+          is_public?: boolean
+          limits?: Json
+          name: string
+          price_inr?: number
+          price_usd?: number
+          product?: string
+          razorpay_plan_id?: string | null
+          slug: string
+          stripe_price_id?: string | null
+          trial_days?: number
+          updated_at?: string
+        }
+        Update: {
+          billing_interval?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          features?: Json
+          id?: string
+          is_active?: boolean
+          is_public?: boolean
+          limits?: Json
+          name?: string
+          price_inr?: number
+          price_usd?: number
+          product?: string
+          razorpay_plan_id?: string | null
+          slug?: string
+          stripe_price_id?: string | null
+          trial_days?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
+          cancel_at_period_end: boolean
           created_at: string
           current_period_end: string | null
           current_period_start: string | null
           expires_at: string | null
           id: string
           is_premium: boolean
-          plan_type: string | null
+          plan_id: string | null
+          plan_type: string
+          provider: string | null
           razorpay_customer_id: string | null
           razorpay_payment_id: string | null
-          status: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
           expires_at?: string | null
           id?: string
           is_premium?: boolean
-          plan_type?: string | null
+          plan_id?: string | null
+          plan_type?: string
+          provider?: string | null
           razorpay_customer_id?: string | null
           razorpay_payment_id?: string | null
-          status?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
           expires_at?: string | null
           id?: string
           is_premium?: boolean
-          plan_type?: string | null
+          plan_id?: string | null
+          plan_type?: string
+          provider?: string | null
           razorpay_customer_id?: string | null
           razorpay_payment_id?: string | null
-          status?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       talent_pool_candidates: {
         Row: {
@@ -1029,7 +1486,7 @@ export type Database = {
           id: string
           name: string
           organization_id: string
-          tags: string[] | null
+          tags: string[]
           updated_at: string
         }
         Insert: {
@@ -1039,7 +1496,7 @@ export type Database = {
           id?: string
           name: string
           organization_id: string
-          tags?: string[] | null
+          tags?: string[]
           updated_at?: string
         }
         Update: {
@@ -1049,7 +1506,7 @@ export type Database = {
           id?: string
           name?: string
           organization_id?: string
-          tags?: string[] | null
+          tags?: string[]
           updated_at?: string
         }
         Relationships: [
@@ -1065,51 +1522,90 @@ export type Database = {
       usage_limits: {
         Row: {
           ai_requests: number
-          created_at: string | null
+          created_at: string
           id: string
-          last_reset_at: string | null
+          last_reset_at: string
           resumes_created: number
-          templates_used: string[] | null
-          updated_at: string | null
+          templates_used: string[]
+          updated_at: string
           user_id: string
         }
         Insert: {
           ai_requests?: number
-          created_at?: string | null
+          created_at?: string
           id?: string
-          last_reset_at?: string | null
+          last_reset_at?: string
           resumes_created?: number
-          templates_used?: string[] | null
-          updated_at?: string | null
+          templates_used?: string[]
+          updated_at?: string
           user_id: string
         }
         Update: {
           ai_requests?: number
-          created_at?: string | null
+          created_at?: string
           id?: string
-          last_reset_at?: string | null
+          last_reset_at?: string
           resumes_created?: number
-          templates_used?: string[] | null
-          updated_at?: string | null
+          templates_used?: string[]
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
       }
       user_roles: {
         Row: {
+          created_at: string
           id: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
+          created_at?: string
           id?: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
+          created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      webhook_events: {
+        Row: {
+          error: string | null
+          event_id: string
+          event_type: string | null
+          id: string
+          payload: Json | null
+          processed_at: string | null
+          provider: string
+          received_at: string
+          status: string
+        }
+        Insert: {
+          error?: string | null
+          event_id: string
+          event_type?: string | null
+          id?: string
+          payload?: Json | null
+          processed_at?: string | null
+          provider: string
+          received_at?: string
+          status?: string
+        }
+        Update: {
+          error?: string | null
+          event_id?: string
+          event_type?: string | null
+          id?: string
+          payload?: Json | null
+          processed_at?: string | null
+          provider?: string
+          received_at?: string
+          status?: string
         }
         Relationships: []
       }
@@ -1140,7 +1636,6 @@ export type Database = {
           technical_skills: Json | null
           updated_at: string | null
           user_id: string | null
-          website_url: string | null
           work_experience: Json | null
         }
         Insert: {
@@ -1167,7 +1662,6 @@ export type Database = {
           technical_skills?: Json | null
           updated_at?: string | null
           user_id?: string | null
-          website_url?: string | null
           work_experience?: Json | null
         }
         Update: {
@@ -1194,7 +1688,6 @@ export type Database = {
           technical_skills?: Json | null
           updated_at?: string | null
           user_id?: string | null
-          website_url?: string | null
           work_experience?: Json | null
         }
         Relationships: []
@@ -1205,12 +1698,16 @@ export type Database = {
         Args: { profile_data: Json }
         Returns: number
       }
+      expire_subscriptions: { Args: never; Returns: undefined }
+      generate_invoice_number: { Args: never; Returns: string }
+      get_org_entitlements: { Args: { p_org_id: string }; Returns: Json }
+      get_user_entitlements: { Args: { p_user_id?: string }; Returns: Json }
       get_user_role: {
-        Args: { user_id: string }
+        Args: { p_user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
       }
       has_org_role: {
-        Args: { org_id: string; required_role: string }
+        Args: { p_org_id: string; p_required_role: string }
         Returns: boolean
       }
       has_role: {
@@ -1221,8 +1718,9 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
-      is_org_member: { Args: { org_id: string }; Returns: boolean }
+      is_org_member: { Args: { p_org_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      org_has_members: { Args: { p_org_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
@@ -1351,6 +1849,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],

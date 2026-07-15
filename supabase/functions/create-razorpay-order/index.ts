@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { checkRateLimit, rateLimitResponse } from '../_shared/rateLimiter.ts'
+import { getPaymentGatewayKeys } from '../_shared/paymentKeyManager.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -67,8 +68,11 @@ serve(async (req) => {
 
     const amount = PLAN_PRICES[planType]
 
-    const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID')
-    const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET')
+    // Checks Admin > Payments (payment_gateway_keys) first, falls back to
+    // RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET secrets if not configured there.
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    const { keyId: razorpayKeyId, keySecret: razorpayKeySecret } =
+      await getPaymentGatewayKeys(supabaseUrl, serviceRoleKey, 'razorpay')
 
     if (!razorpayKeyId || !razorpayKeySecret) {
       return new Response(

@@ -21,6 +21,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { getPaymentGatewayKeys } from '../_shared/paymentKeyManager.ts'
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -52,7 +53,9 @@ function timingSafeEqual(a: string, b: string): boolean {
 }
 
 serve(async (req) => {
-  const webhookSecret = Deno.env.get('RAZORPAY_WEBHOOK_SECRET')
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  const { webhookSecret } = await getPaymentGatewayKeys(supabaseUrl, serviceRoleKey, 'razorpay')
   if (!webhookSecret) return json({ error: 'Not configured' }, 500)
 
   const signature = req.headers.get('x-razorpay-signature')
@@ -79,10 +82,7 @@ serve(async (req) => {
     (payload as any)?.payload?.payment?.entity?.id ?? crypto.randomUUID()
   }`
 
-  const admin = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-  )
+  const admin = createClient(supabaseUrl, serviceRoleKey)
 
   // --- Idempotency (same protocol as stripe-webhook) ---
   const { error: insertError } = await admin.from('webhook_events').insert({

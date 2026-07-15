@@ -13,6 +13,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext'
 import { checkRateLimit, rateLimitResponse } from '../_shared/rateLimiter.ts'
+import { getPaymentGatewayKeys } from '../_shared/paymentKeyManager.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -39,17 +40,19 @@ serve(async (req) => {
   }
 
   try {
-    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+
+    // Checks Admin > Payments (payment_gateway_keys) first, falls back to
+    // STRIPE_SECRET_KEY if not configured there.
+    const { keySecret: stripeKey } = await getPaymentGatewayKeys(supabaseUrl, serviceRoleKey, 'stripe')
     if (!stripeKey) return json({ error: 'Stripe is not configured' }, 500)
 
     // --- Authenticate caller ---
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) return json({ error: 'Unauthorized' }, 401)
 
-    const supabaseAnon = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    )
+    const supabaseAnon = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? '')
     const token = authHeader.replace('Bearer ', '')
     const { data: userData, error: userError } = await supabaseAnon.auth.getUser(token)
     if (userError || !userData?.user) return json({ error: 'Unauthorized' }, 401)
@@ -63,10 +66,7 @@ serve(async (req) => {
     const { planType, successUrl, cancelUrl } = await req.json()
     if (typeof planType !== 'string') return json({ error: 'Invalid planType' }, 400)
 
-    const admin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const admin = createClient(supabaseUrl, serviceRoleKey)
     const { data: plan, error: planError } = await admin
       .from('subscription_plans')
       .select('*')

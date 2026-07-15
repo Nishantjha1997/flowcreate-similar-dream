@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import "https://deno.land/x/xhr@0.1.0/mod.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { checkRateLimit, rateLimitResponse } from '../_shared/rateLimiter.ts'
+import { AIKeyManager } from '../_shared/aiKeyManager.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -50,8 +51,14 @@ serve(async (req) => {
     if (!rl.allowed) {
       return rateLimitResponse(corsHeaders, rl.resetAt);
     }
-    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
-    
+    // Checks Admin > AI Management (ai_api_keys) first, same source
+    // gemini-suggest uses, falling back to the GEMINI_API_KEY secret.
+    const keyManager = new AIKeyManager(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+    const GEMINI_API_KEY = (await keyManager.getActiveKey('gemini')) ?? Deno.env.get('GEMINI_API_KEY')
+
     if (!GEMINI_API_KEY) {
       console.log('GEMINI_API_KEY is not configured')
       return new Response(JSON.stringify({ 

@@ -1,4 +1,4 @@
-project_id = "tkhnxiqvghvejdulvmmx"
+project_id = "ufzxrojekrrvlweadnkq"
 
 [functions.admin-list-users]
 verify_jwt = false
@@ -7,4 +7,10 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.admin-add-org-member]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.razorpay-webhook]
 verify_jwt = false
