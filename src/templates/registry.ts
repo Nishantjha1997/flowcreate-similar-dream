@@ -232,6 +232,19 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
     supportsPhoto: false,
     defaultAccent: '#f59e0b',
   },
+  {
+    key: 'soft-cards',
+    legacyIds: [],
+    name: 'Soft Cards',
+    category: 'Minimal',
+    description: 'Sections in soft rounded cards with hairline borders. Calm and contemporary.',
+    layout: 'single',
+    atsOptimized: true,
+    featured: false,
+    premium: true,
+    supportsPhoto: false,
+    defaultAccent: '#6366f1',
+  },
 ];
 
 // ─── Dev-time consistency guard ───────────────────────────────────────────────

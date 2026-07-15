@@ -1122,6 +1122,70 @@ const templateStyles: Record<string, TemplateStyles> = {
     skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '7px', marginTop: '8px' },
     skill: { padding: '5px 13px', fontSize: '12px', fontWeight: 600, backgroundColor: '#fffbeb', color: '#92400e', borderRadius: '4px', border: '1.5px solid #fcd34d' },
   },
+
+  // ─── 17. SOFT CARDS (premium) ────────────────────────────────
+  // Every section sits in a soft slate card with rounded corners and
+  // a hairline border. Calm, contemporary, app-like.
+  'soft-cards': {
+    container: {
+      fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
+      color: '#334155',
+      lineHeight: '1.6',
+      maxWidth: '100%',
+      height: '100%',
+      padding: '40px 44px',
+      backgroundColor: '#ffffff',
+      boxSizing: 'border-box' as const,
+    },
+    header: {
+      marginBottom: '20px',
+      padding: '22px 24px',
+      backgroundColor: '#f8fafc',
+      border: '1px solid #e2e8f0',
+      borderRadius: '12px',
+      display: 'flex',
+      flexDirection: 'column' as const,
+    },
+    profilePhoto: { width: '0px', height: '0px', display: 'none' },
+    name: {
+      fontSize: '28px',
+      fontWeight: 700,
+      marginBottom: '4px',
+      color: '#6366f1',
+      letterSpacing: '-0.02em',
+    },
+    contact: {
+      fontSize: '12.5px',
+      display: 'flex',
+      flexWrap: 'wrap' as const,
+      gap: '14px',
+      marginTop: '8px',
+      color: '#64748b',
+    },
+    section: {
+      marginBottom: '16px',
+      padding: '18px 20px',
+      backgroundColor: '#f8fafc',
+      border: '1px solid #e2e8f0',
+      borderRadius: '10px',
+    },
+    sectionTitle: {
+      fontSize: '12px',
+      fontWeight: 700,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '2px',
+      color: '#6366f1',
+      marginBottom: '10px',
+    },
+    sectionContent: { marginTop: '6px' },
+    item: { marginBottom: '14px' },
+    itemTitle: { fontSize: '15px', fontWeight: 600, color: '#1e293b', marginBottom: '2px' },
+    itemSubtitle: { fontSize: '13.5px', fontWeight: 500, color: '#4f46e5' },
+    itemDate: { fontSize: '12px', color: '#94a3b8', marginBottom: '5px' },
+    itemDescription: { fontSize: '13.5px', whiteSpace: 'pre-line' as const, lineHeight: '1.6', color: '#475569' },
+    skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '6px', marginTop: '6px' },
+    skill: { padding: '4px 12px', fontSize: '11.5px', backgroundColor: '#ffffff', color: '#4f46e5', borderRadius: '8px', border: '1px solid #c7d2fe' },
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════
