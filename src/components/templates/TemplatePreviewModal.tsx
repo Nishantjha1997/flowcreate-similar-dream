@@ -9,14 +9,14 @@ interface TemplatePreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   template: {
-    id: number;
+    id: number | string;
     name: string;
     description: string;
     category: string;
     templateKey?: string;
     image?: string;
   };
-  onCustomize?: (templateId: number) => void;
+  onCustomize?: (templateId: any) => void;
 }
 
 const TemplatePreviewModal = ({ isOpen, onClose, template, onCustomize }: TemplatePreviewModalProps) => {

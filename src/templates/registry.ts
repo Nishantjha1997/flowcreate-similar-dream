@@ -23,7 +23,7 @@ export interface TemplateDefinition {
 export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
   {
     key: 'clean-slate',
-    legacyIds: ['1'],
+    legacyIds: ['1', 'modern'],
     name: 'Clean Slate',
     category: 'Minimal',
     description: 'Ultra-minimal single column with thin top accent line and maximum white space.',
@@ -36,7 +36,7 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
   },
   {
     key: 'executive-serif',
-    legacyIds: ['2'],
+    legacyIds: ['2', 'classic', 'executive'],
     name: 'Executive Serif',
     category: 'Executive',
     description: 'Timeless serif design with centered header and double-rule section dividers.',
@@ -62,7 +62,7 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
   },
   {
     key: 'tech-engineer',
-    legacyIds: ['4'],
+    legacyIds: ['4', 'technical', 'developer', 'data-scientist'],
     name: 'Tech Engineer',
     category: 'Technology',
     description: 'Dark slate header with cyan accents; monospace font for a developer-first look.',
@@ -75,7 +75,7 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
   },
   {
     key: 'coral-creative',
-    legacyIds: ['5'],
+    legacyIds: ['5', 'creative', 'elegant'],
     name: 'Coral Creative',
     category: 'Creative',
     description: 'Warm coral palette with bold section headers and expressive typographic rhythm.',
@@ -88,7 +88,7 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
   },
   {
     key: 'navy-professional',
-    legacyIds: ['6'],
+    legacyIds: ['6', 'professional'],
     name: 'Navy Professional',
     category: 'Professional',
     description: 'Navy blue header band with clean two-tone layout; perfect for corporate roles.',
@@ -101,7 +101,7 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
   },
   {
     key: 'emerald-minimal',
-    legacyIds: ['7'],
+    legacyIds: ['7', 'minimalist'],
     name: 'Emerald Minimal',
     category: 'Minimal',
     description: 'Fresh emerald green accents on a clean white canvas with generous spacing.',
