@@ -78,6 +78,41 @@ serve(async (req) => {
       );
     }
 
+    // ── Plan metering (defense in depth; the UI also gates free users) ──
+    // Cap comes from subscription_plans via get_user_entitlements:
+    // -1 = unlimited, 0 = none (free plan). Usage is tracked in
+    // usage_limits.ai_requests with a rolling 30-day reset.
+    const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    const { data: ent } = await admin.rpc('get_user_entitlements', { p_user_id: userId });
+    const rawCap = (ent as { limits?: { ai_requests_per_month?: unknown } } | null)?.limits?.ai_requests_per_month;
+    const cap = typeof rawCap === 'number' ? rawCap : 0;
+
+    const { data: usage } = await admin
+      .from('usage_limits')
+      .select('ai_requests, last_reset_at')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+    const resetDue = usage?.last_reset_at
+      ? Date.now() - new Date(usage.last_reset_at).getTime() > THIRTY_DAYS_MS
+      : false;
+    const used = resetDue ? 0 : (usage?.ai_requests ?? 0);
+
+    if (cap === 0) {
+      return new Response(
+        JSON.stringify({ error: "AI suggestions are a Premium feature. Upgrade on the Pricing page to unlock them." }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    if (cap !== -1 && used >= cap) {
+      return new Response(
+        JSON.stringify({ error: `You've used all ${cap} AI suggestions in your plan for this month. Your quota resets automatically.` }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Resolve key: try any active provider from DB, then fall back to env GEMINI_API_KEY
     const keyManager = new AIKeyManager(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     let resolved = await getAnyActiveKey(keyManager);
@@ -113,6 +148,19 @@ serve(async (req) => {
     }
 
     if (result.text) {
+      // Record usage (best-effort; a lost increment is acceptable, a blocked
+      // suggestion is not — so failures here never fail the request)
+      const { error: meterError } = await admin.from('usage_limits').upsert(
+        {
+          user_id: userId,
+          ai_requests: used + 1,
+          last_reset_at: resetDue || !usage?.last_reset_at ? new Date().toISOString() : usage.last_reset_at,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' }
+      );
+      if (meterError) console.error('[AI Suggest] usage metering failed:', meterError.message);
+
       return new Response(
         JSON.stringify({ suggestion: result.text }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
