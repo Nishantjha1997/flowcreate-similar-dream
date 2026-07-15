@@ -116,7 +116,7 @@ const fontPairOptions = [
 ];
 
 const sectionIcons = {
-  personal: <User className="h-4 w-4" />,
+  summary: <User className="h-4 w-4" />,
   contact: <Phone className="h-4 w-4" />,
   experience: <Briefcase className="h-4 w-4" />,
   education: <GraduationCap className="h-4 w-4" />,
@@ -137,7 +137,7 @@ export const CustomizationPanel = ({
 }: CustomizationPanelProps) => {
   const [activeTab, setActiveTab] = useState('colors');
   const [sectionsOrder, setSectionsOrder] = useState<string[]>(
-    customization.sectionsOrder || ['personal', 'experience', 'education', 'skills', 'projects']
+    customization.sectionsOrder || ['summary', 'experience', 'education', 'skills', 'projects']
   );
   const [hiddenSections, setHiddenSections] = useState<string[]>(
     customization.hiddenSections || []

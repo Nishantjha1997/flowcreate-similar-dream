@@ -1,5 +1,5 @@
 # Overhaul Progress
-## Current task: P4-T5
+## Current task: Phase 4 Stop Gate
 ## Completed
 - P0-T1: Baseline verified; progress tracker created
 - P1-T1: Created supabase/functions/_shared/aiProviders.ts (callTextModel + getAnyActiveKey)
@@ -36,6 +36,7 @@
 - P4-T2: Add font pairing presets and wire to adapter/renderer
 - P4-T3: Expose density and line-height controls as segmented tabs
 - P4-T4: Add photo visibility and shape controls
+- P4-T5: Align section manager keys with renderer
 
 ## Blocked / conflicts found
 (none)

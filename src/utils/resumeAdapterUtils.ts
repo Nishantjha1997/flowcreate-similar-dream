@@ -40,6 +40,24 @@ export interface ResumeData {
     link?: string;
     technologies?: string[];
   }[];
+  languages?: {
+    language: string;
+    proficiency: string;
+  }[];
+  interests?: string[];
+  certifications?: {
+    name: string;
+    issuer: string;
+    date: string;
+    url?: string;
+  }[];
+  volunteer?: {
+    organization: string;
+    role: string;
+    startDate: string;
+    endDate: string;
+    description: string;
+  }[];
   customization: {
     primaryColor: string;
     secondaryColor?: string;
@@ -109,6 +127,10 @@ export const adaptResumeData = (data: ResumeData): TypesResumeData => {
       link: project.link,
       technologies: project.technologies
     })) || [],
+    languages: data.languages || [],
+    interests: data.interests || [],
+    certifications: data.certifications || [],
+    volunteer: data.volunteer || [],
     customization: {
       primaryColor: data.customization?.primaryColor || '#2563eb', // Provide default value
       secondaryColor: data.customization?.secondaryColor,
@@ -175,6 +197,10 @@ export const reverseAdaptResumeData = (data: TypesResumeData): Partial<ResumeDat
       link: project.link,
       technologies: project.technologies
     })) || [],
+    languages: data.languages || [],
+    interests: data.interests || [],
+    certifications: data.certifications || [],
+    volunteer: data.volunteer || [],
     customization: {
       primaryColor: data.customization?.primaryColor || '#2563eb', // Ensure primaryColor always has a value
       secondaryColor: data.customization?.secondaryColor,

@@ -30,7 +30,7 @@ interface SectionDragDropCustomizerProps {
 }
 
 const sectionIcons: Record<string, React.ReactNode> = {
-  personal: <User className="h-4 w-4" />,
+  summary: <User className="h-4 w-4" />,
   experience: <Briefcase className="h-4 w-4" />,
   education: <GraduationCap className="h-4 w-4" />,
   skills: <Award className="h-4 w-4" />,
@@ -42,7 +42,7 @@ const sectionIcons: Record<string, React.ReactNode> = {
 };
 
 const availableSections = [
-  { id: 'personal', label: 'Personal Info' },
+  { id: 'summary', label: 'Summary' },
   { id: 'experience', label: 'Experience' },
   { id: 'education', label: 'Education' },
   { id: 'skills', label: 'Skills' },
@@ -54,7 +54,7 @@ const availableSections = [
 ];
 
 export const SectionDragDropCustomizer = ({
-  activeSections = ['personal', 'experience', 'education', 'skills', 'projects'],
+  activeSections = ['summary', 'experience', 'education', 'skills', 'projects'],
   hiddenSections = [],
   sectionTitles = {},
   onSectionsChange,

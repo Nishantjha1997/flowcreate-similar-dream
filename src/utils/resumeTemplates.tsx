@@ -1642,13 +1642,89 @@ const ResumeTemplate = ({
           );
         }
         break;
+      case "languages":
+        if (resumeData.languages && resumeData.languages.length > 0) {
+          const sectionTitleStr = (resumeData.customization?.sectionTitles?.languages) || "Languages";
+          return (
+            <div style={styles.section} key="languages">
+              <div style={secTitle}>{sectionTitleStr}</div>
+              <div style={styles.sectionContent}>
+                {resumeData.languages.map((lang, idx) => (
+                  <div key={idx} style={{ ...styles.item, marginBottom: '4px' }}>
+                    <span style={styles.itemTitle}>{lang.language}</span>
+                    {lang.proficiency && <span style={{ ...styles.itemSubtitle, marginLeft: '8px' }}>({lang.proficiency})</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        break;
+      case "interests":
+        if (resumeData.interests && resumeData.interests.length > 0) {
+          const sectionTitleStr = (resumeData.customization?.sectionTitles?.interests) || "Interests";
+          return (
+            <div style={styles.section} key="interests">
+              <div style={secTitle}>{sectionTitleStr}</div>
+              <div style={styles.skillsList}>
+                {resumeData.interests.map((interest, idx) => (
+                  <div key={idx} style={styles.skill}>{interest}</div>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        break;
+      case "certifications":
+        if (resumeData.certifications && resumeData.certifications.length > 0) {
+          const sectionTitleStr = (resumeData.customization?.sectionTitles?.certifications) || "Certifications";
+          return (
+            <div style={styles.section} key="certifications">
+              <div style={secTitle}>{sectionTitleStr}</div>
+              <div style={styles.sectionContent}>
+                {resumeData.certifications.map((cert, idx) => (
+                  <div key={idx} style={styles.item}>
+                    <div style={styles.itemTitle}>
+                      {cert.name}
+                      {cert.url && (
+                        <a href={cert.url} target="_blank" rel="noopener noreferrer" style={{ marginLeft: '8px', fontSize: '14px' }}>↗</a>
+                      )}
+                    </div>
+                    <div style={styles.itemSubtitle}>{cert.issuer} {cert.date ? `| ${cert.date}` : ''}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        break;
+      case "volunteer":
+        if (resumeData.volunteer && resumeData.volunteer.length > 0) {
+          const sectionTitleStr = (resumeData.customization?.sectionTitles?.volunteer) || "Volunteer Work";
+          return (
+            <div style={styles.section} key="volunteer">
+              <div style={secTitle}>{sectionTitleStr}</div>
+              <div style={styles.sectionContent}>
+                {resumeData.volunteer.map((vol, idx) => (
+                  <div key={idx} style={styles.item}>
+                    <div style={styles.itemTitle}>{vol.role}</div>
+                    <div style={styles.itemSubtitle}>{vol.organization}</div>
+                    <div style={styles.itemDate}>{vol.startDate} - {vol.endDate}</div>
+                    {vol.description && <div style={styles.itemDescription}>{vol.description}</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        break;
       default:
         return null;
     }
     return null;
   };
 
-  const defaultOrder = ["summary", "experience", "education", "skills", "projects"];
+  const defaultOrder = ["summary", "experience", "education", "skills", "projects", "languages", "interests", "certifications", "volunteer"];
   const useOrder = sectionOrder && sectionOrder.length > 0 ? sectionOrder : defaultOrder;
 
   const templateDef = getTemplate(resolvedKey);
