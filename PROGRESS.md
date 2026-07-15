@@ -1,7 +1,8 @@
 # Overhaul Progress
-## Current task: P1-T1
+## Current task: P1-T2
 ## Completed
 - P0-T1: Baseline verified; progress tracker created
+- P1-T1: Created supabase/functions/_shared/aiProviders.ts (callTextModel + getAnyActiveKey)
 ## Blocked / conflicts found
 (none)
 ## Baseline notes
