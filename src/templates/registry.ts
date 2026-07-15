@@ -141,6 +141,19 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
     supportsPhoto: false,
     defaultAccent: '#14b8a6',
   },
+  {
+    key: 'header-band',
+    legacyIds: [],
+    name: 'Header Band',
+    category: 'Creative',
+    description: 'Full-width indigo header band with photo; clean single-column body.',
+    layout: 'header-band',
+    atsOptimized: true,
+    featured: true,
+    premium: true,
+    supportsPhoto: true,
+    defaultAccent: '#4f46e5',
+  },
 ];
 
 // ─── Dev-time consistency guard ───────────────────────────────────────────────
