@@ -1,5 +1,5 @@
 # Overhaul Progress
-## Current task: P5-T2
+## Current task: P5-T3
 ## Completed
 - P0-T1: Baseline verified; progress tracker created
 - P1-T1: Created supabase/functions/_shared/aiProviders.ts (callTextModel + getAnyActiveKey)
@@ -38,6 +38,7 @@
 - P4-T4: Add photo visibility and shape controls
 - P4-T5: Align section manager keys with renderer
 - P5-T1: Add paged A4 preview with zoom
+- P5-T2: Show page-break indicators in preview
 
 ## Blocked / conflicts found
 (none)

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { ResumeVisualPreview } from '@/components/resume/ResumeVisualPreview';
 import { ResumeData } from '@/utils/types';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,71 @@ interface ResumePreviewSectionProps {
   hiddenSections: string[];
   onDownload?: () => void;
 }
+
+const PageBreakIndicators = ({ containerRef }: { containerRef: React.RefObject<HTMLDivElement> }) => {
+  const [pages, setPages] = useState<number[]>([]);
+  const [containerStyle, setContainerStyle] = useState<{ left: string; width: string }>({ left: '0px', width: '794px' });
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const checkHeight = () => {
+      const height = el.scrollHeight;
+      const pageHeight = 1123;
+      const pageCount = Math.floor(height / pageHeight);
+      const newPages = [];
+      for (let i = 1; i <= pageCount; i++) {
+        newPages.push(i);
+      }
+      setPages(newPages);
+
+      // Align exactly with the resume-container positioning
+      setContainerStyle({
+        left: `${el.offsetLeft}px`,
+        width: `${el.offsetWidth}px`
+      });
+    };
+
+    checkHeight();
+    
+    const observer = new ResizeObserver(checkHeight);
+    observer.observe(el);
+    
+    // Also handle window resize
+    window.addEventListener('resize', checkHeight);
+    
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', checkHeight);
+    };
+  }, [containerRef]);
+
+  if (pages.length === 0) return null;
+
+  return (
+    <div 
+      className="absolute pointer-events-none z-10"
+      style={{ left: containerStyle.left, width: containerStyle.width, top: 0, bottom: 0 }}
+    >
+      {pages.map((pageNum) => {
+        const topPos = pageNum * 1123;
+        return (
+          <div 
+            key={pageNum} 
+            className="absolute left-0 right-0 flex items-center"
+            style={{ top: `${topPos}px`, transform: 'translateY(-50%)' }}
+          >
+            <div className="w-full border-t-2 border-dashed border-red-400/50" />
+            <span className="absolute right-4 bg-red-500 text-white text-[9px] font-semibold px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap uppercase tracking-wider">
+              Page {pageNum + 1}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 export const ResumePreviewSection = ({ 
   resume, 
@@ -143,7 +208,7 @@ export const ResumePreviewSection = ({
         isNeoBrutalism && "bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,hsl(var(--muted)/0.1)_10px,hsl(var(--muted)/0.1)_20px)]"
       )}>
         <div 
-          className="transition-transform duration-300 ease-out origin-top"
+          className="transition-transform duration-300 ease-out origin-top relative"
           style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
         >
           <div 
@@ -165,6 +230,8 @@ export const ResumePreviewSection = ({
               hiddenSections={hiddenSections}
             />
           </div>
+          
+          <PageBreakIndicators containerRef={resumeRef} />
         </div>
       </div>
       
