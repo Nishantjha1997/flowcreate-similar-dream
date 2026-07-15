@@ -21,6 +21,9 @@ export type TemplateStyles = {
   profilePhoto?: CSSProperties;
   sidebar?: CSSProperties;
   mainContent?: CSSProperties;
+  // Optional override for section titles rendered inside a sidebar (e.g. a
+  // dark aside where the shared sectionTitle color would be unreadable).
+  sidebarSectionTitle?: CSSProperties;
 };
 
 const applyCustomization = (
@@ -544,6 +547,87 @@ const templateStyles: Record<string, TemplateStyles> = {
     skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '6px', marginTop: '8px' },
     skill: { padding: '4px 12px', fontSize: '11.5px', backgroundColor: '#ecfdf5', color: '#065f46', borderRadius: '4px', border: '1px solid #a7f3d0' },
   },
+
+  // ─── 8. SPLIT FRAME (premium) ────────────────────────────────
+  // True two-column: dark slate left sidebar (photo, contact, skills),
+  // clean white main column with sky-blue accents.
+  'split-frame': {
+    container: {
+      fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
+      color: '#111827',
+      lineHeight: '1.6',
+      maxWidth: '100%',
+      height: '100%',
+      backgroundColor: '#ffffff',
+      boxSizing: 'border-box' as const,
+    },
+    sidebar: {
+      width: '32%',
+      backgroundColor: '#1e293b',
+      color: '#e2e8f0',
+      padding: '40px 24px',
+      boxSizing: 'border-box' as const,
+      display: 'flex',
+      flexDirection: 'column' as const,
+      gap: '16px',
+    },
+    mainContent: {
+      flex: 1,
+      padding: '40px 36px',
+      boxSizing: 'border-box' as const,
+    },
+    header: {
+      marginBottom: '22px',
+      paddingBottom: '14px',
+      borderBottom: '2px solid #38bdf8',
+    },
+    profilePhoto: { width: '96px', height: '96px', borderRadius: '50%', objectFit: 'cover' as const, border: '3px solid #38bdf8', marginBottom: '6px' },
+    name: {
+      fontSize: '30px',
+      fontWeight: 700,
+      marginBottom: '2px',
+      color: '#0f172a',
+      letterSpacing: '-0.02em',
+    },
+    contact: {
+      fontSize: '12px',
+      color: '#cbd5e1',
+      display: 'flex',
+      flexDirection: 'column' as const,
+      gap: '2px',
+      marginTop: '4px',
+      wordBreak: 'break-word' as const,
+    },
+    section: { marginBottom: '20px' },
+    sectionTitle: {
+      fontSize: '12px',
+      fontWeight: 700,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '2px',
+      color: '#0369a1',
+      marginBottom: '10px',
+      paddingBottom: '5px',
+      borderBottom: '1.5px solid #bae6fd',
+    },
+    sidebarSectionTitle: {
+      fontSize: '12px',
+      fontWeight: 700,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '2px',
+      color: '#38bdf8',
+      marginBottom: '10px',
+      paddingBottom: '5px',
+      borderBottom: '1.5px solid #334155',
+    },
+    sectionContent: { marginTop: '8px' },
+    item: { marginBottom: '16px' },
+    itemTitle: { fontSize: '15px', fontWeight: 600, color: '#0f172a', marginBottom: '2px' },
+    itemSubtitle: { fontSize: '13.5px', fontWeight: 500, color: '#0369a1' },
+    itemDate: { fontSize: '12px', color: '#64748b', marginBottom: '5px' },
+    itemDescription: { fontSize: '13.5px', whiteSpace: 'pre-line' as const, lineHeight: '1.6', color: '#334155' },
+    skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '6px', marginTop: '8px' },
+    skill: { padding: '4px 10px', fontSize: '11.5px', backgroundColor: '#334155', color: '#e2e8f0', borderRadius: '4px', border: '1px solid #475569' },
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -753,14 +837,15 @@ const ResumeTemplate = ({
     </>
   );
 
-  const renderSection = (key: string) => {
+  const renderSection = (key: string, titleStyle?: CSSProperties) => {
     if (hiddenSections && hiddenSections.includes(key)) return null;
+    const secTitle = titleStyle ?? styles.sectionTitle;
     switch (key) {
       case "summary":
         if (resumeData.personal.summary) {
           return (
             <div style={styles.section} key="summary">
-              <div style={styles.sectionTitle}>Summary</div>
+              <div style={secTitle}>Summary</div>
               <div style={styles.itemDescription}>{resumeData.personal.summary}</div>
             </div>
           );
@@ -770,7 +855,7 @@ const ResumeTemplate = ({
         if (resumeData.experience && resumeData.experience.length > 0) {
           return (
             <div style={styles.section} key="experience">
-              <div style={styles.sectionTitle}>Experience</div>
+              <div style={secTitle}>Experience</div>
               <div style={styles.sectionContent}>
                 {resumeData.experience.map((exp) => (
                   <div key={exp.id} style={styles.item}>
@@ -789,7 +874,7 @@ const ResumeTemplate = ({
         if (resumeData.education && resumeData.education.length > 0) {
           return (
             <div style={styles.section} key="education">
-              <div style={styles.sectionTitle}>Education</div>
+              <div style={secTitle}>Education</div>
               <div style={styles.sectionContent}>
                 {resumeData.education.map((edu) => (
                   <div key={edu.id} style={styles.item}>
@@ -808,7 +893,7 @@ const ResumeTemplate = ({
         if (resumeData.skills && resumeData.skills.length > 0) {
           return (
             <div style={styles.section} key="skills">
-              <div style={styles.sectionTitle}>Skills</div>
+              <div style={secTitle}>Skills</div>
               <div style={styles.skillsList}>
                 {resumeData.skills.map((skill, index) => (
                   <div key={index} style={styles.skill}>{skill}</div>
@@ -822,7 +907,7 @@ const ResumeTemplate = ({
         if (resumeData.projects && resumeData.projects.length > 0) {
           return (
             <div style={styles.section} key="projects">
-              <div style={styles.sectionTitle}>Projects</div>
+              <div style={secTitle}>Projects</div>
               <div style={styles.sectionContent}>
                 {resumeData.projects.map((project) => (
                   <div key={project.id} style={styles.item}>
@@ -874,7 +959,7 @@ const ResumeTemplate = ({
             {resumeData.personal.website && <div style={{ display: 'block', marginBottom: '6px' }}>{resumeData.personal.website}</div>}
             {resumeData.personal.linkedin && <div style={{ display: 'block', marginBottom: '6px' }}>{resumeData.personal.linkedin}</div>}
           </div>
-          {renderSection('skills')}
+          {renderSection('skills', styles.sidebarSectionTitle)}
         </aside>
         <div style={styles.mainContent}>
           <div style={styles.header}>

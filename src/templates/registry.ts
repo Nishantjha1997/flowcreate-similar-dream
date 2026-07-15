@@ -112,6 +112,22 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
     supportsPhoto: false,
     defaultAccent: '#059669',
   },
+
+  // ─── 12 new templates (Phase 3) ─────────────────────────────────────────────
+
+  {
+    key: 'split-frame',
+    legacyIds: [],
+    name: 'Split Frame',
+    category: 'Professional',
+    description: 'Dark slate sidebar with photo, contact and skills; crisp white main column.',
+    layout: 'sidebar-left',
+    atsOptimized: false,
+    featured: true,
+    premium: true,
+    supportsPhoto: true,
+    defaultAccent: '#38bdf8',
+  },
 ];
 
 // ─── Dev-time consistency guard ───────────────────────────────────────────────
