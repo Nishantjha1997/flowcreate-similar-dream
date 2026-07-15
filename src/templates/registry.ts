@@ -258,6 +258,19 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
     supportsPhoto: false,
     defaultAccent: '#1d4ed8',
   },
+  {
+    key: 'ink-serif',
+    legacyIds: ['academic'],
+    name: 'Ink Serif',
+    category: 'Executive',
+    description: 'Monochrome ink-on-paper serif with small-caps name and justified text.',
+    layout: 'single',
+    atsOptimized: true,
+    featured: false,
+    premium: true,
+    supportsPhoto: false,
+    defaultAccent: '#111111',
+  },
 ];
 
 // ─── Dev-time consistency guard ───────────────────────────────────────────────
