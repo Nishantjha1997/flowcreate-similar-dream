@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
-import { Search, Star, CheckCircle, Award, Briefcase, Code, Palette, Building2, Zap } from 'lucide-react';
+import { Search, Star, CheckCircle, Award, Briefcase, Code, Palette, Building2, Zap, Crown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -13,7 +13,9 @@ import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 
 import { TEMPLATE_REGISTRY } from '@/templates/registry';
 
-const categories = ["All", "Minimal", "Executive", "Creative", "Technology", "Corporate"];
+// Derive category chips from the registry so new templates automatically
+// surface their category (order: All first, then registry order, de-duped).
+const categories = ["All", ...Array.from(new Set(TEMPLATE_REGISTRY.map((t) => t.category)))];
 
 const Templates = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -128,9 +130,19 @@ const Templates = () => {
                         <Badge variant="secondary" className="bg-green-100 text-green-800">ATS-Friendly</Badge>
                       )}
                     </div>
-                    {isPopular && (
-                      <Badge variant="secondary" className="absolute top-3 right-3">Popular</Badge>
-                    )}
+                    <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
+                      {template.premium ? (
+                        <Badge className="bg-amber-500 text-white hover:bg-amber-500">
+                          <Crown className="h-3 w-3 mr-1" />
+                          Premium
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-800">Free</Badge>
+                      )}
+                      {isPopular && (
+                        <Badge variant="secondary">Popular</Badge>
+                      )}
+                    </div>
                   </div>
                   
                   <CardContent className="p-4">
