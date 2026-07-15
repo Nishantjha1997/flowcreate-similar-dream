@@ -7,60 +7,54 @@ import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import { resolveTemplateKey, getTemplate } from '@/templates/registry';
+
 const exampleResumes = [
   {
     id: 1,
     title: "Marketing Manager",
-    template: "Modern",
     image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
     category: "Marketing"
   },
   {
     id: 2,
     title: "Software Engineer",
-    template: "Technical",
     image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
     category: "Technology"
   },
   {
     id: 3,
     title: "Graphic Designer",
-    template: "Creative",
     image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6", 
     category: "Design"
   },
   {
     id: 4,
     title: "Financial Analyst",
-    template: "Professional",
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
     category: "Finance"
   },
   {
     id: 5,
     title: "Project Manager",
-    template: "Executive",
     image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
     category: "Management"
   },
   {
     id: 6,
     title: "UX/UI Designer",
-    template: "Contemporary",
     image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
     category: "Design"
   },
   {
     id: 7,
     title: "Data Scientist",
-    template: "Technical",
     image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
     category: "Technology"
   },
   {
     id: 8,
     title: "Content Writer",
-    template: "Elegant",
     image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
     category: "Marketing"
   },
@@ -74,9 +68,11 @@ const Examples = () => {
 
   const filteredResumes = exampleResumes.filter((resume) => {
     const matchesCategory = selectedCategory === "All" || resume.category === selectedCategory;
+    const resolvedKey = resolveTemplateKey(String(resume.id));
+    const templateDef = getTemplate(resolvedKey);
     const matchesSearch = 
       resume.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      resume.template.toLowerCase().includes(searchQuery.toLowerCase());
+      templateDef.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -98,7 +94,7 @@ const Examples = () => {
             <div className="flex overflow-x-auto py-2 space-x-2">
               {categories.map((category) => (
                 <Button
-                  key={category}
+                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
                   onClick={() => setSelectedCategory(category)}
                   className="whitespace-nowrap"
@@ -121,31 +117,35 @@ const Examples = () => {
           </div>
           
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {filteredResumes.map((resume) => (
-              <div key={resume.id} className="template-card group">
-                <div className="relative">
-                  <img 
-                    src={resume.image} 
-                    alt={resume.title} 
-                    className="w-full aspect-[3/4] object-cover"
-                  />
-                  <div className="absolute top-2 right-2 bg-primary text-white text-xs font-semibold px-2 py-1 rounded">
-                    {resume.template}
+            {filteredResumes.map((resume) => {
+              const resolvedKey = resolveTemplateKey(String(resume.id));
+              const templateDef = getTemplate(resolvedKey);
+              return (
+                <div key={resume.id} className="template-card group">
+                  <div className="relative">
+                    <img 
+                      src={resume.image} 
+                      alt={resume.title} 
+                      className="w-full aspect-[3/4] object-cover"
+                    />
+                    <div className="absolute top-2 right-2 bg-primary text-white text-xs font-semibold px-2 py-1 rounded">
+                      {templateDef.name}
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-lg font-medium text-foreground">{resume.title}</h3>
+                    <p className="text-sm text-muted-foreground">{resume.category}</p>
+                  </div>
+                  <div className="template-overlay">
+                    <Link to={`/resume-builder?template=${templateDef.key}&example=true`}>
+                      <Button>
+                        Use this example
+                      </Button>
+                    </Link>
                   </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-medium text-foreground">{resume.title}</h3>
-                  <p className="text-sm text-muted-foreground">{resume.category}</p>
-                </div>
-                <div className="template-overlay">
-                  <Link to={`/resume-builder?template=${resume.id}&example=true`}>
-                    <Button>
-                      Use this example
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           
           {filteredResumes.length === 0 && (
