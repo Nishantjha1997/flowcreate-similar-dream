@@ -69,6 +69,12 @@ const fontOptions = [
   { value: "'Helvetica', sans-serif", label: "Helvetica" },
 ];
 
+const accentColors = [
+  '#2563eb', '#4f46e5', '#7c3aed', '#db2777',
+  '#dc2626', '#ea580c', '#d97706', '#16a34a',
+  '#0d9488', '#0ea5e9', '#64748b', '#111827'
+];
+
 const sectionIcons = {
   personal: <User className="h-4 w-4" />,
   contact: <Phone className="h-4 w-4" />,
@@ -351,6 +357,30 @@ export const CustomizationPanel = ({
                         {preset.name}
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="block mb-3">Accent Presets</Label>
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {accentColors.map((color) => {
+                      const isSelected = (customization.primaryColor || '#2563eb').toLowerCase() === color.toLowerCase();
+                      return (
+                        <button
+                          key={color}
+                          onClick={() => handleColorChange('primaryColor', color)}
+                          className={`h-8 w-8 rounded-full border cursor-pointer transition-transform relative ${isSelected ? 'border-primary ring-2 ring-primary/20 scale-110' : 'border-gray-200 hover:scale-110'}`}
+                          style={{ backgroundColor: color }}
+                          title={color}
+                        >
+                          {isSelected && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Check className="h-4 w-4 text-white drop-shadow-md" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 

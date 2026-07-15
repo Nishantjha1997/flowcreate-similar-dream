@@ -1,5 +1,5 @@
 # Overhaul Progress
-## Current task: P4-T1 (Phase 7 complete; resume plan order at Phase 4 customization)
+## Current task: P4-T2
 ## Completed
 - P0-T1: Baseline verified; progress tracker created
 - P1-T1: Created supabase/functions/_shared/aiProviders.ts (callTextModel + getAnyActiveKey)
@@ -32,6 +32,7 @@
 - P7-T3: TemplateSelector rewritten registry-driven (fixes P2-T3 leftover hardcoded array) with premium lock overlays + upgrade dialog linking /pricing
 - P7-T4: gemini-suggest meters usage_limits.ai_requests against plan cap (0 = premium-only 403, finite cap = 429 when exhausted, -1 = unlimited; 30-day rolling reset; best-effort increment); deployed
 - P7-GATE: get_user_entitlements verified live (owner → lifetime / max_resumes -1 / premium_templates true); tsc + build pass; pushed
+- P4-T1: Add one-click accent color presets to customizer panel
 
 ## Blocked / conflicts found
 (none)
