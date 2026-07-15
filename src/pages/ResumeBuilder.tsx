@@ -25,6 +25,7 @@ const ResumeBuilder = () => {
   const navigate = useNavigate();
   const resumeElementRef = useRef<HTMLDivElement>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [activeMobileTab, setActiveMobileTab] = useState<'edit' | 'preview'>('edit');
   
   const { resume, setResume, templateId, isExample, editResumeId, loadingExistingResume } = useResumeData();
   const handlers = useResumeHandlers(setResume);
@@ -150,10 +151,34 @@ const ResumeBuilder = () => {
             <AutoSaveIndicator status={saveStatus} lastSaved={lastSaved} />
           </div>
 
+          {/* Mobile Tab Switcher */}
+          <div className="flex md:hidden mb-4 p-1 bg-muted rounded-xl border border-border/40">
+            <button
+              onClick={() => setActiveMobileTab('edit')}
+              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
+                activeMobileTab === 'edit' 
+                  ? "bg-background text-foreground shadow-sm" 
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Edit Details
+            </button>
+            <button
+              onClick={() => setActiveMobileTab('preview')}
+              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
+                activeMobileTab === 'preview' 
+                  ? "bg-background text-foreground shadow-sm" 
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Preview
+            </button>
+          </div>
+
           {/* Main Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 lg:h-[calc(100vh-10rem)]">
             {/* Left Sidebar */}
-            <div className="lg:col-span-3 flex flex-col gap-3 lg:h-full lg:overflow-hidden" data-tour="section-nav">
+            <div className={`lg:col-span-3 flex flex-col gap-3 lg:h-full lg:overflow-hidden ${activeMobileTab !== 'edit' ? 'hidden md:flex' : ''}`} data-tour="section-nav">
               <div className="flex-shrink-0">
                 <ProgressIndicator 
                   resume={resume}
@@ -197,7 +222,7 @@ const ResumeBuilder = () => {
             </div>
 
             {/* Right Preview */}
-            <div className="lg:col-span-7 lg:h-full" data-tour="preview">
+            <div className={`lg:col-span-7 lg:h-full ${activeMobileTab !== 'preview' ? 'hidden md:block' : ''}`} data-tour="preview">
               <ResumePreviewSection
                 resume={resume}
                 templateId={templateId}
