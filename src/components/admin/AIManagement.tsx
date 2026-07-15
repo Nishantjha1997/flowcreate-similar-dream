@@ -103,6 +103,9 @@ export function AIManagement() {
           <p className="text-muted-foreground">
             Manage API keys for AI features across the platform
           </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Keys added here power AI suggestions and PDF resume import. Scanned/image PDFs require a Gemini key.
+          </p>
         </div>
         <div className="flex items-center space-x-3">
           <Badge variant="outline" className="text-sm flex items-center">

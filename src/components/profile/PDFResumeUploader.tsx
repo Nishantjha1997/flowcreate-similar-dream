@@ -180,8 +180,8 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
             <Alert className="border-orange-200 bg-orange-50">
               <Key className="h-4 w-4 text-orange-600" />
               <AlertDescription className="text-orange-800">
-                <strong>AI Parsing Not Configured:</strong> This feature requires a Gemini API key to be configured. 
-                Please contact the administrator to enable AI resume parsing, or manually enter your profile information.
+                <strong>AI Parsing Not Configured:</strong> This feature requires an AI key (Gemini, DeepSeek, or OpenAI) to be configured. 
+                Please contact the administrator to add an AI key in Admin → AI Management, or manually enter your profile information.
               </AlertDescription>
             </Alert>
           )}
@@ -189,9 +189,9 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              <strong>How it works:</strong> We use Google Gemini AI to extract information from your resume including 
+              <strong>How it works:</strong> We use an AI key (Gemini, DeepSeek, or OpenAI) to extract information from your resume including 
               personal details, work experience, education, skills, and projects. You can review and selectively 
-              import the extracted data into your profile.
+              import the extracted data into your profile. Scanned/image PDFs require a Google Gemini key.
             </AlertDescription>
           </Alert>
         </div>

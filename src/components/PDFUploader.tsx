@@ -195,9 +195,9 @@ export const PDFUploader: React.FC<PDFUploaderProps> = ({ onDataExtracted }) => 
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          <strong>How it works:</strong> We use Gemini AI to extract information from your resume including 
+          <strong>How it works:</strong> We use an AI key (Gemini, DeepSeek, or OpenAI) to extract information from your resume including 
           personal details, work experience, education, skills, and projects. The data will be automatically 
-          filled into your resume builder.
+          filled into your resume builder. Add an AI key in Admin → AI Management if this feature is unavailable.
         </AlertDescription>
       </Alert>
     </div>
