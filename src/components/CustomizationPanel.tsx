@@ -75,6 +75,45 @@ const accentColors = [
   '#0d9488', '#0ea5e9', '#64748b', '#111827'
 ];
 
+const fontPairOptions = [
+  {
+    value: "inter-inter",
+    label: "Inter / Inter",
+    headingFont: "'Inter', sans-serif",
+    bodyFont: "'Inter', sans-serif"
+  },
+  {
+    value: "georgia-inter",
+    label: "Georgia / Inter",
+    headingFont: "Georgia, serif",
+    bodyFont: "'Inter', sans-serif"
+  },
+  {
+    value: "playfair-arial",
+    label: "Playfair Display / Arial",
+    headingFont: "'Playfair Display', Georgia, serif",
+    bodyFont: "Arial, sans-serif"
+  },
+  {
+    value: "arial-arial",
+    label: "Arial / Arial",
+    headingFont: "Arial, sans-serif",
+    bodyFont: "Arial, sans-serif"
+  },
+  {
+    value: "times-times",
+    label: "Times New Roman / Times New Roman",
+    headingFont: "'Times New Roman', Times, serif",
+    bodyFont: "'Times New Roman', Times, serif"
+  },
+  {
+    value: "segoe-segoe",
+    label: "Segoe UI / Segoe UI",
+    headingFont: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    bodyFont: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+  }
+];
+
 const sectionIcons = {
   personal: <User className="h-4 w-4" />,
   contact: <Phone className="h-4 w-4" />,
@@ -115,9 +154,24 @@ export const CustomizationPanel = ({
   const handleFontFamilyChange = (value: string) => {
     onCustomizationChange({
       ...customization,
-      fontFamily: value
+      fontFamily: value,
+      headingFont: undefined,
+      bodyFont: undefined
     });
     setHasUnsavedChanges(true);
+  };
+
+  const handleFontPairChange = (value: string) => {
+    const pair = fontPairOptions.find(p => p.value === value);
+    if (pair) {
+      onCustomizationChange({
+        ...customization,
+        headingFont: pair.headingFont,
+        bodyFont: pair.bodyFont,
+        fontFamily: 'default'
+      });
+      setHasUnsavedChanges(true);
+    }
   };
   
   const handleFontSizeChange = (value: 'small' | 'medium' | 'large') => {
@@ -301,6 +355,10 @@ export const CustomizationPanel = ({
     setHasUnsavedChanges(true);
   };
 
+  const currentFontPairValue = fontPairOptions.find(
+    pair => pair.headingFont === customization.headingFont && pair.bodyFont === customization.bodyFont
+  )?.value || '';
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
@@ -460,6 +518,25 @@ export const CustomizationPanel = ({
           <Card>
             <CardContent className="pt-4">
               <div className="space-y-6">
+                <div>
+                  <Label className="block mb-2">Font Pairing Presets</Label>
+                  <Select
+                    value={currentFontPairValue}
+                    onValueChange={handleFontPairChange}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select font pairing" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fontPairOptions.map(pair => (
+                        <SelectItem key={pair.value} value={pair.value}>
+                          {pair.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div>
                   <Label className="block mb-2">Font Family</Label>
                   <Select

@@ -60,6 +60,8 @@ export interface ResumeData {
       shape: 'circle' | 'square' | 'rounded';
     };
     sectionTitles?: Record<string, string>;
+    headingFont?: string;
+    bodyFont?: string;
     sectionsOrder?: string[];
     hiddenSections?: string[];
   };
@@ -122,6 +124,8 @@ export const adaptResumeData = (data: ResumeData): TypesResumeData => {
       showPhoto: data.customization?.showPhoto,
       profileImage: data.customization?.profileImage,
       sectionTitles: data.customization?.sectionTitles,
+      headingFont: data.customization?.headingFont,
+      bodyFont: data.customization?.bodyFont,
       sectionsOrder: data.customization?.sectionsOrder,
       hiddenSections: data.customization?.hiddenSections
     },
@@ -185,6 +189,8 @@ export const reverseAdaptResumeData = (data: TypesResumeData): Partial<ResumeDat
       layoutType: data.customization?.layoutType,
       profileImage: data.customization?.profileImage,
       sectionTitles: data.customization?.sectionTitles,
+      headingFont: data.customization?.headingFont,
+      bodyFont: data.customization?.bodyFont,
       sectionsOrder: data.customization?.sectionsOrder,
       hiddenSections: data.customization?.hiddenSections
     }

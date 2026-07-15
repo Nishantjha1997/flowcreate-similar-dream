@@ -80,7 +80,15 @@ const applyCustomization = (
     if (styles.itemDescription) styles.itemDescription.fontSize = getNewFontSize(styles.itemDescription.fontSize, m, 12);
   }
   
-  if (customization.fontFamily && customization.fontFamily !== 'default') {
+  if (customization.headingFont) {
+    if (styles.name) styles.name.fontFamily = customization.headingFont;
+    if (styles.sectionTitle) styles.sectionTitle.fontFamily = customization.headingFont;
+    if (styles.itemTitle) styles.itemTitle.fontFamily = customization.headingFont;
+  }
+
+  if (customization.bodyFont) {
+    if (styles.container) styles.container.fontFamily = customization.bodyFont;
+  } else if (customization.fontFamily && customization.fontFamily !== 'default') {
     if (styles.container) styles.container.fontFamily = customization.fontFamily;
   }
   

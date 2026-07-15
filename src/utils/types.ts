@@ -77,6 +77,8 @@ export interface ResumeData {
       shape: 'circle' | 'square' | 'rounded';
     };
     sectionTitles?: Record<string, string>;
+    headingFont?: string;
+    bodyFont?: string;
     sectionsOrder?: string[];
     hiddenSections?: string[];
   };
