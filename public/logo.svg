@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-labelledby="fc-logo-title">
+  <title id="fc-logo-title">FlowCreate</title>
+  <defs>
+    <linearGradient id="fc-grad" x1="1" y1="1" x2="31" y2="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3FA1FF" />
+      <stop offset="1" stop-color="#0057D9" />
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="30" height="30" rx="9" fill="url(#fc-grad)" />
+  <path d="M10 7.5h8.5l4 4V24a1 1 0 0 1-1 1h-11.5a1 1 0 0 1-1-1V8.5a1 1 0 0 1 1-1z" fill="#ffffff" />
+  <path d="M18.5 7.5l4 4h-3a1 1 0 0 1-1-1v-3z" fill="#bfe0ff" />
+  <path d="M12.5 17.6l2.6 2.6 5.2-5.7" fill="none" stroke="#0A66E0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

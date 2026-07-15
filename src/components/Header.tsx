@@ -45,7 +45,8 @@ const Header = () => {
       <header className="sticky top-0 z-50 bg-background border-b-4 border-foreground">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <Link to="/" className="flex items-center">
+            <Link to="/" className="flex items-center gap-2">
+              <img src="/logo.svg" alt="" className="h-8 w-8 rounded-lg" />
               <span className="text-2xl font-bold uppercase tracking-wider text-primary">Flow</span>
               <span className="text-2xl font-bold uppercase tracking-wider text-foreground">Create</span>
             </Link>
@@ -98,7 +99,7 @@ const Header = () => {
         {mobileMenuOpen && (
           <div className="fixed inset-0 z-50 bg-background px-4">
             <div className="flex h-16 items-center justify-between">
-              <Link to="/"><span className="text-2xl font-bold uppercase tracking-wider text-primary">Flow</span><span className="text-2xl font-bold uppercase tracking-wider text-foreground">Create</span></Link>
+              <Link to="/" className="flex items-center gap-2"><img src="/logo.svg" alt="" className="h-8 w-8 rounded-lg" /><span className="text-2xl font-bold uppercase tracking-wider text-primary">Flow</span><span className="text-2xl font-bold uppercase tracking-wider text-foreground">Create</span></Link>
               <button onClick={() => setMobileMenuOpen(false)} className="border-2 border-foreground p-2"><X className="h-5 w-5" /></button>
             </div>
             <div className="mt-6 space-y-6 py-6">
@@ -119,7 +120,8 @@ const Header = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-12 items-center justify-between">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
+            <Link to="/" className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
+              <img src="/logo.svg" alt="" className="h-7 w-7 rounded-lg" />
               <span className="text-xl font-semibold tracking-apple-tight text-foreground">FlowCreate</span>
               <span className="sr-only">FlowCreate - AI-powered resume builder</span>
             </Link>
@@ -264,7 +266,8 @@ const Header = () => {
         <div className="fixed inset-0 z-50 md:hidden bg-background/95 backdrop-blur-xl">
           <div className="px-4 sm:px-6">
             <div className="flex h-12 items-center justify-between">
-              <Link to="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
+              <Link to="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                <img src="/logo.svg" alt="" className="h-7 w-7 rounded-lg" />
                 <span className="text-xl font-semibold tracking-apple-tight text-foreground">FlowCreate</span>
               </Link>
               <button

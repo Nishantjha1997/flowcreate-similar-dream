@@ -93,44 +93,37 @@ serve(async (req) => {
       );
     }
     
-    // Try with primary key
-    let apiRequest = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: trimmedPrompt }] }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 1000,
-          }
-        }),
+    // Gemini key is sent via header, not the ?key= query string, so it never
+    // ends up in provider-side request logs/URLs.
+    const geminiEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+    const geminiBody = JSON.stringify({
+      contents: [{ parts: [{ text: trimmedPrompt }] }],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 1000,
       }
-    );
-    
+    });
+
+    // Try with primary key
+    let apiRequest = await fetch(geminiEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY },
+      body: geminiBody,
+    });
+
     let apiData = await apiRequest.json();
-    
+
     // If primary key failed, try fallback
     if (apiData.error && (apiData.error.status === 'PERMISSION_DENIED' || apiData.error.status === 'INVALID_ARGUMENT')) {
       console.log('[Gemini] Primary key failed, trying fallback');
       const fallbackKey = await keyManager.getFallbackKey('gemini');
-      
+
       if (fallbackKey) {
-        apiRequest = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${fallbackKey}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: trimmedPrompt }] }],
-              generationConfig: {
-                temperature: 0.7,
-                maxOutputTokens: 1000,
-              }
-            }),
-          }
-        );
+        apiRequest = await fetch(geminiEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": fallbackKey },
+          body: geminiBody,
+        });
         apiData = await apiRequest.json();
       }
     }

@@ -15,6 +15,15 @@ const PLAN_PRICES: Record<string, number> = {
   lifetime: 499900,
 } as const;
 
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false
+  const ab = new TextEncoder().encode(a)
+  const bb = new TextEncoder().encode(b)
+  let diff = 0
+  for (let i = 0; i < ab.length; i++) diff |= ab[i] ^ bb[i]
+  return diff === 0
+}
+
 function validatePaymentInput(body: unknown): { valid: true; data: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string } } | { valid: false; error: string } {
   if (!body || typeof body !== 'object') {
     return { valid: false, error: 'Invalid request body' };
@@ -66,7 +75,7 @@ serve(async (req) => {
     const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(`${razorpay_order_id}|${razorpay_payment_id}`))
     const expectedSignature = Array.from(new Uint8Array(signatureBuffer)).map(b => b.toString(16).padStart(2, '0')).join('')
     
-    if (expectedSignature !== razorpay_signature) {
+    if (!timingSafeEqual(expectedSignature, razorpay_signature)) {
       console.error('Payment verification failed - signature mismatch')
       return new Response(
         JSON.stringify({ error: 'Payment verification failed' }),
@@ -142,6 +151,23 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Payment amount does not match plan price' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      )
+    }
+
+    // Replay guard: if this exact payment was already recorded, the
+    // subscription was already extended for it (either by an earlier call
+    // here, or by the razorpay-webhook). Re-running the period math on a
+    // replay would push current_period_end further out for free.
+    const { data: existingPayment } = await supabase
+      .from('payments')
+      .select('id')
+      .eq('razorpay_payment_id', razorpay_payment_id)
+      .maybeSingle()
+
+    if (existingPayment) {
+      return new Response(
+        JSON.stringify({ success: true, message: 'Payment already verified', alreadyApplied: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       )
     }
 

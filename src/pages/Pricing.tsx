@@ -50,14 +50,16 @@ const Pricing = () => {
     );
   }
 
-  const testPrice = isIndianUser ? '₹1' : '$0.01';
-  const monthlyPrice = isIndianUser ? '₹199' : '$2.99';
-  const yearlyPrice = isIndianUser ? '₹1,999' : '$19.99';
-  const lifetimePrice = isIndianUser ? '₹2,500' : '$29.99';
-  const testAmount = isIndianUser ? 1 : 1;
-  const monthlyAmount = isIndianUser ? 199 : 199;
-  const yearlyAmount = isIndianUser ? 1999 : 1999;
-  const lifetimeAmount = isIndianUser ? 2500 : 2500;
+  // These must match PLAN_PRICES in supabase/functions/create-razorpay-order
+  // and verify-razorpay-payment (the server decides the real charge from
+  // planType alone, so a mismatch here would only mislead the customer, not
+  // change what they're billed - keep these in sync with the server).
+  const monthlyPrice = isIndianUser ? '₹299' : '$4.99';
+  const yearlyPrice = isIndianUser ? '₹2,499' : '$39.99';
+  const lifetimePrice = isIndianUser ? '₹4,999' : '$79.99';
+  const monthlyAmount = 299;
+  const yearlyAmount = 2499;
+  const lifetimeAmount = 4999;
 
   return (
     <div className="min-h-screen bg-background">
@@ -78,45 +80,7 @@ const Pricing = () => {
           </div>
           </ScrollReveal>
           <ScrollReveal delay={100}>
-          <div className="max-w-7xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-            {/* Test Plan */}
-            <div className="rounded-xl border-2 border-orange-500 bg-orange-50 shadow-lg overflow-hidden flex flex-col">
-              <div className="p-6 bg-orange-500 text-white text-center">
-                <h2 className="text-2xl font-bold">Test</h2>
-                <div className="mt-4 flex items-center justify-center">
-                  <span className="text-5xl font-bold tracking-tight">{testPrice}</span>
-                </div>
-                <p className="mt-2 text-base text-orange-100">
-                  Test payment - Premium access
-                </p>
-              </div>
-              <div className="p-6">
-                <ul className="space-y-2 text-orange-900 font-semibold text-sm">
-                  <li>✔️ Everything in Premium</li>
-                  <li>✔️ Test payment only</li>
-                  <li>✔️ Full premium features</li>
-                </ul>
-                <div className="mt-6 text-center">
-                  {user ? (
-                    <PremiumUpgradeButton
-                      planType="monthly"
-                      amount={testAmount}
-                      size="lg"
-                      className="w-full bg-orange-600 hover:bg-orange-700 text-xs"
-                    >
-                      Test Payment
-                    </PremiumUpgradeButton>
-                  ) : (
-                    <Link to="/login">
-                      <Button size="lg" className="w-full bg-orange-600 hover:bg-orange-700 text-xs">
-                        Sign In to Test
-                      </Button>
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </div>
-
+          <div className="max-w-7xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Free Plan */}
             <div className="rounded-xl border border-primary bg-card shadow-sm overflow-hidden flex flex-col">
               <div className="p-6 bg-primary text-primary-foreground text-center">
@@ -204,7 +168,7 @@ const Pricing = () => {
                   <span className="ml-2 text-sm">/year</span>
                 </div>
                 <p className="mt-2 text-base text-green-100">
-                  {isIndianUser ? 'Save ₹389 compared to monthly!' : 'Save $16.89 compared to monthly!'}
+                  {isIndianUser ? 'Save ₹1,089 compared to monthly!' : 'Save $19.89 compared to monthly!'}
                 </p>
               </div>
               <div className="p-6">

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { checkRateLimit, rateLimitResponse } from '../_shared/rateLimiter.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -47,6 +48,12 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Insufficient permissions' }), {
         status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       })
+    }
+
+    // Rate limit: 5 deletions per admin per minute
+    const rl = checkRateLimit(`admin-delete-user:${user.id}`, 5, 60_000)
+    if (!rl.allowed) {
+      return rateLimitResponse(corsHeaders, rl.resetAt)
     }
 
     const { targetUserId } = await req.json()

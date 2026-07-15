@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { checkRateLimit, rateLimitResponse } from '../_shared/rateLimiter.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -47,6 +48,12 @@ serve(async (req) => {
       })
     }
 
+    // Rate limit: 20 requests per admin per minute
+    const rl = checkRateLimit(`admin-add-org-member:${user.id}`, 20, 60_000)
+    if (!rl.allowed) {
+      return rateLimitResponse(corsHeaders, rl.resetAt)
+    }
+
     const { action, organizationId, email, userId, role, memberId } = await req.json()
 
     if (action === 'add') {
@@ -92,12 +99,20 @@ serve(async (req) => {
     }
 
     if (action === 'remove') {
-      const { error: delErr } = await supabaseAdmin
+      // Scope by organizationId too - memberId alone isn't enough to stop an
+      // admin of org A from touching a membership row that belongs to org B.
+      const { error: delErr, count } = await supabaseAdmin
         .from('organization_members')
-        .delete()
+        .delete({ count: 'exact' })
         .eq('id', memberId)
+        .eq('organization_id', organizationId)
 
       if (delErr) throw delErr
+      if (!count) {
+        return new Response(JSON.stringify({ error: 'Member not found in this organization' }), {
+          status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+      }
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -105,12 +120,18 @@ serve(async (req) => {
     }
 
     if (action === 'update-role') {
-      const { error: updErr } = await supabaseAdmin
+      const { error: updErr, count } = await supabaseAdmin
         .from('organization_members')
-        .update({ role })
+        .update({ role }, { count: 'exact' })
         .eq('id', memberId)
+        .eq('organization_id', organizationId)
 
       if (updErr) throw updErr
+      if (!count) {
+        return new Response(JSON.stringify({ error: 'Member not found in this organization' }), {
+          status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+      }
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -147,7 +168,7 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('admin-add-org-member error:', error)
-    return new Response(JSON.stringify({ error: error.message || 'Internal server error' }), {
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
   }

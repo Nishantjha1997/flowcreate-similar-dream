@@ -90,9 +90,17 @@ serve(async (req) => {
       })
     }
 
-    // Convert PDF to base64 for Gemini
+    // Convert PDF to base64 for Gemini. Spreading the whole byte array into
+    // String.fromCharCode(...) blows the call stack on larger PDFs, so this
+    // builds the binary string in bounded chunks instead.
     const arrayBuffer = await file.arrayBuffer()
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)))
+    const bytes = new Uint8Array(arrayBuffer)
+    const CHUNK_SIZE = 8192
+    let binary = ''
+    for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK_SIZE))
+    }
+    const base64 = btoa(binary)
 
     const prompt = `You are a resume parser. Extract structured information from this resume PDF and return it as valid JSON.
 
@@ -153,10 +161,11 @@ Return the data in this EXACT format (no additional text, only JSON):
 
 Only return valid JSON. If a section is not found, use empty arrays or empty strings. Extract ALL available information from the resume.`
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'x-goog-api-key': GEMINI_API_KEY,
       },
       body: JSON.stringify({
         contents: [{
