@@ -58,15 +58,8 @@ interface ResumeBuilderSidebarProps {
   onPDFDataExtracted?: (data: Partial<ResumeData>) => void;
 }
 
-const templates = [
-  { id: "1", name: "Clean Slate", category: "Minimal", templateKey: "clean-slate", featured: true, atsOptimized: true },
-  { id: "2", name: "Executive Serif", category: "Executive", templateKey: "executive-serif", featured: true, atsOptimized: true },
-  { id: "3", name: "Sidebar Modern", category: "Creative", templateKey: "sidebar-modern", featured: true, atsOptimized: true },
-  { id: "4", name: "Tech Engineer", category: "Technology", templateKey: "tech-engineer", featured: true, atsOptimized: true },
-  { id: "5", name: "Coral Creative", category: "Creative", templateKey: "coral-creative", featured: true, atsOptimized: true },
-  { id: "6", name: "Navy Professional", category: "Corporate", templateKey: "navy-professional", featured: true, atsOptimized: true },
-  { id: "7", name: "Emerald Minimal", category: "Minimal", templateKey: "emerald-minimal", featured: true, atsOptimized: true },
-];
+import { TEMPLATE_REGISTRY, resolveTemplateKey } from '@/templates/registry';
+
 
 const sections = [
   { id: 'personal', name: 'Personal', icon: User },
@@ -293,46 +286,49 @@ export const ResumeBuilderSidebar = ({
               <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Choose Template</span>
               
               <div className="grid grid-cols-2 gap-2">
-                {templates.map((template) => (
-                  <button
-                    key={template.id}
-                    className={cn(
-                      "relative text-left rounded-xl overflow-hidden border transition-all duration-200 hover:shadow-md group",
-                      currentTemplateId === template.id 
-                        ? "ring-2 ring-foreground border-foreground" 
-                        : "border-border/40 hover:border-border",
-                      isNeoBrutalism && "border-2 border-foreground shadow-[3px_3px_0_0_hsl(var(--foreground))]"
-                    )}
-                    onClick={() => onTemplateChange(template.id)}
-                  >
-                    <div className="aspect-[3/4] bg-muted/30 overflow-hidden relative">
-                      <ResumeTemplatePreview 
-                        templateKey={template.templateKey}
-                        className="w-full h-full scale-[0.6] origin-top-left"
-                      />
-                      {currentTemplateId === template.id && (
-                        <div className="absolute inset-0 bg-foreground/5 flex items-center justify-center">
-                          <Badge className="text-[10px] bg-foreground text-background">Active</Badge>
-                        </div>
+                {TEMPLATE_REGISTRY.map((template) => {
+                  const isSelected = resolveTemplateKey(currentTemplateId) === template.key;
+                  return (
+                    <button
+                      key={template.key}
+                      className={cn(
+                        "relative text-left rounded-xl overflow-hidden border transition-all duration-200 hover:shadow-md group",
+                        isSelected 
+                          ? "ring-2 ring-foreground border-foreground" 
+                          : "border-border/40 hover:border-border",
+                        isNeoBrutalism && "border-2 border-foreground shadow-[3px_3px_0_0_hsl(var(--foreground))]"
                       )}
-                      <div className="absolute top-1 left-1 flex gap-0.5">
-                        {template.featured && (
-                          <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">⭐</Badge>
+                      onClick={() => onTemplateChange(template.key)}
+                    >
+                      <div className="aspect-[3/4] bg-muted/30 overflow-hidden relative">
+                        <ResumeTemplatePreview 
+                          templateKey={template.key}
+                          className="w-full h-full scale-[0.6] origin-top-left"
+                        />
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-foreground/5 flex items-center justify-center">
+                            <Badge className="text-[10px] bg-foreground text-background">Active</Badge>
+                          </div>
                         )}
-                        {template.atsOptimized && (
-                          <Badge className="text-[9px] px-1 py-0 h-4 bg-green-500/90 text-white border-0">ATS</Badge>
-                        )}
+                        <div className="absolute top-1 left-1 flex gap-0.5">
+                          {template.featured && (
+                            <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">⭐</Badge>
+                          )}
+                          {template.atsOptimized && (
+                            <Badge className="text-[9px] px-1 py-0 h-4 bg-green-500/90 text-white border-0">ATS</Badge>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <div className={cn(
-                      "p-1.5 bg-background border-t border-border/30",
-                      isNeoBrutalism && "border-t-2 border-foreground"
-                    )}>
-                      <div className="text-[11px] font-semibold truncate text-foreground">{template.name}</div>
-                      <div className="text-[10px] text-muted-foreground">{template.category}</div>
-                    </div>
-                  </button>
-                ))}
+                      <div className={cn(
+                        "p-1.5 bg-background border-t border-border/30",
+                        isNeoBrutalism && "border-t-2 border-foreground"
+                      )}>
+                        <div className="text-[11px] font-semibold truncate text-foreground">{template.name}</div>
+                        <div className="text-[10px] text-muted-foreground">{template.category}</div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
 
               <div className="p-2.5 bg-muted/20 rounded-xl border border-border/30">

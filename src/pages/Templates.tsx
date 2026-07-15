@@ -11,43 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 
-const templates = [
-  {
-    id: 1, name: "Clean Slate", category: "Minimal", templateKey: "clean-slate",
-    featured: true, popular: true, atsOptimized: true,
-    description: "Ultra-clean single-column layout with blue accent line. Maximum whitespace, perfect for any industry."
-  },
-  {
-    id: 2, name: "Executive Serif", category: "Executive", templateKey: "executive-serif",
-    featured: true, popular: true, atsOptimized: true,
-    description: "Prestigious serif typography with centered header and double-border. Ideal for C-level and senior leadership."
-  },
-  {
-    id: 3, name: "Sidebar Modern", category: "Creative", templateKey: "sidebar-modern",
-    featured: true, popular: true, atsOptimized: true,
-    description: "Bold purple accent bar with rounded skill badges and geometric feel. Great for marketing and branding roles."
-  },
-  {
-    id: 4, name: "Tech Engineer", category: "Technology", templateKey: "tech-engineer",
-    featured: true, popular: true, atsOptimized: true,
-    description: "Dark header band with monospace font and cyan accents. Built for developers, DevOps, and engineers."
-  },
-  {
-    id: 5, name: "Coral Creative", category: "Creative", templateKey: "coral-creative",
-    featured: true, popular: false, atsOptimized: true,
-    description: "Warm coral/rose tones with rounded elements and creative left-border items. Perfect for designers."
-  },
-  {
-    id: 6, name: "Navy Professional", category: "Corporate", templateKey: "navy-professional",
-    featured: true, popular: true, atsOptimized: true,
-    description: "Navy authority with strong borders and filled skill badges. For finance, consulting, and management."
-  },
-  {
-    id: 7, name: "Emerald Minimal", category: "Minimal", templateKey: "emerald-minimal",
-    featured: true, popular: false, atsOptimized: true,
-    description: "Earthy emerald/teal tones with generous whitespace. Great for healthcare, education, and sustainability."
-  },
-];
+import { TEMPLATE_REGISTRY } from '@/templates/registry';
 
 const categories = ["All", "Minimal", "Executive", "Creative", "Technology", "Corporate"];
 
@@ -56,10 +20,10 @@ const Templates = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
 
-  const filteredTemplates = templates.filter((template) => {
+  const filteredTemplates = TEMPLATE_REGISTRY.filter((template) => {
     // Filter by tab
     if (activeTab === "featured" && !template.featured) return false;
-    if (activeTab === "popular" && !template.popular) return false;
+    if (activeTab === "popular" && (template.key === "coral-creative" || template.key === "emerald-minimal")) return false;
     if (activeTab === "ats" && !template.atsOptimized) return false;
     
     // Filter by category
@@ -72,6 +36,7 @@ const Templates = () => {
     return matchesCategory && matchesSearch;
   });
 
+
   return (
     <div className="min-h-screen bg-[hsl(var(--surface-elevated))]">
       <Header />
@@ -82,7 +47,7 @@ const Templates = () => {
               Resume Templates
             </h1>
             <p className="apple-subheadline mx-auto">
-              Choose from {templates.length}+ professionally designed templates for every industry.
+              Choose from {TEMPLATE_REGISTRY.length}+ professionally designed templates for every industry.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-4">
               <Badge variant="secondary" className="flex items-center gap-1">
@@ -146,45 +111,48 @@ const Templates = () => {
           </div>
           
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredTemplates.map((template) => (
-              <Card key={template.id} className="overflow-hidden h-full transition-all duration-500 hover:shadow-xl hover:-translate-y-1 rounded-2xl border border-border/40 bg-background group">
-                <div className="relative aspect-[3/4] overflow-hidden bg-muted/50">
-                  <ResumeTemplatePreview 
-                    templateKey={template.templateKey}
-                    className="w-full h-full transform transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute top-3 left-3 flex flex-col gap-2">
-                    {template.featured && (
-                      <Badge className="bg-primary">Featured</Badge>
+            {filteredTemplates.map((template) => {
+              const isPopular = template.key !== 'coral-creative' && template.key !== 'emerald-minimal';
+              return (
+                <Card key={template.key} className="overflow-hidden h-full transition-all duration-500 hover:shadow-xl hover:-translate-y-1 rounded-2xl border border-border/40 bg-background group">
+                  <div className="relative aspect-[3/4] overflow-hidden bg-muted/50">
+                    <ResumeTemplatePreview 
+                      templateKey={template.key}
+                      className="w-full h-full transform transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute top-3 left-3 flex flex-col gap-2">
+                      {template.featured && (
+                        <Badge className="bg-primary">Featured</Badge>
+                      )}
+                      {template.atsOptimized && (
+                        <Badge variant="secondary" className="bg-green-100 text-green-800">ATS-Friendly</Badge>
+                      )}
+                    </div>
+                    {isPopular && (
+                      <Badge variant="secondary" className="absolute top-3 right-3">Popular</Badge>
                     )}
-                    {template.atsOptimized && (
-                      <Badge variant="secondary" className="bg-green-100 text-green-800">ATS-Friendly</Badge>
-                    )}
-                  </div>
-                  {template.popular && (
-                    <Badge variant="secondary" className="absolute top-3 right-3">Popular</Badge>
-                  )}
-                </div>
-                
-                <CardContent className="p-4">
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold">{template.name}</h3>
-                    <p className="text-sm text-muted-foreground">{template.category}</p>
                   </div>
                   
-                  <p className="text-sm mb-4 text-muted-foreground line-clamp-2">{template.description}</p>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <Link to={`/resume-builder?template=${template.id}`}>
-                      <Button variant="outline" className="w-full text-xs">Preview</Button>
-                    </Link>
-                    <Link to={`/resume-builder?template=${template.id}&example=true`}>
-                      <Button className="w-full text-xs">Use Template</Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  <CardContent className="p-4">
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold">{template.name}</h3>
+                      <p className="text-sm text-muted-foreground">{template.category}</p>
+                    </div>
+                    
+                    <p className="text-sm mb-4 text-muted-foreground line-clamp-2">{template.description}</p>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link to={`/resume-builder?template=${template.key}`}>
+                        <Button variant="outline" className="w-full text-xs">Preview</Button>
+                      </Link>
+                      <Link to={`/resume-builder?template=${template.key}&example=true`}>
+                        <Button className="w-full text-xs">Use Template</Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
           
           {filteredTemplates.length === 0 && (

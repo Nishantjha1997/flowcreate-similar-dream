@@ -1,5 +1,5 @@
 # Overhaul Progress
-## Current task: P2-T3
+## Current task: P2-T4
 ## Completed
 - P0-T1: Baseline verified; progress tracker created
 - P1-T1: Created supabase/functions/_shared/aiProviders.ts (callTextModel + getAnyActiveKey)
@@ -8,6 +8,7 @@
 - P1-T4: Updated AI copy in PDFUploader, PDFResumeUploader, AIManagement to reference Gemini/DeepSeek/OpenAI
 - P2-T1: Created src/templates/registry.ts with TemplateDefinition, TEMPLATE_REGISTRY (7 templates), resolveTemplateKey, getTemplate
 - P2-T2: Routed all template-key resolution through the registry; updated useResumeSave to persist canonical key; updated Account.tsx, ResumeVisualPreview.tsx, ResumeData.ts, resumeTemplates.tsx
+- P2-T3: Replaced hardcoded templates arrays in ResumeBuilderSidebar.tsx and Templates.tsx with TEMPLATE_REGISTRY map loops
 ## Blocked / conflicts found
 (none)
 ## Baseline notes
