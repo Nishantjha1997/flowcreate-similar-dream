@@ -36,7 +36,7 @@ const OptimizedResumePreview = memo(function OptimizedResumePreview({
   ]);
 
   return (
-    <div ref={resumeRef} className="bg-white p-8 shadow-lg min-h-[297mm] w-[210mm] mx-auto">
+    <div ref={resumeRef} className="bg-white p-8 shadow-lg min-h-[1123px] w-[794px] mx-auto">
       <ResumeTemplatePreview
         templateKey={templateId}
       />

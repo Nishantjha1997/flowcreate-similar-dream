@@ -65,6 +65,20 @@ export const ResumePreviewSection = ({
         
         {/* Zoom Controls */}
         <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-0.5 mr-2 bg-muted/40 p-0.5 rounded-lg border border-border/10">
+            {[50, 75, 100, 125].map((z) => (
+              <Button
+                key={z}
+                variant={zoom === z ? 'secondary' : 'ghost'}
+                size="sm"
+                className="h-6 px-2 text-[10px] rounded-md font-medium transition-all"
+                onClick={() => setZoom(z)}
+              >
+                {z}%
+              </Button>
+            ))}
+          </div>
+
           <Tooltip>
             <TooltipTrigger asChild>
               <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={zoomOut} disabled={zoom <= 30}>
@@ -139,7 +153,7 @@ export const ResumePreviewSection = ({
               "hover:shadow-[0_2px_8px_rgba(0,0,0,0.06),0_16px_48px_rgba(0,0,0,0.1)]",
               isNeoBrutalism && "border-2 border-foreground shadow-[6px_6px_0_0_hsl(var(--foreground))] rounded-none"
             )}
-            style={{ width: '210mm', minHeight: '297mm' }}
+            style={{ width: '794px', minHeight: '1123px' }}
             id="resume-preview-container" 
             ref={resumeRef}
           >
