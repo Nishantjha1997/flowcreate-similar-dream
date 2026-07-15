@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import TemplatePreviewModal from "@/components/templates/TemplatePreviewModal";
 import TemplateCustomizationModal from "@/components/templates/TemplateCustomizationModal";
+import { TEMPLATE_REGISTRY } from '@/templates/registry';
 
 const ResumeTemplate = lazy(() => import('@/utils/resumeTemplates'));
 
@@ -19,26 +20,18 @@ const mockResumeData = {
   customization: { primaryColor: '#2563eb', secondaryColor: '#6b7280', fontSize: 'medium' as const, spacing: 'normal' as const }
 };
 
-const templates = [
-  { id: 1, name: "Clean Slate", category: "Minimal", templateKey: "clean-slate", description: "Ultra-clean, any industry", image: "/placeholder.svg" },
-  { id: 2, name: "Executive Serif", category: "Executive", templateKey: "executive-serif", description: "Prestigious serif layout", image: "/placeholder.svg" },
-  { id: 3, name: "Sidebar Modern", category: "Creative", templateKey: "sidebar-modern", description: "Modern purple accent", image: "/placeholder.svg" },
-  { id: 4, name: "Tech Engineer", category: "Technology", templateKey: "tech-engineer", description: "Developer-focused dark header", image: "/placeholder.svg" },
-  { id: 5, name: "Coral Creative", category: "Creative", templateKey: "coral-creative", description: "Warm coral for creatives", image: "/placeholder.svg" },
-];
-
 const TemplatesCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [previewId, setPreviewId] = useState<number | null>(null);
-  const [customizeId, setCustomizeId] = useState<number | null>(null);
+  const [previewKey, setPreviewKey] = useState<string | null>(null);
+  const [customizeKey, setCustomizeKey] = useState<string | null>(null);
 
-  const previewTemplate = previewId !== null ? templates.find(t => t.id === previewId) : null;
-  const customizeTemplate = customizeId !== null ? templates.find(t => t.id === customizeId) : null;
+  const previewTemplate = previewKey !== null ? TEMPLATE_REGISTRY.find(t => t.key === previewKey) : null;
+  const customizeTemplate = customizeKey !== null ? TEMPLATE_REGISTRY.find(t => t.key === customizeKey) : null;
 
-  const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % templates.length);
-  const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + templates.length) % templates.length);
+  const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % TEMPLATE_REGISTRY.length);
+  const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + TEMPLATE_REGISTRY.length) % TEMPLATE_REGISTRY.length);
   const visibleTemplates = 3;
-  const maxIndex = Math.max(0, templates.length - visibleTemplates);
+  const maxIndex = Math.max(0, TEMPLATE_REGISTRY.length - visibleTemplates);
 
   return (
     <section className="apple-section bg-background">
@@ -78,14 +71,14 @@ const TemplatesCarousel = () => {
               className="flex transition-transform duration-700 ease-out"
               style={{ transform: `translateX(-${currentIndex * (100 / visibleTemplates)}%)` }}
             >
-              {templates.map((template) => (
-                <div key={template.id} className="w-1/3 flex-shrink-0 px-2.5">
+              {TEMPLATE_REGISTRY.map((template) => (
+                <div key={template.key} className="w-1/3 flex-shrink-0 px-2.5">
                   <div className="group relative overflow-hidden rounded-2xl bg-[hsl(var(--surface-mid))] border border-border/30 transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
-                    <div className="aspect-[3/4] overflow-hidden cursor-pointer bg-white p-3" onClick={() => setPreviewId(template.id)}>
+                    <div className="aspect-[3/4] overflow-hidden cursor-pointer bg-white p-3" onClick={() => setPreviewKey(template.key)}>
                       <div className="h-full w-full bg-white rounded-lg shadow-sm overflow-hidden">
                         <div style={{ transform: 'scale(0.85)', transformOrigin: 'top left', width: '117.6%', height: '117.6%' }}>
                           <Suspense fallback={<div className="w-full h-full bg-muted animate-pulse rounded" />}>
-                            <ResumeTemplate data={mockResumeData} templateName={template.templateKey} />
+                            <ResumeTemplate data={mockResumeData} templateName={template.key} />
                           </Suspense>
                         </div>
                       </div>
@@ -105,7 +98,7 @@ const TemplatesCarousel = () => {
                       
                       <Button
                         className="w-full rounded-full h-9 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90"
-                        onClick={() => setCustomizeId(template.id)}
+                        onClick={() => setCustomizeKey(template.key)}
                       >
                         Use Template
                       </Button>
@@ -140,17 +133,23 @@ const TemplatesCarousel = () => {
         {previewTemplate && (
           <TemplatePreviewModal
             isOpen={!!previewTemplate}
-            onClose={() => setPreviewId(null)}
-            template={previewTemplate}
-            onCustomize={(id) => { setPreviewId(null); setCustomizeId(id); }}
+            onClose={() => setPreviewKey(null)}
+            template={{
+              id: previewTemplate.key,
+              name: previewTemplate.name,
+              category: previewTemplate.category,
+              templateKey: previewTemplate.key,
+              description: previewTemplate.description
+            }}
+            onCustomize={(key) => { setPreviewKey(null); setCustomizeKey(key); }}
           />
         )}
         {customizeTemplate && (
           <TemplateCustomizationModal
             isOpen={!!customizeTemplate}
-            onClose={() => setCustomizeId(null)}
+            onClose={() => setCustomizeKey(null)}
             templateName={customizeTemplate.name}
-            onStart={() => { window.location.href = `/resume-builder?template=${customizeTemplate.id}&custom=true`; }}
+            onStart={() => { window.location.href = `/resume-builder?template=${customizeTemplate.key}&custom=true`; }}
           />
         )}
       </div>
@@ -159,3 +158,4 @@ const TemplatesCarousel = () => {
 };
 
 export default TemplatesCarousel;
+

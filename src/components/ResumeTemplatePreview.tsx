@@ -70,8 +70,8 @@ const mockResumeData: ResumeData = {
 
 export const ResumeTemplatePreview = ({ templateKey, className = '' }: ResumeTemplatePreviewProps) => {
   return (
-    <div className={`bg-white shadow-sm overflow-hidden ${className}`}>
-      <div className="scale-[0.3] origin-top-left transform w-[333%] h-[333%]">
+    <div className={`bg-white shadow-sm overflow-hidden aspect-[8.5/11] ${className}`}>
+      <div style={{ transform: 'scale(0.32)', transformOrigin: 'top left', width: '312.5%', height: '312.5%' }}>
         <ResumeTemplate 
           data={mockResumeData} 
           templateName={templateKey}
@@ -80,3 +80,4 @@ export const ResumeTemplatePreview = ({ templateKey, className = '' }: ResumeTem
     </div>
   );
 };
+

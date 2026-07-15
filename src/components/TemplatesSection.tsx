@@ -6,21 +6,17 @@ import { useState } from "react";
 import TemplatePreviewModal from "@/components/templates/TemplatePreviewModal";
 import TemplateCustomizationModal from "@/components/templates/TemplateCustomizationModal";
 import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
-
-const templates = [
-  { id: 1, name: "Clean Slate", category: "Minimal", templateKey: "clean-slate", description: "Ultra-clean with blue accent — perfect for any industry" },
-  { id: 2, name: "Executive Serif", category: "Executive", templateKey: "executive-serif", description: "Prestigious serif for C-level and leadership roles" },
-  { id: 3, name: "Sidebar Modern", category: "Creative", templateKey: "sidebar-modern", description: "Purple accent with modern geometric feel" },
-  { id: 4, name: "Tech Engineer", category: "Technology", templateKey: "tech-engineer", description: "Dark header, monospace — built for developers" },
-  { id: 5, name: "Coral Creative", category: "Creative", templateKey: "coral-creative", description: "Warm coral tones for designers and creatives" },
-];
+import { TEMPLATE_REGISTRY } from '@/templates/registry';
 
 const TemplatesSection = () => {
-  const [previewId, setPreviewId] = useState<number | null>(null);
-  const [customizeId, setCustomizeId] = useState<number | null>(null);
+  const [previewKey, setPreviewKey] = useState<string | null>(null);
+  const [customizeKey, setCustomizeKey] = useState<string | null>(null);
 
-  const previewTemplate = previewId !== null ? templates.find(t => t.id === previewId) : null;
-  const customizeTemplate = customizeId !== null ? templates.find(t => t.id === customizeId) : null;
+  const previewTemplate = previewKey !== null ? TEMPLATE_REGISTRY.find(t => t.key === previewKey) : null;
+  const customizeTemplate = customizeKey !== null ? TEMPLATE_REGISTRY.find(t => t.key === customizeKey) : null;
+
+  // Render first 6 templates to perfectly fit a 3-column layout
+  const displayedTemplates = TEMPLATE_REGISTRY.slice(0, 6);
 
   return (
     <section className="py-24 bg-muted/30">
@@ -35,11 +31,11 @@ const TemplatesSection = () => {
         </div>
         
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {templates.map((template) => (
-            <div key={template.id} className="group relative overflow-hidden rounded-xl border bg-background shadow-md transition-all duration-300 hover:shadow-xl">
-              <div className="aspect-[3/4] overflow-hidden cursor-pointer bg-gray-50" onClick={() => setPreviewId(template.id)}>
+          {displayedTemplates.map((template) => (
+            <div key={template.key} className="group relative overflow-hidden rounded-xl border bg-background shadow-md transition-all duration-300 hover:shadow-xl">
+              <div className="aspect-[3/4] overflow-hidden cursor-pointer bg-gray-50" onClick={() => setPreviewKey(template.key)}>
                 <ResumeTemplatePreview 
-                  templateKey={template.templateKey}
+                  templateKey={template.key}
                   className="w-full h-full transform transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
@@ -68,22 +64,27 @@ const TemplatesSection = () => {
         {previewTemplate && (
           <TemplatePreviewModal
             isOpen={!!previewTemplate}
-            onClose={() => setPreviewId(null)}
-            template={previewTemplate}
-            onCustomize={(id) => {
-              setPreviewId(null);
-              setCustomizeId(id);
+            onClose={() => setPreviewKey(null)}
+            template={{
+              id: previewTemplate.key,
+              name: previewTemplate.name,
+              category: previewTemplate.category,
+              templateKey: previewTemplate.key,
+              description: previewTemplate.description
+            }}
+            onCustomize={(key) => {
+              setPreviewKey(null);
+              setCustomizeKey(key);
             }}
           />
         )}
         {customizeTemplate && (
           <TemplateCustomizationModal
             isOpen={!!customizeTemplate}
-            onClose={() => setCustomizeId(null)}
+            onClose={() => setCustomizeKey(null)}
             templateName={customizeTemplate.name}
             onStart={() => {
-              // For now, navigate directly to builder with the template
-              window.location.href = `/resume-builder?template=${customizeTemplate.id}&custom=true`;
+              window.location.href = `/resume-builder?template=${customizeTemplate.key}&custom=true`;
             }}
           />
         )}
@@ -93,4 +94,5 @@ const TemplatesSection = () => {
 };
 
 export default TemplatesSection;
+
 

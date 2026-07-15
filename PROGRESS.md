@@ -1,5 +1,5 @@
 # Overhaul Progress
-## Current task: P2-GATE (Phase 2 complete — verification and push)
+## Current task: P2-T5
 ## Completed
 - P0-T1: Baseline verified; progress tracker created
 - P1-T1: Created supabase/functions/_shared/aiProviders.ts (callTextModel + getAnyActiveKey)
@@ -9,7 +9,7 @@
 - P2-T1: Created src/templates/registry.ts with TemplateDefinition, TEMPLATE_REGISTRY (7 templates), resolveTemplateKey, getTemplate
 - P2-T2: Routed all template-key resolution through the registry; updated useResumeSave to persist canonical key; updated Account.tsx, ResumeVisualPreview.tsx, ResumeData.ts, resumeTemplates.tsx
 - P2-T3: Replaced hardcoded templates arrays in ResumeBuilderSidebar.tsx and Templates.tsx with TEMPLATE_REGISTRY map loops
-- P2-T4: Updated src/pages/Examples.tsx to route template name lookups and cards through TEMPLATE_REGISTRY mapping
+- P2-T4: Updated src/pages/Examples.tsx to route template name lookups and cards through TEMPLATE_REGISTRY mapping; updated TemplatesSection.tsx, TemplatesCarousel.tsx, and ResumeTemplatePreview.tsx to utilize registry keys and exact styled box parameters.
 ## Blocked / conflicts found
 (none)
 ## Baseline notes
