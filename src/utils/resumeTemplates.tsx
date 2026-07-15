@@ -1,7 +1,7 @@
 import { CSSProperties } from 'react';
 import { ResumeData as TypesResumeData } from './types';
 import { ResumeData, reverseAdaptResumeData } from './resumeAdapterUtils';
-import { TEMPLATE_REGISTRY, resolveTemplateKey } from '@/templates/registry';
+import { TEMPLATE_REGISTRY, resolveTemplateKey, getTemplate } from '@/templates/registry';
 
 export type TemplateStyles = {
   container: CSSProperties;

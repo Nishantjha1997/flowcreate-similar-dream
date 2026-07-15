@@ -141,7 +141,7 @@ const TemplatesCarousel = () => {
               templateKey: previewTemplate.key,
               description: previewTemplate.description
             }}
-            onCustomize={(key) => { setPreviewKey(null); setCustomizeKey(key); }}
+            onCustomize={(key) => { setPreviewKey(null); setCustomizeKey(String(key)); }}
           />
         )}
         {customizeTemplate && (

@@ -74,7 +74,7 @@ const TemplatesSection = () => {
             }}
             onCustomize={(key) => {
               setPreviewKey(null);
-              setCustomizeKey(key);
+              setCustomizeKey(String(key));
             }}
           />
         )}
