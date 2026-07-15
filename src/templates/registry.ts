@@ -154,6 +154,19 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
     supportsPhoto: true,
     defaultAccent: '#4f46e5',
   },
+  {
+    key: 'swiss-grid',
+    legacyIds: [],
+    name: 'Swiss Grid',
+    category: 'Minimal',
+    description: 'International Typographic Style: oversized name, red accents, zero decoration.',
+    layout: 'single',
+    atsOptimized: true,
+    featured: true,
+    premium: true,
+    supportsPhoto: false,
+    defaultAccent: '#dc2626',
+  },
 ];
 
 // ─── Dev-time consistency guard ───────────────────────────────────────────────

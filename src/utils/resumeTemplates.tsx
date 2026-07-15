@@ -752,6 +752,62 @@ const templateStyles: Record<string, TemplateStyles> = {
     skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '6px', marginTop: '8px' },
     skill: { padding: '4px 12px', fontSize: '11.5px', backgroundColor: '#eef2ff', color: '#4338ca', borderRadius: '6px', border: '1px solid #c7d2fe' },
   },
+
+  // ─── 11. SWISS GRID (premium) ────────────────────────────────
+  // International Typographic Style: oversized uppercase name, red
+  // accents, strict left alignment, zero decoration.
+  'swiss-grid': {
+    container: {
+      fontFamily: "Helvetica, Arial, sans-serif",
+      color: '#111111',
+      lineHeight: '1.5',
+      maxWidth: '100%',
+      height: '100%',
+      padding: '48px 52px',
+      backgroundColor: '#ffffff',
+      boxSizing: 'border-box' as const,
+    },
+    header: {
+      marginBottom: '32px',
+      display: 'flex',
+      flexDirection: 'column' as const,
+    },
+    profilePhoto: { width: '0px', height: '0px', display: 'none' },
+    name: {
+      fontSize: '40px',
+      fontWeight: 800,
+      marginBottom: '6px',
+      color: '#111111',
+      letterSpacing: '-0.03em',
+      textTransform: 'uppercase' as const,
+      lineHeight: '1.05',
+    },
+    contact: {
+      fontSize: '12.5px',
+      display: 'flex',
+      flexWrap: 'wrap' as const,
+      gap: '16px',
+      marginTop: '10px',
+      color: '#525252',
+    },
+    section: { marginBottom: '24px' },
+    sectionTitle: {
+      fontSize: '13px',
+      fontWeight: 800,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '1.5px',
+      color: '#dc2626',
+      marginBottom: '10px',
+    },
+    sectionContent: { marginTop: '8px' },
+    item: { marginBottom: '16px' },
+    itemTitle: { fontSize: '15px', fontWeight: 700, color: '#111111', marginBottom: '2px' },
+    itemSubtitle: { fontSize: '13.5px', fontWeight: 500, color: '#404040' },
+    itemDate: { fontSize: '12px', color: '#737373', marginBottom: '5px' },
+    itemDescription: { fontSize: '13.5px', whiteSpace: 'pre-line' as const, lineHeight: '1.55', color: '#262626' },
+    skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '8px', marginTop: '8px' },
+    skill: { padding: '3px 0px', fontSize: '12.5px', backgroundColor: 'transparent', color: '#111111', fontWeight: 600, border: 'none', borderBottom: '2px solid #dc2626' },
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════
