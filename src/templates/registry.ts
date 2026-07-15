@@ -206,6 +206,19 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
     supportsPhoto: false,
     defaultAccent: '#b45309',
   },
+  {
+    key: 'duo-tone',
+    legacyIds: [],
+    name: 'Duo Tone',
+    category: 'Professional',
+    description: 'Light-gray right rail for contact and skills; sky-blue accented main column.',
+    layout: 'sidebar-right',
+    atsOptimized: false,
+    featured: false,
+    premium: true,
+    supportsPhoto: true,
+    defaultAccent: '#0ea5e9',
+  },
 ];
 
 // ─── Dev-time consistency guard ───────────────────────────────────────────────

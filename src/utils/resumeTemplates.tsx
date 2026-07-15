@@ -980,6 +980,88 @@ const templateStyles: Record<string, TemplateStyles> = {
     skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '8px', marginTop: '8px' },
     skill: { padding: '4px 12px', fontSize: '11.5px', backgroundColor: 'transparent', color: '#92400e', borderRadius: '0px', border: '1px solid #d6b26e' },
   },
+
+  // ─── 15. DUO TONE (premium) ──────────────────────────────────
+  // Light-gray right rail (contact, skills), sky-blue accents in the
+  // white main column on the left.
+  'duo-tone': {
+    container: {
+      fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
+      color: '#0f172a',
+      lineHeight: '1.6',
+      maxWidth: '100%',
+      height: '100%',
+      backgroundColor: '#ffffff',
+      boxSizing: 'border-box' as const,
+    },
+    sidebar: {
+      width: '30%',
+      backgroundColor: '#f1f5f9',
+      color: '#334155',
+      padding: '40px 22px',
+      boxSizing: 'border-box' as const,
+      display: 'flex',
+      flexDirection: 'column' as const,
+      gap: '16px',
+      borderLeft: '1px solid #e2e8f0',
+    },
+    mainContent: {
+      flex: 1,
+      padding: '40px 34px',
+      boxSizing: 'border-box' as const,
+    },
+    header: {
+      marginBottom: '22px',
+      paddingBottom: '14px',
+      borderBottom: '2px solid #0ea5e9',
+    },
+    profilePhoto: { width: '88px', height: '88px', borderRadius: '12px', objectFit: 'cover' as const, border: '2px solid #bae6fd', marginBottom: '6px' },
+    name: {
+      fontSize: '30px',
+      fontWeight: 700,
+      marginBottom: '2px',
+      color: '#0ea5e9',
+      letterSpacing: '-0.02em',
+    },
+    contact: {
+      fontSize: '12px',
+      color: '#475569',
+      display: 'flex',
+      flexDirection: 'column' as const,
+      gap: '2px',
+      marginTop: '4px',
+      wordBreak: 'break-word' as const,
+    },
+    section: { marginBottom: '20px' },
+    sectionTitle: {
+      fontSize: '12px',
+      fontWeight: 700,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '2px',
+      color: '#0284c7',
+      marginBottom: '10px',
+      paddingBottom: '5px',
+      borderBottom: '1.5px solid #bae6fd',
+    },
+    sidebarSectionTitle: {
+      fontSize: '12px',
+      fontWeight: 700,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '2px',
+      color: '#0284c7',
+      marginBottom: '10px',
+      paddingBottom: '5px',
+      borderBottom: '1.5px solid #cbd5e1',
+    },
+    sectionContent: { marginTop: '8px' },
+    item: { marginBottom: '16px' },
+    itemTitle: { fontSize: '15px', fontWeight: 600, color: '#0f172a', marginBottom: '2px' },
+    itemSubtitle: { fontSize: '13.5px', fontWeight: 500, color: '#0284c7' },
+    itemDate: { fontSize: '12px', color: '#64748b', marginBottom: '5px' },
+    itemDescription: { fontSize: '13.5px', whiteSpace: 'pre-line' as const, lineHeight: '1.6', color: '#334155' },
+    skillsList: { display: 'flex', flexWrap: 'wrap' as const, gap: '6px', marginTop: '8px' },
+    skill: { padding: '4px 10px', fontSize: '11.5px', backgroundColor: '#ffffff', color: '#0369a1', borderRadius: '6px', border: '1px solid #bae6fd' },
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════
