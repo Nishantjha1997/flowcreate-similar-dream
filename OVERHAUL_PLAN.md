@@ -363,6 +363,181 @@ All tasks modify `src/components/CustomizationPanel.tsx` (+ small support files)
 
 ---
 
+# PHASE 10 — UI Refinements & Competitive Feature Parity
+
+- **P10-T1** Remove landing hero AI badge:
+  - **Modify**: `src/components/HeroSection.tsx`
+  - **Action**: Locate lines 61-65 `<div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.08] ...">` and delete the entire container block containing the green dot and "AI-Powered Resume Builder" text.
+  - **Acceptance**: Blinking dot and "AI-Powered Resume Builder" badge are completely removed from the Apple-inspired hero section.
+  - **Commit**: `[P10-T1] Remove landing hero AI badge`
+
+- **P10-T2** A4 Dimensions Constants:
+  - **Create**: `src/constants/pdfDimensions.ts`
+  - **Action**: Add and export the following core dimensions:
+    ```typescript
+    /** A4 width at 96dpi (210mm) */
+    export const A4_WIDTH_PX = 794;
+    /** A4 height at 96dpi (297mm) */
+    export const A4_HEIGHT_PX = 1123;
+    /** A4 width in mm */
+    export const A4_WIDTH_MM = 210;
+    /** A4 height in mm */
+    export const A4_HEIGHT_MM = 297;
+    ```
+  - **Acceptance**: Constants are exported and typecheck correctly.
+  - **Commit**: `[P10-T2] Introduce A4 dimension constants`
+
+- **P10-T3** PDF Exporter Refinement:
+  - **Modify**: `src/hooks/usePDFGenerator.tsx`
+  - **Action**: 
+    - Import A4 constants from `@/constants/pdfDimensions`.
+    - Replace all occurrences of hardcoded widths (e.g. `816px`) with `A4_WIDTH_PX`.
+    - Set `overflow: 'hidden'` on the offscreen container style.
+    - Set `width: A4_WIDTH_PX + 'px'`, `maxWidth: '100%'`, `overflow: 'hidden'` on the clone root element.
+    - Pass `windowWidth: A4_WIDTH_PX` and `width: A4_WIDTH_PX` to the `html2canvas` options object.
+    - Update `jsPDF` mm calculation utilizing `A4_HEIGHT_PX`, `A4_WIDTH_MM`, `A4_HEIGHT_MM` to maintain exact slicing intervals.
+  - **Acceptance**: PDF is generated at exactly A4 width/height scaling.
+  - **Commit**: `[P10-T3] Standardize PDF exporter on A4 constants`
+
+- **P10-T4** Use A4 constants in preview section:
+  - **Modify**: `src/components/resume/ResumePreviewSection.tsx`
+  - **Action**:
+    - Import `A4_WIDTH_PX` and `A4_HEIGHT_PX` from `@/constants/pdfDimensions`.
+    - Replace all hardcoded `794px` and `1123` width/height references with `A4_WIDTH_PX` and `A4_HEIGHT_PX`.
+  - **Acceptance**: Canvas styles and page break calculations use the central dimensions.
+  - **Commit**: `[P10-T4] Use A4 constants in preview section`
+
+- **P10-T5** Cover Letter Builder Schema:
+  - **Create migration**: `supabase/migrations/20260717000000_cover_letters.sql`
+  - **Action**: Create a `cover_letters` table linked to users:
+    ```sql
+    CREATE TABLE public.cover_letters (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+      resume_id UUID REFERENCES public.resumes(id) ON DELETE SET NULL,
+      title TEXT NOT NULL DEFAULT 'Untitled Cover Letter',
+      content TEXT NOT NULL DEFAULT '',
+      template_id TEXT NOT NULL DEFAULT 'clean-slate',
+      customization JSONB DEFAULT '{}',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+    ALTER TABLE public.cover_letters ENABLE ROW LEVEL SECURITY;
+    CREATE POLICY "Users manage own cover letters" ON public.cover_letters FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+    CREATE INDEX idx_cover_letters_user_id ON public.cover_letters(user_id);
+    ```
+  - **Acceptance**: Migration compiles; applied via db push.
+  - **Commit**: `[P10-T5] Add cover_letters table migration`
+
+- **P10-T6** Cover Letter Builder Frontend:
+  - **Create**: `src/pages/CoverLetterBuilder.tsx`, `src/components/cover-letter/CoverLetterEditor.tsx`, `src/components/cover-letter/CoverLetterPreview.tsx`, `src/hooks/useCoverLetterData.ts`
+  - **Action**:
+    - Build `useCoverLetterData.ts` hook for Cover Letter CRUD.
+    - Wire `CoverLetterBuilder` with side-by-side edit panel + A4 preview page.
+    - Use `usePDFGenerator` hook to download letters.
+  - **Acceptance**: Cover letters can be created, updated, previewed, and exported.
+  - **Commit**: `[P10-T6] Implement cover letter builder frontend`
+
+- **P10-T7** Cover Letter AI Suggestion:
+  - **Modify**: `supabase/functions/gemini-suggest/index.ts`
+  - **Action**: Extend endpoint to parse `context: 'cover_letter'` containing target job specs + user resume history to yield context-aware Cover Letter templates.
+  - **Acceptance**: Edge function suggests draft contents.
+  - **Commit**: `[P10-T7] Extend gemini-suggest for cover letters`
+
+- **P10-T8** Cover Letter Design Templates:
+  - **Create**: `src/utils/coverLetterTemplates.tsx`
+  - **Action**: Implement A4 letter layouts (letterhead header, date, recipient address block, body paragraph spacing, signature line) styled identically to `clean-slate`, `executive-serif`, and `split-frame` resume themes.
+  - **Acceptance**: Letter templates display properly in preview canvas.
+  - **Commit**: `[P10-T8] Add cover letter design templates`
+
+- **P10-T9** Shareable Feedback Schema:
+  - **Create migration**: `supabase/migrations/20260718000000_resume_sharing.sql`
+  - **Action**: Create public share links and comment annotations tables:
+    ```sql
+    CREATE TABLE public.resume_shares (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      resume_id UUID NOT NULL REFERENCES public.resumes(id) ON DELETE CASCADE,
+      user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+      share_token TEXT UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(16), 'hex'),
+      is_active BOOLEAN NOT NULL DEFAULT true,
+      allow_comments BOOLEAN NOT NULL DEFAULT true,
+      expires_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+    CREATE TABLE public.resume_comments (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      share_id UUID NOT NULL REFERENCES public.resume_shares(id) ON DELETE CASCADE,
+      author_name TEXT NOT NULL,
+      author_email TEXT,
+      content TEXT NOT NULL,
+      section_ref TEXT,
+      is_resolved BOOLEAN NOT NULL DEFAULT false,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+    ALTER TABLE public.resume_shares ENABLE ROW LEVEL SECURITY;
+    CREATE POLICY "Owners manage shares" ON public.resume_shares FOR ALL USING (auth.uid() = user_id);
+    CREATE POLICY "Public read by token" ON public.resume_shares FOR SELECT USING (is_active = true AND (expires_at IS NULL OR expires_at > now()));
+    ALTER TABLE public.resume_comments ENABLE ROW LEVEL SECURITY;
+    CREATE POLICY "Public insert on active shares" ON public.resume_comments FOR INSERT WITH CHECK (EXISTS (SELECT 1 FROM public.resume_shares WHERE id = share_id AND is_active = true AND (expires_at IS NULL OR expires_at > now())));
+    CREATE POLICY "Public read comments" ON public.resume_comments FOR SELECT USING (EXISTS (SELECT 1 FROM public.resume_shares WHERE id = share_id AND is_active = true));
+    CREATE POLICY "Owner resolves comments" ON public.resume_comments FOR UPDATE USING (EXISTS (SELECT 1 FROM public.resume_shares WHERE id = share_id AND user_id = auth.uid()));
+    CREATE INDEX idx_shares_token ON public.resume_shares(share_token);
+    CREATE INDEX idx_comments_share ON public.resume_comments(share_id);
+    ```
+  - **Acceptance**: RLS rules applied successfully on DB push.
+  - **Commit**: `[P10-T9] Add sharing and comments database schema`
+
+- **P10-T10** Shareable Feedback Frontend:
+  - **Create/Modify**: `src/pages/SharedResumeView.tsx`, `src/components/sharing/CommentPanel.tsx`, `src/components/sharing/ShareManagement.tsx`
+  - **Action**: Add share generation popover in `ResumeBuilder.tsx`. Wire `/r/:share_token` public route. Enable floating annotations comment bar for guest users.
+  - **Acceptance**: Users can generate links, guests can comment without logging in.
+  - **Commit**: `[P10-T10] Implement public feedback and commenting UI`
+
+- **P10-T11** Resume Analytics Tracker:
+  - **Create edge function**: `supabase/functions/track-resume-view/index.ts`
+  - **Action**: Create tracking endpoint called by `SharedResumeView.tsx` on mount. Hashes IP address (`sha256`) and logs referrer, device, browser agent into `analytics_events`.
+  - **Acceptance**: Views register view events.
+  - **Commit**: `[P10-T11] Create view tracking edge function`
+
+- **P10-T12** Resume Analytics Dashboard:
+  - **Create**: `src/components/analytics/ResumeViewAnalytics.tsx`
+  - **Action**: Build visual dashboard (charts for views, referrers, locations) and embed in `Account.tsx` dashboard.
+  - **Acceptance**: Views data displays correctly on charts.
+  - **Commit**: `[P10-T12] Add analytics charts dashboard`
+
+- **P10-T13** Multi-Resume Profiles Database Schema:
+  - **Create migration**: `supabase/migrations/20260719000000_master_profiles.sql`
+  - **Action**: Create master profiles table containing user profile supersets:
+    ```sql
+    CREATE TABLE public.master_profiles (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+      name TEXT NOT NULL DEFAULT 'Master Profile',
+      profile_data JSONB NOT NULL DEFAULT '{}',
+      is_default BOOLEAN NOT NULL DEFAULT false,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      UNIQUE(user_id, name)
+    );
+    ALTER TABLE public.resumes ADD COLUMN master_profile_id UUID REFERENCES public.master_profiles(id) ON DELETE SET NULL;
+    ALTER TABLE public.master_profiles ENABLE ROW LEVEL SECURITY;
+    CREATE POLICY "Users manage own master profiles" ON public.master_profiles FOR ALL USING (auth.uid() = user_id);
+    CREATE INDEX idx_master_profiles_user ON public.master_profiles(user_id);
+    ```
+  - **Acceptance**: RLS and schema push cleanly.
+  - **Commit**: `[P10-T13] Create master_profiles schema`
+
+- **P10-T14** Resume Spawner & Translation UI:
+  - **Create/Modify**: `src/pages/MasterProfile.tsx`, `src/components/profile/ResumeSpawner.tsx`, `src/components/profile/TranslationPanel.tsx`
+  - **Action**: Build spawner UI to seed custom resumes from Master Profile. Integrate language translation selector using Gemini suggest translate context.
+  - **Acceptance**: Multi-resume generation and language selection complete.
+  - **Commit**: `[P10-T14] Add resume spawner and multi-language translation`
+
+**PHASE 10 GATE**: Landing badge removed; A4 PDF exports precisely align with builder page breaks; cover letters and public comment tracking functional; push.
+
+---
+
 ## Appendix A — Key file map
 ```
 src/utils/resumeTemplates.tsx        renderer + inline styles + mock data (SOURCE OF TRUTH for rendering)
