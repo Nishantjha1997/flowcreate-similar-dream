@@ -29,6 +29,18 @@ function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+function cleanHTML(html: string): string {
+  return html
+    .replace(/```html|```|``/g, '')           // strip markdown code fences
+    .replace(/<\/?(html|body|head|article|div)\b[^>]*>/gi, '') // strip wrapper tags
+    .replace(/<h1\b[^>]*>/gi, '<h2>')         // h1 → h2
+    .replace(/<\/h1>/gi, '</h2>')
+    .replace(/\n{3,}/g, '\n\n')               // collapse excessive newlines
+    .replace(/(<\/p>)\s*(<p>)/gi, '$1\n$2')   // space between paragraphs
+    .replace(/(<\/h[23]>)\s*(<p>)/gi, '$1\n\n$2') // space after headings
+    .trim();
+}
+
 async function callGemini(prompt: string, maxTokens?: number): Promise<string> {
   const body: Record<string, unknown> = { prompt };
   if (maxTokens) body.maxTokens = maxTokens;
@@ -230,7 +242,7 @@ ABSOLUTE REQUIREMENTS — VIOLATE ANY AND THE ARTICLE IS REJECTED:
 • NO <h1>. NO markdown. NO code blocks. Return raw HTML only.`;
 
       const htmlRaw = await callGemini(prompt, 4000);
-      let html = htmlRaw.replace(/```html|```/g, '').trim();
+      let html = cleanHTML(htmlRaw);
       const metaMatch = html.match(/<!--\s*meta-desc:\s*(.*?)\s*-->/i);
       const metaDesc = metaMatch ? metaMatch[1].trim() : '';
       html = html.replace(/<!--\s*meta-desc:.*?-->/gi, '').trim();
@@ -296,7 +308,7 @@ ${html.slice(0, 8000)}`;
       
       if (typeof audit.score === 'number' && audit.improved) {
         setSeoScore(audit.score);
-        let improvedHtml = audit.improved.replace(/```html|```/g, '').trim();
+        let improvedHtml = cleanHTML(audit.improved);
         // Auto-generate images from AI suggestions
         improvedHtml = improvedHtml.replace(/<!--\s*img:\s*(.*?)\s*-->/gi, (_match: string, terms: string) => {
           const searchQuery = terms.trim().replace(/\s+/g, ',');
@@ -317,6 +329,37 @@ ${html.slice(0, 8000)}`;
       }
     } catch (err: unknown) {
       toast({ title: 'SEO audit failed', description: err instanceof Error ? err.message : 'Try again', variant: 'destructive' });
+    } finally { setSeoAuditing(false); }
+  };
+
+  // ─── Beautify existing content ──────────────────────────
+  const beautifyContent = async () => {
+    if (!editingPost) return;
+    syncContent();
+    const html = editorRef.current?.innerHTML || editingPost.content;
+    if (!html || html.length < 100) { toast({ title: 'Not enough content', variant: 'destructive' }); return; }
+
+    setSeoAuditing(true);
+    try {
+      const result = await callGemini(`Reformat this blog article HTML to be visually stunning. Apply these rules STRICTLY:
+- Wrap INTRO paragraph in <p><strong>...</strong></p> for emphasis
+- EVERY section uses <h2> heading
+- EVERY list uses <ul><li> format (minimum 2 lists total)
+- Add 1-2 <blockquote> for key takeaways
+- EVERY paragraph MAX 3 sentences
+- Add <!-- img: [search terms] --> at 2-3 spots
+- Keep ALL existing content and meaning — only restructure the HTML
+- NO <h1>, NO markdown, NO wrapper tags. Return raw HTML only.
+
+Article:
+${html.slice(0, 8000)}`, 4000);
+
+      const improved = cleanHTML(result);
+      if (editorRef.current) editorRef.current.innerHTML = improved;
+      setEditingPost({ ...editingPost, content: improved });
+      toast({ title: 'Content beautified!', description: 'Review the improved formatting.' });
+    } catch (err: unknown) {
+      toast({ title: 'Beautify failed', description: err instanceof Error ? err.message : 'Try again', variant: 'destructive' });
     } finally { setSeoAuditing(false); }
   };
 
@@ -511,6 +554,10 @@ ${html.slice(0, 8000)}`;
               <Button size="sm" variant="outline" onClick={runSeoAudit} disabled={seoAuditing} className="text-foreground">
                 {seoAuditing ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <BarChart3 className="h-4 w-4 mr-1" />}
                 SEO Audit
+              </Button>
+              <Button size="sm" variant="outline" onClick={beautifyContent} disabled={seoAuditing} className="text-foreground">
+                {seoAuditing ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Sparkles className="h-4 w-4 mr-1" />}
+                Beautify
               </Button>
               <Button size="sm" onClick={() => savePost('published')} disabled={saving} className="bg-green-600 hover:bg-green-700 text-white border-0">
                 <Send className="h-4 w-4 mr-1" /> Publish
