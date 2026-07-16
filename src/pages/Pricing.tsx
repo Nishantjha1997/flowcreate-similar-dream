@@ -70,11 +70,11 @@ const getPlanStyles = (slug: string) => {
     case 'monthly':
       return {
         cardClass: "rounded-xl border border-yellow-500 bg-yellow-50/50 shadow-sm overflow-hidden flex flex-col dark:bg-yellow-950/20",
-        headerClass: "p-6 bg-yellow-400 text-center",
-        titleStyle: { color: "#904803" },
-        titleClass: "text-2xl font-bold",
-        priceStyle: { color: "#202020", textShadow: "0 1px 2px rgba(255,255,255,0.4)" },
-        descClass: "mt-2 text-base text-yellow-800",
+        headerClass: "p-6 bg-yellow-400 dark:bg-yellow-600 text-center",
+        titleStyle: {},
+        titleClass: "text-2xl font-bold text-[#904803] dark:text-yellow-50",
+        priceStyle: {},
+        descClass: "mt-2 text-base text-yellow-800 dark:text-yellow-200",
         featureClass: "space-y-2 text-yellow-900 dark:text-yellow-100 font-semibold text-sm",
         btnVariant: "default" as const
       };
@@ -179,8 +179,8 @@ const Pricing = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center mb-12">
               <div className="animate-pulse">
-                <div className="h-8 bg-gray-300 rounded mb-4"></div>
-                <div className="h-4 bg-gray-300 rounded mb-8"></div>
+                <div className="h-8 bg-muted rounded mb-4"></div>
+                <div className="h-4 bg-muted rounded mb-8"></div>
               </div>
             </div>
           </div>
@@ -221,11 +221,11 @@ const Pricing = () => {
 
               return (
                 <div key={plan.id} className={styles.cardClass}>
-                  <div className={styles.headerClass} style={plan.slug === 'monthly' ? { textShadow: "0px 1px 3px #fafafa, 0 1px 2px #00000016" } : undefined}>
+                  <div className={styles.headerClass} style={plan.slug === 'monthly' ? { textShadow: "0px 1px 3px rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.1)" } : undefined}>
                     <h2 className={styles.titleClass} style={styles.titleStyle}>{plan.name}</h2>
                     <div className="mt-4 flex items-center justify-center">
                       <span className="text-5xl font-bold tracking-tight" style={styles.priceStyle}>{priceText}</span>
-                      {intervalText && <span className="ml-2 text-sm" style={plan.slug === 'monthly' ? { color: "#202020" } : undefined}>{intervalText}</span>}
+                      {intervalText && <span className={cn("ml-2 text-sm", plan.slug === 'monthly' && "text-[#202020] dark:text-yellow-100")}>{intervalText}</span>}
                     </div>
                     {plan.description && <p className={styles.descClass}>{plan.description}</p>}
                   </div>

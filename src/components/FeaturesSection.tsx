@@ -17,7 +17,7 @@ const FeaturesSection = () => {
 
   if (isNeoBrutalism) {
     return (
-      <section className="py-24 bg-[#E0F2FE] border-y-[4px] border-foreground nb-pattern-dots">
+      <section className="py-24 bg-[#E0F2FE] dark:bg-sky-950 border-y-[4px] border-foreground nb-pattern-dots">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-16">
             <h2 className="text-4xl font-black tracking-tight text-foreground uppercase mb-4" style={{ textShadow: '3px 3px 0px hsl(var(--muted-foreground) / 0.3)' }}>

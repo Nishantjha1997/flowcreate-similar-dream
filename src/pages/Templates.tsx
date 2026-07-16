@@ -127,7 +127,7 @@ const Templates = () => {
                         <Badge className="bg-primary">Featured</Badge>
                       )}
                       {template.atsOptimized && (
-                        <Badge variant="secondary" className="bg-green-100 text-green-800">ATS-Friendly</Badge>
+                        <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">ATS-Friendly</Badge>
                       )}
                     </div>
                     <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
@@ -137,7 +137,7 @@ const Templates = () => {
                           Premium
                         </Badge>
                       ) : (
-                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-800">Free</Badge>
+                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">Free</Badge>
                       )}
                       {isPopular && (
                         <Badge variant="secondary">Popular</Badge>

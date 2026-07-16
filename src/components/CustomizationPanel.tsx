@@ -431,7 +431,7 @@ export const CustomizationPanel = ({
                         <button
                           key={color}
                           onClick={() => handleColorChange('primaryColor', color)}
-                          className={`h-8 w-8 rounded-full border cursor-pointer transition-transform relative ${isSelected ? 'border-primary ring-2 ring-primary/20 scale-110' : 'border-gray-200 hover:scale-110'}`}
+                          className={`h-8 w-8 rounded-full border cursor-pointer transition-transform relative ${isSelected ? 'border-primary ring-2 ring-primary/20 scale-110' : 'border-border hover:scale-110'}`}
                           style={{ backgroundColor: color }}
                           title={color}
                         >
@@ -607,7 +607,7 @@ export const CustomizationPanel = ({
                     </div>
                     <div className="border rounded-md p-3 flex items-center space-x-3 hover:bg-muted cursor-pointer">
                       <RadioGroupItem value="underlined" id="style-underlined" />
-                      <Label htmlFor="style-underlined" className="border-b-2 border-black cursor-pointer">Underlined Headings</Label>
+                      <Label htmlFor="style-underlined" className="border-b-2 border-foreground cursor-pointer">Underlined Headings</Label>
                     </div>
                     <div className="border rounded-md p-3 flex items-center space-x-3 hover:bg-muted cursor-pointer">
                       <RadioGroupItem value="capitalized" id="style-capitalized" />
@@ -615,7 +615,7 @@ export const CustomizationPanel = ({
                     </div>
                     <div className="border rounded-md p-3 flex items-center space-x-3 hover:bg-muted cursor-pointer">
                       <RadioGroupItem value="minimal" id="style-minimal" />
-                      <Label htmlFor="style-minimal" className="text-gray-500 font-light cursor-pointer">Minimal Headings</Label>
+                      <Label htmlFor="style-minimal" className="text-muted-foreground font-light cursor-pointer">Minimal Headings</Label>
                     </div>
                   </RadioGroup>
                 </div>

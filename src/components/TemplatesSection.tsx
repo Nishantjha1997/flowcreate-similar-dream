@@ -33,7 +33,7 @@ const TemplatesSection = () => {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {displayedTemplates.map((template) => (
             <div key={template.key} className="group relative overflow-hidden rounded-xl border bg-background shadow-md transition-all duration-300 hover:shadow-xl">
-              <div className="aspect-[3/4] overflow-hidden cursor-pointer bg-gray-50" onClick={() => setPreviewKey(template.key)}>
+              <div className="aspect-[3/4] overflow-hidden cursor-pointer bg-muted/50" onClick={() => setPreviewKey(template.key)}>
                 <ResumeTemplatePreview 
                   templateKey={template.key}
                   className="w-full h-full transform transition-transform duration-500 group-hover:scale-105"
