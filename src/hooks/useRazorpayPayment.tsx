@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useRazorpay } from '@/components/RazorpayProvider';
+import { captureError } from '@/lib/monitoring';
 
 interface PaymentOptions {
   amount: number; // in paise
@@ -105,6 +106,7 @@ export const useRazorpayPayment = () => {
             }, 1000);
           } catch (error) {
             console.error('Payment verification failed:', error);
+            captureError(error, { context: 'payment_verification' });
             toast({
               title: "Payment verification failed",
               description: "Please contact support if your payment was deducted. Error: " + (error instanceof Error ? error.message : 'Unknown error'),
@@ -129,6 +131,7 @@ export const useRazorpayPayment = () => {
 
     } catch (error) {
       console.error('Payment initiation failed:', error);
+      captureError(error, { context: 'payment_initiation' });
       toast({
         title: "Payment failed",
         description: "Unable to initiate payment. Please try again. Error: " + (error instanceof Error ? error.message : 'Unknown error'),

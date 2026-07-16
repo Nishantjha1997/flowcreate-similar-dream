@@ -3,6 +3,8 @@ import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+import { captureError } from '@/lib/monitoring';
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
@@ -26,6 +28,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    captureError(error, { errorInfo });
     this.props.onError?.(error, errorInfo);
   }
 
