@@ -21,6 +21,7 @@ import { ATSManagement } from "@/components/admin/ATSManagement";
 import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AuditLogs } from "@/components/admin/AuditLogs";
 import { HelpCenter } from "@/components/admin/HelpCenter";
+import { BlogManager } from "@/components/admin/BlogManager";
 import { Skeleton } from "@/components/ui/loading-skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +48,7 @@ import {
   LogOut,
   Settings,
   MessageSquare,
+  BookOpen,
 } from "lucide-react";
 import { useDesignMode } from "@/hooks/useDesignMode";
 import { cn } from "@/lib/utils";
@@ -89,6 +91,7 @@ const NAV_GROUPS = [
       { value: "analytics", label: "Site Analytics", icon: BarChart3 },
       { value: "improvements", label: "Improvement Plans", icon: Lightbulb },
       { value: "content", label: "Content Management", icon: FileText },
+      { value: "blog", label: "Blog Manager", icon: BookOpen },
       { value: "actions", label: "Quick Actions", icon: Zap },
     ],
   },
@@ -335,6 +338,7 @@ const Admin = () => {
                   />
                 )}
                 {activeTab === "helpcenter" && <HelpCenter isAdmin={!!isAdmin} />}
+                {activeTab === "blog" && <BlogManager />}
                 {activeTab === "ats" && <ATSManagement isAdmin={!!isAdmin} />}
                 {activeTab === "templates" && <TemplateManagement />}
                 {activeTab === "website" && <WebsiteCustomization />}

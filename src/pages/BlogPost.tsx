@@ -1,43 +1,87 @@
 import { useParams, Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, ArrowLeft, Clock, Calendar, Share2 } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Clock, Calendar, Share2, Loader2 } from 'lucide-react';
 import { ScrollReveal } from '@/hooks/useScrollAnimation';
 import { usePageMeta } from '@/hooks/usePageMeta';
-import { blogPosts } from '@/data/blogPosts';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
+
+interface BlogPost {
+  id: string; slug: string; title: string; excerpt: string;
+  description: string; content: string; category: string;
+  read_time: string; published_at: string; created_at: string; keywords: string[];
+}
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
-  const post = blogPosts.find((p) => p.slug === slug);
+
+  const { data: post, isLoading, isError } = useQuery({
+    queryKey: ['blog-post', slug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('slug', slug)
+        .eq('status', 'published')
+        .single();
+      if (error) throw error;
+      return data as BlogPost;
+    },
+    enabled: !!slug,
+    retry: false,
+  });
+
+  const { data: relatedPosts = [] } = useQuery({
+    queryKey: ['related-posts', post?.category, slug],
+    queryFn: async () => {
+      if (!post) return [];
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('id, slug, title, category, read_time')
+        .eq('status', 'published')
+        .eq('category', post.category)
+        .neq('slug', slug)
+        .order('published_at', { ascending: false })
+        .limit(3);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!post,
+    retry: false,
+  });
 
   usePageMeta({
     title: post ? `${post.title} | FlowCreate Blog` : 'Blog Post',
     description: post?.description || 'Resume tips and career advice from FlowCreate.',
   });
 
-  if (!post) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="py-20">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-3xl font-bold mb-4">Article Not Found</h1>
-            <p className="text-muted-foreground mb-8">The article you're looking for doesn't exist or has been moved.</p>
-            <Link to="/blog">
-              <Button size="lg">Browse All Articles <ArrowRight className="ml-2 h-4 w-4" /></Button>
-            </Link>
-          </div>
-        </main>
+      <div className="min-h-screen bg-background"><Header />
+        <main className="py-20"><div className="container mx-auto px-4 text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground mt-4">Loading article...</p>
+        </div></main>
         <Footer />
       </div>
     );
   }
 
-  // Related posts: same-category first, then pad with recent posts
-  const sameCategory = blogPosts.filter((p) => p.slug !== post.slug && p.category === post.category);
-  const otherPosts = blogPosts.filter((p) => p.slug !== post.slug && p.category !== post.category);
-  const relatedPosts = [...sameCategory, ...otherPosts].slice(0, 3);
+  if (isError || !post) {
+    return (
+      <div className="min-h-screen bg-background"><Header />
+        <main className="py-20"><div className="container mx-auto px-4 text-center">
+          <h1 className="text-3xl font-bold mb-4">Article Not Found</h1>
+          <p className="text-muted-foreground mb-8">The article you're looking for doesn't exist or has been moved.</p>
+          <Link to="/blog"><Button size="lg">Browse All Articles <ArrowRight className="ml-2 h-4 w-4" /></Button></Link>
+        </div></main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -59,7 +103,7 @@ const BlogPost = () => {
                 </span>
                 <span className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
-                  {new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  {new Date(post.published_at || post.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock className="h-4 w-4" /> {post.readTime}

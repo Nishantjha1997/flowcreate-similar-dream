@@ -7,13 +7,33 @@ import { Input } from '@/components/ui/input';
 import { ArrowRight, Clock, Calendar, Search } from 'lucide-react';
 import { ScrollReveal } from '@/hooks/useScrollAnimation';
 import { usePageMeta } from '@/hooks/usePageMeta';
-import { blogPosts } from '@/data/blogPosts';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
-const categories = ['All', ...Array.from(new Set(blogPosts.map((p) => p.category)))];
+interface BlogPost {
+  id: string; slug: string; title: string; excerpt: string;
+  category: string; read_time: string; created_at: string; published_at: string;
+}
 
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const { data: blogPosts = [], isLoading } = useQuery({
+    queryKey: ['published-blog-posts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('id, slug, title, excerpt, category, read_time, created_at, published_at')
+        .eq('status', 'published')
+        .order('published_at', { ascending: false });
+      if (error) throw error;
+      return data as BlogPost[];
+    },
+    retry: false,
+  });
+
+  const categories = ['All', ...Array.from(new Set(blogPosts.map((p) => p.category)))];
 
   usePageMeta({
     title: 'Resume Tips & Career Advice Blog',
@@ -103,7 +123,7 @@ const Blog = () => {
                         </p>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground mt-auto pt-4 border-t">
                           <Calendar className="h-3 w-3" />
-                          <span>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                          <span>{new Date(post.published_at || post.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                         </div>
                       </div>
                     </div>
