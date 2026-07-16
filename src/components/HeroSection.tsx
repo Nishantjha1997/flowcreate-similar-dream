@@ -58,12 +58,6 @@ const HeroSection = () => {
         <div className="flex flex-col lg:flex-row items-center gap-12 max-w-6xl mx-auto">
           {/* Left Text Column */}
           <div className="w-full lg:w-[55%] text-center lg:text-left">
-            {/* Overline badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.08] border border-white/[0.1] mb-8 animate-apple-fade-in-up backdrop-blur-sm">
-              <div className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-white/70 text-xs font-medium tracking-wide">AI-Powered Resume Builder</span>
-            </div>
-
             {/* Main headline */}
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-none text-white mb-6 animate-apple-fade-in-up-delay-1" style={{ letterSpacing: '-0.03em' }}>
               Your resume.{' '}
