@@ -1,146 +1,93 @@
-# 📄 ResumeForge - Professional Resume Builder & ATS Platform
+# 📄 FlowCreate - Professional Resume Builder & ATS Platform
 
-A full-stack resume builder application with an integrated Applicant Tracking System (ATS). Built with React, TypeScript, and Supabase.
+A modern, full-stack resume builder application with an integrated Applicant Tracking System (ATS), rebuilt for high performance, maintainability, and exceptional UX.
 
-## 🌟 Features
+## 🌟 Key Features
 
 ### Resume Builder
-- **Multiple Templates**: Modern, Classic, Creative, Technical, Professional
-- **Real-time Preview**: See changes instantly as you type
-- **Customization**: Colors, fonts, spacing, layout options
-- **PDF Export**: Download your resume as PDF
-- **Profile Sync**: Fill resume from saved profile data
-- **Section Reordering**: Drag-and-drop section arrangement
+- **Premium Templates**: 7 ATS-optimized templates supporting multiple layouts.
+- **Customization Engine**: Advanced theming, font pairing, density controls, and live color palettes.
+- **Real-time Preview**: A4-paged live preview with interactive zoom controls.
+- **Robust PDF Export**: High-fidelity export using `html2canvas` + `jspdf`.
 
-### User Profile
-- Comprehensive profile management
-- Auto-save functionality
-- Profile completeness tracking
-- PDF resume upload with AI parsing
+### Subscriptions & Features
+- **Entitlements System**: Granular access control based on active subscription tiers.
+- **Metered AI**: AI enhancements driven by Gemini, metered securely at the edge.
+- **Premium Gating**: Certain templates and features seamlessly upsell to a Razorpay-powered checkout.
 
-### ATS (Applicant Tracking System)
-- Organization management
-- Job posting and publishing
-- Candidate pipeline (Kanban-style)
-- Interview scheduling
-- Talent pools
-- Team collaboration
+### Applicant Tracking System (ATS)
+- Organization & member management
+- Job posting and candidate pipeline Kanban
+- Automated notifications on application submission
 
-### AI Features
-- Resume content suggestions
-- PDF resume parsing
-- Match scoring (planned)
+## 🏗️ Architecture
 
-## 🛠️ Tech Stack
-
-- **Frontend**: React 18, TypeScript, Vite
-- **Styling**: Tailwind CSS, shadcn/ui
-- **State**: TanStack React Query, React Context
-- **Backend**: Supabase (PostgreSQL, Auth, Edge Functions)
-- **Payments**: Razorpay
-- **AI**: Google Gemini
-
-## 📁 Project Structure
-
-```
-src/
-├── components/
-│   ├── ui/           # shadcn/ui components
-│   ├── admin/        # Admin dashboard
-│   ├── profile/      # User profile forms
-│   ├── resume/       # Resume builder
-│   └── templates/    # Template components
-├── hooks/            # Custom React hooks
-├── pages/            # Route pages
-│   └── ats/          # ATS module pages
-├── integrations/     # Supabase client
-├── utils/            # Utilities and types
-└── lib/              # Helper functions
-
-supabase/
-├── functions/        # Edge functions
-└── migrations/       # Database migrations
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                       Frontend (Vite)                       │
+│                                                             │
+│  ┌────────────────┐    ┌─────────────────┐    ┌──────────┐  │
+│  │   UI & Pages   │    │  Template Engine│    │ Adapters │  │
+│  │ (shadcn, React)│    │ (registry.ts)   │    │ (utils)  │  │
+│  └───────┬────────┘    └────────┬────────┘    └────┬─────┘  │
+│          │                      │                  │        │
+│  ┌───────▼──────────────────────▼──────────────────▼─────┐  │
+│  │                 React Query / Hooks                   │  │
+│  └──────────────────────────┬────────────────────────────┘  │
+└─────────────────────────────┼───────────────────────────────┘
+                              │ Supabase JS Client
+┌─────────────────────────────▼───────────────────────────────┐
+│                    Supabase Backend                         │
+│                                                             │
+│  ┌─────────────────┐ ┌────────────────┐ ┌────────────────┐  │
+│  │   Edge Functions│ │ Postgres (RLS) │ │ Auth / Storage │  │
+│  └─────────────────┘ └────────────────┘ └────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- npm or bun
+- Node.js 20+
+- npm (v9+)
 
-### Installation
+### Installation & Setup
 
-```bash
-# Clone the repository
-git clone <repository-url>
-cd <project-directory>
+1. **Clone and install dependencies:**
+   ```bash
+   git clone <repository-url>
+   cd <project-directory>
+   npm install
+   ```
 
-# Install dependencies
-npm install
+2. **Environment Variables (`.env`):**
+   Create a `.env` file in the root based on `.env.example`.
+   ```env
+   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   # If running Edge Functions locally:
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role
+   RAZORPAY_KEY_ID=your_razorpay_key
+   RAZORPAY_KEY_SECRET=your_razorpay_secret
+   GEMINI_API_KEY=your_gemini_key
+   ```
 
-# Start development server
-npm run dev
-```
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
 
-### Environment Variables
-The project uses Supabase for backend. Required secrets are configured in Supabase:
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `RAZORPAY_KEY_ID`
-- `RAZORPAY_KEY_SECRET`
-- `GEMINI_API_KEY`
+## 📜 Available Scripts
 
-## 📖 Documentation
+- `npm run dev` — Starts the Vite development server.
+- `npm run build` — Builds the production assets.
+- `npm run preview` — Previews the production build locally.
+- `npm run lint` — Runs ESLint across the codebase.
+- `npm run test` — Runs the Vitest unit test suite (templates, math logic, adapters).
 
-Detailed documentation is available in `.clinerules/`:
-- `00-project-overview.md` - Project summary
-- `01-tech-stack.md` - Technology details
-- `02-project-structure.md` - File organization
-- `03-database-schema.md` - Database documentation
-- `04-routing.md` - Routes and navigation
-- `05-state-management.md` - State patterns
-- `06-theming-styling.md` - Design system
-- `07-resume-builder.md` - Resume feature docs
-- `08-authentication.md` - Auth system
-- `09-edge-functions.md` - Backend functions
-- `10-ats-module.md` - ATS documentation
-- `11-payments.md` - Payment integration
-- `12-ai-features.md` - AI capabilities
-- `13-development-guidelines.md` - Coding standards
+## 📖 Overhaul Documentation
 
-## 🎨 Theming
-
-The application supports:
-- **Light/Dark Mode**: System-aware theme switching
-- **Neo-Brutalism Mode**: Bold, high-contrast design option
-
-## 🔒 Security
-
-- Row Level Security (RLS) on all tables
-- Role-based access control
-- Secure API key management
-- Payment signature verification
-
-## 📱 Responsive Design
-
-Fully responsive across:
-- Desktop (1280px+)
-- Tablet (768px - 1279px)
-- Mobile (< 768px)
-
-## 🤝 Contributing
-
-1. Check `.clinerules/TASK.md` for current tasks
-2. Follow guidelines in `.clinerules/13-development-guidelines.md`
-3. Test in both light and dark modes
-4. Ensure neo-brutalism compatibility
-
-## 📄 License
-
-[Add your license here]
-
-## 🔗 Links
-
-- [Lovable Project](https://lovable.dev/projects/d8cf94cf-ef67-4735-8e54-18b509204d5e)
-- [Documentation](https://docs.lovable.dev)
+The codebase has undergone a major 9-phase overhaul for stability, feature-completeness, and monetization:
+- **[OVERHAUL_PLAN.md](./OVERHAUL_PLAN.md)** - The master phase-by-phase implementation plan.
+- **[PROGRESS.md](./PROGRESS.md)** - The chronological execution log of the overhaul.
+- **[GEMINI_MASTER_PROMPT.md](./GEMINI_MASTER_PROMPT.md)** - The architectural guidelines and agent instructions used during the overhaul.
