@@ -16,6 +16,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
 };
 
 serve(async (req) => {
@@ -58,6 +59,7 @@ serve(async (req) => {
     const context = body?.context;
     const resumeId = body?.resumeId;
     const currentContent = body?.currentContent;
+    const maxTokensParam = typeof body?.maxTokens === 'number' ? body.maxTokens : undefined;
 
     let finalPrompt: string;
 
@@ -178,7 +180,7 @@ Keep the tone professional yet warm. Do NOT include placeholder brackets — wri
 
     // Call the resolved provider
     let result = await callTextModel(resolved.provider, resolved.key, trimmedPrompt, {
-      maxTokens: 1000,
+      maxTokens: maxTokensParam || 1000,
       temperature: 0.7,
     });
 
@@ -188,7 +190,7 @@ Keep the tone professional yet warm. Do NOT include placeholder brackets — wri
       const fallbackKey = await keyManager.getFallbackKey('gemini');
       if (fallbackKey) {
         result = await callTextModel('gemini', fallbackKey, trimmedPrompt, {
-          maxTokens: 1000,
+          maxTokens: maxTokensParam || 1000,
           temperature: 0.7,
         });
       }

@@ -170,7 +170,7 @@ export function HelpCenter({ isAdmin = false }: HelpCenterProps) {
               <div key={ticket.id} className="border rounded-lg">
                 <button
                   className="w-full p-4 flex items-center justify-between text-left hover:bg-muted/50 transition-colors"
-                  onClick={() => setExpandedId(isExpanded ? null : ticket.id)}
+                  onClick={() => { setExpandedId(isExpanded ? null : ticket.id); setReplyText(''); }}
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">

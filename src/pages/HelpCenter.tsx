@@ -59,7 +59,7 @@ const HelpCenter = () => {
     description: 'Get help with FlowCreate. Submit a support ticket, find answers to common questions, or contact our team.',
   });
 
-  const { data: tickets, isLoading } = useQuery({
+  const { data: tickets, isLoading, isError, error: ticketsError } = useQuery({
     queryKey: ['helpTickets', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -68,7 +68,7 @@ const HelpCenter = () => {
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
-      if (error) { console.warn('help_tickets:', error.message); return []; }
+      if (error) throw error;
       return data as HelpTicket[];
     },
     enabled: !!user?.id,
@@ -171,12 +171,12 @@ const HelpCenter = () => {
                       <div><Label>Subject</Label><Input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Brief description" /></div>
                       <div className="grid grid-cols-2 gap-4">
                         <div><Label>Category</Label>
-                          <select className="w-full rounded-md border px-3 py-2 text-sm" value={category} onChange={e => setCategory(e.target.value)}>
+                          <select className="w-full rounded-md border px-3 py-2 text-sm bg-background" value={category} onChange={e => setCategory(e.target.value)}>
                             <option value="general">General</option><option value="billing">Billing</option><option value="technical">Technical Issue</option><option value="feature">Feature Request</option><option value="account">Account</option>
                           </select>
                         </div>
                         <div><Label>Priority</Label>
-                          <select className="w-full rounded-md border px-3 py-2 text-sm" value={priority} onChange={e => setPriority(e.target.value as any)}>
+                          <select className="w-full rounded-md border px-3 py-2 text-sm bg-background" value={priority} onChange={e => setPriority(e.target.value as any)}>
                             <option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option>
                           </select>
                         </div>
@@ -197,6 +197,7 @@ const HelpCenter = () => {
                 <ScrollReveal delay={100}>
                 <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><MessageSquare className="h-5 w-5" /> My Tickets</h2>
                 {isLoading ? <p className="text-center py-8 text-muted-foreground">Loading...</p> :
+                 isError ? <p className="text-center py-8 text-red-500">Failed to load tickets. Please try again later.</p> :
                  tickets && tickets.length > 0 ? (
                   <div className="space-y-2">
                     {tickets.map(ticket => {
