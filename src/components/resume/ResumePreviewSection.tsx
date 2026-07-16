@@ -14,6 +14,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDesignMode } from '@/hooks/useDesignMode';
 import { cn } from '@/lib/utils';
+import { A4_WIDTH_PX, A4_HEIGHT_PX } from '@/constants/pdfDimensions';
 
 interface ResumePreviewSectionProps {
   resume: ResumeData;
@@ -27,7 +28,7 @@ interface ResumePreviewSectionProps {
 
 const PageBreakIndicators = ({ containerRef }: { containerRef: React.RefObject<HTMLDivElement> }) => {
   const [pages, setPages] = useState<number[]>([]);
-  const [containerStyle, setContainerStyle] = useState<{ left: string; width: string }>({ left: '0px', width: '794px' });
+  const [containerStyle, setContainerStyle] = useState<{ left: string; width: string }>({ left: '0px', width: `${A4_WIDTH_PX}px` });
 
   useEffect(() => {
     const el = containerRef.current;
@@ -35,7 +36,7 @@ const PageBreakIndicators = ({ containerRef }: { containerRef: React.RefObject<H
 
     const checkHeight = () => {
       const height = el.scrollHeight;
-      const pageHeight = 1123;
+      const pageHeight = A4_HEIGHT_PX;
       const pageCount = Math.floor(height / pageHeight);
       const newPages = [];
       for (let i = 1; i <= pageCount; i++) {
@@ -72,7 +73,7 @@ const PageBreakIndicators = ({ containerRef }: { containerRef: React.RefObject<H
       style={{ left: containerStyle.left, width: containerStyle.width, top: 0, bottom: 0 }}
     >
       {pages.map((pageNum) => {
-        const topPos = pageNum * 1123;
+        const topPos = pageNum * A4_HEIGHT_PX;
         return (
           <div 
             key={pageNum} 
@@ -218,7 +219,7 @@ export const ResumePreviewSection = ({
               "hover:shadow-[0_2px_8px_rgba(0,0,0,0.06),0_16px_48px_rgba(0,0,0,0.1)]",
               isNeoBrutalism && "border-2 border-foreground shadow-[6px_6px_0_0_hsl(var(--foreground))] rounded-none"
             )}
-            style={{ width: '794px', minHeight: '1123px' }}
+            style={{ width: `${A4_WIDTH_PX}px`, minHeight: `${A4_HEIGHT_PX}px` }}
             id="resume-preview-container" 
             ref={resumeRef}
           >
