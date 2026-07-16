@@ -194,50 +194,6 @@ export type Database = {
           },
         ]
       }
-      cover_letters: {
-        Row: {
-          content: string
-          created_at: string
-          customization: Json | null
-          id: string
-          resume_id: string | null
-          template_id: string
-          title: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          content?: string
-          created_at?: string
-          customization?: Json | null
-          id?: string
-          resume_id?: string | null
-          template_id?: string
-          title?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          content?: string
-          created_at?: string
-          customization?: Json | null
-          id?: string
-          resume_id?: string | null
-          template_id?: string
-          title?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "cover_letters_resume_id_fkey"
-            columns: ["resume_id"]
-            isOneToOne: false
-            referencedRelation: "resumes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       ats_activities: {
         Row: {
           action: string
@@ -317,6 +273,50 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      cover_letters: {
+        Row: {
+          content: string
+          created_at: string
+          customization: Json | null
+          id: string
+          resume_id: string | null
+          template_id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          customization?: Json | null
+          id?: string
+          resume_id?: string | null
+          template_id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          customization?: Json | null
+          id?: string
+          resume_id?: string | null
+          template_id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cover_letters_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       departments: {
         Row: {
@@ -763,6 +763,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      master_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean
+          name: string
+          profile_data: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          profile_data?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          profile_data?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       notification_preferences: {
         Row: {
@@ -1247,6 +1277,91 @@ export type Database = {
         }
         Relationships: []
       }
+      resume_comments: {
+        Row: {
+          author_email: string | null
+          author_name: string
+          content: string
+          created_at: string
+          id: string
+          is_resolved: boolean
+          section_ref: string | null
+          share_id: string
+        }
+        Insert: {
+          author_email?: string | null
+          author_name: string
+          content: string
+          created_at?: string
+          id?: string
+          is_resolved?: boolean
+          section_ref?: string | null
+          share_id: string
+        }
+        Update: {
+          author_email?: string | null
+          author_name?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_resolved?: boolean
+          section_ref?: string | null
+          share_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resume_comments_share_id_fkey"
+            columns: ["share_id"]
+            isOneToOne: false
+            referencedRelation: "resume_shares"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resume_shares: {
+        Row: {
+          allow_comments: boolean
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          resume_id: string
+          share_token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          allow_comments?: boolean
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          resume_id: string
+          share_token?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          allow_comments?: boolean
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          resume_id?: string
+          share_token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resume_shares_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resume_templates: {
         Row: {
           category: string
@@ -1296,6 +1411,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          master_profile_id: string | null
           resume_data: Json
           template_id: string
           updated_at: string
@@ -1304,6 +1420,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          master_profile_id?: string | null
           resume_data: Json
           template_id?: string
           updated_at?: string
@@ -1312,12 +1429,21 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          master_profile_id?: string | null
           resume_data?: Json
           template_id?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "resumes_master_profile_id_fkey"
+            columns: ["master_profile_id"]
+            isOneToOne: false
+            referencedRelation: "master_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_settings: {
         Row: {

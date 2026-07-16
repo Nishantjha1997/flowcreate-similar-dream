@@ -13,7 +13,12 @@ describe('resumeTemplates', () => {
       itemSubtitle: { fontStyle: 'italic' },
       itemDescription: {},
       itemDate: { color: '#666' },
-      text: { fontSize: '14px' },
+      contact: {},
+      section: {},
+      sectionContent: {},
+      item: {},
+      skillsList: {},
+      skill: {},
     };
 
     it('returns base styles if no customization is provided', () => {
@@ -32,6 +37,7 @@ describe('resumeTemplates', () => {
 
     it('performs px math correctly for font size scaling (no NaNs)', () => {
       const custom: ResumeData['customization'] = {
+        primaryColor: '#000000',
         fontSize: 'large', // scale factor 1.1
       };
       
@@ -45,6 +51,7 @@ describe('resumeTemplates', () => {
 
     it('handles numeric font sizes safely without NaN', () => {
       const custom: ResumeData['customization'] = {
+        primaryColor: '#000000',
         fontSize: 'small', // scale factor 0.9
       };
       
@@ -60,6 +67,7 @@ describe('resumeTemplates', () => {
 
     it('adjusts line height correctly', () => {
       const custom: ResumeData['customization'] = {
+        primaryColor: '#000000',
         lineHeight: 'relaxed',
       };
       const result = applyCustomization(baseStyles, custom);

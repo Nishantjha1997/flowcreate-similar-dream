@@ -46,6 +46,8 @@ const ATSPublicJobs = lazy(() => import("./pages/ats/ATSPublicJobs"));
 const ATSApply = lazy(() => import("./pages/ats/ATSApply"));
 const ATSTalentPools = lazy(() => import("./pages/ats/ATSTalentPools"));
 const ATSCandidateDiscovery = lazy(() => import("./pages/ats/ATSCandidateDiscovery"));
+const SharedResumeView = lazy(() => import("./pages/SharedResumeView"));
+const MasterProfile = lazy(() => import("./pages/MasterProfile"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -104,6 +106,12 @@ const App = () => (
                       <Route path="/ats/apply/:jobId" element={<ATSApply />} />
                       <Route path="/ats/talent-pools" element={<ATSTalentPools />} />
                       <Route path="/ats/candidates" element={<ATSCandidateDiscovery />} />
+                      
+                      {/* Shared Resume View */}
+                      <Route path="/r/:token" element={<SharedResumeView />} />
+                      
+                      {/* Master Profiles */}
+                      <Route path="/master-profiles" element={<MasterProfile />} />
                       
                       <Route path="*" element={<NotFound />} />
                     </Routes>

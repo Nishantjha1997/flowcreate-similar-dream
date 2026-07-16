@@ -143,15 +143,32 @@ CREATE TABLE public.profiles (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- 4.1b master_profiles --------------------------------------------------------
+CREATE TABLE public.master_profiles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL DEFAULT 'Master Profile',
+  profile_data JSONB NOT NULL DEFAULT '{}',
+  is_default BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(user_id, name)
+);
+
+CREATE INDEX idx_master_profiles_user ON public.master_profiles(user_id);
+
 -- 4.2 resumes ----------------------------------------------------------------
 CREATE TABLE public.resumes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  master_profile_id UUID REFERENCES public.master_profiles(id) ON DELETE SET NULL,
   resume_data JSONB NOT NULL,
   template_id TEXT NOT NULL DEFAULT 'modern',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+CREATE INDEX idx_resumes_master_profile ON public.resumes(master_profile_id) WHERE master_profile_id IS NOT NULL;
 
 -- 4.2b cover_letters ----------------------------------------------------------
 CREATE TABLE public.cover_letters (
@@ -164,6 +181,30 @@ CREATE TABLE public.cover_letters (
   customization JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- 4.2c resume_shares & resume_comments -----------------------------------------
+CREATE TABLE public.resume_shares (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  resume_id UUID NOT NULL REFERENCES public.resumes(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  share_token TEXT UNIQUE NOT NULL DEFAULT encode(extensions.gen_random_bytes(16), 'hex'),
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  allow_comments BOOLEAN NOT NULL DEFAULT true,
+  expires_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.resume_comments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  share_id UUID NOT NULL REFERENCES public.resume_shares(id) ON DELETE CASCADE,
+  author_name TEXT NOT NULL,
+  author_email TEXT,
+  content TEXT NOT NULL,
+  section_ref TEXT,
+  is_resolved BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- 4.3 subscription_plans (NEW) — the pricing source of truth ------------------
@@ -649,6 +690,10 @@ CREATE TABLE public.webhook_events (
 CREATE INDEX idx_resumes_user ON public.resumes (user_id);
 CREATE INDEX idx_cover_letters_user ON public.cover_letters (user_id);
 CREATE INDEX idx_cover_letters_resume ON public.cover_letters (resume_id);
+CREATE INDEX idx_resume_shares_token ON public.resume_shares (share_token);
+CREATE INDEX idx_resume_shares_user ON public.resume_shares (user_id);
+CREATE INDEX idx_resume_shares_resume ON public.resume_shares (resume_id);
+CREATE INDEX idx_resume_comments_share ON public.resume_comments (share_id);
 CREATE INDEX idx_payments_user ON public.payments (user_id);
 CREATE INDEX idx_payments_subscription ON public.payments (subscription_id);
 CREATE INDEX idx_invoices_user ON public.invoices (user_id);
@@ -994,6 +1039,8 @@ ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.usage_limits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.analytics_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.cover_letters ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.resume_shares ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.resume_comments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ai_api_keys ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ai_token_usage ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
@@ -1037,6 +1084,11 @@ CREATE POLICY "Org members can view discoverable candidates" ON public.profiles
     AND EXISTS (SELECT 1 FROM public.organization_members om WHERE om.user_id = (SELECT auth.uid()))
   );
 
+-- master_profiles -------------------------------------------------------------
+CREATE POLICY "Users manage own master profiles" ON public.master_profiles
+  FOR ALL TO authenticated USING (user_id = (SELECT auth.uid()))
+  WITH CHECK (user_id = (SELECT auth.uid()));
+
 -- resumes ---------------------------------------------------------------------
 CREATE POLICY "Users can view their own resumes" ON public.resumes
   FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
@@ -1051,6 +1103,42 @@ CREATE POLICY "Users can delete their own resumes" ON public.resumes
 CREATE POLICY "Users manage own cover letters" ON public.cover_letters
   FOR ALL TO authenticated USING (user_id = (SELECT auth.uid()))
   WITH CHECK (user_id = (SELECT auth.uid()));
+
+-- resume_shares & resume_comments -----------------------------------------------
+CREATE POLICY "Owners manage shares" ON public.resume_shares
+  FOR ALL TO authenticated USING (user_id = (SELECT auth.uid()))
+  WITH CHECK (user_id = (SELECT auth.uid()));
+CREATE POLICY "Public read active shares" ON public.resume_shares
+  FOR SELECT TO anon, authenticated
+  USING (is_active = true AND (expires_at IS NULL OR expires_at > now()));
+
+CREATE POLICY "Public insert on active shares" ON public.resume_comments
+  FOR INSERT TO anon, authenticated
+  WITH CHECK (EXISTS (
+    SELECT 1 FROM public.resume_shares
+    WHERE id = share_id AND is_active = true AND allow_comments = true
+    AND (expires_at IS NULL OR expires_at > now())
+  ));
+CREATE POLICY "Public read comments" ON public.resume_comments
+  FOR SELECT TO anon, authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.resume_shares WHERE id = share_id AND is_active = true
+  ));
+CREATE POLICY "Owner resolves comments" ON public.resume_comments
+  FOR UPDATE TO authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.resume_shares
+    WHERE id = share_id AND user_id = (SELECT auth.uid())
+  ));
+
+-- Public read of resumes linked to active shares (fills RLS gap)
+CREATE POLICY "Public read shared resumes" ON public.resumes
+  FOR SELECT TO anon, authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.resume_shares
+    WHERE resume_id = id AND is_active = true
+    AND (expires_at IS NULL OR expires_at > now())
+  ));
 
 -- subscription_plans -------------------------------------------------------------
 CREATE POLICY "Anyone can view active public plans" ON public.subscription_plans

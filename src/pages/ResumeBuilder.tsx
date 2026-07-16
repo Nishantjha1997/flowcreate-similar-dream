@@ -20,6 +20,7 @@ import { templateNames } from '@/components/resume/ResumeData';
 import { ResumeData } from '@/utils/types';
 import { analytics, usePageTracking, useJourneyTracking } from '@/components/ui/analytics-tracker';
 import { Crown, Zap } from 'lucide-react';
+import { ShareManagement } from '@/components/sharing/ShareManagement';
 
 const ResumeBuilder = () => {
   const navigate = useNavigate();
@@ -82,10 +83,11 @@ const ResumeBuilder = () => {
     toast.success("Resume data imported successfully!");
   };
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast.success("Link copied to clipboard!");
-  };
+	const [shareDialogOpen, setShareDialogOpen] = useState(false);
+
+	  const handleShare = () => {
+	    setShareDialogOpen(true);
+	  };
 
   const handleDownload = () => {
     if (resumeElementRef.current) {
@@ -240,6 +242,14 @@ const ResumeBuilder = () => {
       <UserOnboarding 
         isFirstVisit={showOnboarding}
         onComplete={() => setShowOnboarding(false)}
+      />
+      
+      {/* Share Management Dialog (controlled by header Share button) */}
+      <ShareManagement
+        resumeId={editResumeId}
+        resumeName={resume.personal?.name}
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
       />
     </div>
   );

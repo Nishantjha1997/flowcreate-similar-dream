@@ -49,6 +49,7 @@ import { ProfileInsights } from '@/components/profile/ProfileInsights';
 import { FloatingSmartSuggestions } from '@/components/profile/FloatingSmartSuggestions';
 import { ProfileAutoSave } from '@/components/profile/ProfileAutoSave';
 import { AdvancedSkillsForm } from '@/components/profile/AdvancedSkillsForm';
+import { ResumeViewAnalytics } from '@/components/analytics/ResumeViewAnalytics';
 
 // Tab configuration with icons and completion status
 const getTabConfig = (profile: any) => [
@@ -104,6 +105,12 @@ const getTabConfig = (profile: any) => [
     id: 'resumes', 
     label: 'Resumes', 
     icon: FileText, 
+    isComplete: true 
+  },
+  { 
+    id: 'analytics', 
+    label: 'Analytics', 
+    icon: Eye, 
     isComplete: true 
   },
   { 
@@ -814,6 +821,10 @@ const Account = () => {
                     )}
                   </CardContent>
                 </Card>
+              </TabsContent>
+              
+              <TabsContent value="analytics" className="mt-0 animate-fade-in">
+                <ResumeViewAnalytics isNeoBrutalism={isNeoBrutalism} />
               </TabsContent>
               
               <TabsContent value="security" className="mt-0 animate-fade-in">
