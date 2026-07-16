@@ -56,6 +56,21 @@
 - P9-T3: Route-level error boundary with monitoring seam
 - P9-T4: Refresh README with setup, env, scripts, architecture diagram
 - P9-GATE: All tests pass, GitHub Actions configured, project overhaul complete.
+- P10-T1: Remove landing hero AI badge
+- P10-T2: Introduce A4 dimension constants
+- P10-T3: Standardize PDF exporter on A4 constants
+- P10-T4: Use A4 constants in preview section
+- P10-T5: Add cover_letters table migration
+- P10-T6: Implement cover letter builder frontend
+- P10-T7: Extend gemini-suggest for cover letters
+- P10-T8: Add cover letter design templates
+- P10-T9: Add sharing and comments database schema
+- P10-T10: Implement public feedback and commenting UI
+- P10-T11: Create view tracking edge function
+- P10-T12: Add analytics charts dashboard
+- P10-T13: Create master_profiles schema
+- P10-T14: Add resume spawner and multi-language translation
+- P10-GATE: E2E refined templates & FlowCV-like feature parity implemented and built cleanly.
 ## Blocked / conflicts found
 (none)
 
