@@ -137,9 +137,67 @@ const getIntervalText = (interval: string) => {
 
 const Pricing = () => {
   usePageMeta({
-    title: 'Pricing - FlowCreate',
-    description: 'Simple, transparent pricing for FlowCreate. Free for 1 resume, or upgrade for unlimited resumes and advanced features.',
+    title: 'Pricing — Free Resume Builder Plans | FlowCreate',
+    description: 'FlowCreate is free forever. Upgrade for unlimited resumes, AI suggestions, version history and cloud backup. Plans from ₹299/month. No hidden fees.',
   });
+
+  // FAQ structured data for Google rich snippets
+  useEffect(() => {
+    const faqScript = document.createElement('script');
+    faqScript.type = 'application/ld+json';
+    faqScript.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Is FlowCreate really free?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. FlowCreate has a permanently free plan that lets you create and download 1 resume with access to all templates. No credit card required.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I cancel my subscription anytime?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Absolutely. You can cancel your subscription at any time from your account settings. You will retain access until the end of your billing period.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is included in the free plan?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The free plan includes access to all resume templates, live preview, basic editing features, and the ability to save and download 1 resume as a PDF.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Do you offer a refund?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. We offer a full refund within 7 days of purchase if you are not satisfied with the premium features.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Are the resume templates ATS-friendly?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. All FlowCreate templates are designed to pass through Applicant Tracking Systems (ATS) used by employers. They use clean formatting and standard fonts recognized by ATS software.',
+          },
+        },
+      ],
+    });
+    faqScript.id = 'faq-schema';
+    document.head.appendChild(faqScript);
+    return () => {
+      const el = document.getElementById('faq-schema');
+      if (el) document.head.removeChild(el);
+    };
+  }, []);
 
   const { user } = useAuth();
   const [isIndianUser, setIsIndianUser] = useState(false);

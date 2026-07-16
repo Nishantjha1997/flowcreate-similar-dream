@@ -29,7 +29,7 @@ const Templates = () => {
 
   usePageMeta({
     title: pageTitle,
-    description: `Browse our collection of ${selectedCategory === "All" ? "professional" : selectedCategory.toLowerCase()} resume templates. ATS-friendly and easy to customize.`,
+    description: `Browse ${TEMPLATE_REGISTRY.length}+ free ATS-optimized resume templates for ${selectedCategory === "All" ? "every industry" : selectedCategory.toLowerCase() + " professionals"}. Fully customizable, instant PDF download. No credit card required.`,
   });
 
   const filteredTemplates = TEMPLATE_REGISTRY.filter((template) => {

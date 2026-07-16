@@ -12,3 +12,5 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://flowcreate-similar-dream.vercel.app/sitemap.xml

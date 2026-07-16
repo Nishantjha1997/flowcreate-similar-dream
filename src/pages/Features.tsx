@@ -22,8 +22,8 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 
 const Features = () => {
   usePageMeta({
-    title: 'Features - Resume Builder',
-    description: 'Explore the powerful features of FlowCreate, including AI assistance, ATS optimization, and professional templates.',
+    title: 'Resume Builder Features — ATS Optimization, AI Suggestions & More',
+    description: 'Discover FlowCreate features: 30+ ATS-optimized templates, real-time preview, AI writing suggestions, one-click PDF export, cloud storage & resume sharing. Free resume builder online.',
   });
 
   const features = [
