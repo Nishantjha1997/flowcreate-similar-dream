@@ -58,6 +58,72 @@ const BlogPost = () => {
     description: post?.description || 'Resume tips and career advice from FlowCreate.',
   });
 
+  // Inject JSON-LD structured data for SEO + LLM discoverability
+  useEffect(() => {
+    if (!post) return;
+    // Extract FAQ items from content if they exist
+    const faqItems: { question: string; answer: string }[] = [];
+    const faqRegex = /<h[23]>\s*(?:Q:?\s*)?(.*?)<\/h[23]>\s*<p>\s*(?:A:?\s*)?([\s\S]*?)<\/p>/gi;
+    let match;
+    while ((match = faqRegex.exec(post.content)) !== null) {
+      const q = match[1].replace(/<[^>]*>/g, '').trim();
+      const a = match[2].replace(/<[^>]*>/g, '').trim();
+      if (q.endsWith('?') || q.toLowerCase().startsWith('how') || q.toLowerCase().startsWith('what') || q.toLowerCase().startsWith('can') || q.toLowerCase().startsWith('is') || q.toLowerCase().startsWith('do')) {
+        faqItems.push({ question: q, answer: a.slice(0, 300) });
+      }
+    }
+
+    const jsonLd: any = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'BlogPosting',
+          headline: post.title,
+          description: post.description,
+          datePublished: post.published_at || post.created_at,
+          dateModified: post.published_at || post.created_at,
+          author: { '@type': 'Person', name: post.author || 'FlowCreate Team' },
+          publisher: {
+            '@type': 'Organization',
+            name: 'FlowCreate',
+            url: window.location.origin,
+          },
+          mainEntityOfPage: { '@type': 'WebPage', '@id': window.location.href },
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: window.location.origin },
+            { '@type': 'ListItem', position: 2, name: 'Blog', item: `${window.location.origin}/blog` },
+            { '@type': 'ListItem', position: 3, name: post.title },
+          ],
+        },
+      ],
+    };
+
+    // Add FAQ schema if FAQ items found
+    if (faqItems.length > 0) {
+      jsonLd['@graph'].push({
+        '@type': 'FAQPage',
+        mainEntity: faqItems.map(f => ({
+          '@type': 'Question',
+          name: f.question,
+          acceptedAnswer: { '@type': 'Answer', text: f.answer },
+        })),
+      });
+    }
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = 'blog-structured-data';
+    script.textContent = JSON.stringify(jsonLd);
+    document.head.appendChild(script);
+    return () => {
+      const el = document.getElementById('blog-structured-data');
+      if (el) el.remove();
+    };
+  }, [post]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background"><Header />
