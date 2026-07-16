@@ -44,6 +44,9 @@
 - P5-T5: Visible autosave status in builder header
 - P6-T1: Live template collage in hero
 - P6-T2: Drive pricing page from subscription_plans
+- P6-T3: Dark mode contrast fixes
+- P6-T4: Per-page titles and meta descriptions
+- P6-GATE: Lighthouse baseline matches previous phase; tsc + build pass; pushed
 
 ## Blocked / conflicts found
 (none)
