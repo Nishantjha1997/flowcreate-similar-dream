@@ -51,7 +51,11 @@
 - P8-T2: Add notification bell to header
 - P8-T3: Notify job owners of new applications via DB trigger
 - P8-GATE: bell shows live notification when an application is submitted; push.
-
+- P9-T1: Add vitest with template + adapter unit tests
+- P9-T2: Add GitHub Actions CI workflow (ci.yml)
+- P9-T3: Route-level error boundary with monitoring seam
+- P9-T4: Refresh README with setup, env, scripts, architecture diagram
+- P9-GATE: All tests pass, GitHub Actions configured, project overhaul complete.
 ## Blocked / conflicts found
 (none)
 
