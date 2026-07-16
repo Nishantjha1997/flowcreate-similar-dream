@@ -1,5 +1,5 @@
 # Overhaul Progress
-## Current task: P6-T2
+## Current task: P6-T3
 ## Completed
 - P0-T1: Baseline verified; progress tracker created
 - P1-T1: Created supabase/functions/_shared/aiProviders.ts (callTextModel + getAnyActiveKey)
@@ -43,6 +43,7 @@
 - P5-T4: Consistent skeletons and empty states
 - P5-T5: Visible autosave status in builder header
 - P6-T1: Live template collage in hero
+- P6-T2: Drive pricing page from subscription_plans
 
 ## Blocked / conflicts found
 (none)
