@@ -286,7 +286,7 @@ if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const DEFAULT_KEY = 'clean-slate';
+export const DEFAULT_KEY = 'clean-slate';
 
 /**
  * Convert a legacy numeric id ("1"–"7") or a canonical key to the canonical key.

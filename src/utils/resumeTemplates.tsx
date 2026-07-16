@@ -26,7 +26,7 @@ export type TemplateStyles = {
   sidebarSectionTitle?: CSSProperties;
 };
 
-const applyCustomization = (
+export const applyCustomization = (
   baseStyles: TemplateStyles, 
   customization?: ResumeData['customization']
 ): TemplateStyles => {
@@ -69,10 +69,10 @@ const applyCustomization = (
   if (customization.fontSize) {
     const m = customization.fontSize === 'small' ? 0.9 : customization.fontSize === 'large' ? 1.1 : 1;
     const getNewFontSize = (val: string | number | undefined, multiplier: number, fallback: number): string => {
-      if (!val) return `${fallback * multiplier}px`;
+      if (!val) return `${parseFloat((fallback * multiplier).toFixed(1))}px`;
       const num = parseInt(String(val));
-      if (isNaN(num)) return `${fallback * multiplier}px`;
-      return `${num * multiplier}px`;
+      if (isNaN(num)) return `${parseFloat((fallback * multiplier).toFixed(1))}px`;
+      return `${parseFloat((num * multiplier).toFixed(1))}px`;
     };
     if (styles.name) styles.name.fontSize = getNewFontSize(styles.name.fontSize, m, 28);
     if (styles.itemTitle) styles.itemTitle.fontSize = getNewFontSize(styles.itemTitle.fontSize, m, 14);
@@ -95,10 +95,10 @@ const applyCustomization = (
   if (customization.spacing) {
     const m = customization.spacing === 'compact' ? 0.75 : customization.spacing === 'spacious' ? 1.25 : 1;
     const getNewSpacing = (val: string | number | undefined, multiplier: number, fallback: number): string => {
-      if (!val) return `${fallback * multiplier}px`;
+      if (!val) return `${parseFloat((fallback * multiplier).toFixed(1))}px`;
       const num = parseInt(String(val));
-      if (isNaN(num)) return `${fallback * multiplier}px`;
-      return `${num * multiplier}px`;
+      if (isNaN(num)) return `${parseFloat((fallback * multiplier).toFixed(1))}px`;
+      return `${parseFloat((num * multiplier).toFixed(1))}px`;
     };
     if (styles.section) styles.section.marginBottom = getNewSpacing(styles.section.marginBottom, m, 24);
     if (styles.item) styles.item.marginBottom = getNewSpacing(styles.item.marginBottom, m, 16);
