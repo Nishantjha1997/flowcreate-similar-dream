@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import {
   Edit, Trash2, Eye, Search, RefreshCw, Sparkles,
   Bold, Italic, List, ListOrdered,
-  Link2, Image, Send, Loader2, BookOpen, Lightbulb, Wand2
+  Link2, Image, Send, Loader2, BookOpen, Lightbulb, Wand2, BarChart3
 } from 'lucide-react';
 
 interface BlogPost {
@@ -57,6 +57,8 @@ export function BlogManager() {
   const [aiTopic, setAiTopic] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');
+  const [seoAuditing, setSeoAuditing] = useState(false);
+  const [seoScore, setSeoScore] = useState<number | null>(null);
 
   const { data: posts = [], isLoading, refetch } = useQuery({
     queryKey: ['admin-blog-posts'],
@@ -210,6 +212,60 @@ CRITICAL REQUIREMENTS:
     } finally { setAiLoading(false); }
   };
 
+  // ─── SEO Audit ─────────────────────────────────────────
+  const runSeoAudit = async () => {
+    if (!editingPost) return;
+    syncContent();
+    const html = editorRef.current?.innerHTML || editingPost.content;
+    if (!html || html.length < 200) { toast({ title: 'Not enough content to audit', variant: 'destructive' }); return; }
+
+    setSeoAuditing(true); setSeoScore(null);
+    try {
+      const prompt = `You are an expert SEO auditor. Analyze this blog article HTML and return a JSON response with two fields:
+1. "score" - a number from 0-100 rating the SEO quality
+2. "improved" - the complete rewritten HTML with ALL these SEO improvements applied:
+   - Proper heading hierarchy (NO h1 - article title is handled by the page template)
+   - Primary keyword in first 100 words, at least one H2, and conclusion
+   - Meta description optimized (150-160 chars with primary keyword)
+   - At least one internal link to relevant pages
+   - FAQ section with schema-ready Q&A format at the end (if missing)
+   - Short paragraphs (2-4 sentences max)
+   - Bullet points for scannable lists
+   - Strong CTAs with descriptive anchor text
+   - Readability: grade 8-10 level, active voice
+
+Return ONLY a valid JSON object like: {"score":85,"improved":"<h2>...</h2><p>...</p>"}
+No markdown code blocks. The "improved" field must contain the full rewritten HTML.
+
+Article HTML:
+${html.slice(0, 8000)}`;
+
+      const result = await callGemini(prompt, 4000);
+      const jsonMatch = result.match(/\{[\s\S]*"score"[\s\S]*"improved"[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('Could not parse SEO audit result');
+      const audit = JSON.parse(jsonMatch[0]);
+      
+      if (typeof audit.score === 'number' && audit.improved) {
+        setSeoScore(audit.score);
+        const improvedHtml = audit.improved.replace(/```html|```/g, '').trim();
+        const plainText = improvedHtml.replace(/<[^>]*>/g, '');
+        const wordCount = plainText.split(/\s+/).filter(Boolean).length;
+        
+        setEditingPost({
+          ...editingPost,
+          content: improvedHtml,
+          read_time: `${Math.ceil(wordCount / 200)} min read`,
+        });
+        if (editorRef.current) editorRef.current.innerHTML = improvedHtml;
+        
+        const grade = audit.score >= 90 ? 'Excellent' : audit.score >= 75 ? 'Good' : audit.score >= 60 ? 'Fair' : 'Needs Work';
+        toast({ title: `SEO Score: ${audit.score}/100 — ${grade}`, description: 'Content optimized. Review changes and publish.' });
+      }
+    } catch (err: unknown) {
+      toast({ title: 'SEO audit failed', description: err instanceof Error ? err.message : 'Try again', variant: 'destructive' });
+    } finally { setSeoAuditing(false); }
+  };
+
   // ─── Render ─────────────────────────────────────────────
   return (
     <GlassCard variant="elevated" className="p-6">
@@ -223,7 +279,7 @@ CRITICAL REQUIREMENTS:
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => refetch()}><RefreshCw className="h-4 w-4 mr-1" /> Refresh</Button>
+          <Button variant="outline" size="sm" onClick={() => refetch()} className="text-foreground"><RefreshCw className="h-4 w-4 mr-1" /> Refresh</Button>
           <Button size="sm" onClick={startAiFlow} className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0">
             <Wand2 className="h-4 w-4 mr-1" /> AI Generate Post
           </Button>
@@ -387,11 +443,20 @@ CRITICAL REQUIREMENTS:
                 {editingPost.id ? 'Edit Post' : <><Sparkles className="h-4 w-4 text-purple-600" /> Review AI-Generated Draft</>}
               </h4>
               {!editingPost.id && <p className="text-xs text-muted-foreground mt-0.5">Review the AI content below. Edit anything, then publish.</p>}
+              {seoScore !== null && (
+                <Badge className={`mt-1 text-xs ${seoScore >= 90 ? 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300' : seoScore >= 75 ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300' : seoScore >= 60 ? 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300' : 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300'}`}>
+                  <BarChart3 className="h-3 w-3 mr-1" /> SEO Score: {seoScore}/100
+                </Badge>
+              )}
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => { if (!editingPost.id && !confirm('Discard this AI-generated draft?')) return; setEditingPost(null); }}>Cancel</Button>
-              <Button size="sm" variant="outline" onClick={() => savePost('draft')} disabled={saving}>
+              <Button variant="outline" size="sm" onClick={() => { if (!editingPost.id && !confirm('Discard this AI-generated draft?')) return; setEditingPost(null); }} className="text-foreground">Cancel</Button>
+              <Button size="sm" variant="outline" onClick={() => savePost('draft')} disabled={saving} className="text-foreground">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null} Save Draft
+              </Button>
+              <Button size="sm" variant="outline" onClick={runSeoAudit} disabled={seoAuditing} className="text-foreground">
+                {seoAuditing ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <BarChart3 className="h-4 w-4 mr-1" />}
+                SEO Audit
               </Button>
               <Button size="sm" onClick={() => savePost('published')} disabled={saving} className="bg-green-600 hover:bg-green-700 text-white border-0">
                 <Send className="h-4 w-4 mr-1" /> Publish
