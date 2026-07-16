@@ -47,6 +47,10 @@
 - P6-T3: Dark mode contrast fixes
 - P6-T4: Per-page titles and meta descriptions
 - P6-GATE: Lighthouse baseline matches previous phase; tsc + build pass; pushed
+- P8-T1: Add useNotifications hook with realtime
+- P8-T2: Add notification bell to header
+- P8-T3: Notify job owners of new applications via DB trigger
+- P8-GATE: bell shows live notification when an application is submitted; push.
 
 ## Blocked / conflicts found
 (none)
