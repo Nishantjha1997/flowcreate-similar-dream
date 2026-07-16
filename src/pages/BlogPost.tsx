@@ -185,7 +185,7 @@ const BlogPost = () => {
             {/* Content */}
             <ScrollReveal delay={50}>
             <article
-              className="prose prose-lg max-w-none prose-headings:text-foreground prose-p:text-foreground/85 prose-a:text-primary prose-strong:text-foreground prose-li:text-foreground/85 mb-16"
+              className="prose prose-lg dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground/85 prose-a:text-primary prose-strong:text-foreground prose-li:text-foreground/85 prose-img:rounded-xl prose-img:shadow-md mb-16"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
             </ScrollReveal>
