@@ -14,6 +14,7 @@ import { DesignModeProvider } from "./hooks/useDesignMode";
 const Index = lazy(() => import("./pages/Index"));
 const Templates = lazy(() => import("./pages/Templates"));
 const ResumeBuilder = lazy(() => import("./pages/ResumeBuilder"));
+const CoverLetterBuilder = lazy(() => import("./pages/CoverLetterBuilder"));
 const Examples = lazy(() => import("./pages/Examples"));
 const Features = lazy(() => import("./pages/Features"));
 const Pricing = lazy(() => import("./pages/Pricing"));
@@ -72,6 +73,7 @@ const App = () => (
                       <Route path="/" element={<Index />} />
                       <Route path="/templates" element={<Templates />} />
                       <Route path="/resume-builder" element={<ResumeBuilder />} />
+                      <Route path="/cover-letter-builder" element={<CoverLetterBuilder />} />
                       <Route path="/examples" element={<Examples />} />
                       <Route path="/features" element={<Features />} />
                       <Route path="/pricing" element={<Pricing />} />
