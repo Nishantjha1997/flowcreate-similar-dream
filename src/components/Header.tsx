@@ -35,10 +35,10 @@ const Header = () => {
 
   const navItems = [
     { to: '/templates', label: 'Templates' },
-    { to: '/account', label: 'Profile' },
+    { to: '/blog', label: 'Blog' },
     { to: '/pricing', label: 'Pricing' },
     { to: '/ats', label: 'For Companies' },
-    { to: '/about', label: 'About' }
+    { to: '/help', label: 'Help' },
   ];
 
   if (isNeoBrutalism) {

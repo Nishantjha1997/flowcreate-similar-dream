@@ -20,6 +20,7 @@ import { PaymentGatewayManagement } from "@/components/admin/PaymentGatewayManag
 import { ATSManagement } from "@/components/admin/ATSManagement";
 import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AuditLogs } from "@/components/admin/AuditLogs";
+import { HelpCenter } from "@/components/admin/HelpCenter";
 import { Skeleton } from "@/components/ui/loading-skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -45,6 +46,7 @@ import {
   X,
   LogOut,
   Settings,
+  MessageSquare,
 } from "lucide-react";
 import { useDesignMode } from "@/hooks/useDesignMode";
 import { cn } from "@/lib/utils";
@@ -56,6 +58,7 @@ const NAV_GROUPS = [
     items: [
       { value: "registrations", label: "Registrations", icon: UserCheck },
       { value: "users", label: "User Management", icon: Users },
+      { value: "helpcenter", label: "Help Center", icon: MessageSquare },
     ],
   },
   {
@@ -331,6 +334,7 @@ const Admin = () => {
                     refetch={() => { refetch(); }}
                   />
                 )}
+                {activeTab === "helpcenter" && <HelpCenter isAdmin={!!isAdmin} />}
                 {activeTab === "ats" && <ATSManagement isAdmin={!!isAdmin} />}
                 {activeTab === "templates" && <TemplateManagement />}
                 {activeTab === "website" && <WebsiteCustomization />}

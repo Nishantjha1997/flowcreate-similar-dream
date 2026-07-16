@@ -23,6 +23,12 @@ const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const ResumeTemplateProfession = lazy(() => import("./pages/ResumeTemplateProfession"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const Resources = lazy(() => import("./pages/Resources"));
+const CareerAdvice = lazy(() => import("./pages/CareerAdvice"));
+const HelpCenter = lazy(() => import("./pages/HelpCenter"));
 const Account = lazy(() => import("./pages/Account"));
 const AccountSettings = lazy(() => import("./pages/AccountSettings"));
 const Admin = lazy(() => import("./pages/Admin"));
@@ -112,6 +118,20 @@ const App = () => (
                       
                       {/* Master Profiles */}
                       <Route path="/master-profiles" element={<MasterProfile />} />
+                      
+                      {/* Programmatic SEO — Resume Template by Profession */}
+                      <Route path="/resume-template/:profession" element={<ResumeTemplateProfession />} />
+                      
+                      {/* Blog */}
+                      <Route path="/blog" element={<Blog />} />
+                      <Route path="/blog/:slug" element={<BlogPost />} />
+                      
+                      {/* Resources & Career Advice */}
+                      <Route path="/resources" element={<Resources />} />
+                      <Route path="/career-advice" element={<CareerAdvice />} />
+                      
+                      {/* Help Center */}
+                      <Route path="/help" element={<HelpCenter />} />
                       
                       <Route path="*" element={<NotFound />} />
                     </Routes>
