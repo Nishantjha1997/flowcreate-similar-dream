@@ -194,6 +194,50 @@ export type Database = {
           },
         ]
       }
+      cover_letters: {
+        Row: {
+          content: string
+          created_at: string
+          customization: Json | null
+          id: string
+          resume_id: string | null
+          template_id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          customization?: Json | null
+          id?: string
+          resume_id?: string | null
+          template_id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          customization?: Json | null
+          id?: string
+          resume_id?: string | null
+          template_id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cover_letters_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ats_activities: {
         Row: {
           action: string

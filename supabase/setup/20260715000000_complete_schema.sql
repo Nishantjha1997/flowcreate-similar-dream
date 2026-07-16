@@ -153,6 +153,19 @@ CREATE TABLE public.resumes (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- 4.2b cover_letters ----------------------------------------------------------
+CREATE TABLE public.cover_letters (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  resume_id UUID REFERENCES public.resumes(id) ON DELETE SET NULL,
+  title TEXT NOT NULL DEFAULT 'Untitled Cover Letter',
+  content TEXT NOT NULL DEFAULT '',
+  template_id TEXT NOT NULL DEFAULT 'clean-slate',
+  customization JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- 4.3 subscription_plans (NEW) — the pricing source of truth ------------------
 -- Prices stored in minor units (paise / cents). `limits` drives feature gating.
 CREATE TABLE public.subscription_plans (
@@ -634,6 +647,8 @@ CREATE TABLE public.webhook_events (
 -- §5 INDEXES (beyond PK/UNIQUE)
 -- ============================================================================
 CREATE INDEX idx_resumes_user ON public.resumes (user_id);
+CREATE INDEX idx_cover_letters_user ON public.cover_letters (user_id);
+CREATE INDEX idx_cover_letters_resume ON public.cover_letters (resume_id);
 CREATE INDEX idx_payments_user ON public.payments (user_id);
 CREATE INDEX idx_payments_subscription ON public.payments (subscription_id);
 CREATE INDEX idx_invoices_user ON public.invoices (user_id);
@@ -978,6 +993,7 @@ ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.usage_limits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.analytics_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cover_letters ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ai_api_keys ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ai_token_usage ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
@@ -1030,6 +1046,11 @@ CREATE POLICY "Users can update their own resumes" ON public.resumes
   FOR UPDATE TO authenticated USING (user_id = (SELECT auth.uid()));
 CREATE POLICY "Users can delete their own resumes" ON public.resumes
   FOR DELETE TO authenticated USING (user_id = (SELECT auth.uid()));
+
+-- cover_letters -----------------------------------------------------------------
+CREATE POLICY "Users manage own cover letters" ON public.cover_letters
+  FOR ALL TO authenticated USING (user_id = (SELECT auth.uid()))
+  WITH CHECK (user_id = (SELECT auth.uid()));
 
 -- subscription_plans -------------------------------------------------------------
 CREATE POLICY "Anyone can view active public plans" ON public.subscription_plans
