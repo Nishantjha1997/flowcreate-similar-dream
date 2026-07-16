@@ -1,5 +1,5 @@
 
-import { supabase, SUPABASE_FUNCTIONS_URL } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Enhanced utility to request resume enhancements from Gemini API via Supabase Edge Function.
@@ -22,41 +22,24 @@ export async function fetchGeminiSuggestions(request: SuggestionRequest): Promis
   const prompts = generateContextualPrompts(request);
   const suggestions: string[] = [];
 
-  // Get the access token for authentication
-  const { data: { session } } = await supabase.auth.getSession();
-  const accessToken = session?.access_token;
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-  
-  if (accessToken) {
-    headers["Authorization"] = `Bearer ${accessToken}`;
-  }
-
-  // Fetch multiple suggestions in parallel
+  // Fetch multiple suggestions in parallel using supabase.functions.invoke (handles auth + CORS automatically)
   const suggestionPromises = prompts.map(async (prompt) => {
     try {
-      const response = await fetch(
-        `${SUPABASE_FUNCTIONS_URL}/gemini-suggest`,
-        {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ prompt }),
+      const { data, error } = await supabase.functions.invoke('gemini-suggest', {
+        body: { prompt },
+      });
+
+      if (error) {
+        if (error.message?.toLowerCase().includes('authorization') || (error as any)?.code === 401) {
+          throw new Error("Authorization error: Please make sure you are logged in.");
         }
-      );
-
-      const data = await response.json();
-      console.log("[Gemini] Suggestion response", data);
-
-      if (data.suggestion) {
-        return data.suggestion.trim();
-      } else if (data.code === 401 || data.message?.toLowerCase().includes('authorization')) {
-        throw new Error(
-          "Authorization error: Please make sure you are logged in, or contact support if this issue persists."
-        );
-      } else {
-        throw new Error(data.error || "No suggestion returned from Gemini");
+        throw new Error(error.message || "No suggestion returned from AI");
       }
+
+      if (data?.suggestion) {
+        return (data.suggestion as string).trim();
+      }
+      throw new Error(data?.error || "No suggestion returned from AI");
     } catch (error) {
       console.error("[Gemini] Individual suggestion error:", error);
       return null;

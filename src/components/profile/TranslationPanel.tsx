@@ -112,41 +112,22 @@ export function TranslationPanel({ resumeData, profileId, onTranslated }: Transl
 
       const prompt = `Translate the following resume content to ${langLabel}. Preserve the field labels exactly (e.g., "Name:", "Summary:", "Job Title:") - only translate the values after the colon. Keep the "---" separators between sections. Do not add any extra text or commentary.\n\n${sourceText}`;
 
-      // Call the gemini-suggest edge function for translation
-      const { data: sessionData } = await supabase.auth.getSession();
-      const authToken = sessionData?.session?.access_token;
+      // Call the gemini-suggest edge function for translation (uses invoke for CORS-safe call)
+      const { data: funcData, error: funcError } = await supabase.functions.invoke('gemini-suggest', {
+        body: { prompt },
+      });
 
-      if (!authToken) {
-        toast.error('Authentication required. Please log in again.');
-        setIsTranslating(false);
-        return;
+      if (funcError) {
+        throw new Error(funcError.message || 'Translation service unavailable');
       }
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gemini-suggest`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`,
-          },
-          body: JSON.stringify({ prompt }),
-        }
-      );
-
-      const result = await response.json();
-
-      if (!response.ok || result.error) {
-        throw new Error(result.error || 'Translation service unavailable');
-      }
-
-      setTranslatedText(result.suggestion || '');
+      setTranslatedText(funcData?.suggestion || '');
 
       // Save translated data back to master profile
-      if (result.suggestion && onTranslated) {
+      if (funcData?.suggestion && onTranslated) {
         try {
           // Parse translated sections back into profile data
-          const translatedSections = parseTranslatedSections(result.suggestion, resumeData);
+          const translatedSections = parseTranslatedSections(funcData.suggestion, resumeData);
           await supabase
             .from('master_profiles')
             .update({
