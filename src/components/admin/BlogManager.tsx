@@ -172,62 +172,75 @@ export function BlogManager() {
     if (!aiTopic.trim()) { setAiError('Enter or select a topic first'); return; }
     setAiLoading(true); setAiError('');
     try {
-      const prompt = `You are an expert SEO content writer and web designer for FlowCreate, a free online resume builder.
+      const prompt = `You are an expert SEO content writer for FlowCreate, a free online resume builder. Write a blog article titled "${aiTopic}".
 
-Write a comprehensive, beautifully formatted blog article titled "${aiTopic}".
+Your output renders through Tailwind prose — a professional typography system. To look beautiful, you MUST follow this EXACT structure:
 
-YOUR OUTPUT WILL BE RENDERED in a professional typography system (Tailwind prose) that automatically styles semantic HTML. Use these elements to create a visually stunning article:
+<p>[2-3 sentence hook. Must include the primary keyword. End with a question or compelling statement.]</p>
 
-<article>
-  <p class="lead">[Engaging opening paragraph - 2-3 sentences that hook the reader]</p>
-  
-  <h2>Main Section Heading</h2>
-  <p>[2-4 sentence paragraph. Be specific, actionable, and data-driven.]</p>
-  <p>[Additional paragraph if needed. Break up long text.]</p>
-  
-  <h3>Sub-section (if helpful)</h3>
-  <ul>
-    <li><strong>Bold lead-in:</strong> explanatory detail</li>
-    <li><strong>Another point:</strong> with supporting information</li>
-  </ul>
-  
-  <blockquote><p>Key takeaway or memorable quote that readers should remember from this section.</p></blockquote>
-  
-  <h2>Next Major Section</h2>
-  ... (repeat pattern for 4-6 sections)
-  
-  <hr>
-  
-  <h2>Frequently Asked Questions</h2>
-  <h3>Q: Common question about this topic?</h3>
-  <p>A: Detailed, helpful answer that genuinely informs the reader. 2-4 sentences.</p>
-  (3-5 Q&A pairs)
-  
-  <hr>
-  
-  <h2>Ready to Take Action?</h2>
-  <p>Strong closing paragraph that motivates the reader.</p>
-  <p><a href="/resume-builder"><strong>Build Your Free Resume Now →</strong></a></p>
-</article>
+<!-- img: professional office resume workspace -->
+<h2>First Key Section (include keyword if natural)</h2>
+<p>[2-3 sentences. One clear idea per paragraph.]</p>
+<ul>
+  <li><strong>Point one:</strong> brief explanation</li>
+  <li><strong>Point two:</strong> brief explanation</li>
+  <li><strong>Point three:</strong> brief explanation</li>
+</ul>
 
-CRITICAL RULES:
-1. Start with <!-- meta-desc: [150-160 char SEO description] --> on its own line
-2. Use <h2> for all main sections. NO <h1> tags.
-3. Use <ul><li> for any list of 2+ items. Never write lists as plain text.
-4. Use <strong> for bold text, <em> for italics
-5. Use <blockquote> once or twice for key takeaways
-6. Add <!-- img: [describe relevant image] --> at 2-3 places
-7. Link to: /resume-builder, /templates, /pricing with descriptive anchor text
-8. Primary keyword MUST appear in: first paragraph, at least one H2, FAQ answers, and conclusion
-9. Length: 800-1200 words of body content
-10. EVERY paragraph must be 2-4 sentences. NO walls of text.
-11. Return ONLY raw HTML. No markdown, no code blocks, no explanations.`;
+<h2>Second Key Section</h2>
+<p>[2-3 sentences.]</p>
+<blockquote><p>A memorable insight or statistic that supports this section.</p></blockquote>
+<p>[1-2 follow-up sentences.]</p>
+
+<!-- img: career professional success -->
+<h2>Third Key Section</h2>
+<p>[2-3 sentences.]</p>
+<ul>
+  <li><strong>Tip:</strong> actionable advice</li>
+  <li><strong>Tip:</strong> actionable advice</li>
+  <li><strong>Tip:</strong> actionable advice</li>
+</ul>
+
+<h2>Fourth Key Section</h2>
+<p>[2-3 sentences. Use <strong>bold</strong> for important terms.]</p>
+<p>[2-3 more sentences if needed. Break up text aggressively.]</p>
+
+<h2>Frequently Asked Questions</h2>
+<h3>Q: [question]?</h3>
+<p>A: [2-4 sentence answer with keyword and internal link.]</p>
+<h3>Q: [question]?</h3>
+<p>A: [2-4 sentence answer.]</p>
+<h3>Q: [question]?</h3>
+<p>A: [2-4 sentence answer.]</p>
+
+<h2>Start Building Your Resume Today</h2>
+<p>[1-2 sentence closing.]</p>
+<p><a href="/resume-builder"><strong>Create Your Free Professional Resume →</strong></a></p>
+
+ABSOLUTE REQUIREMENTS — VIOLATE ANY AND THE ARTICLE IS REJECTED:
+• MINIMUM 2 <ul> lists with 3+ <li> items each — NO exceptions
+• MINIMUM 1 <blockquote> — NO exceptions
+• EVERY <p> tag: MAXIMUM 3 sentences — break up any paragraph longer than 3 sentences
+• 4-5 <h2> sections + FAQ section + CTA section = 6-7 sections total
+• Primary keyword in: first <p>, at least 2 <h2> headings, FAQ answers
+• 2-3 <!-- img: [search terms] --> comments with relevant image descriptions
+• Links: /resume-builder, /templates, /pricing with descriptive anchor text
+• Start with: <!-- meta-desc: [150-160 char SEO description] -->
+• 800-1200 words total
+• NO <h1>. NO markdown. NO code blocks. Return raw HTML only.`;
 
       const htmlRaw = await callGemini(prompt, 4000);
       let html = htmlRaw.replace(/```html|```/g, '').trim();
       const metaMatch = html.match(/<!--\s*meta-desc:\s*(.*?)\s*-->/i);
       const metaDesc = metaMatch ? metaMatch[1].trim() : '';
       html = html.replace(/<!--\s*meta-desc:.*?-->/gi, '').trim();
+
+      // Auto-generate images from AI's <!-- img: [search terms] --> suggestions
+      html = html.replace(/<!--\s*img:\s*(.*?)\s*-->/gi, (_match: string, terms: string) => {
+        const searchQuery = terms.trim().replace(/\s+/g, ',');
+        const imgUrl = `https://source.unsplash.com/800x400/?${encodeURIComponent(searchQuery)}`;
+        return `<img src="${imgUrl}" alt="${terms.trim()}" class="rounded-xl shadow-md w-full" loading="lazy" />`;
+      });
 
       const plainText = html.replace(/<[^>]*>/g, '');
       const wordCount = plainText.split(/\s+/).filter(Boolean).length;
@@ -283,7 +296,12 @@ ${html.slice(0, 8000)}`;
       
       if (typeof audit.score === 'number' && audit.improved) {
         setSeoScore(audit.score);
-        const improvedHtml = audit.improved.replace(/```html|```/g, '').trim();
+        let improvedHtml = audit.improved.replace(/```html|```/g, '').trim();
+        // Auto-generate images from AI suggestions
+        improvedHtml = improvedHtml.replace(/<!--\s*img:\s*(.*?)\s*-->/gi, (_match: string, terms: string) => {
+          const searchQuery = terms.trim().replace(/\s+/g, ',');
+          return `<img src="https://source.unsplash.com/800x400/?${encodeURIComponent(searchQuery)}" alt="${terms.trim()}" class="rounded-xl shadow-md w-full" loading="lazy" />`;
+        });
         const plainText = improvedHtml.replace(/<[^>]*>/g, '');
         const wordCount = plainText.split(/\s+/).filter(Boolean).length;
         
