@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
 import { ResumeData } from '@/utils/types';
 import { useResumeSave } from './useResumeSave';
 
@@ -19,66 +18,76 @@ export function useAutoSave({
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const { handleSaveResume } = useResumeSave(editResumeId);
+
+  // Hold the latest resume in a ref so the interval callback always sees
+  // current data without being recreated on every keystroke.
+  const resumeRef = useRef<ResumeData>(resume);
+  const lastSavedStringRef = useRef<string>();
   const intervalRef = useRef<NodeJS.Timeout>();
-  const lastResumeRef = useRef<string>();
+  // Track in-flight status-reset timers so we can cancel them on unmount.
+  const statusTimerRef = useRef<NodeJS.Timeout>();
+  const mountedRef = useRef(true);
+
+  // Keep the ref in sync with the prop on every render.
+  resumeRef.current = resume;
 
   const triggerAutoSave = async () => {
     if (!enabled) return;
 
-    const currentResumeString = JSON.stringify(resume);
-    
-    // Skip if no changes
-    if (currentResumeString === lastResumeRef.current) {
-      return;
-    }
+    const current = resumeRef.current;
+    const currentString = JSON.stringify(current);
 
-    // Skip if required fields are missing
-    if (!resume.personal?.name?.trim() || !resume.personal?.email?.trim()) {
-      return;
-    }
+    // Skip if no changes since last successful save.
+    if (currentString === lastSavedStringRef.current) return;
+
+    // Skip if required fields are missing.
+    if (!current.personal?.name?.trim() || !current.personal?.email?.trim()) return;
 
     try {
-      setSaveStatus('saving');
-      await handleSaveResume(resume);
-      setSaveStatus('saved');
-      setLastSaved(new Date());
-      lastResumeRef.current = currentResumeString;
-      
-      // Reset to idle after 3 seconds
-      setTimeout(() => setSaveStatus('idle'), 3000);
+      if (mountedRef.current) setSaveStatus('saving');
+      await handleSaveResume(current);
+      lastSavedStringRef.current = currentString;
+      if (mountedRef.current) {
+        setSaveStatus('saved');
+        setLastSaved(new Date());
+      }
+      // Reset to idle after 3 s; cancel if unmounted first.
+      if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
+      statusTimerRef.current = setTimeout(() => {
+        if (mountedRef.current) setSaveStatus('idle');
+      }, 3000);
     } catch (error) {
-      setSaveStatus('error');
       console.error('Auto-save failed:', error);
-      
-      // Reset to idle after 5 seconds
-      setTimeout(() => setSaveStatus('idle'), 5000);
+      if (mountedRef.current) setSaveStatus('error');
+      if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
+      statusTimerRef.current = setTimeout(() => {
+        if (mountedRef.current) setSaveStatus('idle');
+      }, 5000);
     }
   };
 
+  // Set up the interval once per [enabled, interval, editResumeId] change.
+  // `resume` is intentionally excluded — we read it via resumeRef inside
+  // triggerAutoSave so the interval is never recreated on every keystroke.
   useEffect(() => {
+    mountedRef.current = true;
+
     if (!enabled) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current);
       return;
     }
 
-    // Clear existing interval
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-
-    // Set up auto-save interval
+    if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(triggerAutoSave, interval);
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      mountedRef.current = false;
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
     };
-  }, [resume, enabled, interval, editResumeId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, interval, editResumeId]);
 
-  // Manual save function
   const manualSave = () => {
     triggerAutoSave();
   };

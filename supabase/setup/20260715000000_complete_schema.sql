@@ -830,7 +830,15 @@ BEGIN
   END IF;
 
   IF v_plan.id IS NULL THEN
-    SELECT * INTO v_plan FROM subscription_plans WHERE product = 'resume' AND slug = 'free';
+    -- If the user is flagged premium but no plan row matched (e.g. manual admin
+    -- grant), give them monthly limits rather than free limits so they aren't
+    -- silently under-served.
+    IF v_sub.is_premium THEN
+      SELECT * INTO v_plan FROM subscription_plans WHERE product = 'resume' AND slug = 'monthly';
+    END IF;
+    IF v_plan.id IS NULL THEN
+      SELECT * INTO v_plan FROM subscription_plans WHERE product = 'resume' AND slug = 'free';
+    END IF;
   END IF;
 
   RETURN jsonb_build_object(
