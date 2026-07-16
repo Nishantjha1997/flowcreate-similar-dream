@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { NotificationBell } from './NotificationBell';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -59,6 +60,7 @@ const Header = () => {
             </nav>
             <div className="hidden md:flex md:items-center md:space-x-3">
               <ThemeToggle />
+              {user && <NotificationBell />}
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -92,6 +94,7 @@ const Header = () => {
             </div>
             <div className="flex md:hidden items-center gap-2">
               <ThemeToggle />
+              {user && <NotificationBell />}
               <button onClick={() => setMobileMenuOpen(true)} className="border-2 border-foreground p-2"><MenuIcon className="h-5 w-5" /></button>
             </div>
           </div>
@@ -141,6 +144,7 @@ const Header = () => {
 
           <div className="hidden md:flex md:items-center md:space-x-3">
             <ThemeToggle />
+            {user && <NotificationBell />}
             
             {user ? (
               <DropdownMenu>
@@ -229,6 +233,7 @@ const Header = () => {
 
           <div className="flex md:hidden items-center gap-2">
             <ThemeToggle />
+            {user && <NotificationBell />}
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
