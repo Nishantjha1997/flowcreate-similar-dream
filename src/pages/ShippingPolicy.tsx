@@ -1,8 +1,14 @@
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 const ShippingPolicy = () => {
+  usePageMeta({
+    title: 'Shipping Policy - FlowCreate',
+    description: 'Information regarding the digital delivery of FlowCreate products and services.',
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <Header />

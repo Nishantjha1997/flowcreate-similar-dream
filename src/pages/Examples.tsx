@@ -8,6 +8,7 @@ import { Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { resolveTemplateKey, getTemplate } from '@/templates/registry';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 const exampleResumes = [
   {
@@ -63,6 +64,11 @@ const exampleResumes = [
 const categories = ["All", "Technology", "Marketing", "Design", "Finance", "Management"];
 
 const Examples = () => {
+  usePageMeta({
+    title: 'Resume Examples - FlowCreate',
+    description: 'Browse professional resume examples across various industries to inspire your next application.',
+  });
+
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
 

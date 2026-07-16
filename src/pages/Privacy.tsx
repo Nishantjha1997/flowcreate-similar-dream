@@ -1,8 +1,14 @@
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 const Privacy = () => {
+  usePageMeta({
+    title: 'Privacy Policy - FlowCreate',
+    description: 'Learn how FlowCreate collects, uses, and protects your personal information and resume data.',
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <Header />

@@ -1,8 +1,14 @@
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 const RefundPolicy = () => {
+  usePageMeta({
+    title: 'Refund Policy - FlowCreate',
+    description: 'Review our cancellation and refund policies for FlowCreate subscriptions and services.',
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <Header />

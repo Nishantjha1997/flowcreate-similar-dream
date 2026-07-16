@@ -6,9 +6,14 @@ import TestimonialsSection from '@/components/TestimonialsSection';
 import CallToAction from '@/components/CallToAction';
 import Footer from '@/components/Footer';
 import { ScrollReveal } from '@/hooks/useScrollAnimation';
-
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 const Index = () => {
+  usePageMeta({
+    title: 'FlowCreate - AI Resume Builder',
+    description: 'Create a professional, ATS-friendly resume in minutes with FlowCreate\'s AI-powered builder.',
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <Header />

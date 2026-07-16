@@ -1,8 +1,14 @@
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 const Terms = () => {
+  usePageMeta({
+    title: 'Terms and Conditions - FlowCreate',
+    description: 'Read the terms and conditions for using the FlowCreate AI resume builder service.',
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <Header />

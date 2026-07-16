@@ -5,8 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Github, Heart, Code, Users, Coffee, ArrowRight, User, Mail } from 'lucide-react';
 import { ScrollReveal } from '@/hooks/useScrollAnimation';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 const About = () => {
+  usePageMeta({
+    title: 'About Us - FlowCreate',
+    description: 'Learn about the team and mission behind FlowCreate, the open-source AI resume builder.',
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <Header />

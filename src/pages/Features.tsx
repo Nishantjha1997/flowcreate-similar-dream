@@ -18,8 +18,14 @@ import {
   Globe,
   Zap
 } from 'lucide-react';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 const Features = () => {
+  usePageMeta({
+    title: 'Features - Resume Builder',
+    description: 'Explore the powerful features of FlowCreate, including AI assistance, ATS optimization, and professional templates.',
+  });
+
   const features = [
     {
       icon: <Layout className="h-8 w-8 text-primary" />,

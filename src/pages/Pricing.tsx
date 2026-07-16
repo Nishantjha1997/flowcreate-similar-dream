@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 const FALLBACK_PLANS = [
   {
@@ -135,6 +136,11 @@ const getIntervalText = (interval: string) => {
 };
 
 const Pricing = () => {
+  usePageMeta({
+    title: 'Pricing - FlowCreate',
+    description: 'Simple, transparent pricing for FlowCreate. Free for 1 resume, or upgrade for unlimited resumes and advanced features.',
+  });
+
   const { user } = useAuth();
   const [isIndianUser, setIsIndianUser] = useState(false);
   const [loading, setLoading] = useState(true);

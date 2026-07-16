@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 
 import { TEMPLATE_REGISTRY } from '@/templates/registry';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 // Derive category chips from the registry so new templates automatically
 // surface their category (order: All first, then registry order, de-duped).
@@ -21,6 +22,15 @@ const Templates = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+
+  const pageTitle = selectedCategory === "All" 
+    ? "Resume Templates - FlowCreate" 
+    : `${selectedCategory} Resume Templates - FlowCreate`;
+
+  usePageMeta({
+    title: pageTitle,
+    description: `Browse our collection of ${selectedCategory === "All" ? "professional" : selectedCategory.toLowerCase()} resume templates. ATS-friendly and easy to customize.`,
+  });
 
   const filteredTemplates = TEMPLATE_REGISTRY.filter((template) => {
     // Filter by tab
