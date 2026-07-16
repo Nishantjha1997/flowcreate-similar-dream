@@ -172,27 +172,56 @@ export function BlogManager() {
     if (!aiTopic.trim()) { setAiError('Enter or select a topic first'); return; }
     setAiLoading(true); setAiError('');
     try {
-      const prompt = `You are an expert SEO content writer for FlowCreate, a free online resume builder.
+      const prompt = `You are an expert SEO content writer and web designer for FlowCreate, a free online resume builder.
 
-Write a comprehensive, fully SEO-optimized blog article titled "${aiTopic}".
+Write a comprehensive, beautifully formatted blog article titled "${aiTopic}".
 
-CRITICAL FORMATTING REQUIREMENTS:
-1. Start with <!-- meta-desc: [compelling 150-160 char meta description with primary keyword] -->
-2. Use proper HTML with semantic structure:
-   - <h2> for main sections (4-6 sections)
-   - <h3> for sub-sections where helpful
-   - <p> for paragraphs (2-4 sentences each, no walls of text)
-   - <ul><li> for bulleted lists
-   - <strong> for emphasis
-   - <a href="..."> for links
-3. Add <!-- img: [describe an image that would enhance this section] --> comments at 2-3 strategic points where images would add value (we'll add actual images later).
-4. End with <h2>Frequently Asked Questions</h2> followed by 3-5 <h3>Q: question?</h3><p>A: detailed answer</p> pairs.
-5. Naturally link to: <a href="/resume-builder">free resume builder</a>, <a href="/templates">resume templates</a>, <a href="/pricing">pricing</a> — use descriptive anchor text.
-6. Target primary keyword in first 100 words, at least one H2, and conclusion.
-7. Include a compelling call-to-action at the end.
-8. Length: 800-1200 words. Tone: professional, helpful, authoritative.
-9. Use short paragraphs, bullet points, and clear section breaks — the article must look clean and scannable when rendered.
-10. Return raw HTML only — no markdown code blocks, no explanations.`;
+YOUR OUTPUT WILL BE RENDERED in a professional typography system (Tailwind prose) that automatically styles semantic HTML. Use these elements to create a visually stunning article:
+
+<article>
+  <p class="lead">[Engaging opening paragraph - 2-3 sentences that hook the reader]</p>
+  
+  <h2>Main Section Heading</h2>
+  <p>[2-4 sentence paragraph. Be specific, actionable, and data-driven.]</p>
+  <p>[Additional paragraph if needed. Break up long text.]</p>
+  
+  <h3>Sub-section (if helpful)</h3>
+  <ul>
+    <li><strong>Bold lead-in:</strong> explanatory detail</li>
+    <li><strong>Another point:</strong> with supporting information</li>
+  </ul>
+  
+  <blockquote><p>Key takeaway or memorable quote that readers should remember from this section.</p></blockquote>
+  
+  <h2>Next Major Section</h2>
+  ... (repeat pattern for 4-6 sections)
+  
+  <hr>
+  
+  <h2>Frequently Asked Questions</h2>
+  <h3>Q: Common question about this topic?</h3>
+  <p>A: Detailed, helpful answer that genuinely informs the reader. 2-4 sentences.</p>
+  (3-5 Q&A pairs)
+  
+  <hr>
+  
+  <h2>Ready to Take Action?</h2>
+  <p>Strong closing paragraph that motivates the reader.</p>
+  <p><a href="/resume-builder"><strong>Build Your Free Resume Now →</strong></a></p>
+</article>
+
+CRITICAL RULES:
+1. Start with <!-- meta-desc: [150-160 char SEO description] --> on its own line
+2. Use <h2> for all main sections. NO <h1> tags.
+3. Use <ul><li> for any list of 2+ items. Never write lists as plain text.
+4. Use <strong> for bold text, <em> for italics
+5. Use <blockquote> once or twice for key takeaways
+6. Add <!-- img: [describe relevant image] --> at 2-3 places
+7. Link to: /resume-builder, /templates, /pricing with descriptive anchor text
+8. Primary keyword MUST appear in: first paragraph, at least one H2, FAQ answers, and conclusion
+9. Length: 800-1200 words of body content
+10. EVERY paragraph must be 2-4 sentences. NO walls of text.
+11. Return ONLY raw HTML. No markdown, no code blocks, no explanations.`;
 
       const htmlRaw = await callGemini(prompt, 4000);
       let html = htmlRaw.replace(/```html|```/g, '').trim();
@@ -228,20 +257,21 @@ CRITICAL FORMATTING REQUIREMENTS:
 
     setSeoAuditing(true); setSeoScore(null);
     try {
-      const prompt = `You are an expert SEO auditor. Analyze this blog article HTML and return a JSON response with two fields:
-1. "score" - a number from 0-100 rating the SEO quality
-2. "improved" - the complete rewritten HTML with ALL these improvements:
-   - Clean, scannable formatting: short paragraphs (2-4 sentences), bullet lists, clear H2/H3 hierarchy
-   - NO h1 tags (article title is handled by the page template)
-   - Primary keyword in first 100 words, at least one H2, and conclusion
-   - At least one internal link to FlowCreate pages
-   - FAQ section with schema-ready Q&A at the end (if missing, add it)
-   - Strong CTA with descriptive anchor text at the end
-   - Add <!-- img: [description] --> comments at 2-3 places where images would enhance the article
-   - Readability: grade 8-10, active voice, no jargon without explanation
+      const prompt = `You are an expert SEO auditor and content designer. Analyze this blog article HTML and return JSON:
+1. "score" - 0-100 rating SEO + formatting quality
+2. "improved" - complete rewritten HTML optimized for Tailwind prose rendering:
+   - Beautiful, scannable layout: <h2> sections, <h3> subsections, short <p> (2-4 sentences), <ul> lists
+   - <blockquote> for key takeaways, <strong>/<em> for emphasis
+   - NO <h1> (page template handles title)
+   - Primary keyword in first paragraph, H2 headings, and conclusion
+   - FAQ section at end with <h3>Q:</h3><p>A:</p> pairs
+   - Internal links to /resume-builder, /templates, /pricing
+   - Strong call-to-action with descriptive anchor text
+   - <!-- img: [description] --> at 2-3 places
+   - Grade 8-10 readability, active voice
+   - NO markdown artifacts
 
 Return ONLY: {"score":85,"improved":"<h2>...</h2><p>...</p>"}
-No markdown blocks, no extra text. "improved" must be the complete article HTML.
 
 Article HTML:
 ${html.slice(0, 8000)}`;
