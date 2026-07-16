@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useDesignMode } from '@/hooks/useDesignMode';
+import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 
 const HeroSection = () => {
   const { isNeoBrutalism } = useDesignMode();
@@ -54,62 +55,94 @@ const HeroSection = () => {
       }} />
 
       <div className="container mx-auto px-4 pt-24 pb-20 md:pt-36 md:pb-28 lg:pt-44 lg:pb-36 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Overline badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.08] border border-white/[0.1] mb-8 animate-apple-fade-in-up backdrop-blur-sm">
-            <div className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-white/70 text-xs font-medium tracking-wide">AI-Powered Resume Builder</span>
-          </div>
-
-          {/* Main headline */}
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-none text-white mb-6 animate-apple-fade-in-up-delay-1" style={{ letterSpacing: '-0.03em' }}>
-            Your resume.{' '}
-            <span className="text-white/40">Perfected.</span>
-          </h1>
-
-          {/* Subheadline */}
-          <p className="text-lg md:text-xl text-white/50 font-normal leading-relaxed mx-auto mb-12 max-w-[42rem] animate-apple-fade-in-up-delay-2">
-            Create stunning, ATS-optimized resumes with intelligent AI suggestions. 
-            Stand out to employers and land your dream job.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-apple-fade-in-up-delay-3">
-            <Link to="/resume-builder">
-              <Button 
-                size="lg" 
-                className="rounded-full px-8 h-12 text-base font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 shadow-lg"
-              >
-                Start Building
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-            <Link to="/templates">
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="rounded-full px-8 h-12 text-base font-medium border-foreground/25 text-foreground hover:bg-foreground/10 transition-all duration-300"
-              >
-                View Templates
-              </Button>
-            </Link>
-          </div>
-
-          {/* Trust indicators on dark */}
-          <div className="mt-20 md:mt-24 animate-apple-fade-in-up-delay-3">
-            <p className="text-[10px] text-white/30 uppercase tracking-[0.2em] mb-6">
-              Trusted by professionals at
-            </p>
-            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
-              {['Google', 'Microsoft', 'Amazon', 'Adobe', 'Meta'].map((company) => (
-                <span 
-                  key={company} 
-                  className="text-lg md:text-xl font-semibold text-white/[0.12] hover:text-white/[0.25] transition-colors duration-500"
-                >
-                  {company}
-                </span>
-              ))}
+        <div className="flex flex-col lg:flex-row items-center gap-12 max-w-6xl mx-auto">
+          {/* Left Text Column */}
+          <div className="w-full lg:w-[55%] text-center lg:text-left">
+            {/* Overline badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.08] border border-white/[0.1] mb-8 animate-apple-fade-in-up backdrop-blur-sm">
+              <div className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-white/70 text-xs font-medium tracking-wide">AI-Powered Resume Builder</span>
             </div>
+
+            {/* Main headline */}
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-none text-white mb-6 animate-apple-fade-in-up-delay-1" style={{ letterSpacing: '-0.03em' }}>
+              Your resume.{' '}
+              <span className="text-white/40">Perfected.</span>
+            </h1>
+
+            {/* Subheadline */}
+            <p className="text-lg md:text-xl text-white/50 font-normal leading-relaxed mb-12 max-w-[42rem] lg:mx-0 mx-auto animate-apple-fade-in-up-delay-2">
+              Create stunning, ATS-optimized resumes with intelligent AI suggestions. 
+              Stand out to employers and land your dream job.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 lg:justify-start justify-center animate-apple-fade-in-up-delay-3">
+              <Link to="/resume-builder" className="w-full sm:w-auto">
+                <Button 
+                  size="lg" 
+                  className="rounded-full px-8 h-12 text-base font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 shadow-lg w-full"
+                >
+                  Start Building
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link to="/templates" className="w-full sm:w-auto">
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="rounded-full px-8 h-12 text-base font-medium border-white/20 text-white hover:bg-white/10 transition-all duration-300 w-full"
+                >
+                  View Templates
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Right Collage Column */}
+          <div className="w-full lg:w-[45%] flex justify-center items-center h-[350px] sm:h-[450px] relative overflow-visible mt-8 lg:mt-0 animate-apple-fade-in-up-delay-3">
+            <div className="relative w-[280px] h-[320px] sm:w-[380px] sm:h-[420px] overflow-visible">
+              {/* Template 1: Left Card */}
+              <div className="absolute left-0 top-12 w-[160px] sm:w-[220px] transform -rotate-12 transition-all duration-500 hover:rotate-0 hover:z-20 hover:scale-105">
+                <ResumeTemplatePreview 
+                  templateKey="split-frame" 
+                  className="rounded-xl border border-white/10 shadow-2xl overflow-hidden aspect-[8.5/11]"
+                />
+              </div>
+              
+              {/* Template 3: Right Card */}
+              <div className="absolute right-0 top-12 w-[160px] sm:w-[220px] transform rotate-12 transition-all duration-500 hover:rotate-0 hover:z-20 hover:scale-105">
+                <ResumeTemplatePreview 
+                  templateKey="bold-headline" 
+                  className="rounded-xl border border-white/10 shadow-2xl overflow-hidden aspect-[8.5/11]"
+                />
+              </div>
+              
+              {/* Template 2: Center Card */}
+              <div className="absolute left-1/2 top-4 -translate-x-1/2 w-[170px] sm:w-[230px] z-10 transform transition-all duration-500 hover:scale-105 hover:z-20">
+                <ResumeTemplatePreview 
+                  templateKey="modern" 
+                  className="rounded-xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden aspect-[8.5/11]"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Trust indicators on dark */}
+        <div className="mt-24 text-center animate-apple-fade-in-up-delay-3">
+          <p className="text-[10px] text-white/30 uppercase tracking-[0.2em] mb-6">
+            Trusted by professionals at
+          </p>
+          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+            {['Google', 'Microsoft', 'Amazon', 'Adobe', 'Meta'].map((company) => (
+              <span 
+                key={company} 
+                className="text-lg md:text-xl font-semibold text-white/[0.12] hover:text-white/[0.25] transition-colors duration-500"
+              >
+                {company}
+              </span>
+            ))}
           </div>
         </div>
       </div>
