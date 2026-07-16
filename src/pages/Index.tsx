@@ -7,12 +7,36 @@ import CallToAction from '@/components/CallToAction';
 import Footer from '@/components/Footer';
 import { ScrollReveal } from '@/hooks/useScrollAnimation';
 import { usePageMeta } from '@/hooks/usePageMeta';
+import { useEffect } from 'react';
 
 const Index = () => {
   usePageMeta({
-    title: 'FlowCreate - AI Resume Builder',
-    description: 'Create a professional, ATS-friendly resume in minutes with FlowCreate\'s AI-powered builder.',
+    title: 'Free Online Resume Builder — Create Professional Resumes',
+    description: 'Build a professional resume online free with FlowCreate. 30+ ATS-friendly templates, AI-powered suggestions, and instant PDF download. No credit card required.',
   });
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: 'FlowCreate',
+      url: 'https://flowcreate.com',
+      description: 'Free online resume builder with 30+ professional templates, AI-powered suggestions, and instant PDF download.',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'All',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+      },
+    });
+    document.head.appendChild(script);
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">

@@ -8,7 +8,7 @@ interface PageMetaProps {
 export function usePageMeta({ title, description }: PageMetaProps) {
   useEffect(() => {
     // Update the document title
-    const defaultTitle = 'FlowCreate - AI Resume Builder';
+    const defaultTitle = 'Free Online Resume Builder — Create Professional Resumes | FlowCreate';
     document.title = title ? `${title} | FlowCreate` : defaultTitle;
 
     // Update the meta description
@@ -22,13 +22,12 @@ export function usePageMeta({ title, description }: PageMetaProps) {
       metaDescription.setAttribute('content', description);
     }
     
-    // Cleanup is not strictly necessary for most SPA navigations since 
-    // the next page will overwrite it, but good practice.
+    // Cleanup on unmount
     return () => {
       document.title = defaultTitle;
       const meta = document.querySelector('meta[name="description"]');
       if (meta) {
-        meta.setAttribute('content', 'Create a professional, ATS-friendly resume in minutes with FlowCreate\'s AI-powered builder.');
+        meta.setAttribute('content', 'Build a professional resume online free with FlowCreate. 30+ ATS-friendly templates, AI-powered suggestions, and instant PDF download. No credit card required.');
       }
     };
   }, [title, description]);
