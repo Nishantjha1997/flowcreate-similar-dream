@@ -82,11 +82,10 @@ const TemplateComparisonModal = memo(function TemplateComparisonModal({
               
               <CardContent>
                 <div className="w-full h-64 overflow-hidden rounded border">
-                  <div className="transform scale-50 origin-top-left" style={{ width: '200%', height: '200%' }}>
-                    <ResumeTemplatePreview
-                      templateKey={templateId}
-                    />
-                  </div>
+                  <ResumeTemplatePreview
+                    templateKey={templateId}
+                    scale={0.35}
+                  />
                 </div>
                 
                 <div className="mt-3 text-center">
