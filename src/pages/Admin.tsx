@@ -161,97 +161,248 @@ const Admin = () => {
         
         <ScrollReveal delay={150}>
         <GlassCard variant="elevated" neoBrutalism={isNeoBrutalism} className="p-6">
-          <Tabs defaultValue="registrations" className="w-full">
-            <TabsList className={`grid w-full grid-cols-[repeat(13,minmax(0,1fr))] ${
-              isNeoBrutalism 
-                ? 'bg-muted border-2 border-foreground rounded-none' 
-                : 'bg-muted/50 dark:bg-gray-800/50 backdrop-blur-sm border border-border/50'
-            }`}>
-              {[
-                { value: 'registrations', label: 'Registrations' },
-                { value: 'users', label: 'Users' },
-                { value: 'ats', label: 'ATS' },
-                { value: 'templates', label: 'Templates' },
-                { value: 'website', label: 'Website' },
-                { value: 'improvements', label: 'Improvements' },
-                { value: 'actions', label: 'Actions' },
-                { value: 'content', label: 'Content' },
-                { value: 'security', label: 'Security' },
-                { value: 'ai', label: 'AI' },
-                { value: 'payments', label: 'Payments' },
-                { value: 'analytics', label: 'Analytics' },
-                { value: 'audit', label: 'Audit Logs' },
-              ].map(tab => (
-                <TabsTrigger 
-                  key={tab.value} 
-                  value={tab.value} 
-                  className={`text-xs ${
-                    isNeoBrutalism 
-                      ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground data-[state=active]:shadow-[2px_2px_0px_0px_hsl(var(--foreground))]' 
-                      : 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground'
-                  }`}
-                >
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            
-            <TabsContent value="registrations" className="mt-6">
-              <UserRegistrations isAdmin={!!isAdmin} />
-            </TabsContent>
-            
-            <TabsContent value="users" className="mt-6">
-              <UserManagement 
-                members={members} 
-                userProfiles={userProfiles}
-                isLoading={loadingMembers || loadingProfiles} 
-                refetch={() => { refetch(); }} 
-              />
-            </TabsContent>
-            
-            <TabsContent value="ats" className="mt-6">
-              <ATSManagement isAdmin={!!isAdmin} />
-            </TabsContent>
-            
-            <TabsContent value="templates" className="mt-6">
-              <TemplateManagement />
-            </TabsContent>
-            
-            <TabsContent value="website" className="mt-6">
-              <WebsiteCustomization />
-            </TabsContent>
-            
-            <TabsContent value="improvements" className="mt-6">
-              <ImprovementPlans />
-            </TabsContent>
-            
-            <TabsContent value="actions" className="mt-6">
-              <QuickActions refetch={refetch} />
-            </TabsContent>
-            
-            <TabsContent value="content" className="mt-6">
-              <ContentManagement />
-            </TabsContent>
-            
-            <TabsContent value="security" className="mt-6">
-              <SecuritySettings />
-            </TabsContent>
-            
-            <TabsContent value="ai" className="mt-6">
-              <AIManagement />
-            </TabsContent>
+          <Tabs defaultValue="registrations" className="w-full flex flex-col lg:flex-row gap-8">
+            {/* Sidebar Navigation */}
+            <div className="w-full lg:w-64 flex-shrink-0">
+              <TabsList className={`flex flex-col h-auto w-full gap-5 bg-transparent p-0 border-0 items-start`}>
+                
+                {/* Operations Group */}
+                <div className="w-full space-y-1.5">
+                  <div className="px-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Operations & Users
+                  </div>
+                  <div className="flex flex-col w-full gap-1">
+                    <TabsTrigger 
+                      value="registrations" 
+                      className={`w-full justify-start text-left px-3 py-2 text-xs transition-all duration-200 ${
+                        isNeoBrutalism 
+                          ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground' 
+                          : 'data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold hover:bg-muted/50 rounded-md'
+                      }`}
+                    >
+                      Registrations
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="users" 
+                      className={`w-full justify-start text-left px-3 py-2 text-xs transition-all duration-200 ${
+                        isNeoBrutalism 
+                          ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground' 
+                          : 'data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold hover:bg-muted/50 rounded-md'
+                      }`}
+                    >
+                      User Management
+                    </TabsTrigger>
+                  </div>
+                </div>
 
-            <TabsContent value="payments" className="mt-6">
-              <PaymentGatewayManagement />
-            </TabsContent>
+                {/* Core Features Group */}
+                <div className="w-full space-y-1.5">
+                  <div className="px-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Core Builder
+                  </div>
+                  <div className="flex flex-col w-full gap-1">
+                    <TabsTrigger 
+                      value="templates" 
+                      className={`w-full justify-start text-left px-3 py-2 text-xs transition-all duration-200 ${
+                        isNeoBrutalism 
+                          ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground' 
+                          : 'data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold hover:bg-muted/50 rounded-md'
+                      }`}
+                    >
+                      Templates
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="website" 
+                      className={`w-full justify-start text-left px-3 py-2 text-xs transition-all duration-200 ${
+                        isNeoBrutalism 
+                          ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground' 
+                          : 'data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold hover:bg-muted/50 rounded-md'
+                      }`}
+                    >
+                      Website Customization
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="ats" 
+                      className={`w-full justify-start text-left px-3 py-2 text-xs transition-all duration-200 ${
+                        isNeoBrutalism 
+                          ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground' 
+                          : 'data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold hover:bg-muted/50 rounded-md'
+                      }`}
+                    >
+                      ATS Management
+                    </TabsTrigger>
+                  </div>
+                </div>
 
-            <TabsContent value="analytics" className="mt-6">
-              <AdminAnalytics isAdmin={!!isAdmin} />
-            </TabsContent>
+                {/* Security Group */}
+                <div className="w-full space-y-1.5">
+                  <div className="px-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Security & Logs
+                  </div>
+                  <div className="flex flex-col w-full gap-1">
+                    <TabsTrigger 
+                      value="security" 
+                      className={`w-full justify-start text-left px-3 py-2 text-xs transition-all duration-200 ${
+                        isNeoBrutalism 
+                          ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground' 
+                          : 'data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold hover:bg-muted/50 rounded-md'
+                      }`}
+                    >
+                      Security Settings
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="audit" 
+                      className={`w-full justify-start text-left px-3 py-2 text-xs transition-all duration-200 ${
+                        isNeoBrutalism 
+                          ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground' 
+                          : 'data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold hover:bg-muted/50 rounded-md'
+                      }`}
+                    >
+                      Audit Logs
+                    </TabsTrigger>
+                  </div>
+                </div>
+
+                {/* Integrations Group */}
+                <div className="w-full space-y-1.5">
+                  <div className="px-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Integrations
+                  </div>
+                  <div className="flex flex-col w-full gap-1">
+                    <TabsTrigger 
+                      value="ai" 
+                      className={`w-full justify-start text-left px-3 py-2 text-xs transition-all duration-200 ${
+                        isNeoBrutalism 
+                          ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground' 
+                          : 'data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold hover:bg-muted/50 rounded-md'
+                      }`}
+                    >
+                      AI Management
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="payments" 
+                      className={`w-full justify-start text-left px-3 py-2 text-xs transition-all duration-200 ${
+                        isNeoBrutalism 
+                          ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground' 
+                          : 'data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold hover:bg-muted/50 rounded-md'
+                      }`}
+                    >
+                      Payment Gateways
+                    </TabsTrigger>
+                  </div>
+                </div>
+
+                {/* System & Utilities Group */}
+                <div className="w-full space-y-1.5">
+                  <div className="px-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Utilities & Stats
+                  </div>
+                  <div className="flex flex-col w-full gap-1">
+                    <TabsTrigger 
+                      value="analytics" 
+                      className={`w-full justify-start text-left px-3 py-2 text-xs transition-all duration-200 ${
+                        isNeoBrutalism 
+                          ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground' 
+                          : 'data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold hover:bg-muted/50 rounded-md'
+                      }`}
+                    >
+                      Site Analytics
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="improvements" 
+                      className={`w-full justify-start text-left px-3 py-2 text-xs transition-all duration-200 ${
+                        isNeoBrutalism 
+                          ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground' 
+                          : 'data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold hover:bg-muted/50 rounded-md'
+                      }`}
+                    >
+                      Improvement Plans
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="content" 
+                      className={`w-full justify-start text-left px-3 py-2 text-xs transition-all duration-200 ${
+                        isNeoBrutalism 
+                          ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground' 
+                          : 'data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold hover:bg-muted/50 rounded-md'
+                      }`}
+                    >
+                      Content Management
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="actions" 
+                      className={`w-full justify-start text-left px-3 py-2 text-xs transition-all duration-200 ${
+                        isNeoBrutalism 
+                          ? 'rounded-none uppercase font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground' 
+                          : 'data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold hover:bg-muted/50 rounded-md'
+                      }`}
+                    >
+                      Quick Actions
+                    </TabsTrigger>
+                  </div>
+                </div>
+
+              </TabsList>
+            </div>
             
-            <TabsContent value="audit" className="mt-6">
-              <AuditLogs isAdmin={!!isAdmin} />
-            </TabsContent>
+            {/* Scrollable Content Container */}
+            <div className="flex-1 min-w-0">
+              <TabsContent value="registrations" className="mt-0">
+                <UserRegistrations isAdmin={!!isAdmin} />
+              </TabsContent>
+              
+              <TabsContent value="users" className="mt-0">
+                <UserManagement 
+                  members={members} 
+                  userProfiles={userProfiles}
+                  isLoading={loadingMembers || loadingProfiles} 
+                  refetch={() => { refetch(); }} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="ats" className="mt-0">
+                <ATSManagement isAdmin={!!isAdmin} />
+              </TabsContent>
+              
+              <TabsContent value="templates" className="mt-0">
+                <TemplateManagement />
+              </TabsContent>
+              
+              <TabsContent value="website" className="mt-0">
+                <WebsiteCustomization />
+              </TabsContent>
+              
+              <TabsContent value="improvements" className="mt-0">
+                <ImprovementPlans />
+              </TabsContent>
+              
+              <TabsContent value="actions" className="mt-0">
+                <QuickActions refetch={refetch} />
+              </TabsContent>
+              
+              <TabsContent value="content" className="mt-0">
+                <ContentManagement />
+              </TabsContent>
+              
+              <TabsContent value="security" className="mt-0">
+                <SecuritySettings />
+              </TabsContent>
+              
+              <TabsContent value="ai" className="mt-0">
+                <AIManagement />
+              </TabsContent>
+
+              <TabsContent value="payments" className="mt-0">
+                <PaymentGatewayManagement />
+              </TabsContent>
+
+              <TabsContent value="analytics" className="mt-0">
+                <AdminAnalytics isAdmin={!!isAdmin} />
+              </TabsContent>
+              
+              <TabsContent value="audit" className="mt-0">
+                <AuditLogs isAdmin={!!isAdmin} />
+              </TabsContent>
+            </div>
           </Tabs>
         </GlassCard>
         </ScrollReveal>

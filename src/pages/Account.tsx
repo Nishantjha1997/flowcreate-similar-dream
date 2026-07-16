@@ -36,76 +36,27 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 // Profile Components
 import { ProfileCompletenessCard } from '@/components/profile/ProfileCompletenessCard';
-import { PersonalInfoForm } from '@/components/profile/PersonalInfoForm';
-import { ProfessionalInfoForm } from '@/components/profile/ProfessionalInfoForm';
-import { SkillsForm } from '@/components/profile/SkillsForm';
-import { WorkExperienceForm } from '@/components/profile/WorkExperienceForm';
-import { EducationForm } from '@/components/profile/EducationForm';
-import { ProjectsForm } from '@/components/profile/ProjectsForm';
-import { CertificationsForm } from '@/components/profile/CertificationsForm';
-import { VolunteerForm } from '@/components/profile/VolunteerForm';
 import { PDFResumeUploader } from '@/components/profile/PDFResumeUploader';
 import { ProfileInsights } from '@/components/profile/ProfileInsights';
 import { FloatingSmartSuggestions } from '@/components/profile/FloatingSmartSuggestions';
 import { ProfileAutoSave } from '@/components/profile/ProfileAutoSave';
-import { AdvancedSkillsForm } from '@/components/profile/AdvancedSkillsForm';
 import { ResumeViewAnalytics } from '@/components/analytics/ResumeViewAnalytics';
+import { MasterProfileForm } from '@/components/profile/MasterProfileForm';
+import { DocumentsDashboard } from '@/components/profile/DocumentsDashboard';
 
 // Tab configuration with icons and completion status
 const getTabConfig = (profile: any) => [
   { 
-    id: 'personal', 
-    label: 'Personal', 
-    icon: User, 
-    isComplete: !!(profile?.full_name && profile?.email && profile?.phone) 
-  },
-  { 
-    id: 'professional', 
-    label: 'Professional', 
-    icon: Briefcase, 
-    isComplete: !!(profile?.professional_summary && profile?.current_position) 
-  },
-  { 
-    id: 'experience', 
-    label: 'Experience', 
-    icon: Clock, 
-    isComplete: !!(profile?.work_experience && profile.work_experience.length > 0) 
-  },
-  { 
-    id: 'education', 
-    label: 'Education', 
-    icon: GraduationCap, 
-    isComplete: !!(profile?.education && profile.education.length > 0) 
-  },
-  { 
-    id: 'skills', 
-    label: 'Skills', 
-    icon: Wrench, 
-    isComplete: !!(profile?.technical_skills && profile.technical_skills.length > 0) 
-  },
-  { 
-    id: 'projects', 
-    label: 'Projects', 
-    icon: Code, 
-    isComplete: !!(profile?.projects && profile.projects.length > 0) 
-  },
-  { 
-    id: 'certifications', 
-    label: 'Certifications', 
-    icon: Award, 
-    isComplete: !!(profile?.certifications && profile.certifications.length > 0) 
-  },
-  { 
-    id: 'volunteer', 
-    label: 'Volunteer', 
-    icon: Heart, 
-    isComplete: !!(profile?.volunteer_experience && profile.volunteer_experience.length > 0) 
-  },
-  { 
-    id: 'resumes', 
-    label: 'Resumes', 
+    id: 'documents', 
+    label: 'My Documents', 
     icon: FileText, 
     isComplete: true 
+  },
+  { 
+    id: 'profile', 
+    label: 'Master Profile', 
+    icon: User, 
+    isComplete: !!(profile?.full_name && profile?.email && profile?.phone) 
   },
   { 
     id: 'analytics', 
@@ -115,7 +66,7 @@ const getTabConfig = (profile: any) => [
   },
   { 
     id: 'security', 
-    label: 'Security', 
+    label: 'Security & Settings', 
     icon: Lock, 
     isComplete: true 
   },
@@ -145,7 +96,7 @@ const Account = () => {
   const [pendingChanges, setPendingChanges] = useState<any>({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [extractedProfileData, setExtractedProfileData] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState('personal');
+  const [activeTab, setActiveTab] = useState('documents');
 
   const breadcrumbItems: BreadcrumbItem[] = [
     { label: 'Home', href: '/' },
@@ -583,7 +534,15 @@ const Account = () => {
             <ProfileCompletenessCard 
               profile={mergedProfile} 
               completeness={calculateCompleteness(mergedProfile)}
-              onSectionClick={setActiveTab}
+              onSectionClick={(id) => {
+                setActiveTab('profile');
+                setTimeout(() => {
+                  const element = document.getElementById(`profile-section-${id}`);
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }, 100);
+              }}
               isNeoBrutalism={isNeoBrutalism}
             />
             <div className="hidden lg:block">
@@ -634,193 +593,20 @@ const Account = () => {
                 <Progress value={tabProgress} className={`h-2 transition-all duration-500 ${isNeoBrutalism ? 'border border-foreground' : ''}`} />
               </div>
           
-              <TabsContent value="personal" className="mt-0 space-y-6 animate-fade-in">
-                <PersonalInfoForm 
-                  profile={mergedProfile} 
-                  onUpdate={handleProfileUpdate}
-                  isNeoBrutalism={isNeoBrutalism}
-                />
-              </TabsContent>
-              
-              <TabsContent value="professional" className="mt-0 animate-fade-in">
-                <ProfessionalInfoForm 
-                  profile={mergedProfile} 
-                  onUpdate={handleProfileUpdate}
-                  isNeoBrutalism={isNeoBrutalism}
-                />
-              </TabsContent>
-              
-              <TabsContent value="experience" className="mt-0 animate-fade-in">
-                <WorkExperienceForm 
-                  profile={mergedProfile} 
-                  onUpdate={handleProfileUpdate}
-                  isNeoBrutalism={isNeoBrutalism}
-                />
-              </TabsContent>
-              
-              <TabsContent value="education" className="mt-0 animate-fade-in">
-                <EducationForm 
-                  profile={mergedProfile} 
-                  onUpdate={handleProfileUpdate}
-                  isNeoBrutalism={isNeoBrutalism}
-                />
-              </TabsContent>
-              
-              <TabsContent value="skills" className="mt-0 space-y-6 animate-fade-in">
-                <AdvancedSkillsForm 
-                  profile={mergedProfile} 
-                  onUpdate={handleProfileUpdate}
-                  isPremium={premiumData?.isPremium || false}
-                />
-                <SkillsForm 
-                  profile={mergedProfile} 
-                  onUpdate={handleProfileUpdate}
-                  isNeoBrutalism={isNeoBrutalism}
-                />
-              </TabsContent>
-              
-              <TabsContent value="projects" className="mt-0 animate-fade-in">
-                <ProjectsForm 
-                  profile={mergedProfile} 
-                  onUpdate={handleProfileUpdate}
-                  isNeoBrutalism={isNeoBrutalism}
-                />
-              </TabsContent>
-              
-              <TabsContent value="certifications" className="mt-0 animate-fade-in">
-                <CertificationsForm 
-                  profile={mergedProfile} 
-                  onUpdate={handleProfileUpdate}
-                  isNeoBrutalism={isNeoBrutalism}
-                />
-              </TabsContent>
-              
-              <TabsContent value="volunteer" className="mt-0 animate-fade-in">
-                <VolunteerForm 
-                  profile={mergedProfile} 
-                  onUpdate={handleProfileUpdate}
-                  isNeoBrutalism={isNeoBrutalism}
+              <TabsContent value="documents" className="mt-0 animate-fade-in">
+                <DocumentsDashboard 
+                  isNeoBrutalism={isNeoBrutalism} 
+                  isPremium={premiumData?.isPremium || false} 
                 />
               </TabsContent>
 
-              <TabsContent value="resumes" className="mt-0 animate-fade-in">
-                <Card className={isNeoBrutalism ? 'border-3 border-foreground shadow-[6px_6px_0px_0px_hsl(var(--foreground))]' : ''}>
-                  <CardHeader>
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                      <div>
-                        <CardTitle className={`flex items-center gap-2 ${isNeoBrutalism ? 'uppercase font-black' : ''}`}>
-                          <FileText className="w-5 h-5" />
-                          My Resumes
-                        </CardTitle>
-                        <CardDescription>
-                          Manage all your saved resumes. Download or edit them anytime.
-                        </CardDescription>
-                      </div>
-                      <Link to="/resume-builder">
-                        <Button className={isNeoBrutalism ? 'border-2 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground))] hover:translate-y-1 hover:shadow-none uppercase font-bold' : ''}>
-                          <Plus className="w-4 h-4 mr-2" />
-                          Create New Resume
-                        </Button>
-                      </Link>
-                    </div>
-                    {!premiumData?.isPremium && (
-                      <div className={`mt-4 p-3 rounded-lg ${isNeoBrutalism ? 'bg-yellow-200 border-2 border-foreground' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'}`}>
-                        <p className={`text-sm ${isNeoBrutalism ? 'font-bold text-foreground' : ''}`}>
-                          Free users can save 1 resume. Upgrade to Premium for unlimited resumes!
-                        </p>
-                      </div>
-                    )}
-                  </CardHeader>
-                  <CardContent>
-                    {loadingResumes ? (
-                      <div className="space-y-4">
-                        {Array.from({ length: 2 }).map((_, i) => (
-                          <div 
-                            key={i} 
-                            className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg border ${isNeoBrutalism ? 'border-2 border-foreground' : ''}`}
-                          >
-                            <div className="flex items-center gap-4 w-full sm:w-auto">
-                              <Skeleton className="h-10 w-10 rounded-lg flex-shrink-0" />
-                              <div className="space-y-2 w-48">
-                                <Skeleton className="h-4 w-full" />
-                                <Skeleton className="h-3 w-3/4" />
-                              </div>
-                            </div>
-                            <div className="flex gap-2">
-                              <Skeleton className="h-8 w-16" />
-                              <Skeleton className="h-8 w-24" />
-                              <Skeleton className="h-8 w-16" />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : savedResumes && savedResumes.length > 0 ? (
-                      <div className="space-y-4">
-                        {savedResumes.map((resume) => (
-                          <div 
-                            key={resume.id} 
-                            className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg transition-all ${isNeoBrutalism ? 'border-2 border-foreground hover:shadow-[4px_4px_0px_0px_hsl(var(--foreground))]' : 'border hover:shadow-sm'}`}
-                          >
-                            <div className="flex items-center gap-4">
-                              <div className={`p-3 rounded-lg ${isNeoBrutalism ? 'bg-primary border-2 border-foreground' : 'bg-primary/10'}`}>
-                                <FileText className={`h-5 w-5 ${isNeoBrutalism ? 'text-primary-foreground' : 'text-primary'}`} />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold">{getResumeName(resume.resume_data)}</h3>
-                                <p className="text-sm text-muted-foreground">
-                                  Updated {new Date(resume.updated_at).toLocaleDateString()}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              <Link to={`/resume-builder?id=${resume.id}`}>
-                                <Button variant="outline" size="sm" className={isNeoBrutalism ? 'border-2 border-foreground' : ''}>
-                                  <Edit className="w-4 h-4 mr-1" />
-                                  Edit
-                                </Button>
-                              </Link>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleDownloadResume(resume)}
-                                className={isNeoBrutalism ? 'border-2 border-foreground' : ''}
-                              >
-                                <Download className="w-4 h-4 mr-1" />
-                                Download
-                              </Button>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleDeleteResume(resume.id)}
-                                disabled={deletingResumeId === resume.id}
-                                className={`text-destructive hover:text-destructive ${isNeoBrutalism ? 'border-2 border-foreground' : ''}`}
-                              >
-                                <Trash2 className="w-4 h-4 mr-1" />
-                                {deletingResumeId === resume.id ? 'Deleting...' : 'Delete'}
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-16 px-4 border-2 border-dashed border-border/60 rounded-2xl bg-muted/10">
-                        <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                          <FileText className="w-6 h-6 text-primary" />
-                        </div>
-                        <h3 className="text-lg font-bold tracking-tight mb-2">No Resumes Saved</h3>
-                        <p className="text-muted-foreground text-sm max-w-sm mx-auto mb-6">
-                          Ready to land your dream job? Create your first professional, ATS-optimized resume in minutes.
-                        </p>
-                        <Link to="/resume-builder">
-                          <Button className={isNeoBrutalism ? 'border-2 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground))]' : 'shadow-sm'}>
-                            <Plus className="w-4 h-4 mr-2" />
-                            Create your first resume
-                          </Button>
-                        </Link>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+              <TabsContent value="profile" className="mt-0 animate-fade-in">
+                <MasterProfileForm 
+                  profile={mergedProfile} 
+                  onUpdate={handleProfileUpdate}
+                  isNeoBrutalism={isNeoBrutalism}
+                  isPremium={premiumData?.isPremium || false}
+                />
               </TabsContent>
               
               <TabsContent value="analytics" className="mt-0 animate-fade-in">
