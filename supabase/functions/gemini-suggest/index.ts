@@ -55,22 +55,69 @@ serve(async (req) => {
 
     const body = await req.json();
     const prompt = body?.prompt;
+    const context = body?.context;
+    const resumeId = body?.resumeId;
+    const currentContent = body?.currentContent;
 
-    if (!prompt || typeof prompt !== "string") {
+    let finalPrompt: string;
+
+    // ── Cover letter context mode ──
+    if (context === 'cover_letter' && resumeId) {
+      // Fetch linked resume for context data (using the user's auth client)
+      const { data: resumeData, error: resumeError } = await supabase
+        .from('resumes')
+        .select('resume_data')
+        .eq('id', resumeId)
+        .eq('user_id', userId)
+        .single();
+
+      if (resumeError || !resumeData) {
+        return new Response(
+          JSON.stringify({ error: 'Linked resume not found.' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const rd = resumeData.resume_data as Record<string, any>;
+      const name = rd?.personal?.name || 'the applicant';
+      const jobTitle = rd?.experience?.[0]?.title || 'professional';
+      const skills = Array.isArray(rd?.skills) ? rd.skills.join(', ') : '';
+      const summary = rd?.summary || '';
+
+      const existingHint = currentContent
+        ? `\nThe user has already drafted the following content. Improve and expand it while keeping their tone:\n"""\n${currentContent}\n"""\n`
+        : '';
+
+      finalPrompt = `Write a professional cover letter for ${name}, who is applying for a position as a ${jobTitle}.
+
+Resume context:
+- Skills: ${skills || 'Not specified'}
+- Professional summary: ${summary || 'Not specified'}
+
+${existingHint}
+Write a compelling, ATS-friendly cover letter in standard business letter format. Include:
+1. A strong opening paragraph expressing enthusiasm for the role
+2. 1-2 body paragraphs connecting their skills and experience to the job
+3. A closing paragraph with a call to action
+
+Keep the tone professional yet warm. Do NOT include placeholder brackets — write complete, ready-to-use content.`;
+    } else if (prompt && typeof prompt === 'string') {
+      finalPrompt = prompt.trim();
+    } else {
       return new Response(
-        JSON.stringify({ error: "Prompt is required." }),
+        JSON.stringify({ error: "Either prompt or a valid context is required." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    if (prompt.length > MAX_PROMPT_LENGTH) {
+    if (finalPrompt.length > MAX_PROMPT_LENGTH) {
       return new Response(
         JSON.stringify({ error: `Prompt must be less than ${MAX_PROMPT_LENGTH} characters.` }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const trimmedPrompt = prompt.trim();
+    const trimmedPrompt = finalPrompt.trim();
     if (trimmedPrompt.length === 0) {
       return new Response(
         JSON.stringify({ error: "Prompt cannot be empty." }),
