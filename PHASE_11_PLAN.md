@@ -85,15 +85,25 @@
 
 ---
 
-### P11-T7 — Implement Premium FlowCV-Inspired Templates
+### P11-T7 — Implement 12 Premium FlowCV-Inspired Templates
 - **Modify**: `src/templates/registry.ts`
-- **Action**: Register 4 new templates:
-  1. `atlantic-blue`: Single column, horizontal blue accent separator line, elegant professional layout. (Premium)
-  2. `mercury-flow`: High-contrast left sidebar column (`#1e293b`), main body on the right, tag pill skills layout. (Premium)
-  3. `saffron-line`: Elegant serif typography, thin top saffron accent border, clean serif spacing. (Premium)
-  4. `blue-steel`: Navy blue accent block header, two columns, tech startup focus. (Premium)
+- **Action**: Register 12 new templates (categorize as Premium/Featured as appropriate):
+  1. `atlantic-blue`: Dark Navy left sidebar, right body white. (Premium)
+  2. `mercury-flow`: Centered minimal layout, heavy padding, left dates. (Featured)
+  3. `steady-form`: Traditional academic serif, photo on right. (Featured)
+  4. `classic-clear`: Massive name, corporate standard, blue horizontal line. (Premium)
+  5. `editorial-rule`: Dense, all caps headers, full width lines. (Featured)
+  6. `hunter-green`: Green left sidebar 35%, white body, name in white body. (Premium)
+  7. `cobalt-edge`: Cobalt Blue top header band full width, gray sidebar below. (Premium)
+  8. `blue-neon`: Thick blue left border on full page, clean minimal body. (Premium)
+  9. `precision-line`: Grid matrix skills, highly dense compact margins. (Premium)
+  10. `saffron-line`: Narrow white sidebar, saffron color accents. (Premium)
+  11. `charcoal-glow`: Dark charcoal header band, white text. (Premium)
+  12. `quicksilver`: Light silver left sidebar, dark text. (Featured)
+  13. `almost-black`: Full dark mode layout, neon pill skills. (Premium)
+  14. `typewriter-photo`: Image-overlay left sidebar, serif font right body. (Premium)
 - **Modify**: `src/utils/resumeTemplates.tsx`
-  - Implement full rendering logic and css styles for the 4 templates.
+  - Implement full rendering logic and css styles for the 14 templates.
   - Obey all print/slicing constraints: hex/rgb colors only, px-string dimensions, fallback font stacks, and no CSS variables.
-- **Acceptance**: The 4 templates display in the gallery selector and E2E render in the builder preview.
-- **Commit Message**: `[P11-T7] Implement premium FlowCV-inspired templates`
+- **Acceptance**: The 14 templates display in the gallery selector and E2E render in the builder preview perfectly matching FlowCV aesthetics.
+- **Commit Message**: `[P11-T7] Implement 14 premium FlowCV-inspired templates`
