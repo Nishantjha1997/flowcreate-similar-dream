@@ -3,10 +3,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-
-// A4 dimensions in mm and points.
-const A4_WIDTH_MM = 210;
-const A4_HEIGHT_MM = 297;
+import { A4_WIDTH_PX, A4_HEIGHT_PX, A4_WIDTH_MM, A4_HEIGHT_MM } from '@/constants/pdfDimensions';
 
 export const usePDFGenerator = (fileName: string = 'document') => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -34,12 +31,12 @@ export const usePDFGenerator = (fileName: string = 'document') => {
       'position:absolute',
       'left:-9999px',
       'top:-9999px',
-      // Render at exactly 8.5in wide so pixel-to-mm ratio is correct.
-      'width:816px',        // 8.5in × 96dpi
+      `width:${A4_WIDTH_PX}px`,        // A4 width at 96dpi
       'height:auto',
       'padding:0',
       'margin:0',
       'background:white',
+      'overflow:hidden',
     ].join(';');
 
     container.innerHTML = resumeContent.outerHTML;
@@ -48,12 +45,13 @@ export const usePDFGenerator = (fileName: string = 'document') => {
     const cloneRoot = container.firstElementChild as HTMLElement | null;
     if (cloneRoot) {
       cloneRoot.style.transform = 'none';
-      cloneRoot.style.width = '100%';
+      cloneRoot.style.width = `${A4_WIDTH_PX}px`;
+      cloneRoot.style.maxWidth = '100%';
       cloneRoot.style.height = 'auto';
       cloneRoot.style.margin = '0';
       // Do NOT set padding here — full-bleed templates own their own padding.
       cloneRoot.style.boxSizing = 'border-box';
-      cloneRoot.style.overflow = 'visible';
+      cloneRoot.style.overflow = 'hidden';
     }
 
     document.body.appendChild(container);
@@ -65,6 +63,8 @@ export const usePDFGenerator = (fileName: string = 'document') => {
           useCORS: true,
           logging: false,
           backgroundColor: '#ffffff',
+          windowWidth: A4_WIDTH_PX,
+          width: A4_WIDTH_PX,
         });
 
         const pdf = new jsPDF({
@@ -76,7 +76,7 @@ export const usePDFGenerator = (fileName: string = 'document') => {
         const pdfWidth = pdf.internal.pageSize.getWidth();   // 210 mm
         const pdfHeight = pdf.internal.pageSize.getHeight(); // 297 mm
 
-        // Canvas pixels per mm (canvas is rendered at 3× scale of 816px = 8.5in).
+        // Canvas pixels per mm (canvas is rendered at 3× scale on A4 width).
         const canvasMmWidth = (canvas.width / 3 / 96) * 25.4; // should be ~210 mm
         const scale = pdfWidth / canvas.width;                 // mm per canvas pixel
 
