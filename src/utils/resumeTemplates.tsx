@@ -2780,6 +2780,33 @@ const ResumeTemplate = ({
   const baseStyles = templateStyles[resolvedKey] || templateStyles['clean-slate'];
   const styles = applyCustomization(baseStyles, resumeData.customization);
 
+  // ─── 5-dot proficiency helper ─────────────────────────────────
+  const proficiencyLevels: Record<string, number> = {
+    'native': 5, 'c2': 5, 'fluent': 5, 'bilingual': 5,
+    'c1': 4, 'advanced': 4, 'professional': 4,
+    'b2': 3, 'upper intermediate': 3, 'intermediate': 3,
+    'b1': 2, 'pre-intermediate': 2, 'elementary': 2,
+    'a2': 1, 'beginner': 1, 'a1': 1, 'basic': 1,
+  };
+
+  const renderProficiencyDots = (proficiency: string, dotColor: string = '#ffffff') => {
+    const level = proficiencyLevels[proficiency.toLowerCase()] ?? 3;
+    return (
+      <span style={{ display: 'inline-flex', gap: '3px', marginLeft: '8px', verticalAlign: 'middle' }}>
+        {[1, 2, 3, 4, 5].map((dot) => (
+          <span key={dot} style={{
+            display: 'inline-block',
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            backgroundColor: dot <= level ? dotColor : 'transparent',
+            border: `1.5px solid ${dotColor}`,
+          }} />
+        ))}
+      </span>
+    );
+  };
+
   const headerContent = (
     <>
       {resumeData.personal.profileImage && styles.profilePhoto && (styles.profilePhoto as any).display !== 'none' && (
@@ -2791,7 +2818,7 @@ const ResumeTemplate = ({
       )}
       <div>
         <div style={styles.name}>{resumeData.personal.name || 'Your Name'}</div>
-        <div style={styles.contact}>
+        <div style={{ ...styles.contact, wordBreak: 'break-word' as const, overflowWrap: 'break-word' as const }}>
           {resumeData.personal.email && <span>{resumeData.personal.email}</span>}
           {resumeData.personal.phone && <span>{resumeData.personal.phone}</span>}
           {resumeData.personal.address && <span>{resumeData.personal.address}</span>}
@@ -2811,7 +2838,7 @@ const ResumeTemplate = ({
           return (
             <div style={styles.section} key="summary">
               <div style={secTitle}>Summary</div>
-              <div style={styles.itemDescription}>{resumeData.personal.summary}</div>
+              <div style={{ ...styles.itemDescription, wordBreak: 'break-word' as const, overflowWrap: 'break-word' as const }}>{resumeData.personal.summary}</div>
             </div>
           );
         }
@@ -2827,7 +2854,7 @@ const ResumeTemplate = ({
                     <div style={styles.itemTitle}>{exp.title}</div>
                     <div style={styles.itemSubtitle}>{exp.company}{exp.location ? ` | ${exp.location}` : ''}</div>
                     <div style={styles.itemDate}>{exp.startDate} - {exp.current ? 'Present' : exp.endDate}</div>
-                    <div style={styles.itemDescription}>{exp.description}</div>
+                    <div style={{ ...styles.itemDescription, wordBreak: 'break-word' as const, overflowWrap: 'break-word' as const }}>{exp.description}</div>
                   </div>
                 ))}
               </div>
@@ -2846,7 +2873,7 @@ const ResumeTemplate = ({
                     <div style={styles.itemTitle}>{edu.degree} {edu.field ? `in ${edu.field}` : ''}</div>
                     <div style={styles.itemSubtitle}>{edu.school}</div>
                     <div style={styles.itemDate}>{edu.startDate} - {edu.endDate}</div>
-                    {edu.description && <div style={styles.itemDescription}>{edu.description}</div>}
+                    {edu.description && <div style={{ ...styles.itemDescription, wordBreak: 'break-word' as const, overflowWrap: 'break-word' as const }}>{edu.description}</div>}
                   </div>
                 ))}
               </div>
@@ -2882,7 +2909,7 @@ const ResumeTemplate = ({
                         <a href={project.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: '8px', fontSize: '14px' }}>↗</a>
                       )}
                     </div>
-                    <div style={styles.itemDescription}>{project.description}</div>
+                    <div style={{ ...styles.itemDescription, wordBreak: 'break-word' as const, overflowWrap: 'break-word' as const }}>{project.description}</div>
                     {project.technologies && project.technologies.length > 0 && (
                       <div style={{ ...styles.skillsList, marginTop: '5px' }}>
                         {project.technologies.map((tech, i) => (
@@ -2905,9 +2932,9 @@ const ResumeTemplate = ({
               <div style={secTitle}>{sectionTitleStr}</div>
               <div style={styles.sectionContent}>
                 {resumeData.languages.map((lang, idx) => (
-                  <div key={idx} style={{ ...styles.item, marginBottom: '4px' }}>
+                  <div key={idx} style={{ ...styles.item, marginBottom: '6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={styles.itemTitle}>{lang.language}</span>
-                    {lang.proficiency && <span style={{ ...styles.itemSubtitle, marginLeft: '8px' }}>({lang.proficiency})</span>}
+                    {lang.proficiency && renderProficiencyDots(lang.proficiency, styles.itemSubtitle?.color || '#4b5563')}
                   </div>
                 ))}
               </div>
@@ -2965,7 +2992,7 @@ const ResumeTemplate = ({
                     <div style={styles.itemTitle}>{vol.role}</div>
                     <div style={styles.itemSubtitle}>{vol.organization}</div>
                     <div style={styles.itemDate}>{vol.startDate} - {vol.endDate}</div>
-                    {vol.description && <div style={styles.itemDescription}>{vol.description}</div>}
+                    {vol.description && <div style={{ ...styles.itemDescription, wordBreak: 'break-word' as const, overflowWrap: 'break-word' as const }}>{vol.description}</div>}
                   </div>
                 ))}
               </div>
@@ -2993,20 +3020,26 @@ const ResumeTemplate = ({
           {resumeData.personal.profileImage && styles.profilePhoto && (styles.profilePhoto as any).display !== 'none' && (
             <img src={resumeData.personal.profileImage} alt={`${resumeData.personal.name || 'Profile'}`} style={styles.profilePhoto}/>
           )}
-          <div style={styles.contact}>
+          {resumeData.personal.name && (
+            <div style={{ ...styles.name, color: (styles.sidebar as any)?.color || styles.name?.color, fontSize: styles.name?.fontSize ? String(parseInt(String(styles.name.fontSize)) * 0.75) + 'px' : '20px' }}>
+              {resumeData.personal.name}
+            </div>
+          )}
+          <div style={{ ...styles.contact, wordBreak: 'break-word' as const, overflowWrap: 'break-word' as const }}>
             {resumeData.personal.email && <div style={{ display: 'block', marginBottom: '6px' }}>{resumeData.personal.email}</div>}
             {resumeData.personal.phone && <div style={{ display: 'block', marginBottom: '6px' }}>{resumeData.personal.phone}</div>}
             {resumeData.personal.address && <div style={{ display: 'block', marginBottom: '6px' }}>{resumeData.personal.address}</div>}
             {resumeData.personal.website && <div style={{ display: 'block', marginBottom: '6px' }}>{resumeData.personal.website}</div>}
             {resumeData.personal.linkedin && <div style={{ display: 'block', marginBottom: '6px' }}>{resumeData.personal.linkedin}</div>}
           </div>
+          {renderSection('summary', styles.sidebarSectionTitle)}
           {renderSection('skills', styles.sidebarSectionTitle)}
+          {renderSection('languages', styles.sidebarSectionTitle)}
+          {renderSection('certifications', styles.sidebarSectionTitle)}
+          {renderSection('interests', styles.sidebarSectionTitle)}
         </aside>
         <div style={styles.mainContent}>
-          <div style={styles.header}>
-            <div style={styles.name}>{resumeData.personal.name || 'Your Name'}</div>
-          </div>
-          {useOrder.filter(k => k !== 'skills').map((sectionKey) => renderSection(sectionKey))}
+          {useOrder.filter(k => !['skills', 'languages', 'certifications', 'interests', 'summary'].includes(k)).map((sectionKey) => renderSection(sectionKey))}
         </div>
       </div>
     );
@@ -3016,7 +3049,21 @@ const ResumeTemplate = ({
     return (
       <div style={styles.container}>
         <div style={styles.header}>{headerContent}</div>
-        <div style={styles.mainContent}>{useOrder.map((sectionKey) => renderSection(sectionKey))}</div>
+        {styles.sidebar ? (
+          <div style={{ display: 'flex', flexDirection: 'row' }}>
+            <aside style={styles.sidebar}>
+              {renderSection('skills', styles.sidebarSectionTitle)}
+              {renderSection('languages', styles.sidebarSectionTitle)}
+              {renderSection('certifications', styles.sidebarSectionTitle)}
+              {renderSection('interests', styles.sidebarSectionTitle)}
+            </aside>
+            <div style={styles.mainContent}>
+              {useOrder.filter(k => !['skills', 'languages', 'certifications', 'interests'].includes(k)).map((sectionKey) => renderSection(sectionKey))}
+            </div>
+          </div>
+        ) : (
+          <div style={styles.mainContent}>{useOrder.map((sectionKey) => renderSection(sectionKey))}</div>
+        )}
       </div>
     );
   }

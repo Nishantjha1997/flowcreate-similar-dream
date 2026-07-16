@@ -8,7 +8,9 @@ Copy and paste the prompt below into DeepSeek / GLM 5.2. You should also attach 
 Role: Senior Frontend Engineer & UI/UX Designer
 Task: Execute Phase 11 - The "FlowCV Classics" Premium Template Library & Dashboard Simplification
 
-You are tasked with overhauling the user dashboard and implementing **12 brand new, pixel-perfect resume templates** modeled EXACTLY after FlowCV's top designs. The user has attached screenshots of FlowCV templates for your visual reference.
+You are tasked with overhauling the user dashboard and implementing **14 brand new, pixel-perfect resume templates** modeled EXACTLY after FlowCV's top designs. The user has attached screenshots of FlowCV templates for your visual reference.
+
+**FIRST STEP:** Read the `PHASE_11_PLAN.md` file in the root of the project to understand the full scope of the implementation plan. Update it with any additional technical details or refinements you think are necessary before you begin execution.
 
 ### Part 1: Dashboard Simplification
 Modify `src/pages/Account.tsx` and create related components to achieve a clutter-free, FlowCV-style dashboard:
@@ -17,11 +19,14 @@ Modify `src/pages/Account.tsx` and create related components to achieve a clutte
 3. **Master Profile Tab (`MasterProfileForm.tsx`)**: Combine all 8 existing profile data forms (Personal, Experience, Skills, etc.) into a single scrollable view with a left-side vertical sticky navigation menu.
 
 ### Part 2: The "FlowCV Classics" Premium Template Library
-You must completely replace the existing templates with these 12 new premium templates. 
-- Modify `src/templates/registry.ts`: Clear out the old templates (or set `featured: false` for all old ones) and register these 12 new ones.
-- Modify `src/utils/resumeTemplates.tsx`: Implement the exact HTML/Tailwind rendering logic for all 12 templates.
+You must completely replace the existing templates with these 14 new premium templates. 
+- Modify `src/templates/registry.ts`: Clear out the old templates (or set `featured: false` for all old ones) and register these 14 new ones.
+- Modify `src/utils/resumeTemplates.tsx`: Implement the exact HTML/Tailwind rendering logic for all 14 templates.
 
 **CRITICAL RULES FOR TEMPLATES**:
+- **READ THE PDF / SCREENSHOTS**: Carefully study the provided visual references. See how the designs look, note the exact padding, font sizes, line weights, and layout structures.
+- **EXACT REPLICATION**: You must create exactly all those designs to match with the intended design.
+- **DOUBLE QA CHECKS**: Check your code once done to match with the intended design. Run double checks on each design to ensure there are absolutely no bugs and that the rendering logic handles missing JSON data gracefully.
 - A4 dimensions are precisely `w-[794px]` by `min-h-[1123px]`.
 - Use absolute pixel values for text (e.g., `text-[14px]`, `text-[24px]`) to ensure exact PDF scaling.
 - Use only hex/rgb colors, no CSS variables for colors inside the template renderers (html2pdf requires hardcoded colors).

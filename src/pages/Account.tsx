@@ -7,39 +7,28 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import { toast as sonnerToast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Link } from 'react-router-dom';
 import { 
-  Shield, Crown, Download, Edit, Plus, Trash2, Save, User, Briefcase, 
-  GraduationCap, Award, Code, Wrench, Lock, FileText, ChevronRight, 
-  Home, Settings, Clock, Heart, CheckCircle, Circle, Loader2, Eye, 
-  Upload, LayoutTemplate
+  Shield, Crown, Save, User, Lock, FileText,
+  CheckCircle, Circle, Loader2, Eye, Upload, LayoutTemplate
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ResumeData } from '@/utils/types';
-import { usePDFGenerator } from '@/hooks/usePDFGenerator';
-import { resolveTemplateKey } from '@/templates/registry';
 import { Breadcrumbs, BreadcrumbItem } from '@/components/ui/breadcrumbs';
 import { useDesignMode } from '@/hooks/useDesignMode';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { Skeleton } from '@/components/ui/skeleton';
 
 // Profile Components
 import { ProfileCompletenessCard } from '@/components/profile/ProfileCompletenessCard';
-import { PDFResumeUploader } from '@/components/profile/PDFResumeUploader';
 import { ProfileInsights } from '@/components/profile/ProfileInsights';
-import { FloatingSmartSuggestions } from '@/components/profile/FloatingSmartSuggestions';
-import { ProfileAutoSave } from '@/components/profile/ProfileAutoSave';
 import { ResumeViewAnalytics } from '@/components/analytics/ResumeViewAnalytics';
 import { MasterProfileForm } from '@/components/profile/MasterProfileForm';
 import { DocumentsDashboard } from '@/components/profile/DocumentsDashboard';
@@ -88,14 +77,11 @@ const Account = () => {
   const isNeoBrutalism = designMode === 'neo-brutalism';
   
   const [isUpdating, setIsUpdating] = useState(false);
-  const [fullName, setFullName] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [deletingResumeId, setDeletingResumeId] = useState<string | null>(null);
   const [pendingChanges, setPendingChanges] = useState<any>({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [extractedProfileData, setExtractedProfileData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('documents');
 
   const breadcrumbItems: BreadcrumbItem[] = [
@@ -104,7 +90,7 @@ const Account = () => {
   ];
 
   // Fetch user's saved resumes
-  const { data: savedResumes, isLoading: loadingResumes, refetch: refetchResumes } = useQuery({
+  const { data: savedResumes } = useQuery({
     queryKey: ['userResumes', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -120,21 +106,6 @@ const Account = () => {
     },
     enabled: !!user?.id
   });
-
-  const { generatePDF } = usePDFGenerator();
-
-  const handleUpdateProfile = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsUpdating(true);
-    
-    setTimeout(() => {
-      toast({
-        title: "Profile updated",
-        description: "Your profile information has been updated successfully.",
-      });
-      setIsUpdating(false);
-    }, 1000);
-  };
 
   const handleUpdatePassword = (e: React.FormEvent) => {
     e.preventDefault();
@@ -162,134 +133,9 @@ const Account = () => {
     }, 1000);
   };
 
-  const handleDownloadResume = async (resume: any) => {
-    try {
-      const resumeData = resume.resume_data as unknown as ResumeData;
-      const resumeName = resumeData.personal?.name || 'resume';
-      
-      const tempContainer = document.createElement('div');
-      tempContainer.style.position = 'absolute';
-      tempContainer.style.left = '-9999px';
-      tempContainer.style.top = '-9999px';
-      tempContainer.style.width = '8.5in';
-      tempContainer.style.backgroundColor = 'white';
-      tempContainer.style.padding = '0.5in';
-      tempContainer.style.boxSizing = 'border-box';
-      
-      const resumeElement = document.createElement('div');
-      resumeElement.className = 'resume-content bg-white p-6';
-      
-      const { default: ResumeTemplate } = await import('@/utils/resumeTemplates');
-      
-      const ReactDOM = await import('react-dom/client');
-      const React = await import('react');
-      
-      const root = ReactDOM.createRoot(resumeElement);
-      
-      root.render(
-        React.createElement(ResumeTemplate, {
-          data: resumeData,
-          templateName: resolveTemplateKey(resume.template_id)
-        })
-      );
-      
-      document.body.appendChild(tempContainer);
-      tempContainer.appendChild(resumeElement);
-      
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-
-
-      const html2canvasModule = await import('html2canvas');
-      const { jsPDF } = await import('jspdf');
-      
-      const canvas = await html2canvasModule.default(resumeElement, {
-        scale: 3,
-        useCORS: true,
-        logging: false,
-      });
-      
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      pdf.addImage(imgData, 'JPEG', imgX, 0, imgWidth * ratio, imgHeight * ratio);
-      pdf.save(`${resumeName}.pdf`);
-      
-      root.unmount();
-      if (tempContainer.parentNode) {
-        document.body.removeChild(tempContainer);
-      }
-      
-      toast({
-        title: "Resume downloaded successfully!",
-        description: `${resumeName} has been downloaded as PDF.`,
-      });
-    } catch (error) {
-      console.error('Error downloading resume:', error);
-      toast({
-        title: "Download failed",
-        description: "There was an error downloading your resume. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleDeleteResume = async (resumeId: string) => {
-    if (!user?.id) return;
-    
-    setDeletingResumeId(resumeId);
-    
-    try {
-      const { error } = await supabase
-        .from('resumes')
-        .delete()
-        .eq('id', resumeId)
-        .eq('user_id', user.id);
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Resume deleted",
-        description: "Your resume has been deleted successfully.",
-      });
-      
-      refetchResumes();
-    } catch (error) {
-      console.error('Error deleting resume:', error);
-      toast({
-        title: "Delete failed",
-        description: "There was an error deleting your resume. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setDeletingResumeId(null);
-    }
-  };
-
   const handleProfileUpdate = (updates: any) => {
     setPendingChanges({ ...pendingChanges, ...updates });
     setHasUnsavedChanges(true);
-  };
-
-  const handlePDFDataExtracted = (extractedData: any) => {
-    setExtractedProfileData(extractedData);
-  };
-
-  const importExtractedData = () => {
-    if (extractedProfileData) {
-      handleProfileUpdate(extractedProfileData);
-      setExtractedProfileData(null);
-      sonnerToast.success('Profile data imported from resume!');
-    }
-  };
-
-  const discardExtractedData = () => {
-    setExtractedProfileData(null);
   };
 
   const saveProfileChanges = () => {
@@ -297,15 +143,6 @@ const Account = () => {
       updateProfile(pendingChanges);
       setPendingChanges({});
       setHasUnsavedChanges(false);
-    }
-  };
-
-  const getResumeName = (resumeData: any) => {
-    try {
-      const data = resumeData as ResumeData;
-      return data.personal?.name || 'Untitled Resume';
-    } catch {
-      return 'Untitled Resume';
     }
   };
 
@@ -499,32 +336,6 @@ const Account = () => {
           </Card>
         </div>
         </ScrollReveal>
-
-        {/* Extracted Data Notification */}
-        {extractedProfileData && (
-          <Card className={`mb-6 ${isNeoBrutalism ? 'border-3 border-foreground bg-blue-100' : 'border-blue-200 bg-blue-50 dark:bg-blue-950/20'}`}>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div>
-                  <CardTitle className={`text-sm ${isNeoBrutalism ? 'text-foreground uppercase font-black' : 'text-blue-800 dark:text-blue-200'}`}>
-                    Resume Data Extracted
-                  </CardTitle>
-                  <CardDescription className={isNeoBrutalism ? 'text-foreground/70' : 'text-blue-700 dark:text-blue-300'}>
-                    We've extracted information from your resume. Review and import the data below.
-                  </CardDescription>
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={importExtractedData} size="sm" className={isNeoBrutalism ? 'border-2 border-foreground' : ''}>
-                    Import Data
-                  </Button>
-                  <Button onClick={discardExtractedData} variant="outline" size="sm" className={isNeoBrutalism ? 'border-2 border-foreground' : ''}>
-                    Discard
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
-        )}
 
         {/* Main Content Grid */}
         <ScrollReveal delay={150}>
