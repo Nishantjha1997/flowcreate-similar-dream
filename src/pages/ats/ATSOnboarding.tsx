@@ -57,19 +57,22 @@ const ATSOnboarding = () => {
     setIsLoading(true);
 
     try {
+      // Generate UUID on the client so we don't need to .select() after insert.
+      // .select() fails RLS because the user isn't a member of the org yet.
+      const orgId = crypto.randomUUID();
+
       // Create organization
-      const { data: org, error: orgError } = await supabase
+      const { error: orgError } = await supabase
         .from('organizations')
         .insert({
+          id: orgId,
           name: formData.name,
           slug: formData.slug,
           industry: formData.industry || null,
           company_size: formData.company_size || null,
           website_url: formData.website_url || null,
           description: formData.description || null,
-        })
-        .select()
-        .single();
+        });
 
       if (orgError) throw orgError;
 
@@ -77,7 +80,7 @@ const ATSOnboarding = () => {
       const { error: memberError } = await supabase
         .from('organization_members')
         .insert({
-          organization_id: org.id,
+          organization_id: orgId,
           user_id: user.id,
           role: 'owner',
         });
