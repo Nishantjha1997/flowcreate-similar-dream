@@ -188,7 +188,6 @@ const BlogPost = () => {
               className="prose prose-lg dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground/85 prose-a:text-primary prose-strong:text-foreground prose-li:text-foreground/85 prose-img:rounded-xl prose-img:shadow-md mb-16"
               dangerouslySetInnerHTML={{ __html: (post.content || '').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '').replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '').replace(/\s*on\w+\s*=\s*[^\s>]+/gi, '') }}
             />
-            />
             </ScrollReveal>
 
             {/* Share */}
