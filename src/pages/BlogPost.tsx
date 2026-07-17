@@ -172,7 +172,7 @@ const BlogPost = () => {
                   {new Date(post.published_at || post.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                 </span>
                 <span className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" /> {post.readTime}
+                  <Clock className="h-4 w-4" /> {post.read_time}
                 </span>
               </div>
               <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-4">
@@ -215,7 +215,7 @@ const BlogPost = () => {
                         <h3 className="font-semibold mt-2 mb-1 group-hover:text-primary transition-colors line-clamp-2">
                           {rp.title}
                         </h3>
-                        <p className="text-xs text-muted-foreground">{rp.readTime}</p>
+                        <p className="text-xs text-muted-foreground">{rp.read_time}</p>
                       </div>
                     </Link>
                   ))}
