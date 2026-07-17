@@ -132,30 +132,20 @@ const Templates = () => {
                       templateKey={template.key}
                       className="w-full h-full transform transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute top-3 left-3 flex flex-col gap-2">
-                      {template.featured && (
-                        <Badge className="bg-primary">Featured</Badge>
-                      )}
-                      {template.atsOptimized && (
-                        <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">ATS-Friendly</Badge>
-                      )}
-                    </div>
-                    <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
-                      {template.premium ? (
-                        <Badge className="bg-amber-500 text-white hover:bg-amber-500">
-                          <Crown className="h-3 w-3 mr-1" />
-                          Premium
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">Free</Badge>
-                      )}
-                      {isPopular && (
-                        <Badge variant="secondary">Popular</Badge>
-                      )}
-                    </div>
                   </div>
                   
-                  <CardContent className="p-4">
+                  {/* Badges row — outside preview, no overlap */}
+                  <div className="flex flex-wrap items-center gap-1.5 px-4 pt-3">
+                    {template.featured && <Badge className="bg-primary text-xs">Featured</Badge>}
+                    {template.atsOptimized && <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 text-xs">ATS-Friendly</Badge>}
+                    {template.premium ? (
+                      <Badge className="bg-amber-500 text-white text-xs"><Crown className="h-3 w-3 mr-1" />Premium</Badge>
+                    ) : (
+                      <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 text-xs">Free</Badge>
+                    )}
+                  </div>
+                  
+                  <CardContent className="p-4 pt-2">
                     <div className="mb-4">
                       <h3 className="text-lg font-semibold">{template.name}</h3>
                       <p className="text-sm text-muted-foreground">{template.category}</p>

@@ -303,21 +303,19 @@ export const ResumeBuilderSidebar = ({
                       <div className="aspect-[3/4] bg-muted/30 overflow-hidden relative">
                         <ResumeTemplatePreview 
                           templateKey={template.key}
-                          className="w-full h-full scale-[0.6] origin-top-left"
+                          className="w-full h-full"
+                          scale={0.40}
                         />
                         {isSelected && (
                           <div className="absolute inset-0 bg-foreground/5 flex items-center justify-center">
                             <Badge className="text-[10px] bg-foreground text-background">Active</Badge>
                           </div>
                         )}
-                        <div className="absolute top-1 left-1 flex gap-0.5">
-                          {template.featured && (
-                            <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">⭐</Badge>
-                          )}
-                          {template.atsOptimized && (
-                            <Badge className="text-[9px] px-1 py-0 h-4 bg-green-500/90 text-white border-0">ATS</Badge>
-                          )}
-                        </div>
+                      </div>
+                      {/* Badges row — outside preview */}
+                      <div className="flex items-center gap-0.5 px-1.5 pt-1">
+                        {template.featured && <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">⭐</Badge>}
+                        {template.atsOptimized && <Badge className="text-[9px] px-1 py-0 h-4 bg-green-500/90 text-white border-0">ATS</Badge>}
                       </div>
                       <div className={cn(
                         "p-1.5 bg-background border-t border-border/30",
