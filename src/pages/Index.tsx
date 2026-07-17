@@ -7,6 +7,7 @@ import CallToAction from '@/components/CallToAction';
 import Footer from '@/components/Footer';
 import { ScrollReveal } from '@/hooks/useScrollAnimation';
 import { usePageMeta } from '@/hooks/usePageMeta';
+import { SITE_URL } from '@/lib/seo';
 import { useEffect } from 'react';
 
 const Index = () => {
@@ -20,17 +21,37 @@ const Index = () => {
     script.type = 'application/ld+json';
     script.textContent = JSON.stringify({
       '@context': 'https://schema.org',
-      '@type': 'WebApplication',
-      name: 'FlowCreate',
-      url: 'https://flowcreate.com',
-      description: 'Free online resume builder with 30+ professional templates, AI-powered suggestions, and instant PDF download.',
-      applicationCategory: 'BusinessApplication',
-      operatingSystem: 'All',
-      offers: {
-        '@type': 'Offer',
-        price: '0',
-        priceCurrency: 'USD',
-      },
+      '@graph': [
+        {
+          '@type': 'WebApplication',
+          name: 'FlowCreate',
+          url: SITE_URL,
+          description: 'Free online resume builder with 30+ professional templates, AI-powered suggestions, and instant PDF download.',
+          applicationCategory: 'BusinessApplication',
+          operatingSystem: 'All',
+          offers: {
+            '@type': 'Offer',
+            price: '0',
+            priceCurrency: 'USD',
+          },
+        },
+        {
+          '@type': 'Organization',
+          name: 'FlowCreate',
+          url: SITE_URL,
+          logo: `${SITE_URL}/logo.svg`,
+        },
+        {
+          '@type': 'WebSite',
+          name: 'FlowCreate',
+          url: SITE_URL,
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: `${SITE_URL}/blog?search={search_term_string}`,
+            'query-input': 'required name=search_term_string',
+          },
+        },
+      ],
     });
     document.head.appendChild(script);
     return () => {

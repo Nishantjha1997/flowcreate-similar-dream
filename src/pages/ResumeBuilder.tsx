@@ -21,9 +21,14 @@ import { ResumeData } from '@/utils/types';
 import { analytics, usePageTracking, useJourneyTracking } from '@/components/ui/analytics-tracker';
 import { Crown, Zap } from 'lucide-react';
 import { ShareManagement } from '@/components/sharing/ShareManagement';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 const ResumeBuilder = () => {
   const navigate = useNavigate();
+  usePageMeta({
+    title: 'Resume Builder',
+    description: 'Build your professional resume online for free. Choose a template, add your details, and download as PDF in minutes.',
+  });
   const resumeElementRef = useRef<HTMLDivElement>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState<'edit' | 'preview'>('edit');
@@ -124,9 +129,7 @@ const ResumeBuilder = () => {
               </div>
               <button
                 className="px-5 py-2 text-xs font-semibold rounded-full bg-foreground text-background hover:bg-foreground/90 transition-all duration-200 shadow-sm hover:shadow-md"
-                onClick={() =>
-                  toast.info("Premium upgrade coming soon! Unlimited resumes + AI features for ₹199/month")
-                }
+                onClick={() => navigate('/pricing')}
               >
                 Upgrade
               </button>

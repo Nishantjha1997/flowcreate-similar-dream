@@ -8,10 +8,15 @@ import { CoverLetterEditor } from '@/components/cover-letter/CoverLetterEditor';
 import { CoverLetterPreview } from '@/components/cover-letter/CoverLetterPreview';
 import { useCoverLetterData } from '@/hooks/useCoverLetterData';
 import { usePDFGenerator } from '@/hooks/usePDFGenerator';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 const CoverLetterBuilder = () => {
   const navigate = useNavigate();
   const previewRef = useRef<HTMLDivElement>(null);
+  usePageMeta({
+    title: 'Cover Letter Builder',
+    description: 'Write a compelling, AI-assisted cover letter that matches your resume. Free, fast, and ready to download as PDF.',
+  });
   const {
     formData,
     setFormData,

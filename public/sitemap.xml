@@ -1,31 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Homepage -->
   <url><loc>https://flowcreate-similar-dream.vercel.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://flowcreate-similar-dream.vercel.app/resume-builder</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://flowcreate-similar-dream.vercel.app/templates</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/cover-letter-builder</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://flowcreate-similar-dream.vercel.app/pricing</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://flowcreate-similar-dream.vercel.app/features</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://flowcreate-similar-dream.vercel.app/examples</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://flowcreate-similar-dream.vercel.app/cover-letter-builder</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://flowcreate-similar-dream.vercel.app/about</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-
-  <!-- Blog + Articles -->
   <url><loc>https://flowcreate-similar-dream.vercel.app/blog</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/ats-friendly-resume-guide</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/resume-mistakes-to-avoid</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/resume-keywords-by-industry</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/free-vs-paid-resume-builders</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/career-change-resume-guide</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-
-  <!-- Resources & Career Advice -->
   <url><loc>https://flowcreate-similar-dream.vercel.app/resources</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://flowcreate-similar-dream.vercel.app/career-advice</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-
-  <!-- Help Center -->
   <url><loc>https://flowcreate-similar-dream.vercel.app/help</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-
-  <!-- Programmatic SEO — Resume Templates by Profession -->
+  <url><loc>https://flowcreate-similar-dream.vercel.app/about</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/ats</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/ats/jobs/browse</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/refund-policy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/shipping-policy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/resume-headlines-that-hook-recruiters-in-6-seconds</loc><lastmod>2026-07-17</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/how-to-write-a-resume-for-a-first-internship-with-no-experience</loc><lastmod>2026-07-17</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/how-to-write-a-resume-when-you-have-no-formal-work-experience</loc><lastmod>2026-07-16</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/how-to-explain-employment-gaps-on-your-resume-without-hurting-your-chances</loc><lastmod>2026-07-16</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/remote-job-resumes-what-recruiters-look-for-in-a-virtual-candidate</loc><lastmod>2026-07-16</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/resume-length-rules-for-2026-when-one-page-isn-t-enough</loc><lastmod>2026-07-16</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/free-vs-paid-resume-builders-what-s-actually-worth-it-in-2026</loc><lastmod>2026-07-16</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/how-to-write-an-ats-friendly-resume-in-2026</loc><lastmod>2026-07-16</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/resume-mistakes-to-avoid</loc><lastmod>2026-07-16</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/career-change-resume-guide</loc><lastmod>2026-07-16</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://flowcreate-similar-dream.vercel.app/blog/resume-keywords-by-industry</loc><lastmod>2026-07-16</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://flowcreate-similar-dream.vercel.app/resume-template/software-engineer</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://flowcreate-similar-dream.vercel.app/resume-template/data-analyst</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://flowcreate-similar-dream.vercel.app/resume-template/product-manager</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>

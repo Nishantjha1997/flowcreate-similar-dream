@@ -57,6 +57,7 @@ const BlogPost = () => {
   usePageMeta({
     title: post ? `${post.title} | FlowCreate Blog` : 'Blog Post',
     description: post?.description || 'Resume tips and career advice from FlowCreate.',
+    noindex: !isLoading && (isError || !post),
   });
 
   // Count one view per published post per browser session (guards against

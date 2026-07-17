@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 import { professions } from '@/data/professions';
 import { TEMPLATE_REGISTRY } from '@/templates/registry';
+import { SITE_URL, absoluteUrl } from '@/lib/seo';
 
 const ResumeTemplateProfession = () => {
   const { profession } = useParams<{ profession: string }>();
@@ -16,7 +18,41 @@ const ResumeTemplateProfession = () => {
   usePageMeta({
     title: data ? `${data.title} | FlowCreate` : 'Resume Templates by Profession',
     description: data?.description || 'Browse free resume templates tailored for your profession. ATS-optimized, professional designs with instant PDF download.',
+    noindex: !data,
   });
+
+  useEffect(() => {
+    if (!data) return;
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = 'profession-structured-data';
+    script.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+            { '@type': 'ListItem', position: 2, name: 'Resume Templates', item: absoluteUrl('/templates') },
+            { '@type': 'ListItem', position: 3, name: data.title, item: absoluteUrl(`/resume-template/${data.slug}`) },
+          ],
+        },
+        {
+          '@type': 'Product',
+          name: data.title,
+          description: data.description,
+          category: data.category,
+          brand: { '@type': 'Brand', name: 'FlowCreate' },
+          offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', availability: 'https://schema.org/InStock' },
+        },
+      ],
+    });
+    document.head.appendChild(script);
+    return () => {
+      const el = document.getElementById('profession-structured-data');
+      if (el) el.remove();
+    };
+  }, [data]);
 
   if (!data) {
     return (
