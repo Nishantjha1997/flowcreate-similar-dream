@@ -207,13 +207,13 @@ const Admin = () => {
       </header>
 
       {/* ── Body: sidebar + content ─────────────────────────────────────── */}
-      <div className="flex flex-1 max-w-[1600px] mx-auto w-full">
+      <div className="flex flex-1 max-w-[1600px] mx-auto w-full overflow-hidden">
 
         {/* ── Sidebar ──────────────────────────────────────────────────── */}
         <aside className={cn(
           "fixed inset-y-0 left-0 top-14 z-40 w-60 border-r border-border/50 bg-background/95 backdrop-blur-sm",
           "flex flex-col overflow-y-auto",
-          "transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:top-0",
+          "transition-transform duration-300 ease-in-out lg:translate-x-0 lg:sticky lg:top-14 lg:h-[calc(100vh-3.5rem)]",
           sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full",
         )}>
           {/* Admin Profile Block */}
@@ -291,7 +291,7 @@ const Admin = () => {
         )}
 
         {/* ── Main Content ─────────────────────────────────────────────── */}
-        <main className="flex-1 min-w-0 p-4 lg:p-6 space-y-5 overflow-x-hidden">
+        <main className="flex-1 min-w-0 p-4 lg:p-6 space-y-5 overflow-x-hidden overflow-y-auto">
 
           {/* Page Header */}
           <ScrollReveal>
