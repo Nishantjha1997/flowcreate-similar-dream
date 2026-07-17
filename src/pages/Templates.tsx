@@ -124,7 +124,6 @@ const Templates = () => {
           
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredTemplates.map((template) => {
-              const isPopular = template.key !== 'coral-creative' && template.key !== 'emerald-minimal';
               return (
                 <Card key={template.key} className="overflow-hidden h-full transition-all duration-500 hover:shadow-xl hover:-translate-y-1 rounded-2xl border border-border/40 bg-background group">
                   <div className="relative aspect-[3/4] overflow-hidden bg-muted/50">
