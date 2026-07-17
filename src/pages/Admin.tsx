@@ -207,13 +207,19 @@ const Admin = () => {
       </header>
 
       {/* ── Body: sidebar + content ─────────────────────────────────────── */}
-      <div className="flex flex-1 max-w-[1600px] mx-auto w-full overflow-hidden">
+      {/* No overflow-hidden here — an overflowing ancestor would break the
+          sidebar's position:sticky. The window is the scroll container. */}
+      <div className="flex flex-1 max-w-[1600px] mx-auto w-full">
 
         {/* ── Sidebar ──────────────────────────────────────────────────── */}
+        {/* Mobile: fixed slide-in drawer. Desktop: sticky to the viewport,
+            sized to its content (self-start) so the full nav shows with no
+            scrollbar; max-h + overflow only kicks in on very short screens. */}
         <aside className={cn(
           "fixed inset-y-0 left-0 top-14 z-40 w-60 border-r border-border/50 bg-background/95 backdrop-blur-sm",
           "flex flex-col overflow-y-auto",
-          "transition-transform duration-300 ease-in-out lg:translate-x-0 lg:sticky lg:top-14 lg:h-[calc(100vh-3.5rem)]",
+          "transition-transform duration-300 ease-in-out",
+          "lg:translate-x-0 lg:sticky lg:inset-y-auto lg:top-14 lg:self-start lg:max-h-[calc(100vh-3.5rem)]",
           sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full",
         )}>
           {/* Admin Profile Block */}
@@ -233,7 +239,7 @@ const Admin = () => {
           </div>
 
           {/* Navigation Groups */}
-          <nav className="flex-1 p-3 space-y-5 overflow-y-auto">
+          <nav className="flex-1 p-3 space-y-4">
             {NAV_GROUPS.map((group) => (
               <div key={group.label}>
                 <p className="px-2 mb-1.5 text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">
@@ -291,7 +297,7 @@ const Admin = () => {
         )}
 
         {/* ── Main Content ─────────────────────────────────────────────── */}
-        <main className="flex-1 min-w-0 p-4 lg:p-6 space-y-5 overflow-x-hidden overflow-y-auto">
+        <main className="flex-1 min-w-0 p-4 lg:p-6 space-y-5 overflow-x-hidden">
 
           {/* Page Header */}
           <ScrollReveal>

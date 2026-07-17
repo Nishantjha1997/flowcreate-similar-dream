@@ -274,6 +274,63 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_posts: {
+        Row: {
+          author: string | null
+          category: string | null
+          content: string
+          created_at: string
+          description: string | null
+          excerpt: string | null
+          id: string
+          image_url: string | null
+          keywords: string[] | null
+          published_at: string | null
+          read_time: string | null
+          slug: string
+          status: string | null
+          title: string
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          author?: string | null
+          category?: string | null
+          content?: string
+          created_at?: string
+          description?: string | null
+          excerpt?: string | null
+          id?: string
+          image_url?: string | null
+          keywords?: string[] | null
+          published_at?: string | null
+          read_time?: string | null
+          slug: string
+          status?: string | null
+          title: string
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          author?: string | null
+          category?: string | null
+          content?: string
+          created_at?: string
+          description?: string | null
+          excerpt?: string | null
+          id?: string
+          image_url?: string | null
+          keywords?: string[] | null
+          published_at?: string | null
+          read_time?: string | null
+          slug?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
       cover_letters: {
         Row: {
           content: string
@@ -380,6 +437,77 @@ export type Database = {
           plan_requirements?: string[]
           rollout_percentage?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      help_ticket_messages: {
+        Row: {
+          created_at: string
+          id: string
+          is_staff: boolean
+          message: string
+          sender_id: string
+          ticket_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_staff?: boolean
+          message: string
+          sender_id: string
+          ticket_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_staff?: boolean
+          message?: string
+          sender_id?: string
+          ticket_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "help_ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "help_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      help_tickets: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          priority: string
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          priority?: string
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          priority?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1887,6 +2015,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_blog_view: { Args: { post_slug: string }; Returns: undefined }
       is_admin: { Args: never; Returns: boolean }
       is_org_member: { Args: { p_org_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }

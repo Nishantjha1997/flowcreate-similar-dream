@@ -13,6 +13,7 @@ interface BlogPost {
   id: string; slug: string; title: string; excerpt: string;
   description: string; content: string; category: string;
   read_time: string; published_at: string; created_at: string; keywords: string[];
+  author?: string;
 }
 
 const BlogPost = () => {
@@ -57,6 +58,18 @@ const BlogPost = () => {
     title: post ? `${post.title} | FlowCreate Blog` : 'Blog Post',
     description: post?.description || 'Resume tips and career advice from FlowCreate.',
   });
+
+  // Count one view per published post per browser session (guards against
+  // StrictMode double-invoke and re-renders inflating the count).
+  useEffect(() => {
+    if (!post || !slug) return;
+    const key = `blog-viewed:${slug}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');
+    supabase.rpc('increment_blog_view', { post_slug: slug }).then(({ error }) => {
+      if (error) console.error('view count failed:', error.message);
+    });
+  }, [post, slug]);
 
   // Inject JSON-LD structured data for SEO + LLM discoverability
   useEffect(() => {

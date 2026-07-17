@@ -4,8 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Skeleton } from "@/components/ui/loading-skeleton";
-import { 
-  Users, FileText, Briefcase, TrendingUp, CreditCard, Activity 
+import {
+  Users, FileText, Briefcase, TrendingUp, CreditCard, Activity, Eye
 } from "lucide-react";
 
 interface AnalyticsData {
@@ -19,7 +19,11 @@ interface AnalyticsData {
   premiumUsers: number;
   publishedJobs: number;
   newApplications: number;
+  totalBlogViews: number;
+  publishedPosts: number;
 }
+
+interface BlogStat { id: string; title: string; view_count: number; status: string; }
 
 interface AdminAnalyticsProps {
   isAdmin: boolean;
@@ -29,6 +33,7 @@ export const AdminAnalytics = ({ isAdmin }: AdminAnalyticsProps) => {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [recentEvents, setRecentEvents] = useState<any[]>([]);
+  const [topPosts, setTopPosts] = useState<BlogStat[]>([]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -37,7 +42,7 @@ export const AdminAnalytics = ({ isAdmin }: AdminAnalyticsProps) => {
 
   const loadAnalytics = async () => {
     try {
-      const [usersRes, resumesRes, orgsRes, jobsRes, appsRes, paymentsRes, subsRes, eventsRes] = await Promise.all([
+      const [usersRes, resumesRes, orgsRes, jobsRes, appsRes, paymentsRes, subsRes, eventsRes, blogRes] = await Promise.all([
         supabase.from('profiles').select('id, created_at', { count: 'exact', head: false }).limit(1),
         supabase.from('resumes').select('id', { count: 'exact', head: true }),
         supabase.from('organizations').select('id', { count: 'exact', head: true }),
@@ -46,6 +51,7 @@ export const AdminAnalytics = ({ isAdmin }: AdminAnalyticsProps) => {
         supabase.from('payments').select('id', { count: 'exact', head: true }),
         supabase.from('subscriptions').select('id, is_premium').eq('is_premium', true),
         supabase.from('analytics_events').select('id, event_name, created_at, page_url').order('created_at', { ascending: false }).limit(20),
+        supabase.from('blog_posts').select('id, title, view_count, status'),
       ]);
 
       // Count recent signups (last 7 days)
@@ -54,6 +60,10 @@ export const AdminAnalytics = ({ isAdmin }: AdminAnalyticsProps) => {
 
       const publishedJobs = (jobsRes.data || []).filter((j: any) => j.status === 'published').length;
       const newApps = (appsRes.data || []).filter((a: any) => a.status === 'new').length;
+
+      const blogPosts = (blogRes.data || []) as BlogStat[];
+      const publishedPosts = blogPosts.filter((p) => p.status === 'published');
+      const totalBlogViews = blogPosts.reduce((sum, p) => sum + (p.view_count || 0), 0);
 
       setData({
         totalUsers: usersRes.count || 0,
@@ -66,8 +76,11 @@ export const AdminAnalytics = ({ isAdmin }: AdminAnalyticsProps) => {
         premiumUsers: subsRes.data?.length || 0,
         publishedJobs,
         newApplications: newApps,
+        totalBlogViews,
+        publishedPosts: publishedPosts.length,
       });
 
+      setTopPosts([...publishedPosts].sort((a, b) => (b.view_count || 0) - (a.view_count || 0)).slice(0, 5));
       setRecentEvents(eventsRes.data || []);
     } catch (error) {
       console.error('Error loading analytics:', error);
@@ -95,6 +108,7 @@ export const AdminAnalytics = ({ isAdmin }: AdminAnalyticsProps) => {
     { label: "Organizations", value: data.totalOrganizations, icon: Briefcase, color: "text-green-600", bg: "bg-green-50 dark:bg-green-950/30" },
     { label: "Published Jobs", value: data.publishedJobs, icon: TrendingUp, color: "text-cyan-600", bg: "bg-cyan-50 dark:bg-cyan-950/30" },
     { label: "Total Applications", value: data.totalApplications, icon: Activity, color: "text-pink-600", bg: "bg-pink-50 dark:bg-pink-950/30" },
+    { label: "Blog Views", value: data.totalBlogViews, icon: Eye, color: "text-orange-600", bg: "bg-orange-50 dark:bg-orange-950/30" },
   ];
 
   return (
@@ -172,6 +186,35 @@ export const AdminAnalytics = ({ isAdmin }: AdminAnalyticsProps) => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Blog Performance */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Blog Performance</CardTitle>
+          <CardDescription>
+            {data.publishedPosts} published posts · {data.totalBlogViews} total views
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {topPosts.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No published posts yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {topPosts.map((p, i) => (
+                <div key={p.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-xs font-medium text-muted-foreground w-4">{i + 1}.</span>
+                    <span className="text-sm truncate">{p.title}</span>
+                  </div>
+                  <span className="text-sm font-semibold flex items-center gap-1 flex-shrink-0 ml-3">
+                    <Eye className="h-3.5 w-3.5 text-muted-foreground" /> {p.view_count || 0}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Recent Events */}
       {recentEvents.length > 0 && (

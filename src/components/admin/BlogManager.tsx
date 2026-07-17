@@ -21,6 +21,7 @@ interface BlogPost {
   content: string; category: string; status: 'draft' | 'published';
   keywords: string[]; author: string; read_time: string; image_url: string;
   created_at: string; updated_at: string; published_at: string | null;
+  view_count?: number;
 }
 
 const categories = ['Resume Tips', 'Career Advice', 'Job Search', 'Interview Tips', 'Industry Insights'];
@@ -44,8 +45,9 @@ function cleanHTML(html: string): string {
 async function callGemini(prompt: string, maxTokens?: number): Promise<string> {
   const body: Record<string, unknown> = { prompt };
   if (maxTokens) body.maxTokens = maxTokens;
-  const { data, error } = await supabase.functions.invoke('gemini-suggest', { body });
+  const { data, error } = await supabase.functions.invoke('blog-ai', { body });
   if (error) throw new Error(error.message || 'AI request failed');
+  if (data?.error) throw new Error(data.error as string);
   if (!data?.suggestion) throw new Error('No response from AI');
   return data.suggestion as string;
 }
@@ -247,10 +249,14 @@ ABSOLUTE REQUIREMENTS — VIOLATE ANY AND THE ARTICLE IS REJECTED:
       const metaDesc = metaMatch ? metaMatch[1].trim() : '';
       html = html.replace(/<!--\s*meta-desc:.*?-->/gi, '').trim();
 
-      // Auto-generate images from AI's <!-- img: [search terms] --> suggestions
+      // Auto-generate images from AI's <!-- img: [search terms] --> suggestions.
+      // source.unsplash.com was discontinued; loremflickr serves a keyworded
+      // image and stays up. `lock` (derived from the terms) keeps the same
+      // image stable across re-renders instead of shuffling on every load.
       html = html.replace(/<!--\s*img:\s*(.*?)\s*-->/gi, (_match: string, terms: string) => {
-        const searchQuery = terms.trim().replace(/\s+/g, ',');
-        const imgUrl = `https://source.unsplash.com/800x400/?${encodeURIComponent(searchQuery)}`;
+        const tags = terms.trim().replace(/[^a-z0-9\s]/gi, '').replace(/\s+/g, ',');
+        const lock = Math.abs([...terms].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)) % 100000;
+        const imgUrl = `https://loremflickr.com/800/400/${encodeURIComponent(tags)}?lock=${lock}`;
         return `<img src="${imgUrl}" alt="${terms.trim()}" class="rounded-xl shadow-md w-full" loading="lazy" />`;
       });
 
@@ -309,10 +315,11 @@ ${html.slice(0, 8000)}`;
       if (typeof audit.score === 'number' && audit.improved) {
         setSeoScore(audit.score);
         let improvedHtml = cleanHTML(audit.improved);
-        // Auto-generate images from AI suggestions
+        // Auto-generate images from AI suggestions (see note in generateArticle)
         improvedHtml = improvedHtml.replace(/<!--\s*img:\s*(.*?)\s*-->/gi, (_match: string, terms: string) => {
-          const searchQuery = terms.trim().replace(/\s+/g, ',');
-          return `<img src="https://source.unsplash.com/800x400/?${encodeURIComponent(searchQuery)}" alt="${terms.trim()}" class="rounded-xl shadow-md w-full" loading="lazy" />`;
+          const tags = terms.trim().replace(/[^a-z0-9\s]/gi, '').replace(/\s+/g, ',');
+          const lock = Math.abs([...terms].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)) % 100000;
+          return `<img src="https://loremflickr.com/800/400/${encodeURIComponent(tags)}?lock=${lock}" alt="${terms.trim()}" class="rounded-xl shadow-md w-full" loading="lazy" />`;
         });
         const plainText = improvedHtml.replace(/<[^>]*>/g, '');
         const wordCount = plainText.split(/\s+/).filter(Boolean).length;
@@ -517,6 +524,9 @@ ${html.slice(0, 8000)}`, 4000);
                     <Badge variant="outline" className={post.status === 'published' ? 'text-green-600 bg-green-50 dark:bg-green-950 text-xs' : 'text-yellow-600 bg-yellow-50 dark:bg-yellow-950 text-xs'}>{post.status}</Badge>
                     <span className="text-xs text-muted-foreground">{post.category}</span>
                     <span className="text-xs text-muted-foreground">{post.read_time}</span>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1" title="Total views">
+                      <Eye className="h-3 w-3" /> {post.view_count ?? 0}
+                    </span>
                   </div>
                   <p className="text-xs text-muted-foreground truncate">{post.excerpt}</p>
                 </div>

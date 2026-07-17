@@ -119,7 +119,7 @@ const Blog = () => {
                             {post.category}
                           </span>
                           <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" /> {post.readTime}
+                            <Clock className="h-3 w-3" /> {post.read_time}
                           </span>
                         </div>
                         <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2">

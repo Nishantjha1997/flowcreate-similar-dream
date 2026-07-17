@@ -7,7 +7,6 @@
 /* ═══════════════════════════════════════════════════════════════
    PROSE / BLOG TYPOGRAPHY
    Manual styles for blog articles, previews, and content areas.
-   Equivalent to @tailwindcss/typography but without plugin dependency.
    ═══════════════════════════════════════════════════════════════ */
 .prose {
   max-width: 65ch;
@@ -35,7 +34,8 @@
 .prose p {
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
-  color: hsl(var(--foreground) / 0.85);
+  color: hsl(var(--foreground));
+  opacity: 0.85;
 }
 .prose strong {
   color: hsl(var(--foreground));
@@ -48,7 +48,7 @@
   font-weight: 500;
 }
 .prose a:hover {
-  color: hsl(var(--primary) / 0.8);
+  opacity: 0.8;
 }
 .prose ul {
   list-style-type: disc;
@@ -65,17 +65,18 @@
 .prose li {
   margin-top: 0.35rem;
   margin-bottom: 0.35rem;
-  color: hsl(var(--foreground) / 0.85);
+  color: hsl(var(--foreground));
+  opacity: 0.85;
   padding-left: 0.25rem;
 }
 .prose blockquote {
-  border-left: 3px solid hsl(var(--primary) / 0.5);
+  border-left: 3px solid hsl(var(--primary));
   padding: 0.75rem 1.25rem;
   margin: 1.5rem 0;
-  background: hsl(var(--muted) / 0.4);
+  background: hsl(var(--muted));
   border-radius: 0 0.5rem 0.5rem 0;
   font-style: italic;
-  color: hsl(var(--foreground) / 0.8);
+  color: hsl(var(--foreground));
 }
 .prose blockquote p {
   margin: 0;
@@ -98,7 +99,6 @@
   font-size: 0.875em;
   font-family: var(--font-mono, monospace);
 }
-/* Size variants */
 .prose-lg {
   font-size: 1.125rem;
   line-height: 1.8;
@@ -108,18 +108,12 @@
 .prose-sm {
   font-size: 0.9375rem;
 }
-/* Dark mode */
 .dark .prose {
   color: hsl(var(--foreground));
-}
-.dark .prose blockquote {
-  background: hsl(var(--muted) / 0.2);
-  border-left-color: hsl(var(--primary) / 0.6);
 }
 .dark .prose img {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
-/* Max-width none override (used in blog) */
 .prose.max-w-none {
   max-width: none;
 }
