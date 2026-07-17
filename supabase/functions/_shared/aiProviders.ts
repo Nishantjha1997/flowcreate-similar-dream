@@ -26,6 +26,7 @@ export async function callTextModel(
             'Content-Type': 'application/json',
             'x-goog-api-key': apiKey,
           },
+          signal: AbortSignal.timeout(20000),
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
@@ -51,6 +52,7 @@ export async function callTextModel(
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
         },
+        signal: AbortSignal.timeout(20000),
         body: JSON.stringify({
           model: 'deepseek-chat',
           messages: [{ role: 'user', content: prompt }],
@@ -74,6 +76,7 @@ export async function callTextModel(
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
         },
+        signal: AbortSignal.timeout(20000),
         body: JSON.stringify({
           model: 'gpt-4o-mini',
           messages: [{ role: 'user', content: prompt }],

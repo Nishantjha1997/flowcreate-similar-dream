@@ -39,14 +39,14 @@ serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
     const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims?.sub) {
+    const { data: userData, error: claimsError } = await supabase.auth.getUser(token);
+    if (claimsError || !userData?.user?.id) {
       return new Response(
         JSON.stringify({ error: 'Invalid or expired token' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    const userId = claimsData.claims.sub as string;
+    const userId = userData.user.id as string;
 
     // Rate limit: 10 requests per user per hour
     const rl = checkRateLimit(`gemini-suggest:${userId}`, 10, 60 * 60_000);

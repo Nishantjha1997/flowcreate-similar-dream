@@ -93,7 +93,14 @@ const Blog = () => {
 
           {/* Blog Grid */}
           <div className="max-w-5xl mx-auto">
-            {filtered.length === 0 ? (
+            {isLoading ? (
+              <div className="text-center py-16">
+                <div className="animate-pulse space-y-4">
+                  <div className="h-4 bg-muted rounded w-48 mx-auto" />
+                  <div className="h-3 bg-muted rounded w-64 mx-auto" />
+                </div>
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="text-center py-16">
                 <p className="text-muted-foreground text-lg mb-4">No articles found matching your criteria.</p>
                 <Button variant="outline" onClick={() => { setSelectedCategory('All'); setSearchQuery(''); }}>
