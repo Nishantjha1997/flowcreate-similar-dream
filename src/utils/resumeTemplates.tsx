@@ -2904,15 +2904,17 @@ const ResumeTemplate = ({
     </>
   );
 
-  const renderSection = (key: string, titleStyle?: CSSProperties) => {
-    if (hiddenSections && hiddenSections.includes(key)) return null;
-    const secTitle = titleStyle ?? styles.sectionTitle;
-    switch (key) {
+	  const renderSection = (key: string, titleStyle?: CSSProperties) => {
+	    if (hiddenSections && hiddenSections.includes(key)) return null;
+	    const secTitle = titleStyle ?? styles.sectionTitle;
+	    const sectionName = resumeData.customization?.sectionTitles?.[key];
+	    const title = (d: string) => sectionName || d;
+	    switch (key) {
       case "summary":
         if (resumeData.personal.summary) {
           return (
             <div style={styles.section} key="summary">
-              <div style={secTitle}>Summary</div>
+              <div style={secTitle}>{title('Summary')}</div>
               <div style={{ ...styles.itemDescription, wordBreak: 'break-word' as const, overflowWrap: 'break-word' as const }}>{resumeData.personal.summary}</div>
             </div>
           );
@@ -2922,7 +2924,7 @@ const ResumeTemplate = ({
         if (resumeData.experience && resumeData.experience.length > 0) {
           return (
             <div style={styles.section} key="experience">
-              <div style={secTitle}>Experience</div>
+              <div style={secTitle}>{title('Experience')}</div>
               <div style={styles.sectionContent}>
                 {resumeData.experience.map((exp) => (
                   <div key={exp.id} style={styles.item}>
@@ -2941,7 +2943,7 @@ const ResumeTemplate = ({
         if (resumeData.education && resumeData.education.length > 0) {
           return (
             <div style={styles.section} key="education">
-              <div style={secTitle}>Education</div>
+              <div style={secTitle}>{title('Education')}</div>
               <div style={styles.sectionContent}>
                 {resumeData.education.map((edu) => (
                   <div key={edu.id} style={styles.item}>
@@ -2960,7 +2962,7 @@ const ResumeTemplate = ({
         if (resumeData.skills && resumeData.skills.length > 0) {
           return (
             <div style={styles.section} key="skills">
-              <div style={secTitle}>Skills</div>
+              <div style={secTitle}>{title('Skills')}</div>
               <div style={styles.skillsList}>
                 {resumeData.skills.map((skill, index) => (
                   <div key={index} style={styles.skill}>{skill}</div>
@@ -2974,7 +2976,7 @@ const ResumeTemplate = ({
         if (resumeData.projects && resumeData.projects.length > 0) {
           return (
             <div style={styles.section} key="projects">
-              <div style={secTitle}>Projects</div>
+              <div style={secTitle}>{title('Projects')}</div>
               <div style={styles.sectionContent}>
                 {resumeData.projects.map((project) => (
                   <div key={project.id} style={styles.item}>

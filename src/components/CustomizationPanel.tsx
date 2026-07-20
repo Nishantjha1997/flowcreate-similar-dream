@@ -275,16 +275,38 @@ export const CustomizationPanel = ({
     setHasUnsavedChanges(true);
   };
 
+  const [savedStyles, setSavedStyles] = useState<Record<string, any>>(() => {
+    try { return JSON.parse(localStorage.getItem('flowcreate_saved_styles') || '{}'); }
+    catch { return {}; }
+  });
+
   const saveAsTemplate = () => {
-    // This would save the current customization as a template
-    // In a full implementation, it would store to localStorage or backend
-    const templateName = prompt("Enter a name for this template:");
+    const templateName = prompt("Enter a name for this template style:");
     if (templateName) {
-      toast.success(`Template "${templateName}" saved successfully!`, {
-        description: "You can now apply this template to other resumes."
-      });
-      setHasUnsavedChanges(false);
+      try {
+        const saved = JSON.parse(localStorage.getItem('flowcreate_saved_styles') || '{}');
+        saved[templateName] = customization;
+        localStorage.setItem('flowcreate_saved_styles', JSON.stringify(saved));
+        setSavedStyles({ ...saved });
+        toast.success(`"${templateName}" saved!`);
+        setHasUnsavedChanges(false);
+      } catch { toast.error('Failed to save'); }
     }
+  };
+
+  const loadStyle = (name: string) => {
+    const saved = JSON.parse(localStorage.getItem('flowcreate_saved_styles') || '{}');
+    if (saved[name]) {
+      onCustomizationChange({ ...customization, ...saved[name] });
+      toast.success(`"${name}" applied`);
+    }
+  };
+
+  const deleteStyle = (name: string) => {
+    const saved = JSON.parse(localStorage.getItem('flowcreate_saved_styles') || '{}');
+    delete saved[name];
+    localStorage.setItem('flowcreate_saved_styles', JSON.stringify(saved));
+    setSavedStyles({ ...saved });
   };
 
   const colorPresets = [
@@ -922,6 +944,19 @@ export const CustomizationPanel = ({
           Save as Template
         </Button>
       </div>
+      {Object.keys(savedStyles).length > 0 && (
+        <div className="mt-4 border-t pt-4">
+          <p className="text-xs text-muted-foreground mb-2">Saved Styles</p>
+          <div className="space-y-1">
+            {Object.keys(savedStyles).map(name => (
+              <div key={name} className="flex items-center justify-between text-sm py-1">
+                <button className="text-primary hover:underline text-left truncate" onClick={() => loadStyle(name)}>{name}</button>
+                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-destructive" onClick={() => deleteStyle(name)}>×</Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
