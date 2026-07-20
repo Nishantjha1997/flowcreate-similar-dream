@@ -1,12 +1,11 @@
 import React from 'react';
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ResumeData } from '@/utils/types';
 import { Download, Eye, Printer, Share2, Mail, Link, Smartphone } from 'lucide-react';
 import { toast } from 'sonner';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
+import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +15,10 @@ import {
 
 interface ResumePreviewProps {
   resumeData: ResumeData;
-  previewComponent: React.ReactNode;
+  previewComponent: React.ReactElement<{
+    sectionOrder?: string[];
+    hiddenSections?: string[];
+  }>;
   sectionOrder?: string[];
   hiddenSections?: string[];
 }
@@ -32,116 +34,11 @@ export const ResumePreview = ({
   sectionOrder,
   hiddenSections
 }: ResumePreviewProps) => {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isPrinting, setIsPrinting] = useState(false);
   const resumeRef = useRef<HTMLDivElement>(null);
-  
-  /**
-   * Generates and downloads the resume as a PDF
-   */
-  const handleDownload = () => {
-    if (!resumeRef.current) {
-      toast.error("Could not generate PDF. Please try again.");
-      return;
-    }
-
-    setIsGenerating(true);
-    
-    const element = resumeRef.current;
-    const filename = `${resumeData.personal?.name || 'resume'}.pdf`;
-    
-    toast.info("Generating PDF...", { duration: 3000 });
-
-    // Use setTimeout to allow the toast to show before the potentially heavy PDF operation
-    setTimeout(async () => {
-      try {
-        const canvas = await html2canvas(element, {
-          scale: 3,
-          useCORS: true,
-          logging: false,
-        });
-        
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
-        const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'mm',
-          format: 'a4',
-        });
-        
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const imgWidth = canvas.width;
-        const imgHeight = canvas.height;
-        const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-        const imgX = (pdfWidth - imgWidth * ratio) / 2;
-        
-        pdf.addImage(imgData, 'JPEG', imgX, 0, imgWidth * ratio, imgHeight * ratio);
-        pdf.save(filename);
-        
-        setIsGenerating(false);
-        toast.success("Resume downloaded successfully!");
-      } catch (error) {
-        console.error("Error generating PDF:", error);
-        setIsGenerating(false);
-        toast.error("Error generating PDF. Please try again.");
-      }
-    }, 300);
-  };
-
-  /**
-   * Prepares and initiates the print dialog for the resume
-   */
-  const handlePrint = () => {
-    setIsPrinting(true);
-    setTimeout(() => {
-      const printWindow = window.open('', '_blank');
-      
-      if (printWindow && resumeRef.current) {
-        printWindow.document.write(`
-          <html>
-            <head>
-              <title>${resumeData.personal?.name || 'Resume'}</title>
-              <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-              <style>
-                @media print {
-                  body { 
-                    margin: 0;
-                    padding: 0;
-                    background: white;
-                  }
-                  .resume-container {
-                    width: 8.5in;
-                    height: 11in;
-                    margin: 0 auto;
-                    padding: 0.5in;
-                    box-shadow: none;
-                  }
-                  @page {
-                    size: letter;
-                    margin: 0;
-                  }
-                }
-                body { font-family: 'Roboto', sans-serif; }
-                .resume-container {
-                  background: white;
-                  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                }
-              </style>
-            </head>
-            <body onload="window.print();window.close()">
-              <div class="resume-container">
-                ${resumeRef.current.innerHTML}
-              </div>
-            </body>
-          </html>
-        `);
-        printWindow.document.close();
-      }
-      
-      setIsPrinting(false);
-      toast.success("Resume sent to printer!");
-    }, 500);
-  };
+  const fileName = `${resumeData.personal?.name || 'resume'}.pdf`;
+  const { isGenerating, generatePDF, printResume } = usePDFGenerator(fileName);
+  const handleDownload = () => generatePDF(resumeRef.current);
+  const handlePrint = () => printResume(resumeRef.current);
 
   /**
    * Shares the resume via different methods
@@ -149,12 +46,13 @@ export const ResumePreview = ({
    */
   function handleShare(method: 'email' | 'link' | 'phone') {
     switch (method) {
-      case 'email':
+      case 'email': {
         const emailSubject = `Resume: ${resumeData.personal?.name || 'My Resume'}`;
         const emailBody = "Please find my resume attached.";
         window.location.href = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
         toast.success("Email client opened");
         break;
+      }
         
       case 'link':
         // In a real app, this would generate a shareable link to the resume
@@ -188,7 +86,7 @@ export const ResumePreview = ({
           <div ref={resumeRef} className="bg-white rounded-md shadow-md p-6 mb-4 resume-content">
             {/* Pass the extra props for live PDF preview */}
             {React.cloneElement(
-              previewComponent as React.ReactElement<any>,
+              previewComponent,
               {
                 sectionOrder,
                 hiddenSections
@@ -208,12 +106,11 @@ export const ResumePreview = ({
             
             <Button 
               onClick={handlePrint} 
-              disabled={isPrinting}
               variant="outline"
               className="flex items-center gap-2"
             >
               <Printer className="h-4 w-4" />
-              {isPrinting ? "Preparing..." : "Print Resume"}
+              ATS PDF / Print
             </Button>
 
             <DropdownMenu>

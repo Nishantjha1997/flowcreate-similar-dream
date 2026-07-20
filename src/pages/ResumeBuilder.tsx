@@ -1,4 +1,4 @@
-import { useRef, Suspense, lazy, useEffect, useState } from 'react';
+import { useCallback, useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner'; 
 import Header from '@/components/Header';
@@ -9,19 +9,19 @@ import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 import { useResumeData } from '@/hooks/useResumeData';
 import { useResumeHandlers } from '@/hooks/useResumeHandlers';
 import { useResumeSave } from '@/hooks/useResumeSave';
-import { useSectionManagement } from '@/hooks/useSectionManagement';
+import { DEFAULT_RESUME_SECTIONS, useSectionManagement } from '@/hooks/useSectionManagement';
 import { useResumeProfileSync } from '@/hooks/useResumeProfileSync';
 import { useAutoSave } from '@/hooks/useAutoSave';
-import { AutoSaveIndicator } from '@/components/ui/auto-save-indicator';
 import { ResumeSkeleton } from '@/components/ui/resume-skeleton';
 import { UserOnboarding } from '@/components/ui/user-onboarding';
 import { ProgressIndicator } from '@/components/ui/progress-indicator';
 import { templateNames } from '@/components/resume/ResumeData';
 import { ResumeData } from '@/utils/types';
-import { analytics, usePageTracking, useJourneyTracking } from '@/components/ui/analytics-tracker';
-import { Crown, Zap } from 'lucide-react';
+import { usePageTracking, useJourneyTracking } from '@/components/ui/analytics-tracker';
+import { Zap } from 'lucide-react';
 import { ShareManagement } from '@/components/sharing/ShareManagement';
 import { usePageMeta } from '@/hooks/usePageMeta';
+import { getTemplate, resolveTemplateKey } from '@/templates/registry';
 
 const ResumeBuilder = () => {
   const navigate = useNavigate();
@@ -36,7 +36,12 @@ const ResumeBuilder = () => {
   const { resume, setResume, templateId, isExample, editResumeId, loadingExistingResume } = useResumeData();
   const handlers = useResumeHandlers(setResume);
   const { isSaving, handleSaveResume, handleAIFeatureUpsell, premium, resumeCount } = useResumeSave(editResumeId);
-  const { activeSection, activeSections, hiddenSections, handleSectionChange, handleSectionsChange } = useSectionManagement();
+  const { activeSection, activeSections, hiddenSections, handleSectionChange, handleSectionsChange } = useSectionManagement(
+    resume.customization?.sectionsOrder?.length
+      ? resume.customization.sectionsOrder
+      : DEFAULT_RESUME_SECTIONS,
+    resume.customization?.hiddenSections ?? [],
+  );
   
   usePageTracking();
   useJourneyTracking('resume_builder', activeSection);
@@ -64,16 +69,61 @@ const ResumeBuilder = () => {
     const hasSeenOnboarding = localStorage.getItem('onboarding_completed');
     const isFirstEdit = !editResumeId && !isExample;
     if (!hasSeenOnboarding && isFirstEdit) {
-      setTimeout(() => setShowOnboarding(true), 2000);
+      const timer = window.setTimeout(() => setShowOnboarding(true), 2000);
+      return () => window.clearTimeout(timer);
     }
   }, [editResumeId, isExample]);
 
   const resumeName = resume.personal?.name || 'resume';
-  const { isGenerating, generatePDF } = usePDFGenerator(`${resumeName}.pdf`);
+  const { isGenerating, generatePDF, printResume } = usePDFGenerator(`${resumeName}.pdf`);
 
   const handleTemplateChange = (newTemplateId: string) => {
-    navigate(`/resume-builder?template=${newTemplateId}${isExample ? '&example=true' : ''}${editResumeId ? `&edit=${editResumeId}` : ''}`);
+    const canonicalKey = resolveTemplateKey(newTemplateId);
+    const template = getTemplate(canonicalKey);
+
+    if (template.premium && !premium?.isPremium) {
+      toast.info(`“${template.name}” is included with Premium. Choose a free design or view the Pricing page to upgrade.`);
+      return;
+    }
+
+    setResume((current) => ({
+      ...current,
+      selectedTemplate: canonicalKey,
+      customization: {
+        ...current.customization,
+        primaryColor: template.defaultAccent,
+      },
+    }));
+    navigate(`/resume-builder?template=${canonicalKey}${isExample ? '&example=true' : ''}${editResumeId ? `&edit=${editResumeId}` : ''}`);
   };
+
+  const handleSectionLayoutChange = useCallback((active: string[], hidden: string[]) => {
+    handleSectionsChange(active, hidden);
+    setResume((current) => ({
+      ...current,
+      customization: {
+        ...current.customization,
+        sectionsOrder: active,
+        hiddenSections: hidden,
+      },
+    }));
+  }, [handleSectionsChange, setResume]);
+
+  const handleSectionTitleChange = useCallback((sectionId: string, title: string) => {
+    setResume((current) => {
+      const sectionTitles = { ...(current.customization.sectionTitles ?? {}) };
+      if (title.trim()) sectionTitles[sectionId] = title.trim();
+      else delete sectionTitles[sectionId];
+
+      return {
+        ...current,
+        customization: {
+          ...current.customization,
+          sectionTitles,
+        },
+      };
+    });
+  }, [setResume]);
 
   const handlePDFDataExtracted = (extractedData: Partial<ResumeData>) => {
     setResume(prev => ({
@@ -143,6 +193,7 @@ const ResumeBuilder = () => {
               resumeName={resumeName}
               handleShare={handleShare}
               handleDownload={handleDownload}
+              handlePrint={() => printResume(resumeElementRef.current)}
               isGenerating={isGenerating}
               onSave={() => handleSaveResume(resume)}
               isSaving={isSaving}
@@ -158,7 +209,7 @@ const ResumeBuilder = () => {
           </div>
 
           {/* Mobile Tab Switcher */}
-          <div className="flex md:hidden mb-4 p-1 bg-muted rounded-xl border border-border/40">
+          <div className="flex lg:hidden mb-4 p-1 bg-muted rounded-xl border border-border/40">
             <button
               onClick={() => setActiveMobileTab('edit')}
               className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
@@ -184,7 +235,7 @@ const ResumeBuilder = () => {
           {/* Main Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 lg:h-[calc(100vh-10rem)]">
             {/* Left Sidebar */}
-            <div className={`lg:col-span-3 flex flex-col gap-3 lg:h-full lg:overflow-hidden ${activeMobileTab !== 'edit' ? 'hidden md:flex' : ''}`} data-tour="section-nav">
+            <div className={`lg:col-span-3 flex flex-col gap-3 lg:h-full lg:overflow-hidden ${activeMobileTab !== 'edit' ? 'hidden lg:flex' : ''}`} data-tour="section-nav">
               <div className="flex-shrink-0">
                 <ProgressIndicator 
                   resume={resume}
@@ -216,9 +267,9 @@ const ResumeBuilder = () => {
                   isPremium={premium?.isPremium}
                   activeSections={activeSections}
                   hiddenSections={hiddenSections}
-                  sectionTitles={{}}
-                  onSectionsChange={handleSectionsChange}
-                  onSectionTitleChange={() => {}}
+                  sectionTitles={resume.customization.sectionTitles ?? {}}
+                  onSectionsChange={handleSectionLayoutChange}
+                  onSectionTitleChange={handleSectionTitleChange}
                   onPopulateFromProfile={populateFromProfile}
                   hasProfileData={hasProfileData}
                   canFillFromProfile={canFillFromProfile}
@@ -228,7 +279,7 @@ const ResumeBuilder = () => {
             </div>
 
             {/* Right Preview */}
-            <div className={`lg:col-span-7 lg:h-full ${activeMobileTab !== 'preview' ? 'hidden md:block' : ''}`} data-tour="preview">
+            <div className={`lg:col-span-7 lg:h-full ${activeMobileTab !== 'preview' ? 'hidden lg:block' : ''}`} data-tour="preview">
               <ResumePreviewSection
                 resume={resume}
                 templateId={templateId}

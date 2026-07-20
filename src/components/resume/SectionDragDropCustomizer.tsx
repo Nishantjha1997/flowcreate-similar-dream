@@ -1,15 +1,15 @@
 
-import React, { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { Card, CardContent } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { DragDropContext, Droppable, Draggable, type DropResult } from 'react-beautiful-dnd';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { EditableHeading } from '@/components/EditableHeading';
+import { Input } from '@/components/ui/input';
 import { 
-  Plus, 
+  Check,
   GripVertical, 
   Eye, 
   EyeOff,
+  Pencil,
   User, 
   Briefcase, 
   GraduationCap, 
@@ -60,15 +60,12 @@ export const SectionDragDropCustomizer = ({
   onSectionsChange,
   onSectionTitleChange
 }: SectionDragDropCustomizerProps) => {
-  const [sections, setSections] = useState<string[]>(activeSections);
-  const [hidden, setHidden] = useState<string[]>(hiddenSections);
+  const sections = activeSections;
+  const hidden = hiddenSections;
+  const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [draftTitle, setDraftTitle] = useState('');
 
-  useEffect(() => {
-    // Update parent component when sections change
-    onSectionsChange(sections, hidden);
-  }, [sections, hidden]);
-
-  const onDragEnd = (result: any) => {
+  const onDragEnd = (result: DropResult) => {
     // dropped outside the list
     if (!result.destination) {
       return;
@@ -78,31 +75,43 @@ export const SectionDragDropCustomizer = ({
     const [removed] = reorderedSections.splice(result.source.index, 1);
     reorderedSections.splice(result.destination.index, 0, removed);
 
-    setSections(reorderedSections);
+    onSectionsChange(reorderedSections, hidden);
   };
 
   const toggleSectionVisibility = (sectionId: string) => {
     if (hidden.includes(sectionId)) {
       // Make visible again
-      setHidden(hidden.filter(id => id !== sectionId));
+      onSectionsChange(sections, hidden.filter(id => id !== sectionId));
     } else {
       // Hide section
-      setHidden([...hidden, sectionId]);
+      onSectionsChange(sections, [...hidden, sectionId]);
     }
   };
 
   const addSection = (sectionId: string) => {
     if (!sections.includes(sectionId)) {
-      setSections([...sections, sectionId]);
+      const nextSections = [...sections, sectionId];
       // If it was hidden, make it visible
       if (hidden.includes(sectionId)) {
-        setHidden(hidden.filter(id => id !== sectionId));
+        onSectionsChange(nextSections, hidden.filter(id => id !== sectionId));
+      } else {
+        onSectionsChange(nextSections, hidden);
       }
     }
   };
 
   const removeSection = (sectionId: string) => {
-    setSections(sections.filter(id => id !== sectionId));
+    onSectionsChange(sections.filter(id => id !== sectionId), hidden.filter(id => id !== sectionId));
+  };
+
+  const beginTitleEdit = (sectionId: string, currentTitle: string) => {
+    setEditingSection(sectionId);
+    setDraftTitle(currentTitle);
+  };
+
+  const saveTitle = (sectionId: string) => {
+    onSectionTitleChange(sectionId, draftTitle.trim());
+    setEditingSection(null);
   };
 
   // Get sections that can be added (not already in the list)
@@ -155,12 +164,39 @@ export const SectionDragDropCustomizer = ({
                              </span>
                            )}
                            
-                           <span className="flex-1 text-xs font-medium truncate">
-                             {sectionLabel}
-                           </span>
+                           {editingSection === sectionId ? (
+                             <Input
+                               value={draftTitle}
+                               onChange={(event) => setDraftTitle(event.target.value)}
+                               onKeyDown={(event) => {
+                                 if (event.key === 'Enter') saveTitle(sectionId);
+                                 if (event.key === 'Escape') setEditingSection(null);
+                               }}
+                               className="h-7 flex-1 text-xs"
+                               autoFocus
+                               aria-label={`Rename ${sectionLabel} section`}
+                             />
+                           ) : (
+                             <span className="flex-1 text-xs font-medium truncate">
+                               {sectionLabel}
+                             </span>
+                           )}
                          </div>
 
                          <div className="flex items-center gap-1">
+                           <Button
+                             variant="ghost"
+                             size="sm"
+                             onClick={() => editingSection === sectionId
+                               ? saveTitle(sectionId)
+                               : beginTitleEdit(sectionId, sectionLabel)}
+                             className="h-6 w-6 p-0"
+                             title={editingSection === sectionId ? 'Save section title' : 'Rename section'}
+                           >
+                             {editingSection === sectionId
+                               ? <Check className="h-3 w-3" />
+                               : <Pencil className="h-3 w-3" />}
+                           </Button>
                            <Button
                              variant="ghost"
                              size="sm"

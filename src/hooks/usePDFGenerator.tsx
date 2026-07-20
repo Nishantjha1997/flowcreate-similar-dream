@@ -1,12 +1,75 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
 import { A4_WIDTH_PX, A4_HEIGHT_PX, A4_WIDTH_MM, A4_HEIGHT_MM } from '@/constants/pdfDimensions';
 
 export const usePDFGenerator = (fileName: string = 'document') => {
   const [isGenerating, setIsGenerating] = useState(false);
+
+  /**
+   * Open the browser's native print dialog with the resume rendered as real
+   * HTML text. Saving this dialog as PDF preserves selectable text and links,
+   * which is materially more ATS-friendly than the image-based quick export.
+   */
+  const printResume = (element: HTMLElement | null) => {
+    if (!element) {
+      toast.error('Could not prepare the resume for printing.');
+      return;
+    }
+
+    const resumeContent =
+      element.querySelector<HTMLElement>('.resume-content')
+      || element.querySelector<HTMLElement>('.resume-container')
+      || element;
+    const printWindow = window.open('', '_blank', 'popup,width=900,height=1000');
+
+    if (!printWindow) {
+      toast.error('Your browser blocked the print window. Allow pop-ups and try again.');
+      return;
+    }
+    printWindow.opener = null;
+
+    const printDocument = printWindow.document;
+    printDocument.open();
+    printDocument.write('<!doctype html><html><head></head><body></body></html>');
+    printDocument.close();
+    printDocument.title = fileName.replace(/\.pdf$/i, '') || 'resume';
+
+    document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]').forEach((link) => {
+      printDocument.head.appendChild(link.cloneNode(true));
+    });
+
+    const printStyles = printDocument.createElement('style');
+    printStyles.textContent = `
+      @page { size: A4; margin: 0; }
+      html, body { margin: 0; padding: 0; background: #fff; }
+      body { width: 210mm; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .resume-print-root { width: 210mm; margin: 0; padding: 0; background: #fff; }
+      .resume-print-root > * { width: 210mm !important; max-width: none !important; margin: 0 !important; box-shadow: none !important; border-radius: 0 !important; }
+      .resume-print-root a { color: inherit; text-decoration: none; }
+      .resume-print-root [data-resume-item] { break-inside: avoid; page-break-inside: avoid; }
+      @media print { .resume-print-root { display: block; } }
+    `;
+    printDocument.head.appendChild(printStyles);
+
+    const printRoot = printDocument.createElement('div');
+    printRoot.className = 'resume-print-root';
+    printRoot.innerHTML = resumeContent.outerHTML;
+    printDocument.body.appendChild(printRoot);
+
+    const triggerPrint = async () => {
+      try {
+        await printDocument.fonts?.ready;
+      } finally {
+        printWindow.focus();
+        printWindow.print();
+      }
+    };
+
+    printWindow.onafterprint = () => printWindow.close();
+    window.setTimeout(triggerPrint, 350);
+    toast.info('Choose “Save as PDF” in the print dialog for an ATS-friendly file.');
+  };
 
   const generatePDF = (element: HTMLElement | null) => {
     if (!element) {
@@ -58,6 +121,10 @@ export const usePDFGenerator = (fileName: string = 'document') => {
 
     setTimeout(async () => {
       try {
+        const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+          import('html2canvas'),
+          import('jspdf'),
+        ]);
         const canvas = await html2canvas(container, {
           scale: 3,
           useCORS: true,
@@ -76,8 +143,6 @@ export const usePDFGenerator = (fileName: string = 'document') => {
         const pdfWidth = pdf.internal.pageSize.getWidth();   // 210 mm
         const pdfHeight = pdf.internal.pageSize.getHeight(); // 297 mm
 
-        // Canvas pixels per mm (canvas is rendered at 3× scale on A4 width).
-        const canvasMmWidth = (canvas.width / 3 / 96) * 25.4; // should be ~210 mm
         const scale = pdfWidth / canvas.width;                 // mm per canvas pixel
 
         // Height of one A4 page in canvas pixels.
@@ -122,5 +187,5 @@ export const usePDFGenerator = (fileName: string = 'document') => {
     }, 300);
   };
 
-  return { isGenerating, generatePDF };
+  return { isGenerating, generatePDF, printResume };
 };

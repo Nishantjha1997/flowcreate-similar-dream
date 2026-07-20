@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Share2, Save, Loader2 } from 'lucide-react';
+import { Download, Share2, Save, Loader2, Printer } from 'lucide-react';
 import { EnhancedResumePreview } from '@/components/resume/ResumeVisualPreview';
 import { ResumeData } from '@/utils/types';
 import { cn } from '@/lib/utils';
@@ -11,6 +11,7 @@ interface ResumeHeaderSectionProps {
   resumeName: string;
   handleShare: () => void;
   handleDownload: () => void;
+  handlePrint: () => void;
   isGenerating: boolean;
   onSave?: () => void;
   isSaving?: boolean;
@@ -29,6 +30,7 @@ export const ResumeHeaderSection = ({
   resumeName,
   handleShare,
   handleDownload,
+  handlePrint,
   isGenerating,
   onSave,
   isSaving = false,
@@ -80,6 +82,16 @@ export const ResumeHeaderSection = ({
           Share
         </Button>
         <Button
+          onClick={handlePrint}
+          variant="outline"
+          size="sm"
+          className="rounded-full px-4 h-8 text-xs font-medium border-border/50 hover:bg-muted/60 transition-all duration-200"
+          title="Preserves selectable text and links"
+        >
+          <Printer className="h-3.5 w-3.5 mr-1.5" />
+          ATS PDF
+        </Button>
+        <Button
           onClick={handleDownload}
           variant="outline"
           size="sm"
@@ -91,7 +103,7 @@ export const ResumeHeaderSection = ({
           ) : (
             <Download className="h-3.5 w-3.5 mr-1.5" />
           )}
-          {isGenerating ? 'Generating…' : 'PDF'}
+          {isGenerating ? 'Generating…' : 'Quick PDF'}
         </Button>
         <EnhancedResumePreview 
           resume={resume}

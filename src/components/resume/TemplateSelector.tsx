@@ -16,6 +16,7 @@ import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 import { TEMPLATE_REGISTRY, resolveTemplateKey } from '@/templates/registry';
 import { useAuth } from '@/hooks/useAuth';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
+import { useEntitlements } from '@/hooks/useEntitlements';
 
 interface TemplateSelectorProps {
   currentTemplateId: string;
@@ -25,7 +26,8 @@ interface TemplateSelectorProps {
 export const TemplateSelector = ({ currentTemplateId, onTemplateChange }: TemplateSelectorProps) => {
   const { user } = useAuth();
   const { data: premiumStatus } = usePremiumStatus(user?.id);
-  const isPremiumUser = !!premiumStatus?.isPremium;
+  const { data: entitlements } = useEntitlements(user?.id);
+  const isPremiumUser = entitlements?.is_premium ?? !!premiumStatus?.isPremium;
   const [upsellTemplate, setUpsellTemplate] = useState<string | null>(null);
 
   const activeKey = resolveTemplateKey(currentTemplateId);

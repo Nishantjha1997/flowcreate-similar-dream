@@ -22,7 +22,9 @@ export function useAutoSave({
   // Hold the latest resume in a ref so the interval callback always sees
   // current data without being recreated on every keystroke.
   const resumeRef = useRef<ResumeData>(resume);
+  const saveHandlerRef = useRef(handleSaveResume);
   const lastSavedStringRef = useRef<string>();
+  const savingRef = useRef(false);
   const intervalRef = useRef<NodeJS.Timeout>();
   // Track in-flight status-reset timers so we can cancel them on unmount.
   const statusTimerRef = useRef<NodeJS.Timeout>();
@@ -30,9 +32,10 @@ export function useAutoSave({
 
   // Keep the ref in sync with the prop on every render.
   resumeRef.current = resume;
+  saveHandlerRef.current = handleSaveResume;
 
   const triggerAutoSave = async () => {
-    if (!enabled) return;
+    if (!enabled || savingRef.current) return;
 
     const current = resumeRef.current;
     const currentString = JSON.stringify(current);
@@ -44,8 +47,10 @@ export function useAutoSave({
     if (!current.personal?.name?.trim() || !current.personal?.email?.trim()) return;
 
     try {
+      savingRef.current = true;
       if (mountedRef.current) setSaveStatus('saving');
-      await handleSaveResume(current);
+      const didSave = await saveHandlerRef.current(current);
+      if (!didSave) throw new Error('Save was not completed');
       lastSavedStringRef.current = currentString;
       if (mountedRef.current) {
         setSaveStatus('saved');
@@ -63,6 +68,8 @@ export function useAutoSave({
       statusTimerRef.current = setTimeout(() => {
         if (mountedRef.current) setSaveStatus('idle');
       }, 5000);
+    } finally {
+      savingRef.current = false;
     }
   };
 

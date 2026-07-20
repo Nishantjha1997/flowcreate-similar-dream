@@ -3,7 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from "@/integrations/supabase/client";
 import { ResumeData } from '@/utils/types';
-import { exampleResumes, templateNames } from '@/components/resume/ResumeData';
+import { exampleResumes } from '@/components/resume/ResumeData';
+import { DEFAULT_KEY, getTemplate, resolveTemplateKey } from '@/templates/registry';
 
 const defaultResumeData: ResumeData = {
   personal: {
@@ -49,7 +50,7 @@ const defaultResumeData: ResumeData = {
 
 export const useResumeData = () => {
   const [searchParams] = useSearchParams();
-  const templateId = searchParams.get('template') || '1';
+  const requestedTemplateId = searchParams.get('template');
   const isExample = searchParams.get('example') === 'true';
   const editResumeId = searchParams.get('edit');
   
@@ -73,73 +74,86 @@ export const useResumeData = () => {
     enabled: !!editResumeId
   });
 
+  // Query-string selection wins, then the saved DB column, then resume_data.
+  // This lets old edit links containing only ?edit=<id> reopen the correct
+  // template and keeps the canonical key available to every save path.
+  const templateId = resolveTemplateKey(
+    requestedTemplateId
+      || existingResume?.template_id
+      || resume.selectedTemplate
+      || DEFAULT_KEY,
+  );
+
   // Load resume data based on context
   useEffect(() => {
     if (existingResume && existingResume.resume_data) {
-      setResume(existingResume.resume_data as unknown as ResumeData);
+      const savedData = existingResume.resume_data as unknown as ResumeData;
+      setResume({
+        ...savedData,
+        customization: {
+          ...defaultResumeData.customization,
+          ...savedData.customization,
+        },
+        selectedTemplate: resolveTemplateKey(
+          requestedTemplateId || existingResume.template_id || savedData.selectedTemplate,
+        ),
+      });
       return;
     }
-    
-    const savedResume = localStorage.getItem('resumeData');
-    if (savedResume && !editResumeId) {
-      setResume(JSON.parse(savedResume));
-    }
-    
+
     if (isExample) {
-      const exampleId = templateId;
-      if (exampleResumes[exampleId]) {
-        setResume(exampleResumes[exampleId]);
+      if (exampleResumes[templateId]) {
+        setResume({ ...exampleResumes[templateId], selectedTemplate: templateId });
       }
     } else if (!editResumeId) {
-      const templateKey = templateNames[templateId];
-      let primaryColor = '#2563eb';
-      let secondaryColor = '#6b7280';
-      
-      switch(templateKey) {
-        case 'modern':
-          primaryColor = '#2563eb';
-          secondaryColor = '#6b7280';
-          break;
-        case 'classic':
-          primaryColor = '#000000';
-          secondaryColor = '#333333';
-          break;
-        case 'creative':
-          primaryColor = '#FF6B6B';
-          secondaryColor = '#FFE66D';
-          break;
-        case 'technical':
-          primaryColor = '#4CAF50';
-          secondaryColor = '#333333';
-          break;
-        case 'professional':
-          primaryColor = '#003366';
-          secondaryColor = '#555555';
-          break;
-        case 'minimalist':
-          primaryColor = '#FFD700';
-          secondaryColor = '#8B4513';
-          break;
-        case 'executive':
-          primaryColor = '#00008B';
-          secondaryColor = '#B03060';
-          break;
-      }
-      
-      setResume(prev => ({
-        ...prev,
-        customization: {
-          ...prev.customization,
-          primaryColor,
-          secondaryColor
+      let savedData: ResumeData | null = null;
+      const savedResume = localStorage.getItem('resumeData');
+      if (savedResume) {
+        try {
+          savedData = JSON.parse(savedResume) as ResumeData;
+        } catch {
+          localStorage.removeItem('resumeData');
         }
-      }));
-      
-      if (exampleResumes[templateId]) {
-        setResume(exampleResumes[templateId]);
       }
+
+      setResume((current) => {
+        const base = savedData ?? current;
+        const isTemplateChange = resolveTemplateKey(base.selectedTemplate) !== templateId;
+        return {
+          ...base,
+          selectedTemplate: templateId,
+          customization: {
+            ...defaultResumeData.customization,
+            ...base.customization,
+            primaryColor: isTemplateChange
+              ? getTemplate(templateId).defaultAccent
+              : base.customization?.primaryColor || getTemplate(templateId).defaultAccent,
+          },
+        };
+      });
     }
-  }, [templateId, isExample, existingResume, editResumeId]);
+  // Template query changes are handled by the focused effect below; including
+  // them here would reload resume_data and discard unsaved edits.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isExample, existingResume, editResumeId]);
+
+  // Template changes inside the builder must never reload the DB payload and
+  // discard unsaved edits. Only update the selected design metadata here.
+  useEffect(() => {
+    if (!requestedTemplateId) return;
+    const requestedKey = resolveTemplateKey(requestedTemplateId);
+    setResume((current) => {
+      if (resolveTemplateKey(current.selectedTemplate) === requestedKey) return current;
+      return {
+        ...current,
+        selectedTemplate: requestedKey,
+        customization: {
+          ...current.customization,
+          primaryColor: getTemplate(requestedKey).defaultAccent,
+        },
+      };
+    });
+  }, [requestedTemplateId]);
 
   // Save to localStorage
   useEffect(() => {

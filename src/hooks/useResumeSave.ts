@@ -21,12 +21,12 @@ export const useResumeSave = (editResumeId?: string | null) => {
   const handleSaveResume = async (resume: ResumeData) => {
     if (!userId) {
       toast.error("Please log in to save your resume.");
-      return;
+      return false;
     }
 
     if (loadingPremium || loadingCount) {
       toast.warning("Checking your plan...");
-      return;
+      return false;
     }
 
     setIsSaving(true);
@@ -46,8 +46,10 @@ export const useResumeSave = (editResumeId?: string | null) => {
 
         if (error) {
           toast.error("Error updating resume: " + error.message);
+          return false;
         } else {
           toast.success("Resume updated successfully!");
+          return true;
         }
       } else {
         // Create new resume - enforce the plan's resume limit (-1 = unlimited).
@@ -61,7 +63,7 @@ export const useResumeSave = (editResumeId?: string | null) => {
               ? "The free plan includes 1 saved resume. Upgrade on the Pricing page for unlimited resumes, or delete your existing one."
               : `Your plan allows ${maxResumes} saved resumes. Upgrade on the Pricing page for more.`
           );
-          return;
+          return false;
         }
 
         // Insert new resume
@@ -77,13 +79,16 @@ export const useResumeSave = (editResumeId?: string | null) => {
 
         if (error) {
           toast.error("Error saving resume: " + error.message);
+          return false;
         } else {
           toast.success("Resume saved successfully!");
           refetchResumeCount();
+          return true;
         }
       }
     } catch (error) {
       toast.error("An unexpected error occurred");
+      return false;
     } finally {
       setIsSaving(false);
     }

@@ -22,7 +22,8 @@ import {
   Layout,
   FileText,
   Sparkles,
-  CheckCircle2
+  CheckCircle2,
+  Lock,
 } from 'lucide-react';
 
 interface ResumeBuilderSidebarProps {
@@ -119,7 +120,15 @@ export const ResumeBuilderSidebar = ({
   onPDFDataExtracted
 }: ResumeBuilderSidebarProps) => {
   const [activeTab, setActiveTab] = useState('edit');
+  const [templateFilter, setTemplateFilter] = useState<'all' | 'free' | 'ats' | 'photo'>('all');
   const { isNeoBrutalism } = useDesignMode();
+
+  const visibleTemplates = TEMPLATE_REGISTRY.filter((template) => {
+    if (templateFilter === 'free') return !template.premium;
+    if (templateFilter === 'ats') return template.atsOptimized;
+    if (templateFilter === 'photo') return template.supportsPhoto;
+    return true;
+  });
 
   const tabs = [
     { id: 'edit', label: 'Edit', icon: FileText },
@@ -283,22 +292,51 @@ export const ResumeBuilderSidebar = ({
 
           {activeTab === 'templates' && (
             <div className="space-y-3 animate-fade-in">
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Choose Template</span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Choose Template</span>
+                <span className="text-[10px] text-muted-foreground tabular-nums">{visibleTemplates.length}</span>
+              </div>
+
+              <div className="grid grid-cols-4 gap-1 rounded-lg bg-muted/30 p-1" aria-label="Filter templates">
+                {([
+                  ['all', 'All'],
+                  ['free', 'Free'],
+                  ['ats', 'ATS'],
+                  ['photo', 'Photo'],
+                ] as const).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setTemplateFilter(value)}
+                    className={cn(
+                      'rounded-md px-1.5 py-1 text-[9px] font-semibold transition-colors',
+                      templateFilter === value
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground',
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
               
               <div className="grid grid-cols-2 gap-2">
-                {TEMPLATE_REGISTRY.map((template) => {
+                {visibleTemplates.map((template) => {
                   const isSelected = resolveTemplateKey(currentTemplateId) === template.key;
+                  const isLocked = template.premium && !isPremium;
                   return (
                     <button
                       key={template.key}
                       className={cn(
                         "relative text-left rounded-xl overflow-hidden border transition-all duration-200 hover:shadow-md group flex flex-col",
-                        isSelected 
+                        isSelected
                           ? "ring-2 ring-primary border-primary shadow-sm" 
                           : "border-border/40 hover:border-border/80",
+                        isLocked && "hover:border-amber-400/60",
                         isNeoBrutalism && "border-2 border-foreground shadow-[3px_3px_0_0_hsl(var(--foreground))]"
                       )}
                       onClick={() => onTemplateChange(template.key)}
+                      aria-label={`${template.name}${isLocked ? ', Premium template' : ''}`}
                     >
                       <div className="aspect-[3/4] bg-muted/30 overflow-hidden relative w-full">
                         <ResumeTemplatePreview 
@@ -311,6 +349,13 @@ export const ResumeBuilderSidebar = ({
                             <Badge className="text-[10px] bg-primary text-primary-foreground font-medium shadow-sm">
                               Active
                             </Badge>
+                          </div>
+                        )}
+                        {isLocked && (
+                          <div className="absolute inset-0 bg-background/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-1 text-[9px] font-semibold text-white shadow-sm">
+                              <Lock className="h-2.5 w-2.5" /> Premium
+                            </span>
                           </div>
                         )}
                       </div>

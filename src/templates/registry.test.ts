@@ -1,7 +1,21 @@
 import { describe, it, expect, vi } from 'vitest';
-import { resolveTemplateKey, getTemplate, DEFAULT_KEY } from './registry';
+import { resolveTemplateKey, getTemplate, DEFAULT_KEY, TEMPLATE_REGISTRY } from './registry';
+import { templateStyles } from '@/utils/resumeTemplates';
 
 describe('registry', () => {
+  it('has unique keys and a matching style definition for every template', () => {
+    const keys = TEMPLATE_REGISTRY.map((template) => template.key);
+    expect(new Set(keys).size).toBe(keys.length);
+    expect(Object.keys(templateStyles).sort()).toEqual([...keys].sort());
+  });
+
+  it('does not expose competitor branding in customer-facing metadata', () => {
+    const metadata = TEMPLATE_REGISTRY
+      .map((template) => `${template.name} ${template.description}`)
+      .join(' ');
+    expect(metadata).not.toMatch(/flowcv|resume\.io/i);
+  });
+
   describe('resolveTemplateKey', () => {
     it('returns default key for null or undefined', () => {
       expect(resolveTemplateKey(null)).toBe(DEFAULT_KEY);

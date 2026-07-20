@@ -116,10 +116,10 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
       
       setSuggestions(results);
       toast.success(`Generated ${results.length} AI suggestions!`);
-      console.log("[Gemini] AI suggestions:", results);
-    } catch (e: any) {
-      toast.error(e.message || "Failed to get AI suggestions");
-      console.error("[Gemini] Suggestion error:", e);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to get AI suggestions';
+      toast.error(message);
+      console.error("[Gemini] Suggestion error:", error);
     }
     setLoading(false);
   }
@@ -133,8 +133,8 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
   const handleUpgrade = () => {
     setShowUpgradeDialog(false);
     setShowDemoPreview(false);
-    toast.info("Premium upgrade coming soon! Get unlimited resumes + AI features for ₹199/month");
     if (onUpsell) onUpsell();
+    window.location.assign('/pricing');
   };
 
   const availableTypes = getSectionSpecificTypes(section);

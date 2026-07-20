@@ -38,6 +38,7 @@ export const applyCustomization = (
   if (customization.primaryColor) {
     if (styles.name) styles.name.color = customization.primaryColor;
     if (styles.sectionTitle) styles.sectionTitle.color = customization.primaryColor;
+    if (styles.sidebarSectionTitle) styles.sidebarSectionTitle.color = customization.primaryColor;
     if (styles.skill) {
       if (styles.skill.backgroundColor && styles.skill.backgroundColor !== 'transparent') {
         styles.skill.backgroundColor = customization.primaryColor;
@@ -55,6 +56,7 @@ export const applyCustomization = (
   
   if (customization.accentColor) {
     if (styles.sectionTitle) styles.sectionTitle.borderBottomColor = customization.accentColor;
+    if (styles.sidebarSectionTitle) styles.sidebarSectionTitle.borderBottomColor = customization.accentColor;
   }
   
   if (customization.textColor) {
@@ -70,7 +72,7 @@ export const applyCustomization = (
     const m = customization.fontSize === 'small' ? 0.9 : customization.fontSize === 'large' ? 1.1 : 1;
     const getNewFontSize = (val: string | number | undefined, multiplier: number, fallback: number): string => {
       if (!val) return `${parseFloat((fallback * multiplier).toFixed(1))}px`;
-      const num = parseInt(String(val));
+      const num = parseFloat(String(val));
       if (isNaN(num)) return `${parseFloat((fallback * multiplier).toFixed(1))}px`;
       return `${parseFloat((num * multiplier).toFixed(1))}px`;
     };
@@ -96,7 +98,7 @@ export const applyCustomization = (
     const m = customization.spacing === 'compact' ? 0.75 : customization.spacing === 'spacious' ? 1.25 : 1;
     const getNewSpacing = (val: string | number | undefined, multiplier: number, fallback: number): string => {
       if (!val) return `${parseFloat((fallback * multiplier).toFixed(1))}px`;
-      const num = parseInt(String(val));
+      const num = parseFloat(String(val));
       if (isNaN(num)) return `${parseFloat((fallback * multiplier).toFixed(1))}px`;
       return `${parseFloat((num * multiplier).toFixed(1))}px`;
     };
@@ -138,8 +140,8 @@ export const applyCustomization = (
       if (customization.layoutType === 'compact') {
         styles.container.padding = '28px 36px';
       } else if (customization.layoutType === 'minimal') {
-        if (styles.container.borderTop) delete (styles.container as any).borderTop;
-        if (styles.container.borderLeft) delete (styles.container as any).borderLeft;
+        if (styles.container.borderTop) delete styles.container.borderTop;
+        if (styles.container.borderLeft) delete styles.container.borderLeft;
         styles.container.padding = '40px 48px';
       } else if (customization.layoutType === 'creative') {
         styles.container.borderRadius = '12px';
@@ -169,7 +171,7 @@ export const applyCustomization = (
     const sm = customization.sectionMargins === 'small' ? 0.7 : customization.sectionMargins === 'large' ? 1.3 : 1;
     const getMs = (val: string | number | undefined, fallback: number): string => {
       if (!val) return `${parseFloat((fallback * sm).toFixed(1))}px`;
-      const n = parseInt(String(val));
+      const n = parseFloat(String(val));
       return isNaN(n) ? `${parseFloat((fallback * sm).toFixed(1))}px` : `${parseFloat((n * sm).toFixed(1))}px`;
     };
     styles.section.marginBottom = getMs(styles.section.marginBottom, 24);
@@ -181,8 +183,8 @@ export const applyCustomization = (
     if (customization.paperType === 'textured') {
       styles.container.backgroundImage = 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100\' height=\'100\' filter=\'url(%23noise)\' opacity=\'0.03\'/%3E%3C/svg%3E")';
     } else if (customization.paperType === 'minimal') {
-      if (styles.container.boxShadow) delete (styles.container as any).boxShadow;
-      if (styles.container.border) delete (styles.container as any).border;
+      if (styles.container.boxShadow) delete styles.container.boxShadow;
+      if (styles.container.border) delete styles.container.border;
     }
   }
 
@@ -191,7 +193,7 @@ export const applyCustomization = (
     const d = 0.85 + (customization.textDensity / 10) * 0.3; // 0.85x to 1.15x
     const fs = (val: string | number | undefined, fallback: number): string => {
       if (!val) return `${parseFloat((fallback * d).toFixed(1))}px`;
-      const n = parseInt(String(val));
+      const n = parseFloat(String(val));
       return isNaN(n) ? `${parseFloat((fallback * d).toFixed(1))}px` : `${parseFloat((n * d).toFixed(1))}px`;
     };
     if (styles.itemDescription) {
@@ -215,7 +217,7 @@ export const applyCustomization = (
 // Each is visually distinct with unique layout approach
 // ═══════════════════════════════════════════════════════════════
 
-const templateStyles: Record<string, TemplateStyles> = {
+export const templateStyles: Record<string, TemplateStyles> = {
 
   // ─── 1. CLEAN SLATE ─────────────────────────────────────────
   // Ultra-minimal single column. Thin top accent line. 
@@ -2537,7 +2539,7 @@ export const templateMockData: Record<string, ResumeData> = {
     customization: { primaryColor: '#059669', fontSize: 'medium', spacing: 'normal' },
   },
 
-  // ─── 14 FlowCV Classic template mock data ─────────────────────
+  // ─── FlowCreate Studio collection mock data ───────────────────
 
   'atlantic-blue': {
     personal: {
@@ -2884,7 +2886,7 @@ const ResumeTemplate = ({
 
   const headerContent = (
     <>
-      {resumeData.personal.profileImage && styles.profilePhoto && (styles.profilePhoto as any).display !== 'none' && (
+      {resumeData.personal.profileImage && styles.profilePhoto && styles.profilePhoto.display !== 'none' && (
         <img 
           src={resumeData.personal.profileImage} 
           alt={`${resumeData.personal.name || 'Profile'}`}
@@ -2927,7 +2929,7 @@ const ResumeTemplate = ({
               <div style={secTitle}>{title('Experience')}</div>
               <div style={styles.sectionContent}>
                 {resumeData.experience.map((exp) => (
-                  <div key={exp.id} style={styles.item}>
+                  <div key={exp.id} style={styles.item} data-resume-item>
                     <div style={styles.itemTitle}>{exp.title}</div>
                     <div style={styles.itemSubtitle}>{exp.company}{exp.location ? ` | ${exp.location}` : ''}</div>
                     <div style={styles.itemDate}>{exp.startDate} - {exp.current ? 'Present' : exp.endDate}</div>
@@ -2946,7 +2948,7 @@ const ResumeTemplate = ({
               <div style={secTitle}>{title('Education')}</div>
               <div style={styles.sectionContent}>
                 {resumeData.education.map((edu) => (
-                  <div key={edu.id} style={styles.item}>
+                  <div key={edu.id} style={styles.item} data-resume-item>
                     <div style={styles.itemTitle}>{edu.degree} {edu.field ? `in ${edu.field}` : ''}</div>
                     <div style={styles.itemSubtitle}>{edu.school}</div>
                     <div style={styles.itemDate}>{edu.startDate} - {edu.endDate}</div>
@@ -2979,7 +2981,7 @@ const ResumeTemplate = ({
               <div style={secTitle}>{title('Projects')}</div>
               <div style={styles.sectionContent}>
                 {resumeData.projects.map((project) => (
-                  <div key={project.id} style={styles.item}>
+                  <div key={project.id} style={styles.item} data-resume-item>
                     <div style={styles.itemTitle}>
                       {project.title}
                       {project.link && (
@@ -3009,7 +3011,7 @@ const ResumeTemplate = ({
               <div style={secTitle}>{sectionTitleStr}</div>
               <div style={styles.sectionContent}>
                 {resumeData.languages.map((lang, idx) => (
-                  <div key={idx} style={{ ...styles.item, marginBottom: '6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div key={idx} style={{ ...styles.item, marginBottom: '6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} data-resume-item>
                     <span style={styles.itemTitle}>{lang.language}</span>
                     {lang.proficiency && renderProficiencyDots(lang.proficiency, styles.itemSubtitle?.color || '#4b5563')}
                   </div>
@@ -3042,7 +3044,7 @@ const ResumeTemplate = ({
               <div style={secTitle}>{sectionTitleStr}</div>
               <div style={styles.sectionContent}>
                 {resumeData.certifications.map((cert, idx) => (
-                  <div key={idx} style={styles.item}>
+                  <div key={idx} style={styles.item} data-resume-item>
                     <div style={styles.itemTitle}>
                       {cert.name}
                       {cert.url && (
@@ -3065,7 +3067,7 @@ const ResumeTemplate = ({
               <div style={secTitle}>{sectionTitleStr}</div>
               <div style={styles.sectionContent}>
                 {resumeData.volunteer.map((vol, idx) => (
-                  <div key={idx} style={styles.item}>
+                  <div key={idx} style={styles.item} data-resume-item>
                     <div style={styles.itemTitle}>{vol.role}</div>
                     <div style={styles.itemSubtitle}>{vol.organization}</div>
                     <div style={styles.itemDate}>{vol.startDate} - {vol.endDate}</div>
@@ -3094,11 +3096,11 @@ const ResumeTemplate = ({
     return (
       <div style={{ display: 'flex', flexDirection: isLeft ? 'row' : 'row-reverse', ...styles.container }}>
         <aside style={styles.sidebar}>
-          {resumeData.personal.profileImage && styles.profilePhoto && (styles.profilePhoto as any).display !== 'none' && (
+          {resumeData.personal.profileImage && styles.profilePhoto && styles.profilePhoto.display !== 'none' && (
             <img src={resumeData.personal.profileImage} alt={`${resumeData.personal.name || 'Profile'}`} style={styles.profilePhoto}/>
           )}
           {resumeData.personal.name && (
-            <div style={{ ...styles.name, color: (styles.sidebar as any)?.color || styles.name?.color, fontSize: styles.name?.fontSize ? String(parseInt(String(styles.name.fontSize)) * 0.75) + 'px' : '20px' }}>
+            <div style={{ ...styles.name, color: styles.sidebar?.color || styles.name?.color, fontSize: styles.name?.fontSize ? String(parseFloat(String(styles.name.fontSize)) * 0.75) + 'px' : '20px' }}>
               {resumeData.personal.name}
             </div>
           )}

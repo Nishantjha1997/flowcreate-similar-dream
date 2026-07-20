@@ -36,12 +36,18 @@ const PageBreakIndicators = ({ containerRef }: { containerRef: React.RefObject<H
     const checkHeight = () => {
       const height = el.scrollHeight;
       const pageHeight = A4_HEIGHT_PX;
-      const pageCount = Math.floor(height / pageHeight);
+      // Subtract one pixel so content that fits exactly on a page does not
+      // incorrectly display a break and a phantom next page.
+      const pageCount = Math.floor(Math.max(0, height - 1) / pageHeight);
       const newPages = [];
       for (let i = 1; i <= pageCount; i++) {
         newPages.push(i);
       }
-      setPages(newPages);
+      setPages((current) =>
+        current.length === newPages.length && current.every((value, index) => value === newPages[index])
+          ? current
+          : newPages,
+      );
     };
 
     checkHeight();
