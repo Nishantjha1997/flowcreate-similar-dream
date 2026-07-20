@@ -123,7 +123,7 @@ export const applyCustomization = (
     }
   } else if (customization.photoShape) {
     if (styles.profilePhoto) {
-      const shapeMap = {
+      const shapeMap: Record<string, string> = {
         circle: '50%',
         rounded: '12px',
         square: '0px',
@@ -131,7 +131,82 @@ export const applyCustomization = (
       styles.profilePhoto.borderRadius = shapeMap[customization.photoShape] || styles.profilePhoto.borderRadius;
     }
   }
-  
+
+  // ─── Layout Type ─────────────────────────────────────────
+  if (customization.layoutType) {
+    if (styles.container) {
+      if (customization.layoutType === 'compact') {
+        styles.container.padding = '28px 36px';
+      } else if (customization.layoutType === 'minimal') {
+        if (styles.container.borderTop) delete (styles.container as any).borderTop;
+        if (styles.container.borderLeft) delete (styles.container as any).borderLeft;
+        styles.container.padding = '40px 48px';
+      } else if (customization.layoutType === 'creative') {
+        styles.container.borderRadius = '12px';
+        styles.container.padding = '44px 48px';
+      }
+    }
+  }
+
+  // ─── Heading Style ────────────────────────────────────────
+  if (customization.headingStyle && styles.sectionTitle) {
+    if (customization.headingStyle === 'bold') {
+      styles.sectionTitle.fontWeight = 800;
+    } else if (customization.headingStyle === 'underlined') {
+      styles.sectionTitle.borderBottom = '2px solid ' + (styles.sectionTitle.color || '#000');
+      styles.sectionTitle.paddingBottom = '4px';
+    } else if (customization.headingStyle === 'capitalized') {
+      styles.sectionTitle.textTransform = 'uppercase';
+    } else if (customization.headingStyle === 'minimal') {
+      styles.sectionTitle.fontSize = '11px';
+      styles.sectionTitle.fontWeight = 500;
+      styles.sectionTitle.color = styles.sectionTitle.color ? styles.sectionTitle.color + '99' : '#999';
+    }
+  }
+
+  // ─── Section Margins ──────────────────────────────────────
+  if (customization.sectionMargins && styles.section) {
+    const sm = customization.sectionMargins === 'small' ? 0.7 : customization.sectionMargins === 'large' ? 1.3 : 1;
+    const getMs = (val: string | number | undefined, fallback: number): string => {
+      if (!val) return `${parseFloat((fallback * sm).toFixed(1))}px`;
+      const n = parseInt(String(val));
+      return isNaN(n) ? `${parseFloat((fallback * sm).toFixed(1))}px` : `${parseFloat((n * sm).toFixed(1))}px`;
+    };
+    styles.section.marginBottom = getMs(styles.section.marginBottom, 24);
+    if (styles.item) styles.item.marginBottom = getMs(styles.item.marginBottom, 16);
+  }
+
+  // ─── Paper Type ───────────────────────────────────────────
+  if (customization.paperType && styles.container) {
+    if (customization.paperType === 'textured') {
+      styles.container.backgroundImage = 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100\' height=\'100\' filter=\'url(%23noise)\' opacity=\'0.03\'/%3E%3C/svg%3E")';
+    } else if (customization.paperType === 'minimal') {
+      if (styles.container.boxShadow) delete (styles.container as any).boxShadow;
+      if (styles.container.border) delete (styles.container as any).border;
+    }
+  }
+
+  // ─── Text Density ─────────────────────────────────────────
+  if (customization.textDensity && typeof customization.textDensity === 'number') {
+    const d = 0.85 + (customization.textDensity / 10) * 0.3; // 0.85x to 1.15x
+    const fs = (val: string | number | undefined, fallback: number): string => {
+      if (!val) return `${parseFloat((fallback * d).toFixed(1))}px`;
+      const n = parseInt(String(val));
+      return isNaN(n) ? `${parseFloat((fallback * d).toFixed(1))}px` : `${parseFloat((n * d).toFixed(1))}px`;
+    };
+    if (styles.itemDescription) {
+      styles.itemDescription.fontSize = fs(styles.itemDescription.fontSize, 12);
+      styles.itemDescription.lineHeight = String(1.4 + (customization.textDensity / 10) * 0.4);
+    }
+    if (styles.sectionTitle) styles.sectionTitle.fontSize = fs(styles.sectionTitle.fontSize, 13);
+    if (styles.itemTitle) styles.itemTitle.fontSize = fs(styles.itemTitle.fontSize, 14);
+    if (styles.itemSubtitle) styles.itemSubtitle.fontSize = fs(styles.itemSubtitle.fontSize, 12);
+  }
+
+  // ─── Section Titles (custom names) ────────────────────────
+  // Passed through to renderer via sectionTitles; applied in renderSection switch
+  // No style changes needed here — handled in the ResumeTemplate component
+
   return styles;
 };
 
