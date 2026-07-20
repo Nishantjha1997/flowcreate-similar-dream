@@ -292,37 +292,42 @@ export const ResumeBuilderSidebar = ({
                     <button
                       key={template.key}
                       className={cn(
-                        "relative text-left rounded-xl overflow-hidden border transition-all duration-200 hover:shadow-md group",
+                        "relative text-left rounded-xl overflow-hidden border transition-all duration-200 hover:shadow-md group flex flex-col",
                         isSelected 
-                          ? "ring-2 ring-foreground border-foreground" 
-                          : "border-border/40 hover:border-border",
+                          ? "ring-2 ring-primary border-primary shadow-sm" 
+                          : "border-border/40 hover:border-border/80",
                         isNeoBrutalism && "border-2 border-foreground shadow-[3px_3px_0_0_hsl(var(--foreground))]"
                       )}
                       onClick={() => onTemplateChange(template.key)}
                     >
-                      <div className="aspect-[3/4] bg-muted/30 overflow-hidden relative">
+                      <div className="aspect-[3/4] bg-muted/30 overflow-hidden relative w-full">
                         <ResumeTemplatePreview 
                           templateKey={template.key}
                           className="w-full h-full"
                           scale={0.40}
                         />
                         {isSelected && (
-                          <div className="absolute inset-0 bg-foreground/5 flex items-center justify-center">
-                            <Badge className="text-[10px] bg-foreground text-background">Active</Badge>
+                          <div className="absolute inset-0 bg-primary/10 backdrop-blur-[1px] flex items-center justify-center">
+                            <Badge className="text-[10px] bg-primary text-primary-foreground font-medium shadow-sm">
+                              Active
+                            </Badge>
                           </div>
                         )}
                       </div>
-                      {/* Badges row — outside preview */}
-                      <div className="flex items-center gap-0.5 px-1.5 pt-1">
-                        {template.featured && <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">⭐</Badge>}
-                        {template.atsOptimized && <Badge className="text-[9px] px-1 py-0 h-4 bg-green-500/90 text-white border-0">ATS</Badge>}
+                      <div className="flex items-center gap-1 px-2 pt-1.5 flex-wrap">
+                        {template.premium ? (
+                          <Badge className="text-[9px] px-1 py-0 h-4 bg-amber-500 text-white border-0">PRO</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-[9px] px-1 py-0 h-4 text-emerald-600 border-emerald-300">FREE</Badge>
+                        )}
+                        {template.atsOptimized && <Badge className="text-[9px] px-1 py-0 h-4 bg-blue-500 text-white border-0">ATS</Badge>}
                       </div>
                       <div className={cn(
-                        "p-1.5 bg-background border-t border-border/30",
+                        "p-2 bg-background border-t border-border/20 mt-1 flex-1 flex flex-col justify-between",
                         isNeoBrutalism && "border-t-2 border-foreground"
                       )}>
-                        <div className="text-[11px] font-semibold truncate text-foreground">{template.name}</div>
-                        <div className="text-[10px] text-muted-foreground">{template.category}</div>
+                        <div className="text-[11px] font-semibold truncate text-foreground leading-tight">{template.name}</div>
+                        <div className="text-[9px] text-muted-foreground mt-0.5">{template.category}</div>
                       </div>
                     </button>
                   );
