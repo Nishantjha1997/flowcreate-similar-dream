@@ -11,10 +11,11 @@ export async function callTextModel(
   provider: AIProvider,
   apiKey: string,
   prompt: string,
-  opts?: { maxTokens?: number; temperature?: number }
+  opts?: { maxTokens?: number; temperature?: number; timeoutMs?: number }
 ): Promise<TextModelResult> {
   const temperature = opts?.temperature ?? 0.7;
   const maxTokens = opts?.maxTokens ?? 2048;
+  const timeoutMs = opts?.timeoutMs ?? 20000;
 
   try {
     if (provider === 'gemini') {
@@ -26,7 +27,7 @@ export async function callTextModel(
             'Content-Type': 'application/json',
             'x-goog-api-key': apiKey,
           },
-          signal: AbortSignal.timeout(20000),
+          signal: AbortSignal.timeout(timeoutMs),
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
@@ -52,7 +53,7 @@ export async function callTextModel(
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
         },
-        signal: AbortSignal.timeout(20000),
+        signal: AbortSignal.timeout(timeoutMs),
         body: JSON.stringify({
           model: 'deepseek-chat',
           messages: [{ role: 'user', content: prompt }],
@@ -76,7 +77,7 @@ export async function callTextModel(
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
         },
-        signal: AbortSignal.timeout(20000),
+        signal: AbortSignal.timeout(timeoutMs),
         body: JSON.stringify({
           model: 'gpt-4o-mini',
           messages: [{ role: 'user', content: prompt }],

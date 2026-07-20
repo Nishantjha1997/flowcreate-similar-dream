@@ -20,6 +20,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_due_blog_automation_runs: {
+        Args: { p_limit?: number }
+        Returns: {
+          run_id: string
+          schedule_id: string
+          scheduled_for: string
+        }[]
+      }
+      complete_blog_automation_run: {
+        Args: {
+          p_blog_post_id: string
+          p_generated_title: string
+          p_provider: string
+          p_run_id: string
+        }
+        Returns: boolean
+      }
+      fail_blog_automation_run: {
+        Args: {
+          p_error_code: string
+          p_error_message: string
+          p_run_id: string
+        }
+        Returns: boolean
+      }
+      next_blog_automation_run: {
+        Args: { p_current: string; p_frequency: string; p_now?: string; p_time_zone?: string }
+        Returns: string
+      }
       graphql: {
         Args: {
           extensions?: Json
@@ -271,6 +300,141 @@ export type Database = {
           resource_type?: string
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      blog_automation_runs: {
+        Row: {
+          attempt_count: number
+          blog_post_id: string | null
+          completed_at: string | null
+          created_at: string
+          error_code: string | null
+          error_message: string | null
+          generated_title: string | null
+          id: string
+          provider: string | null
+          schedule_id: string | null
+          scheduled_for: string
+          started_at: string | null
+          status: string
+          trigger_source: string
+          updated_at: string
+        }
+        Insert: {
+          attempt_count?: number
+          blog_post_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          generated_title?: string | null
+          id?: string
+          provider?: string | null
+          schedule_id?: string | null
+          scheduled_for: string
+          started_at?: string | null
+          status?: string
+          trigger_source?: string
+          updated_at?: string
+        }
+        Update: {
+          attempt_count?: number
+          blog_post_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          generated_title?: string | null
+          id?: string
+          provider?: string | null
+          schedule_id?: string | null
+          scheduled_for?: string
+          started_at?: string | null
+          status?: string
+          trigger_source?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_automation_runs_blog_post_id_fkey"
+            columns: ["blog_post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_automation_runs_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "blog_automation_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_automation_schedules: {
+        Row: {
+          author: string
+          category: string
+          consecutive_failures: number
+          created_at: string
+          created_by: string | null
+          frequency: string
+          id: string
+          is_enabled: boolean
+          keywords: string[]
+          last_error: string | null
+          last_run_at: string | null
+          last_success_at: string | null
+          max_failures: number
+          name: string
+          next_run_at: string
+          publish_mode: string
+          time_zone: string
+          topic_prompt: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string
+          category?: string
+          consecutive_failures?: number
+          created_at?: string
+          created_by?: string | null
+          frequency?: string
+          id?: string
+          is_enabled?: boolean
+          keywords?: string[]
+          last_error?: string | null
+          last_run_at?: string | null
+          last_success_at?: string | null
+          max_failures?: number
+          name: string
+          next_run_at: string
+          publish_mode?: string
+          time_zone?: string
+          topic_prompt: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          category?: string
+          consecutive_failures?: number
+          created_at?: string
+          created_by?: string | null
+          frequency?: string
+          id?: string
+          is_enabled?: boolean
+          keywords?: string[]
+          last_error?: string | null
+          last_run_at?: string | null
+          last_success_at?: string | null
+          max_failures?: number
+          name?: string
+          next_run_at?: string
+          publish_mode?: string
+          time_zone?: string
+          topic_prompt?: string
+          updated_at?: string
         }
         Relationships: []
       }

@@ -6,7 +6,9 @@ already exists in this repo:
 | Artifact | Path |
 |---|---|
 | Consolidated migration | `supabase/setup/20260715000000_complete_schema.sql` |
-| New edge functions | `supabase/functions/{create-stripe-checkout, stripe-webhook, razorpay-webhook, send-notification}` |
+| Blog automation migration | `supabase/migrations/20260730000000_blog_automation.sql` |
+| Blog cron installer | `supabase/setup/blog_automation_cron.sql` |
+| New edge functions | `supabase/functions/{create-stripe-checkout, stripe-webhook, razorpay-webhook, send-notification, blog-scheduler}` |
 | Env template | `.env.example` |
 | Plan review & decisions | `REFINED_PLAN.md` |
 
@@ -62,15 +64,8 @@ Post-checks:
 ## Phase 4 — Frontend wiring (10 min)
 
 - [ ] `cp .env.example .env` and fill in the new project values
-- [ ] **Required code change** (the only one): `src/integrations/supabase/client.ts`
-      hardcodes the OLD project URL and anon key. Replace the constants with:
-      ```ts
-      const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-      const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-      ```
-      Also `src/utils/ai/gemini.ts` hardcodes the old functions URL
-      (`https://tkhnxiqvghvejdulvmmx.functions.supabase.co/gemini-suggest`) — point it
-      at the new project ref or derive it from `VITE_SUPABASE_URL`.
+- [ ] Confirm `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` point to
+      the new project. The browser client and AI calls already read these values.
 - [ ] Regenerate DB types:
       `supabase gen types typescript --project-id <project-ref> > src/integrations/supabase/types.ts`
 - [ ] `npm install && npm run dev` — app loads, signup works, a `profiles` row
@@ -83,6 +78,9 @@ Post-checks:
       supabase secrets set RAZORPAY_KEY_ID=rzp_test_xxx
       supabase secrets set RAZORPAY_KEY_SECRET=xxx
       supabase secrets set GEMINI_API_KEY=xxx
+      supabase secrets set BLOG_SCHEDULER_SECRET=<random-32-plus-byte-value>
+      # Optional: rebuild the generated sitemap after an auto-publish
+      supabase secrets set VERCEL_DEPLOY_HOOK_URL=https://api.vercel.com/v1/integrations/deploy/...
       # when adopting Stripe / notifications:
       supabase secrets set STRIPE_SECRET_KEY=sk_test_xxx
       supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_xxx
@@ -110,6 +108,8 @@ Post-checks:
       supabase functions deploy create-stripe-checkout
       supabase functions deploy stripe-webhook --no-verify-jwt
       supabase functions deploy razorpay-webhook --no-verify-jwt
+      supabase functions deploy blog-ai
+      supabase functions deploy blog-scheduler --no-verify-jwt
       ```
       Webhooks MUST be `--no-verify-jwt` (providers can't send Supabase JWTs;
       security is the signature verification inside each function).
@@ -120,7 +120,42 @@ Post-checks:
       verify_jwt = false
       [functions.razorpay-webhook]
       verify_jwt = false
+      [functions.blog-scheduler]
+      verify_jwt = false
       ```
+
+### Blog automation cron
+
+- [ ] Apply `supabase/migrations/20260730000000_blog_automation.sql`.
+- [ ] Set `BLOG_SCHEDULER_SECRET` as an Edge Function secret (shown above).
+- [ ] Dashboard → Integrations → Vault: create `flowcreate_project_url` with
+      your Supabase project URL and `blog_scheduler_secret` with the exact same
+      random value used for `BLOG_SCHEDULER_SECRET`.
+- [ ] Dashboard → Integrations → Cron → Create job:
+      - Name: `flowcreate-blog-scheduler`
+      - Schedule: `*/5 * * * *`
+      - SQL:
+        ```sql
+        select net.http_post(
+          url := (select decrypted_secret from vault.decrypted_secrets
+                  where name = 'flowcreate_project_url') || '/functions/v1/blog-scheduler',
+          headers := jsonb_build_object(
+            'Content-Type', 'application/json',
+            'x-blog-scheduler-secret',
+            (select decrypted_secret from vault.decrypted_secrets
+             where name = 'blog_scheduler_secret')
+          ),
+          body := '{"action":"tick"}'::jsonb
+        );
+        ```
+      Or run `supabase/setup/blog_automation_cron.sql` after the Vault secrets
+      exist; it installs the same job without storing a secret in source code.
+- [ ] In Admin → Blog Automation, create a schedule in **Draft** mode first,
+      click **Run now**, and confirm a post plus a successful run are created.
+- [ ] Enable auto-publish only after checking article quality and links.
+- [ ] Optional SEO sync: Vercel → Project Settings → Git → Deploy Hooks → create
+      `blog-sitemap`, then set its URL as `VERCEL_DEPLOY_HOOK_URL`. Each
+      auto-publish will request one rebuild so the generated sitemap includes it.
 
 ## Phase 6 — Payment provider webhooks (10 min)
 

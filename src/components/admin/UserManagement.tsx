@@ -265,16 +265,16 @@ export function UserManagement({ userProfiles, isLoading, refetch }: UserManagem
 
       {/* Users Table */}
       <div className="border border-border rounded-xl overflow-x-auto">
-        <Table>
+        <Table className="table-fixed w-full">
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="font-semibold">User</TableHead>
-              <TableHead className="font-semibold">Email</TableHead>
-              <TableHead className="font-semibold">Roles</TableHead>
-              <TableHead className="font-semibold">Premium</TableHead>
-              <TableHead className="font-semibold">Joined</TableHead>
-              <TableHead className="font-semibold">Last Sign In</TableHead>
-              <TableHead className="font-semibold min-w-[180px]">Actions</TableHead>
+              <TableHead className="font-semibold w-[18%]">User</TableHead>
+              <TableHead className="font-semibold w-[20%]">Email</TableHead>
+              <TableHead className="font-semibold w-[12%]">Roles</TableHead>
+              <TableHead className="font-semibold w-[8%]">Premium</TableHead>
+              <TableHead className="font-semibold w-[12%] hidden md:table-cell">Joined</TableHead>
+              <TableHead className="font-semibold w-[15%] hidden md:table-cell">Last Sign In</TableHead>
+              <TableHead className="font-semibold w-[15%]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -347,10 +347,10 @@ export function UserManagement({ userProfiles, isLoading, refetch }: UserManagem
                       <Badge variant="outline">Free</Badge>
                     )}
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
+                  <TableCell className="text-sm text-muted-foreground hidden md:table-cell">
                     {user.createdAt ? format(new Date(user.createdAt), "MMM d, yyyy") : '—'}
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
+                  <TableCell className="text-sm text-muted-foreground hidden md:table-cell">
                     {user.lastSignIn ? format(new Date(user.lastSignIn), "MMM d, yyyy HH:mm") : 'Never'}
                   </TableCell>
                   <TableCell>

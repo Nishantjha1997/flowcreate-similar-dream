@@ -1,12 +1,11 @@
 import { useAuth } from "@/hooks/useAuth";
-import { ScrollReveal } from "@/hooks/useScrollAnimation";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { useAllMembers } from "@/hooks/useAllMembers";
 import { useUserProfiles } from "@/hooks/useUserProfiles";
 import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "@/hooks/use-toast";
-import { EnhancedSystemStats } from "@/components/admin/EnhancedSystemStats";
+import { AdminOverview } from "@/components/admin/AdminOverview";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { QuickActions } from "@/components/admin/QuickActions";
 import { WebsiteCustomization } from "@/components/admin/WebsiteCustomization";
@@ -22,6 +21,7 @@ import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AuditLogs } from "@/components/admin/AuditLogs";
 import { HelpCenter } from "@/components/admin/HelpCenter";
 import { BlogManager } from "@/components/admin/BlogManager";
+import { BlogAutomation } from "@/components/admin/BlogAutomation";
 import { Skeleton } from "@/components/ui/loading-skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,17 +46,23 @@ import {
   Menu,
   X,
   LogOut,
-  Settings,
   MessageSquare,
   BookOpen,
+  CalendarClock,
+  LayoutDashboard,
 } from "lucide-react";
-import { useDesignMode } from "@/hooks/useDesignMode";
 import { cn } from "@/lib/utils";
 
 // ─── Nav structure ─────────────────────────────────────────────────────────────
 const NAV_GROUPS = [
   {
-    label: "Operations & Users",
+    label: "Workspace",
+    items: [
+      { value: "overview", label: "Overview", icon: LayoutDashboard },
+    ],
+  },
+  {
+    label: "People",
     items: [
       { value: "registrations", label: "Registrations", icon: UserCheck },
       { value: "users", label: "User Management", icon: Users },
@@ -64,35 +70,36 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: "Core Builder",
+    label: "Product",
     items: [
       { value: "templates", label: "Templates", icon: LayoutTemplate },
-      { value: "website", label: "Website", icon: Globe },
       { value: "ats", label: "ATS Management", icon: Briefcase },
+      { value: "blog", label: "Blog Posts", icon: BookOpen },
+      { value: "blog-automation", label: "Blog Automation", icon: CalendarClock },
     ],
   },
   {
-    label: "Security & Logs",
+    label: "Growth & Content",
     items: [
-      { value: "security", label: "Security Settings", icon: Lock },
+      { value: "analytics", label: "Analytics", icon: BarChart3 },
+      { value: "website", label: "Website", icon: Globe },
+      { value: "content", label: "Content", icon: FileText },
+    ],
+  },
+  {
+    label: "Platform",
+    items: [
+      { value: "ai", label: "AI Providers", icon: BrainCircuit },
+      { value: "payments", label: "Payments", icon: CreditCard },
+      { value: "security", label: "Security", icon: Lock },
       { value: "audit", label: "Audit Logs", icon: ClipboardList },
     ],
   },
   {
-    label: "Integrations",
+    label: "Tools",
     items: [
-      { value: "ai", label: "AI Management", icon: BrainCircuit },
-      { value: "payments", label: "Payment Gateways", icon: CreditCard },
-    ],
-  },
-  {
-    label: "Utilities & Stats",
-    items: [
-      { value: "analytics", label: "Site Analytics", icon: BarChart3 },
-      { value: "improvements", label: "Improvement Plans", icon: Lightbulb },
-      { value: "content", label: "Content Management", icon: FileText },
-      { value: "blog", label: "Blog Manager", icon: BookOpen },
       { value: "actions", label: "Quick Actions", icon: Zap },
+      { value: "improvements", label: "Improvement Plans", icon: Lightbulb },
     ],
   },
 ];
@@ -104,13 +111,12 @@ const Admin = () => {
   const { user, isLoading } = useAuth();
   const userId = user?.id;
   const navigate = useNavigate();
-  const { isNeoBrutalism } = useDesignMode();
 
   const { data: isAdmin, isLoading: loadingAdmin } = useAdminStatus(userId);
   const { data: members = [], isLoading: loadingMembers, refetch } = useAllMembers(!!isAdmin);
   const { data: userProfiles = [], isLoading: loadingProfiles } = useUserProfiles(!!isAdmin);
 
-  const [activeTab, setActiveTab] = useState<TabValue>("registrations");
+  const [activeTab, setActiveTab] = useState<TabValue>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -156,10 +162,10 @@ const Admin = () => {
   const CurrentIcon = currentItem?.icon ?? Shield;
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--surface-elevated))] flex flex-col">
+    <div className="h-screen h-dvh overflow-hidden bg-[hsl(var(--surface-elevated))] flex flex-col">
 
       {/* ── Top Header Bar ─────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <header className="relative z-50 flex-none border-b border-border/50 bg-background/90 backdrop-blur-xl">
         <div className="flex items-center justify-between px-4 h-14 max-w-[1600px] mx-auto">
           {/* Left: Mobile menu toggle + logo */}
           <div className="flex items-center gap-3">
@@ -207,19 +213,16 @@ const Admin = () => {
       </header>
 
       {/* ── Body: sidebar + content ─────────────────────────────────────── */}
-      {/* No overflow-hidden here — an overflowing ancestor would break the
-          sidebar's position:sticky. The window is the scroll container. */}
-      <div className="flex flex-1 max-w-[1600px] mx-auto w-full">
+      <div className="flex flex-1 min-h-0 overflow-hidden max-w-[1600px] mx-auto w-full">
 
         {/* ── Sidebar ──────────────────────────────────────────────────── */}
-        {/* Mobile: fixed slide-in drawer. Desktop: sticky to the viewport,
-            sized to its content (self-start) so the full nav shows with no
-            scrollbar; max-h + overflow only kicks in on very short screens. */}
+        {/* Mobile drawer. Desktop sidebar stays in the fixed-height app shell;
+            only its own navigation scrolls on short screens. */}
         <aside className={cn(
-          "fixed inset-y-0 left-0 top-14 z-40 w-60 border-r border-border/50 bg-background/95 backdrop-blur-sm",
-          "flex flex-col overflow-y-auto",
+          "fixed left-0 top-14 bottom-0 z-40 w-60 border-r border-border/50 bg-background/95 backdrop-blur-sm",
+          "flex flex-col overflow-hidden",
           "transition-transform duration-300 ease-in-out",
-          "lg:translate-x-0 lg:sticky lg:inset-y-auto lg:top-14 lg:self-start lg:max-h-[calc(100vh-3.5rem)]",
+          "lg:static lg:inset-auto lg:h-full lg:flex-none lg:translate-x-0",
           sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full",
         )}>
           {/* Admin Profile Block */}
@@ -239,7 +242,7 @@ const Admin = () => {
           </div>
 
           {/* Navigation Groups */}
-          <nav className="flex-1 p-3 space-y-4">
+          <nav className="flex-1 min-h-0 overflow-y-auto p-3 space-y-4">
             {NAV_GROUPS.map((group) => (
               <div key={group.label}>
                 <p className="px-2 mb-1.5 text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">
@@ -297,17 +300,17 @@ const Admin = () => {
         )}
 
         {/* ── Main Content ─────────────────────────────────────────────── */}
-        <main className="flex-1 min-w-0 p-4 lg:p-6 space-y-5 overflow-x-auto">
+        <main className="h-full flex-1 min-w-0 overflow-y-auto overflow-x-hidden p-4 lg:p-6">
 
           {/* Page Header */}
-          <ScrollReveal>
-            <div className="flex items-center justify-between">
+          {activeTab !== "overview" && (
+            <div className="mb-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className={cn(
                   "h-9 w-9 rounded-xl flex items-center justify-center",
                   "bg-primary/10 border border-primary/20",
                 )}>
-                  <CurrentIcon className="h-4.5 w-4.5 text-primary" />
+                  <CurrentIcon className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <h1 className="text-lg font-bold tracking-tight text-foreground">{currentItem?.label ?? "Dashboard"}</h1>
@@ -319,20 +322,13 @@ const Admin = () => {
                 Live
               </Badge>
             </div>
-          </ScrollReveal>
-
-          {/* Stats Row */}
-          <ScrollReveal delay={50}>
-            <EnhancedSystemStats
-              members={members}
-              userProfiles={userProfiles}
-              isLoading={loadingMembers || loadingProfiles}
-            />
-          </ScrollReveal>
+          )}
 
           {/* Tab Content Panel */}
-          <ScrollReveal delay={100}>
-            <div className="rounded-xl border border-border/40 bg-card shadow-sm overflow-y-auto">
+          {activeTab === "overview" ? (
+            <AdminOverview onNavigate={setActiveTab} />
+          ) : (
+            <div className="rounded-xl border border-border/40 bg-card shadow-sm overflow-hidden">
               <div className="p-5">
                 {activeTab === "registrations" && <UserRegistrations isAdmin={!!isAdmin} />}
                 {activeTab === "users" && (
@@ -345,6 +341,7 @@ const Admin = () => {
                 )}
                 {activeTab === "helpcenter" && <HelpCenter isAdmin={!!isAdmin} />}
                 {activeTab === "blog" && <BlogManager />}
+                {activeTab === "blog-automation" && <BlogAutomation />}
                 {activeTab === "ats" && <ATSManagement isAdmin={!!isAdmin} />}
                 {activeTab === "templates" && <TemplateManagement />}
                 {activeTab === "website" && <WebsiteCustomization />}
@@ -358,7 +355,7 @@ const Admin = () => {
                 {activeTab === "audit" && <AuditLogs isAdmin={!!isAdmin} />}
               </div>
             </div>
-          </ScrollReveal>
+          )}
 
         </main>
       </div>

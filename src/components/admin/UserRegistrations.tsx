@@ -329,16 +329,16 @@ export function UserRegistrations({ isAdmin }: UserRegistrationsProps) {
             </div>
 
             {/* Enhanced Users Table */}
-            <div className="border rounded-lg">
-              <Table>
+            <div className="border rounded-lg overflow-x-auto">
+              <Table className="table-fixed w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>User Details</TableHead>
-                    <TableHead>User ID</TableHead>
-                    <TableHead>Roles & Status</TableHead>
-                    <TableHead>Membership</TableHead>
-                    <TableHead>Registration Date</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="w-[25%]">User Details</TableHead>
+                    <TableHead className="w-[14%] hidden md:table-cell">User ID</TableHead>
+                    <TableHead className="w-[17%]">Roles & Status</TableHead>
+                    <TableHead className="w-[10%]">Membership</TableHead>
+                    <TableHead className="w-[16%]">Reg. Date</TableHead>
+                    <TableHead className="w-[18%]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -366,7 +366,7 @@ export function UserRegistrations({ isAdmin }: UserRegistrationsProps) {
                             <div className="text-sm text-muted-foreground">{user.email}</div>
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="hidden md:table-cell">
                           <div className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                             {user.id.substring(0, 8)}...
                           </div>
