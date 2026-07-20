@@ -137,15 +137,19 @@ export const applyCustomization = (
   // ─── Layout Type ─────────────────────────────────────────
   if (customization.layoutType) {
     if (styles.container) {
+      // Multi-column and header-band templates must keep their full-bleed
+      // outer shell. Change only the content region so a density preset never
+      // creates a white frame around a sidebar or colored header.
+      const contentTarget = styles.mainContent || styles.container;
       if (customization.layoutType === 'compact') {
-        styles.container.padding = '28px 36px';
+        contentTarget.padding = '28px 32px';
       } else if (customization.layoutType === 'minimal') {
         if (styles.container.borderTop) delete styles.container.borderTop;
         if (styles.container.borderLeft) delete styles.container.borderLeft;
-        styles.container.padding = '40px 48px';
+        contentTarget.padding = '48px 54px';
       } else if (customization.layoutType === 'creative') {
         styles.container.borderRadius = '12px';
-        styles.container.padding = '44px 48px';
+        contentTarget.padding = '42px 46px';
       }
     }
   }

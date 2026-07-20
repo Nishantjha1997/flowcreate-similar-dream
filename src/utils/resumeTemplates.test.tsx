@@ -73,5 +73,22 @@ describe('resumeTemplates', () => {
       const result = applyCustomization(baseStyles, custom);
       expect(result.itemDescription?.lineHeight).toBe('1.8');
     });
+
+    it('keeps multi-column outer shells full bleed when layout density changes', () => {
+      const multiColumnStyles: TemplateStyles = {
+        ...baseStyles,
+        container: { width: '794px', backgroundColor: '#fff' },
+        sidebar: { width: '32%', backgroundColor: '#111827' },
+        mainContent: { width: '68%', padding: '40px' },
+      };
+
+      const result = applyCustomization(multiColumnStyles, {
+        primaryColor: '#2563eb',
+        layoutType: 'compact',
+      });
+
+      expect(result.container.padding).toBeUndefined();
+      expect(result.mainContent?.padding).toBe('28px 32px');
+    });
   });
 });

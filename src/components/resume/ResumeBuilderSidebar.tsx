@@ -7,7 +7,6 @@ import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 import { ResumeFormSection } from '@/components/resume/ResumeFormSection';
 import { SectionDragDropCustomizer } from '@/components/resume/SectionDragDropCustomizer';
 import { ResumeData } from '@/utils/types';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { CustomizationPanel } from '../CustomizationPanel';
 import { useDesignMode } from '@/hooks/useDesignMode';
 import { cn } from '@/lib/utils';
@@ -20,6 +19,7 @@ import {
   Settings,
   Palette,
   Layout,
+  SlidersHorizontal,
   FileText,
   Sparkles,
   CheckCircle2,
@@ -132,8 +132,9 @@ export const ResumeBuilderSidebar = ({
 
   const tabs = [
     { id: 'edit', label: 'Edit', icon: FileText },
-    { id: 'templates', label: 'Themes', icon: Palette },
-    { id: 'layout', label: 'Layout', icon: Layout },
+    { id: 'templates', label: 'Templates', icon: Palette },
+    { id: 'design', label: 'Design', icon: SlidersHorizontal },
+    { id: 'layout', label: 'Sections', icon: Layout },
   ];
 
   return (
@@ -146,7 +147,7 @@ export const ResumeBuilderSidebar = ({
         "flex-shrink-0 border-b border-border/30",
         isNeoBrutalism && "border-b-2 border-foreground"
       )}>
-        <div className="grid grid-cols-3">
+        <div className="grid grid-cols-4">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -154,7 +155,7 @@ export const ResumeBuilderSidebar = ({
               <button
                 key={tab.id}
                 className={cn(
-                  "flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-all duration-200 relative",
+                  "flex min-w-0 items-center justify-center gap-1 py-2.5 text-[10px] font-medium transition-all duration-200 relative sm:text-[11px]",
                   isActive
                     ? "text-foreground bg-background"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/30",
@@ -166,7 +167,7 @@ export const ResumeBuilderSidebar = ({
                   "h-3.5 w-3.5 transition-transform duration-200",
                   isActive && "scale-110"
                 )} />
-                <span>{tab.label}</span>
+                <span className="truncate">{tab.label}</span>
                 {isActive && (
                   <span className="absolute bottom-0 inset-x-4 h-0.5 bg-foreground rounded-full" />
                 )}
@@ -184,32 +185,15 @@ export const ResumeBuilderSidebar = ({
               {/* Header */}
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Sections</span>
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <Button 
-                      size="sm" 
-                      variant="ghost" 
-                      className="h-7 px-2.5 text-[11px] text-muted-foreground hover:text-foreground"
-                    >
-                      <Settings className="h-3 w-3 mr-1" />
-                      Style
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="right" className="w-full sm:max-w-md z-50">
-                    <SheetHeader>
-                      <SheetTitle>Customize Resume</SheetTitle>
-                    </SheetHeader>
-                    <ScrollArea className="mt-4 h-[calc(100vh-6rem)]">
-                      <div className="pr-4 pb-4">
-                        <CustomizationPanel
-                          customization={resume.customization}
-                          onCustomizationChange={handleCustomizationChange}
-                          resumeData={resume}
-                        />
-                      </div>
-                    </ScrollArea>
-                  </SheetContent>
-                </Sheet>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2.5 text-[11px] text-muted-foreground hover:text-foreground"
+                  onClick={() => setActiveTab('design')}
+                >
+                  <Settings className="h-3 w-3 mr-1" />
+                  Design
+                </Button>
               </div>
 
               {/* Fill from Profile */}
@@ -384,6 +368,17 @@ export const ResumeBuilderSidebar = ({
                   💡 <strong className="text-foreground">ATS templates</strong> are optimized for applicant tracking systems
                 </p>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'design' && (
+            <div className="animate-fade-in">
+              <CustomizationPanel
+                customization={resume.customization}
+                onCustomizationChange={handleCustomizationChange}
+                resumeData={resume}
+                compact
+              />
             </div>
           )}
 

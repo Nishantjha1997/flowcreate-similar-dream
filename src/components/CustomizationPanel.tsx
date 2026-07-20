@@ -21,6 +21,7 @@ import {
   Type,
   MoveHorizontal,
   LayoutGrid,
+  RotateCcw,
   Check
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -29,6 +30,7 @@ interface CustomizationPanelProps {
   customization: ResumeData["customization"];
   onCustomizationChange: (customization: ResumeData["customization"]) => void;
   resumeData: ResumeData;
+  compact?: boolean;
 }
 
 const fontOptions = [
@@ -111,13 +113,30 @@ const fontPairOptions = [
 export const CustomizationPanel = ({ 
   customization = { primaryColor: '#2563eb' }, // Provide a default primaryColor 
   onCustomizationChange,
-  resumeData
+  resumeData,
+  compact = false
 }: CustomizationPanelProps) => {
   const [activeTab, setActiveTab] = useState('colors');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
   const templateDef = getTemplate(resolveTemplateKey(resumeData.selectedTemplate));
   const supportsPhoto = templateDef?.supportsPhoto !== false;
+  const panelCardClass = compact ? 'border-0 bg-transparent shadow-none' : undefined;
+  const panelContentClass = compact ? 'px-0 pt-0' : 'pt-4';
+
+  const handleResetDesign = () => {
+    onCustomizationChange({
+      primaryColor: templateDef.defaultAccent,
+      secondaryColor: '#6b7280',
+      fontSize: 'medium',
+      spacing: 'normal',
+      sectionsOrder: customization.sectionsOrder,
+      hiddenSections: customization.hiddenSections,
+      sectionTitles: customization.sectionTitles,
+    });
+    setHasUnsavedChanges(true);
+    toast.success('Template design reset');
+  };
   
   const handleColorChange = (colorType: 'primaryColor' | 'secondaryColor' | 'accentColor' | 'textColor' | 'backgroundColor', color: string) => {
     onCustomizationChange({
@@ -283,22 +302,42 @@ export const CustomizationPanel = ({
   )?.value || '';
 
   return (
-    <div className="space-y-4">
+    <div className={compact ? "space-y-3" : "space-y-4"}>
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-xl font-semibold">Customize Your Resume</h2>
-        {hasUnsavedChanges && (
-          <div className="text-xs font-medium text-primary flex items-center">
-            <Check className="w-3 h-3 mr-1" /> Applied to this resume
-          </div>
-        )}
+        <div className="min-w-0">
+          <h2 className={compact ? "text-sm font-semibold" : "text-xl font-semibold"}>Design</h2>
+          {compact && (
+            <p className="truncate text-[10px] text-muted-foreground">
+              {templateDef.name} · changes apply to this resume
+            </p>
+          )}
+        </div>
+        <div className="ml-2 flex shrink-0 items-center gap-2">
+          {hasUnsavedChanges && (
+            <div className="flex items-center text-[10px] font-medium text-primary">
+              <Check className="w-3 h-3 mr-1" /> Applied
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={handleResetDesign}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            title="Reset template design"
+            aria-label="Reset template design"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
       
-      <p className="text-muted-foreground">
-        Personalize your resume to match your style and make it stand out.
-      </p>
+      {!compact && (
+        <p className="text-muted-foreground">
+          Personalize your resume to match your style and make it stand out.
+        </p>
+      )}
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid h-auto grid-cols-2 gap-1 sm:grid-cols-4 mb-4">
+        <TabsList className={`grid h-auto gap-1 mb-4 ${compact ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-4'}`}>
           <TabsTrigger value="colors"><Palette className="h-4 w-4 mr-1" /> Colors</TabsTrigger>
           <TabsTrigger value="fonts"><Type className="h-4 w-4 mr-1" /> Type</TabsTrigger>
           <TabsTrigger value="spacing"><MoveHorizontal className="h-4 w-4 mr-1" /> Spacing</TabsTrigger>
@@ -306,37 +345,34 @@ export const CustomizationPanel = ({
         </TabsList>
         
         <TabsContent value="colors" className="space-y-4">
-          <Card>
-            <CardContent className="pt-4">
-              <div className="space-y-6">
+          <Card className={panelCardClass}>
+            <CardContent className={panelContentClass}>
+              <div className={compact ? 'space-y-5' : 'space-y-6'}>
                 <div>
                   <Label className="block mb-3">Color Presets</Label>
-                  <div className="grid grid-cols-7 gap-2 mb-2">
-                    {colorPresets.map((preset, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => applyColorPreset(preset)}
-                        className="flex flex-col items-center gap-1 p-2 border rounded-md hover:bg-muted transition-colors"
-                        title={preset.name}
-                      >
-                        <div className="flex gap-1">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: preset.primaryColor }}></div>
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: preset.secondaryColor }}></div>
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: preset.accentColor }}></div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-2">
-                    {colorPresets.map((preset, idx) => (
-                      <button
-                        key={`name-${idx}`}
-                        onClick={() => applyColorPreset(preset)}
-                        className="text-xs truncate w-full text-center py-1 border-t"
-                      >
-                        {preset.name}
-                      </button>
-                    ))}
+                  <div className="grid grid-cols-2 gap-2">
+                    {colorPresets.map((preset, idx) => {
+                      const selected = customization.primaryColor?.toLowerCase() === preset.primaryColor.toLowerCase()
+                        && customization.accentColor?.toLowerCase() === preset.accentColor.toLowerCase();
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => applyColorPreset(preset)}
+                          className={`flex min-w-0 items-center gap-2 rounded-lg border p-2 text-left transition-colors hover:bg-muted ${selected ? 'border-primary bg-primary/5 ring-1 ring-primary/20' : 'border-border/50'}`}
+                          title={preset.name}
+                          aria-pressed={selected}
+                        >
+                          <div className="flex shrink-0 -space-x-1">
+                            <div className="h-4 w-4 rounded-full border border-background" style={{ backgroundColor: preset.primaryColor }} />
+                            <div className="h-4 w-4 rounded-full border border-background" style={{ backgroundColor: preset.secondaryColor }} />
+                            <div className="h-4 w-4 rounded-full border border-background" style={{ backgroundColor: preset.accentColor }} />
+                          </div>
+                          <span className="truncate text-[10px] font-medium">{preset.name}</span>
+                          {selected && <Check className="ml-auto h-3 w-3 shrink-0 text-primary" />}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -366,7 +402,7 @@ export const CustomizationPanel = ({
 
                 <div>
                   <Label className="block mb-3">Custom Colors</Label>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className={`grid gap-3 ${compact ? 'grid-cols-1' : 'grid-cols-2'}`}>
                     <ColorPicker 
                       label="Primary Color"
                       color={customization.primaryColor || '#2563eb'} 
@@ -395,7 +431,7 @@ export const CustomizationPanel = ({
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className={`grid gap-3 ${compact ? 'grid-cols-1' : 'grid-cols-2'}`}>
                   <ColorPicker 
                     label="Accent Color"
                     color={customization.accentColor || '#3b82f6'} 
@@ -437,9 +473,9 @@ export const CustomizationPanel = ({
         </TabsContent>
         
         <TabsContent value="fonts" className="space-y-4">
-          <Card>
-            <CardContent className="pt-4">
-              <div className="space-y-6">
+          <Card className={panelCardClass}>
+            <CardContent className={panelContentClass}>
+              <div className={compact ? 'space-y-5' : 'space-y-6'}>
                 <div>
                   <Label className="block mb-2">Font Pairing Presets</Label>
                   <Select
@@ -560,9 +596,9 @@ export const CustomizationPanel = ({
         </TabsContent>
         
         <TabsContent value="spacing" className="space-y-4">
-          <Card>
-            <CardContent className="pt-4">
-              <div className="space-y-6">
+          <Card className={panelCardClass}>
+            <CardContent className={panelContentClass}>
+              <div className={compact ? 'space-y-5' : 'space-y-6'}>
                 <div>
                   <Label className="block mb-2">Content Spacing</Label>
                   <Tabs 
@@ -582,7 +618,10 @@ export const CustomizationPanel = ({
                   <Label className="block mb-2">Section Margins</Label>
                   <RadioGroup 
                     value={customization.sectionMargins || 'medium'}
-                    onValueChange={(value) => onCustomizationChange({...customization, sectionMargins: value as 'small' | 'medium' | 'large'})}
+                    onValueChange={(value) => {
+                      onCustomizationChange({...customization, sectionMargins: value as 'small' | 'medium' | 'large'});
+                      setHasUnsavedChanges(true);
+                    }}
                     className="grid grid-cols-3 gap-2"
                   >
                     <div className="flex items-center space-x-2">
@@ -604,7 +643,10 @@ export const CustomizationPanel = ({
                   <Label className="block mb-2">Line Spacing</Label>
                   <Tabs 
                     value={customization.lineHeight || 'normal'}
-                    onValueChange={(value) => onCustomizationChange({...customization, lineHeight: value as 'tight' | 'normal' | 'relaxed'})}
+                    onValueChange={(value) => {
+                      onCustomizationChange({...customization, lineHeight: value as 'tight' | 'normal' | 'relaxed'});
+                      setHasUnsavedChanges(true);
+                    }}
                     className="w-full"
                   >
                     <TabsList className="grid grid-cols-3 w-full">
@@ -658,11 +700,12 @@ export const CustomizationPanel = ({
         </TabsContent>
         
         <TabsContent value="layout" className="space-y-4">
-          <Card>
-            <CardContent className="pt-4">
-              <div className="space-y-6">
+          <Card className={panelCardClass}>
+            <CardContent className={panelContentClass}>
+              <div className={compact ? 'space-y-5' : 'space-y-6'}>
                 <div>
-                  <Label className="block mb-2">Layout Style</Label>
+                  <Label className="block mb-2">Content Layout</Label>
+                  <p className="mb-3 text-[10px] text-muted-foreground">Adjust page density without changing your chosen template.</p>
                   <RadioGroup 
                     value={customization.layoutType || 'standard'}
                     onValueChange={handleLayoutChange}
@@ -683,7 +726,7 @@ export const CustomizationPanel = ({
                           <div className="h-4 w-3/4 bg-primary/20 mx-2 rounded"></div>
                           <div className="h-8 w-full mt-auto bg-primary/10 rounded-b"></div>
                         </div>
-                        <span>Standard</span>
+                        <span>Balanced</span>
                       </Label>
                     </div>
                     
@@ -705,7 +748,7 @@ export const CustomizationPanel = ({
                             <div className="h-3 w-full bg-primary/10 rounded"></div>
                           </div>
                         </div>
-                        <span>Compact</span>
+                        <span>Dense</span>
                       </Label>
                     </div>
                     
@@ -725,7 +768,7 @@ export const CustomizationPanel = ({
                           <div className="h-2 w-3/4 bg-primary/10 rounded mb-1"></div>
                           <div className="h-2 w-3/4 bg-primary/10 rounded"></div>
                         </div>
-                        <span>Minimal</span>
+                        <span>Airy</span>
                       </Label>
                     </div>
                     
@@ -749,7 +792,7 @@ export const CustomizationPanel = ({
                             </div>
                           </div>
                         </div>
-                        <span>Creative</span>
+                        <span>Framed</span>
                       </Label>
                     </div>
                   </RadioGroup>
@@ -774,7 +817,10 @@ export const CustomizationPanel = ({
                           <Label className="block mb-2">Photo Shape</Label>
                           <RadioGroup 
                             value={customization.photoShape || 'circle'}
-                            onValueChange={(value) => onCustomizationChange({...customization, photoShape: value as 'circle'|'rounded'|'square'})}
+                            onValueChange={(value) => {
+                              onCustomizationChange({...customization, photoShape: value as 'circle'|'rounded'|'square'});
+                              setHasUnsavedChanges(true);
+                            }}
                             className="grid grid-cols-3 gap-2"
                           >
                             <div className="flex items-center space-x-2">
