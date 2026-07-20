@@ -274,7 +274,7 @@ export function UserManagement({ userProfiles, isLoading, refetch }: UserManagem
               <TableHead className="font-semibold">Premium</TableHead>
               <TableHead className="font-semibold">Joined</TableHead>
               <TableHead className="font-semibold">Last Sign In</TableHead>
-              <TableHead className="font-semibold">Actions</TableHead>
+              <TableHead className="font-semibold min-w-[180px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -365,7 +365,7 @@ export function UserManagement({ userProfiles, isLoading, refetch }: UserManagem
                         </Button>
                       )}
                       <Select onValueChange={(role) => handleChangeRole(user.id, role)}>
-                        <SelectTrigger className="w-[100px] h-8 text-xs">
+                        <SelectTrigger className="w-[80px] h-8 text-xs">
                           <SelectValue placeholder="Role" />
                         </SelectTrigger>
                         <SelectContent>

@@ -297,7 +297,7 @@ const Admin = () => {
         )}
 
         {/* ── Main Content ─────────────────────────────────────────────── */}
-        <main className="flex-1 min-w-0 p-4 lg:p-6 space-y-5 overflow-x-hidden">
+        <main className="flex-1 min-w-0 p-4 lg:p-6 space-y-5 overflow-x-auto">
 
           {/* Page Header */}
           <ScrollReveal>
@@ -332,7 +332,7 @@ const Admin = () => {
 
           {/* Tab Content Panel */}
           <ScrollReveal delay={100}>
-            <div className="rounded-xl border border-border/40 bg-card shadow-sm overflow-hidden">
+            <div className="rounded-xl border border-border/40 bg-card shadow-sm overflow-y-auto">
               <div className="p-5">
                 {activeTab === "registrations" && <UserRegistrations isAdmin={!!isAdmin} />}
                 {activeTab === "users" && (

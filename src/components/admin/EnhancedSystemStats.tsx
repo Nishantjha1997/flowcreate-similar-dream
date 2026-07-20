@@ -12,7 +12,7 @@ interface EnhancedSystemStatsProps {
 }
 
 export function EnhancedSystemStats({ members, userProfiles, isLoading }: EnhancedSystemStatsProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   if (isLoading) {
     return (
