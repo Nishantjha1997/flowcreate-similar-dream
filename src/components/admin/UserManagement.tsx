@@ -2,12 +2,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Search, Crown, Shield, Trash2, Users, Mail } from "lucide-react";
 import { AddUserModal } from "./AddUserModal";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -17,6 +18,9 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
 
 interface UserProfile {
   id: string;
@@ -33,20 +37,46 @@ interface UserProfile {
 }
 
 interface UserManagementProps {
-  members: any[];
+  members: unknown[];
   userProfiles: UserProfile[];
   isLoading: boolean;
   refetch: () => void;
 }
 
-export function UserManagement({ members, userProfiles, isLoading, refetch }: UserManagementProps) {
+interface ResumePlan {
+  id: string;
+  name: string;
+  slug: string;
+  billing_interval: string;
+}
+
+export function UserManagement({ userProfiles, isLoading, refetch }: UserManagementProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [premiumFilter, setPremiumFilter] = useState("all");
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserProfile | null>(null);
+  const [premiumTarget, setPremiumTarget] = useState<UserProfile | null>(null);
+  const [selectedPlanId, setSelectedPlanId] = useState('');
+  const [grantingId, setGrantingId] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const { data: resumePlans = [] } = useQuery({
+    queryKey: ['admin-resume-plans'],
+    queryFn: async (): Promise<ResumePlan[]> => {
+      const { data, error } = await supabase
+        .from('subscription_plans')
+        .select('id, name, slug, billing_interval')
+        .eq('product', 'resume')
+        .eq('is_active', true)
+        .order('display_order');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const premiumPlans = resumePlans.filter((plan) => plan.slug !== 'free');
 
   // Use userProfiles (from edge function with full auth data) as primary source
   const users = userProfiles.length > 0 ? userProfiles : [];
@@ -65,31 +95,77 @@ export function UserManagement({ members, userProfiles, isLoading, refetch }: Us
     return matchesSearch && matchesRole && matchesPremium;
   });
 
-  const handlePromoteToPremium = async (targetUserId: string) => {
+  const openPremiumDialog = (user: UserProfile) => {
+    const defaultPlan = premiumPlans.find((plan) => plan.slug === 'monthly') ?? premiumPlans[0];
+    setPremiumTarget(user);
+    setSelectedPlanId(defaultPlan?.id ?? '');
+  };
+
+  const handlePromoteToPremium = async () => {
+    if (!premiumTarget || !selectedPlanId) return;
+    const plan = premiumPlans.find((item) => item.id === selectedPlanId);
+    if (!plan) return;
+
+    setGrantingId(premiumTarget.id);
     try {
+      const periodStart = new Date();
+      let periodEnd: Date | null = null;
+      if (plan.billing_interval === 'month') {
+        periodEnd = new Date(periodStart);
+        periodEnd.setMonth(periodEnd.getMonth() + 1);
+      } else if (plan.billing_interval === 'year') {
+        periodEnd = new Date(periodStart);
+        periodEnd.setFullYear(periodEnd.getFullYear() + 1);
+      }
+
       const { error } = await supabase
         .from("subscriptions")
         .upsert({
-          user_id: targetUserId,
+          user_id: premiumTarget.id,
           is_premium: true,
+          plan_id: plan.id,
+          plan_type: plan.slug,
+          provider: 'manual',
+          status: 'active',
+          current_period_start: periodStart.toISOString(),
+          current_period_end: periodEnd?.toISOString() ?? null,
+          expires_at: periodEnd?.toISOString() ?? null,
+          cancel_at_period_end: false,
+          updated_at: new Date().toISOString(),
         }, { onConflict: "user_id" });
       
       if (error) throw error;
       
-      toast({ title: "Success", description: "User promoted to premium." });
+      toast({ title: "Plan granted", description: `${premiumTarget.email} now has ${plan.name}.` });
+      setPremiumTarget(null);
       refetch();
       queryClient.invalidateQueries({ queryKey: ["subscription-status"] });
+      queryClient.invalidateQueries({ queryKey: ["entitlements"] });
       queryClient.invalidateQueries({ queryKey: ["user-profiles"] });
-    } catch (error: any) {
-      toast({ title: "Upgrade failed", description: error.message, variant: "destructive" });
+    } catch (error: unknown) {
+      toast({ title: "Upgrade failed", description: error instanceof Error ? error.message : 'Unknown error', variant: "destructive" });
+    } finally {
+      setGrantingId(null);
     }
   };
 
   const handleRevokePremium = async (targetUserId: string) => {
     try {
+      const freePlan = resumePlans.find((plan) => plan.slug === 'free');
       const { error } = await supabase
         .from("subscriptions")
-        .update({ is_premium: false })
+        .update({
+          is_premium: false,
+          plan_id: freePlan?.id ?? null,
+          plan_type: 'free',
+          provider: 'manual',
+          status: 'canceled',
+          current_period_start: null,
+          current_period_end: null,
+          expires_at: null,
+          cancel_at_period_end: false,
+          updated_at: new Date().toISOString(),
+        })
         .eq("user_id", targetUserId);
       
       if (error) throw error;
@@ -97,9 +173,10 @@ export function UserManagement({ members, userProfiles, isLoading, refetch }: Us
       toast({ title: "Success", description: "Premium access revoked." });
       refetch();
       queryClient.invalidateQueries({ queryKey: ["subscription-status"] });
+      queryClient.invalidateQueries({ queryKey: ["entitlements"] });
       queryClient.invalidateQueries({ queryKey: ["user-profiles"] });
-    } catch (error: any) {
-      toast({ title: "Revoke failed", description: error.message, variant: "destructive" });
+    } catch (error: unknown) {
+      toast({ title: "Revoke failed", description: error instanceof Error ? error.message : 'Unknown error', variant: "destructive" });
     }
   };
 
@@ -108,14 +185,14 @@ export function UserManagement({ members, userProfiles, isLoading, refetch }: Us
       await supabase.from("user_roles").delete().eq("user_id", targetUserId);
       const { error } = await supabase
         .from("user_roles")
-        .insert({ user_id: targetUserId, role: newRole as any });
+        .insert({ user_id: targetUserId, role: newRole as 'admin' | 'moderator' | 'user' });
       if (error) throw error;
 
       toast({ title: "Success", description: `User role updated to ${newRole}.` });
       refetch();
       queryClient.invalidateQueries({ queryKey: ["user-profiles"] });
-    } catch (error: any) {
-      toast({ title: "Role update failed", description: error.message, variant: "destructive" });
+    } catch (error: unknown) {
+      toast({ title: "Role update failed", description: error instanceof Error ? error.message : 'Unknown error', variant: "destructive" });
     }
   };
 
@@ -134,8 +211,8 @@ export function UserManagement({ members, userProfiles, isLoading, refetch }: Us
       setDeleteTarget(null);
       refetch();
       queryClient.invalidateQueries();
-    } catch (error: any) {
-      toast({ title: "Delete failed", description: error.message, variant: "destructive" });
+    } catch (error: unknown) {
+      toast({ title: "Delete failed", description: error instanceof Error ? error.message : 'Unknown error', variant: "destructive" });
     } finally {
       setRemovingId(null);
     }
@@ -157,7 +234,7 @@ export function UserManagement({ members, userProfiles, isLoading, refetch }: Us
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 mb-6 p-4 rounded-xl bg-muted/50 border border-border">
+      <div className="flex flex-wrap gap-3 mb-6 p-4 rounded-xl bg-muted/50 border border-border">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
@@ -187,7 +264,7 @@ export function UserManagement({ members, userProfiles, isLoading, refetch }: Us
       </div>
 
       {/* Users Table */}
-      <div className="border border-border rounded-xl overflow-hidden">
+      <div className="border border-border rounded-xl overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
@@ -279,7 +356,7 @@ export function UserManagement({ members, userProfiles, isLoading, refetch }: Us
                   <TableCell>
                     <div className="flex gap-2 items-center">
                       {!user.isPremium ? (
-                        <Button size="sm" variant="outline" onClick={() => handlePromoteToPremium(user.id)}>
+                        <Button size="sm" variant="outline" onClick={() => openPremiumDialog(user)}>
                           <Crown className="w-3 h-3 mr-1" /> Premium
                         </Button>
                       ) : (
@@ -313,6 +390,35 @@ export function UserManagement({ members, userProfiles, isLoading, refetch }: Us
           </TableBody>
         </Table>
       </div>
+
+      <Dialog open={!!premiumTarget} onOpenChange={(open) => !open && setPremiumTarget(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Grant resume plan</DialogTitle>
+            <DialogDescription>
+              Choose access for {premiumTarget?.email}. Manual monthly and yearly grants expire automatically; lifetime does not.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-2">
+            <Label className="text-sm font-medium">Plan</Label>
+            <Select value={selectedPlanId} onValueChange={setSelectedPlanId}>
+              <SelectTrigger><SelectValue placeholder="Choose plan" /></SelectTrigger>
+              <SelectContent>
+                {premiumPlans.map((plan) => (
+                  <SelectItem key={plan.id} value={plan.id}>{plan.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPremiumTarget(null)}>Cancel</Button>
+            <Button onClick={handlePromoteToPremium} disabled={!selectedPlanId || !!grantingId}>
+              <Crown className="mr-2 h-4 w-4" />
+              {grantingId ? 'Granting…' : 'Grant plan'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>

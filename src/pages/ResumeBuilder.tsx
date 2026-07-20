@@ -56,7 +56,9 @@ const ResumeBuilder = () => {
   const { saveStatus, lastSaved } = useAutoSave({
     resume,
     editResumeId,
-    enabled: !!editResumeId || (!!resume.personal?.name && !!resume.personal?.email)
+    // New drafts already persist to localStorage. Server autosave begins only
+    // after the first manual save gives the resume a stable database id.
+    enabled: !!editResumeId,
   });
   
   const { profile, populateFromProfile, hasProfileData, canFillFromProfile } = useResumeProfileSync({
@@ -152,6 +154,16 @@ const ResumeBuilder = () => {
     }
   };
 
+  const handleManualSave = async () => {
+    const result = await handleSaveResume(resume);
+    if (result.success && result.resumeId && !editResumeId) {
+      navigate(
+        `/resume-builder?template=${templateId}&edit=${result.resumeId}`,
+        { replace: true },
+      );
+    }
+  };
+
   if (loadingExistingResume) {
     return <ResumeSkeleton />;
   }
@@ -195,7 +207,7 @@ const ResumeBuilder = () => {
               handleDownload={handleDownload}
               handlePrint={() => printResume(resumeElementRef.current)}
               isGenerating={isGenerating}
-              onSave={() => handleSaveResume(resume)}
+              onSave={handleManualSave}
               isSaving={isSaving}
               isEditing={!!editResumeId}
               resume={resume}

@@ -1,9 +1,33 @@
 import { useRef } from 'react';
-import { FileText } from 'lucide-react';
 import { ResumePreview } from '@/components/ResumePreview';
-import ResumeTemplate from '@/utils/resumeTemplates';
+import ResumeTemplate, { templateMockData } from '@/utils/resumeTemplates';
 import { ResumeData, adaptResumeData } from '@/utils/resumeAdapterUtils';
 import { resolveTemplateKey } from '@/templates/registry';
+
+const hasUserContent = (resume: ResumeData) => Boolean(
+  resume.personal.name?.trim()
+  || resume.personal.email?.trim()
+  || resume.personal.phone?.trim()
+  || resume.personal.summary?.trim()
+  || resume.experience.some((item) => item.title?.trim() || item.company?.trim() || item.description?.trim())
+  || resume.education.some((item) => item.school?.trim() || item.degree?.trim())
+  || resume.skills.length
+  || resume.projects?.some((item) => item.title?.trim() || item.description?.trim()),
+);
+
+const getPreviewResume = (resume: ResumeData, templateId: string): ResumeData => {
+  if (hasUserContent(resume)) return resume;
+  const templateKey = resolveTemplateKey(templateId);
+  const sample = templateMockData[templateKey] ?? templateMockData['clean-slate'];
+  return {
+    ...sample,
+    customization: {
+      ...sample.customization,
+      ...resume.customization,
+    },
+    selectedTemplate: templateKey,
+  };
+};
 
 interface ResumeVisualPreviewProps {
   resume: ResumeData;
@@ -22,7 +46,7 @@ export const ResumeVisualPreview = ({
 }: ResumeVisualPreviewProps) => {
   const resumeRef = useRef<HTMLDivElement>(null);
   
-  const hasContent = resume.personal.name || resume.experience.some(e => e.title || e.company);
+  const previewResume = getPreviewResume(resume, templateId);
 
   // If sectionOrder/hiddenSections provided by props, use them, otherwise fallback to default template
   const getOrderedSections = () => {
@@ -31,24 +55,10 @@ export const ResumeVisualPreview = ({
     return visibleSections;
   };
 
-  if (!hasContent) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px] bg-muted/30 border-dashed border-2 rounded-md">
-        <div className="text-center p-6">
-          <FileText className="h-12 w-12 mx-auto text-muted-foreground" />
-          <h3 className="text-lg font-medium mt-3">Resume Preview</h3>
-          <p className="text-sm text-muted-foreground mt-1 max-w-[250px]">
-            Start filling in your information to see your resume take shape.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div ref={resumeRef} className="resume-content">
       <ResumeTemplate 
-        data={resume} 
+        data={previewResume}
         templateName={resolveTemplateKey(templateId)}
         sectionOrder={getOrderedSections()}
         hiddenSections={hiddenSections}
@@ -64,14 +74,15 @@ export const EnhancedResumePreview = ({
   sectionOrder,
   hiddenSections
 }: ResumeVisualPreviewProps) => {
-  const adaptedData = adaptResumeData(resume);
+  const previewResume = getPreviewResume(resume, templateId);
+  const adaptedData = adaptResumeData(previewResume);
 
   return (
     <ResumePreview
       resumeData={adaptedData}
       previewComponent={
-        <ResumeTemplate 
-          data={resume} 
+        <ResumeTemplate
+          data={previewResume}
           templateName={resolveTemplateKey(templateId)}
           sectionOrder={sectionOrder}
           hiddenSections={hiddenSections}

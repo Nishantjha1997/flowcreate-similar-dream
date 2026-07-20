@@ -43,18 +43,25 @@ export function useEntitlements(userId: string | undefined) {
       }
       const raw = data as Record<string, unknown>;
       const rawLimits = (raw.limits ?? {}) as Record<string, unknown>;
+      const isPremium = raw.is_premium === true;
+      const maxResumes =
+        typeof rawLimits.max_resumes === "number" ? rawLimits.max_resumes : 1;
+      const aiRequests =
+        typeof rawLimits.ai_requests_per_month === "number"
+          ? rawLimits.ai_requests_per_month
+          : 0;
+
       return {
         plan: typeof raw.plan === "string" ? raw.plan : "free",
-        isPremium: raw.is_premium === true,
+        isPremium,
         status: typeof raw.status === "string" ? raw.status : "active",
         limits: {
-          max_resumes:
-            typeof rawLimits.max_resumes === "number" ? rawLimits.max_resumes : 1,
-          ai_requests_per_month:
-            typeof rawLimits.ai_requests_per_month === "number"
-              ? rawLimits.ai_requests_per_month
-              : 0,
-          premium_templates: rawLimits.premium_templates === true,
+          // Guard legacy/manual premium rows that still point at the free plan.
+          // The database migration repairs these rows; this keeps paid users
+          // working immediately while that migration rolls out.
+          max_resumes: isPremium && maxResumes === 1 ? -1 : maxResumes,
+          ai_requests_per_month: isPremium && aiRequests === 0 ? 100 : aiRequests,
+          premium_templates: isPremium || rawLimits.premium_templates === true,
         },
         features: Array.isArray(raw.features)
           ? raw.features.filter((f): f is string => typeof f === "string")

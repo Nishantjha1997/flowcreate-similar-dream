@@ -49,8 +49,8 @@ export function useAutoSave({
     try {
       savingRef.current = true;
       if (mountedRef.current) setSaveStatus('saving');
-      const didSave = await saveHandlerRef.current(current);
-      if (!didSave) throw new Error('Save was not completed');
+      const result = await saveHandlerRef.current(current);
+      if (!result.success) throw new Error('Save was not completed');
       lastSavedStringRef.current = currentString;
       if (mountedRef.current) {
         setSaveStatus('saved');

@@ -880,11 +880,33 @@ DECLARE
   v_sub subscriptions%ROWTYPE;
   v_plan subscription_plans%ROWTYPE;
 BEGIN
+  IF p_user_id IS NULL THEN
+    RETURN jsonb_build_object(
+      'plan', 'free',
+      'is_premium', false,
+      'status', 'active',
+      'current_period_end', NULL,
+      'limits', jsonb_build_object('max_resumes', 1, 'ai_requests_per_month', 0, 'premium_templates', false),
+      'features', '[]'::jsonb
+    );
+  END IF;
+
+  IF auth.role() <> 'service_role'
+     AND p_user_id IS DISTINCT FROM auth.uid()
+     AND NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Not authorized to read these entitlements';
+  END IF;
+
   SELECT * INTO v_sub FROM subscriptions WHERE user_id = p_user_id;
 
   IF v_sub.id IS NOT NULL AND v_sub.is_premium THEN
     SELECT * INTO v_plan FROM subscription_plans
-    WHERE product = 'resume' AND (id = v_sub.plan_id OR slug = v_sub.plan_type)
+    WHERE product = 'resume'
+      AND slug <> 'free'
+      AND (
+        id = v_sub.plan_id
+        OR (v_sub.plan_type <> 'free' AND slug = v_sub.plan_type)
+      )
     ORDER BY (id = v_sub.plan_id) DESC NULLS LAST
     LIMIT 1;
   END IF;

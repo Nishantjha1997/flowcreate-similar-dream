@@ -1,17 +1,14 @@
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { ColorPicker } from './ColorPicker';
 import { ResumeData } from '@/utils/types';
 import { getTemplate, resolveTemplateKey } from '@/templates/registry';
-import { AvatarUploader } from './AvatarUploader';
-import { SectionDragDropCustomizer } from '@/components/resume/SectionDragDropCustomizer';
 import { 
   Select,
   SelectContent,
@@ -24,17 +21,6 @@ import {
   Type,
   MoveHorizontal,
   LayoutGrid,
-  ArrowDownUp,
-  User,
-  Phone,
-  Briefcase,
-  GraduationCap,
-  Award,
-  BookOpen,
-  Languages,
-  Lightbulb,
-  Medal,
-  HandHeart,
   Check
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -43,8 +29,6 @@ interface CustomizationPanelProps {
   customization: ResumeData["customization"];
   onCustomizationChange: (customization: ResumeData["customization"]) => void;
   resumeData: ResumeData;
-  onSectionOrderChange?: (newOrder: string[]) => void;
-  onSectionTitleChange?: (sectionId: string, newTitle: string) => void;
 }
 
 const fontOptions = [
@@ -75,6 +59,15 @@ const accentColors = [
   '#dc2626', '#ea580c', '#d97706', '#16a34a',
   '#0d9488', '#0ea5e9', '#64748b', '#111827'
 ];
+
+interface ColorPreset {
+  name: string;
+  primaryColor: string;
+  secondaryColor: string;
+  accentColor: string;
+  textColor: string;
+  backgroundColor: string;
+}
 
 const fontPairOptions = [
   {
@@ -115,33 +108,12 @@ const fontPairOptions = [
   }
 ];
 
-const sectionIcons = {
-  summary: <User className="h-4 w-4" />,
-  contact: <Phone className="h-4 w-4" />,
-  experience: <Briefcase className="h-4 w-4" />,
-  education: <GraduationCap className="h-4 w-4" />,
-  skills: <Award className="h-4 w-4" />,
-  projects: <BookOpen className="h-4 w-4" />,
-  languages: <Languages className="h-4 w-4" />,
-  interests: <Lightbulb className="h-4 w-4" />,
-  certifications: <Medal className="h-4 w-4" />,
-  volunteer: <HandHeart className="h-4 w-4" />,
-};
-
 export const CustomizationPanel = ({ 
   customization = { primaryColor: '#2563eb' }, // Provide a default primaryColor 
   onCustomizationChange,
-  resumeData,
-  onSectionOrderChange,
-  onSectionTitleChange
+  resumeData
 }: CustomizationPanelProps) => {
   const [activeTab, setActiveTab] = useState('colors');
-  const [sectionsOrder, setSectionsOrder] = useState<string[]>(
-    customization.sectionsOrder || ['summary', 'experience', 'education', 'skills', 'projects']
-  );
-  const [hiddenSections, setHiddenSections] = useState<string[]>(
-    customization.hiddenSections || []
-  );
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
   const templateDef = getTemplate(resolveTemplateKey(resumeData.selectedTemplate));
@@ -218,47 +190,6 @@ export const CustomizationPanel = ({
     setHasUnsavedChanges(true);
   };
 
-  const handleImageChange = (imageData: { src: string | null; size: number; shape: 'circle' | 'square' | 'rounded'; }) => {
-    onCustomizationChange({
-      ...customization,
-      profileImage: imageData
-    });
-    setHasUnsavedChanges(true);
-  };
-
-  const handleSectionsChange = (activeSections: string[], hiddenSections: string[]) => {
-    setSectionsOrder(activeSections);
-    setHiddenSections(hiddenSections);
-    
-    onCustomizationChange({
-      ...customization,
-      sectionsOrder: activeSections,
-      hiddenSections: hiddenSections
-    });
-    
-    if (onSectionOrderChange) {
-      onSectionOrderChange(activeSections);
-    }
-    setHasUnsavedChanges(true);
-  };
-
-  const handleSectionTitleChange = (sectionId: string, newTitle: string) => {
-    const updatedTitles = {
-      ...(customization.sectionTitles || {}),
-      [sectionId]: newTitle
-    };
-    
-    onCustomizationChange({
-      ...customization,
-      sectionTitles: updatedTitles
-    });
-    
-    if (onSectionTitleChange) {
-      onSectionTitleChange(sectionId, newTitle);
-    }
-    setHasUnsavedChanges(true);
-  };
-
   const handlePaperTypeChange = (value: string) => {
     onCustomizationChange({
       ...customization,
@@ -275,41 +206,7 @@ export const CustomizationPanel = ({
     setHasUnsavedChanges(true);
   };
 
-  const [savedStyles, setSavedStyles] = useState<Record<string, any>>(() => {
-    try { return JSON.parse(localStorage.getItem('flowcreate_saved_styles') || '{}'); }
-    catch { return {}; }
-  });
-
-  const saveAsTemplate = () => {
-    const templateName = prompt("Enter a name for this template style:");
-    if (templateName) {
-      try {
-        const saved = JSON.parse(localStorage.getItem('flowcreate_saved_styles') || '{}');
-        saved[templateName] = customization;
-        localStorage.setItem('flowcreate_saved_styles', JSON.stringify(saved));
-        setSavedStyles({ ...saved });
-        toast.success(`"${templateName}" saved!`);
-        setHasUnsavedChanges(false);
-      } catch { toast.error('Failed to save'); }
-    }
-  };
-
-  const loadStyle = (name: string) => {
-    const saved = JSON.parse(localStorage.getItem('flowcreate_saved_styles') || '{}');
-    if (saved[name]) {
-      onCustomizationChange({ ...customization, ...saved[name] });
-      toast.success(`"${name}" applied`);
-    }
-  };
-
-  const deleteStyle = (name: string) => {
-    const saved = JSON.parse(localStorage.getItem('flowcreate_saved_styles') || '{}');
-    delete saved[name];
-    localStorage.setItem('flowcreate_saved_styles', JSON.stringify(saved));
-    setSavedStyles({ ...saved });
-  };
-
-  const colorPresets = [
+  const colorPresets: ColorPreset[] = [
     {
       name: "Professional Blue",
       primaryColor: "#2563eb",
@@ -368,7 +265,7 @@ export const CustomizationPanel = ({
     }
   ];
 
-  const applyColorPreset = (preset: any) => {
+  const applyColorPreset = (preset: ColorPreset) => {
     onCustomizationChange({
       ...customization,
       primaryColor: preset.primaryColor,
@@ -391,7 +288,7 @@ export const CustomizationPanel = ({
         <h2 className="text-xl font-semibold">Customize Your Resume</h2>
         {hasUnsavedChanges && (
           <div className="text-xs font-medium text-primary flex items-center">
-            <Check className="w-3 h-3 mr-1" /> Changes auto-saved
+            <Check className="w-3 h-3 mr-1" /> Applied to this resume
           </div>
         )}
       </div>
@@ -401,12 +298,11 @@ export const CustomizationPanel = ({
       </p>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-5 mb-4">
+        <TabsList className="grid h-auto grid-cols-2 gap-1 sm:grid-cols-4 mb-4">
           <TabsTrigger value="colors"><Palette className="h-4 w-4 mr-1" /> Colors</TabsTrigger>
-          <TabsTrigger value="fonts"><Type className="h-4 w-4 mr-1" /> Typography</TabsTrigger>
+          <TabsTrigger value="fonts"><Type className="h-4 w-4 mr-1" /> Type</TabsTrigger>
           <TabsTrigger value="spacing"><MoveHorizontal className="h-4 w-4 mr-1" /> Spacing</TabsTrigger>
           <TabsTrigger value="layout"><LayoutGrid className="h-4 w-4 mr-1" /> Layout</TabsTrigger>
-          <TabsTrigger value="sections"><ArrowDownUp className="h-4 w-4 mr-1" /> Sections</TabsTrigger>
         </TabsList>
         
         <TabsContent value="colors" className="space-y-4">
@@ -646,7 +542,7 @@ export const CustomizationPanel = ({
                   <Label className="block mb-2">Text Density</Label>
                   <div className="py-5 px-2">
                     <Slider 
-                      defaultValue={[customization.textDensity || 5]} 
+                      value={[customization.textDensity ?? 5]}
                       max={10} 
                       step={1}
                       onValueChange={handleTextDensityChange}
@@ -875,13 +771,6 @@ export const CustomizationPanel = ({
                     {customization.showPhoto !== false && (
                       <div className="space-y-4">
                         <div>
-                          <AvatarUploader 
-                            onImageChange={handleImageChange}
-                            currentImage={customization.profileImage}
-                          />
-                        </div>
-                        
-                        <div>
                           <Label className="block mb-2">Photo Shape</Label>
                           <RadioGroup 
                             value={customization.photoShape || 'circle'}
@@ -911,52 +800,10 @@ export const CustomizationPanel = ({
           </Card>
         </TabsContent>
         
-        <TabsContent value="sections" className="space-y-4">
-          <Card>
-            <CardContent className="pt-4">
-              <div className="space-y-4">
-                <Label className="block font-medium">Section Order & Visibility</Label>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Drag sections to reorder or toggle visibility
-                </p>
-                
-                <div className="space-y-2">
-                  <SectionDragDropCustomizer 
-                    activeSections={sectionsOrder}
-                    hiddenSections={hiddenSections}
-                    sectionTitles={customization.sectionTitles || {}}
-                    onSectionsChange={handleSectionsChange}
-                    onSectionTitleChange={handleSectionTitleChange}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
-      
-      <div className="flex justify-between mt-6">
-        <Button 
-          variant="outline" 
-          onClick={saveAsTemplate}
-          className="text-sm"
-        >
-          Save as Template
-        </Button>
-      </div>
-      {Object.keys(savedStyles).length > 0 && (
-        <div className="mt-4 border-t pt-4">
-          <p className="text-xs text-muted-foreground mb-2">Saved Styles</p>
-          <div className="space-y-1">
-            {Object.keys(savedStyles).map(name => (
-              <div key={name} className="flex items-center justify-between text-sm py-1">
-                <button className="text-primary hover:underline text-left truncate" onClick={() => loadStyle(name)}>{name}</button>
-                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-destructive" onClick={() => deleteStyle(name)}>×</Button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <p className="text-xs text-muted-foreground">
+        Style changes stay with this resume when you save it.
+      </p>
     </div>
   );
 };
