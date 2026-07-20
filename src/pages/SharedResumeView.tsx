@@ -16,6 +16,8 @@ import {
 import { ResumeData } from '@/utils/types';
 import { resolveTemplateKey } from '@/templates/registry';
 
+import { SITE_URL } from '@/lib/seo';
+
 const SHARE_URL = import.meta.env.VITE_SUPABASE_URL 
   ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/track-resume-view`
   : null;

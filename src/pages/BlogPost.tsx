@@ -9,6 +9,8 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
+import { SITE_URL, absoluteUrl } from '@/lib/seo';
+
 interface BlogPost {
   id: string; slug: string; title: string; excerpt: string;
   description: string; content: string; category: string;
@@ -100,15 +102,15 @@ const BlogPost = () => {
           publisher: {
             '@type': 'Organization',
             name: 'FlowCreate',
-            url: window.location.origin,
+            url: SITE_URL,
           },
-          mainEntityOfPage: { '@type': 'WebPage', '@id': window.location.href },
+          mainEntityOfPage: { '@type': 'WebPage', '@id': absoluteUrl(`/blog/${post.slug}`) },
         },
         {
           '@type': 'BreadcrumbList',
           itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Home', item: window.location.origin },
-            { '@type': 'ListItem', position: 2, name: 'Blog', item: `${window.location.origin}/blog` },
+            { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+            { '@type': 'ListItem', position: 2, name: 'Blog', item: absoluteUrl('/blog') },
             { '@type': 'ListItem', position: 3, name: post.title },
           ],
         },
