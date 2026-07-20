@@ -28,7 +28,6 @@ interface ResumePreviewSectionProps {
 
 const PageBreakIndicators = ({ containerRef }: { containerRef: React.RefObject<HTMLDivElement> }) => {
   const [pages, setPages] = useState<number[]>([]);
-  const [containerStyle, setContainerStyle] = useState<{ left: string; width: string }>({ left: '0px', width: `${A4_WIDTH_PX}px` });
 
   useEffect(() => {
     const el = containerRef.current;
@@ -43,12 +42,6 @@ const PageBreakIndicators = ({ containerRef }: { containerRef: React.RefObject<H
         newPages.push(i);
       }
       setPages(newPages);
-
-      // Align exactly with the resume-container positioning
-      setContainerStyle({
-        left: `${el.offsetLeft}px`,
-        width: `${el.offsetWidth}px`
-      });
     };
 
     checkHeight();
@@ -56,7 +49,6 @@ const PageBreakIndicators = ({ containerRef }: { containerRef: React.RefObject<H
     const observer = new ResizeObserver(checkHeight);
     observer.observe(el);
     
-    // Also handle window resize
     window.addEventListener('resize', checkHeight);
     
     return () => {
@@ -69,8 +61,7 @@ const PageBreakIndicators = ({ containerRef }: { containerRef: React.RefObject<H
 
   return (
     <div 
-      className="absolute pointer-events-none z-10"
-      style={{ left: containerStyle.left, width: containerStyle.width, top: 0, bottom: 0 }}
+      className="absolute inset-0 pointer-events-none z-10"
     >
       {pages.map((pageNum) => {
         const topPos = pageNum * A4_HEIGHT_PX;
@@ -214,7 +205,7 @@ export const ResumePreviewSection = ({
         >
           <div 
             className={cn(
-              "resume-container bg-white rounded-xl mx-auto transition-shadow duration-300",
+              "resume-container bg-white rounded-xl mx-auto transition-shadow duration-300 relative",
               "shadow-[0_2px_8px_rgba(0,0,0,0.04),0_8px_32px_rgba(0,0,0,0.06)]",
               "hover:shadow-[0_2px_8px_rgba(0,0,0,0.06),0_16px_48px_rgba(0,0,0,0.1)]",
               isNeoBrutalism && "border-2 border-foreground shadow-[6px_6px_0_0_hsl(var(--foreground))] rounded-none"
@@ -230,9 +221,8 @@ export const ResumePreviewSection = ({
               sectionOrder={sectionOrder}
               hiddenSections={hiddenSections}
             />
+            <PageBreakIndicators containerRef={resumeRef} />
           </div>
-          
-          <PageBreakIndicators containerRef={resumeRef} />
         </div>
       </div>
       
