@@ -22,6 +22,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { getPaymentGatewayKeys } from '../_shared/paymentKeyManager.ts'
+import { notifyUser } from '../_shared/notify.ts'
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -190,13 +191,15 @@ serve(async (req) => {
         )
         if (payError) throw payError
 
-        const { error: notifyError } = await admin.from('notifications').insert({
+        const notifyResult = await notifyUser(admin, {
           user_id: userId,
           type: 'billing_payment_success',
           title: 'Payment successful',
           body: `Your ${planType} plan is now active. Welcome to FlowCreate Pro!`,
+          action_url: '/account',
+          send_email: true,
         })
-        if (notifyError) console.error('notification insert failed:', notifyError.message)
+        if (!notifyResult.success) console.error('notification failed:', notifyResult.error)
         break
       }
 
@@ -205,13 +208,15 @@ serve(async (req) => {
         const payment = (payload as any)?.payload?.payment?.entity
         const userId: string | undefined = payment?.notes?.user_id
         if (userId) {
-          const { error } = await admin.from('notifications').insert({
+          const notifyResult = await notifyUser(admin, {
             user_id: userId,
             type: 'billing_payment_failed',
             title: 'Payment failed',
             body: 'Your payment could not be processed. No amount was charged — please try again.',
+            action_url: '/pricing',
+            send_email: true,
           })
-          if (error) console.error('notification insert failed:', error.message)
+          if (!notifyResult.success) console.error('notification failed:', notifyResult.error)
         }
         break
       }

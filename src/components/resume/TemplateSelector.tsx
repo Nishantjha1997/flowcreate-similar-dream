@@ -27,7 +27,7 @@ export const TemplateSelector = ({ currentTemplateId, onTemplateChange }: Templa
   const { user } = useAuth();
   const { data: premiumStatus } = usePremiumStatus(user?.id);
   const { data: entitlements } = useEntitlements(user?.id);
-  const isPremiumUser = entitlements?.is_premium ?? !!premiumStatus?.isPremium;
+  const isPremiumUser = entitlements?.isPremium ?? !!premiumStatus?.isPremium;
   const [upsellTemplate, setUpsellTemplate] = useState<string | null>(null);
 
   const activeKey = resolveTemplateKey(currentTemplateId);

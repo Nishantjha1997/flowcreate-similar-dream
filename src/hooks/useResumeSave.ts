@@ -8,6 +8,7 @@ import { usePremiumStatus } from "@/hooks/usePremiumStatus";
 import { useResumeCount } from "@/hooks/useResumeLimit";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { resolveTemplateKey } from '@/templates/registry';
+import { captureError } from '@/lib/monitoring';
 
 export const useResumeSave = (editResumeId?: string | null) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -94,6 +95,7 @@ export const useResumeSave = (editResumeId?: string | null) => {
         }
       }
     } catch (error) {
+      captureError(error, { context: 'resume_save', editResumeId });
       toast.error("An unexpected error occurred");
       return { success: false };
     } finally {

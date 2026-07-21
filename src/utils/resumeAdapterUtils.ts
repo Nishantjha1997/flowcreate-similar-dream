@@ -83,6 +83,8 @@ export interface ResumeData {
     bodyFont?: string;
     sectionsOrder?: string[];
     hiddenSections?: string[];
+    paperType?: 'standard' | 'textured' | 'minimal';
+    textDensity?: number; // 0-10, scales font size/line-height (see applyCustomization)
   };
   selectedTemplate?: string;
 }
@@ -151,7 +153,9 @@ export const adaptResumeData = (data: ResumeData): TypesResumeData => {
       headingFont: data.customization?.headingFont,
       bodyFont: data.customization?.bodyFont,
       sectionsOrder: data.customization?.sectionsOrder,
-      hiddenSections: data.customization?.hiddenSections
+      hiddenSections: data.customization?.hiddenSections,
+      paperType: data.customization?.paperType,
+      textDensity: data.customization?.textDensity
     },
     selectedTemplate: data.selectedTemplate
   };
@@ -221,7 +225,9 @@ export const reverseAdaptResumeData = (data: TypesResumeData): Partial<ResumeDat
       headingFont: data.customization?.headingFont,
       bodyFont: data.customization?.bodyFont,
       sectionsOrder: data.customization?.sectionsOrder,
-      hiddenSections: data.customization?.hiddenSections
+      hiddenSections: data.customization?.hiddenSections,
+      paperType: data.customization?.paperType,
+      textDensity: data.customization?.textDensity
     }
   };
 };

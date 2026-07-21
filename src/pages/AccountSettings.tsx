@@ -9,7 +9,8 @@ import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Link } from 'react-router-dom';
-import { Shield, Crown, Download, Edit, Plus, Trash2, Save, RefreshCw, User, Briefcase, GraduationCap, Award } from 'lucide-react';
+import { Shield, Crown, Download, Edit, Plus, Trash2, Save, RefreshCw, User, Briefcase, GraduationCap, Award, Lock } from 'lucide-react';
+import { SecuritySettingsForm } from '@/components/account/SecuritySettingsForm';
 import Header from '@/components/Header';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -169,7 +170,7 @@ const AccountSettings = () => {
 
           <div className="lg:col-span-3">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-7 lg:grid-cols-7">
+              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
                 <TabsTrigger value="personal">
                   <User className="w-4 h-4 mr-1" />
                   Personal
@@ -197,6 +198,10 @@ const AccountSettings = () => {
                 <TabsTrigger value="skills">
                   <Award className="w-4 h-4 mr-1" />
                   Skills
+                </TabsTrigger>
+                <TabsTrigger value="security">
+                  <Lock className="w-4 h-4 mr-1" />
+                  Security
                 </TabsTrigger>
               </TabsList>
               
@@ -248,11 +253,15 @@ const AccountSettings = () => {
                     profile={mergedProfile} 
                     onUpdate={handleProfileUpdate} 
                   />
-                  <VolunteerForm 
-                    profile={mergedProfile} 
-                    onUpdate={handleProfileUpdate} 
+                  <VolunteerForm
+                    profile={mergedProfile}
+                    onUpdate={handleProfileUpdate}
                   />
                 </div>
+              </TabsContent>
+
+              <TabsContent value="security" className="mt-6">
+                <SecuritySettingsForm />
               </TabsContent>
             </Tabs>
           </div>

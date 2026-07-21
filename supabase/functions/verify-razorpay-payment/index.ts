@@ -3,6 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { checkRateLimit, rateLimitResponse } from '../_shared/rateLimiter.ts'
 import { getPaymentGatewayKeys } from '../_shared/paymentKeyManager.ts'
+import { notifyUser } from '../_shared/notify.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -228,10 +229,23 @@ serve(async (req) => {
       console.error('Payment record error:', paymentError)
     }
 
+    // Best-effort: an email/notification failure should never fail a payment
+    // that already succeeded. The replay guard above means this only fires
+    // once per payment even if the razorpay-webhook also processes it later.
+    const notifyResult = await notifyUser(supabase, {
+      user_id: callerUserId,
+      type: 'billing_payment_success',
+      title: 'Payment successful',
+      body: `Your ${effectivePlanType} plan is now active. Welcome to FlowCreate Pro!`,
+      action_url: '/account',
+      send_email: true,
+    })
+    if (!notifyResult.success) console.error('notification failed:', notifyResult.error)
+
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: 'Payment verified and subscription updated' 
+      JSON.stringify({
+        success: true,
+        message: 'Payment verified and subscription updated'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )

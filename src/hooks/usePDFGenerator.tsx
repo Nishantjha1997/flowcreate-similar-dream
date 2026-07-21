@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { A4_WIDTH_PX, A4_HEIGHT_PX, A4_WIDTH_MM, A4_HEIGHT_MM } from '@/constants/pdfDimensions';
+import { captureError } from '@/lib/monitoring';
 
 export const usePDFGenerator = (fileName: string = 'document') => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -177,6 +178,7 @@ export const usePDFGenerator = (fileName: string = 'document') => {
         toast.success("Resume downloaded successfully!");
       } catch (error) {
         console.error("Error generating PDF:", error);
+        captureError(error, { context: 'pdf_generation' });
         setIsGenerating(false);
         toast.error("Error generating PDF. Please try again.");
       } finally {
