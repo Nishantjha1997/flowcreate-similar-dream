@@ -32,6 +32,8 @@ import { ProfileInsights } from '@/components/profile/ProfileInsights';
 import { ResumeViewAnalytics } from '@/components/analytics/ResumeViewAnalytics';
 import { MasterProfileForm } from '@/components/profile/MasterProfileForm';
 import { DocumentsDashboard } from '@/components/profile/DocumentsDashboard';
+import { PDFResumeUploader } from '@/components/profile/PDFResumeUploader';
+import type { UserProfile } from '@/hooks/useUserProfile';
 
 // Tab configuration with icons and completion status
 const getTabConfig = (profile: any) => [
@@ -411,9 +413,24 @@ const Account = () => {
                 />
               </TabsContent>
 
-              <TabsContent value="profile" className="mt-0 animate-fade-in">
-                <MasterProfileForm 
-                  profile={mergedProfile} 
+              <TabsContent value="profile" className="mt-0 animate-fade-in space-y-6">
+                <PDFResumeUploader
+                  onDataExtracted={(data: Partial<UserProfile>) => handleProfileUpdate(data)}
+                />
+
+                <div className={`flex items-center justify-between p-3 rounded-lg text-sm ${isNeoBrutalism ? 'border-2 border-foreground bg-muted' : 'bg-muted/50'}`}>
+                  <span className="text-muted-foreground">
+                    Want separate tailored profiles for different roles (e.g. "Engineering" vs "Product")?
+                  </span>
+                  <Link to="/master-profiles">
+                    <Button variant="outline" size="sm" className={isNeoBrutalism ? 'border-2 border-foreground' : ''}>
+                      Manage Master Profiles
+                    </Button>
+                  </Link>
+                </div>
+
+                <MasterProfileForm
+                  profile={mergedProfile}
                   onUpdate={handleProfileUpdate}
                   isNeoBrutalism={isNeoBrutalism}
                   isPremium={premiumData?.isPremium || false}

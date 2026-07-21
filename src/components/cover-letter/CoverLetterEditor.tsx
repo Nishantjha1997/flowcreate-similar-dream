@@ -14,12 +14,9 @@ import { Sparkles, Save, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { CoverLetterFormData } from '@/hooks/useCoverLetterData';
+import { coverLetterTemplateNames } from '@/utils/coverLetterTemplates';
 
-const TEMPLATE_OPTIONS = [
-  { value: 'clean-slate', label: 'Clean Slate' },
-  { value: 'executive-serif', label: 'Executive Serif' },
-  { value: 'split-frame', label: 'Split Frame' },
-];
+const TEMPLATE_OPTIONS = Object.entries(coverLetterTemplateNames).map(([value, label]) => ({ value, label }));
 
 interface CoverLetterEditorProps {
   formData: CoverLetterFormData;

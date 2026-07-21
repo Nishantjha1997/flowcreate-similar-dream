@@ -112,6 +112,31 @@ export const useMasterProfile = () => {
     },
   });
 
+  // Merge `updates` into a SPECIFIC profile's data (not just the default) -
+  // used by the /master-profiles page, which lets a user manage several
+  // named profiles at once.
+  const updateByIdMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<UserProfile> }) => {
+      const target = profiles.find((p) => p.id === id);
+      const merged = { ...(target?.profile_data as object | undefined), ...updates };
+      const { data, error } = await supabase
+        .from('master_profiles')
+        .update({ profile_data: merged as any })
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as unknown as MasterProfile;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['masterProfiles'] });
+      toast.success('Profile updated!');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to update profile: ${error.message}`);
+    },
+  });
+
   const setDefaultMutation = useMutation({
     mutationFn: async (profileId: string) => {
       // The DB trigger enforce_single_default_master_profile clears the
@@ -152,6 +177,7 @@ export const useMasterProfile = () => {
     isLoading,
     createProfile: createMutation.mutate,
     updateProfile: updateMutation.mutate,
+    updateProfileById: updateByIdMutation.mutate,
     setDefault: setDefaultMutation.mutate,
     renameProfile: renameMutation.mutate,
     deleteProfile: deleteMutation.mutate,

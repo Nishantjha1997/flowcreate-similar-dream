@@ -9,9 +9,8 @@ import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Link } from 'react-router-dom';
-import { Shield, Crown, Download, Edit, Plus, Trash2, Save, RefreshCw, User, Briefcase, GraduationCap, Award, Lock, FolderKanban } from 'lucide-react';
+import { Shield, Crown, Download, Edit, Plus, Trash2, Save, RefreshCw, User, Briefcase, GraduationCap, Award, Lock } from 'lucide-react';
 import { SecuritySettingsForm } from '@/components/account/SecuritySettingsForm';
-import { MasterProfileTab } from '@/components/account/MasterProfileTab';
 import Header from '@/components/Header';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -171,11 +170,7 @@ const AccountSettings = () => {
 
           <div className="lg:col-span-3">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-9">
-                <TabsTrigger value="masterProfile">
-                  <FolderKanban className="w-4 h-4 mr-1" />
-                  Master Profile
-                </TabsTrigger>
+              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
                 <TabsTrigger value="personal">
                   <User className="w-4 h-4 mr-1" />
                   Personal
@@ -209,10 +204,6 @@ const AccountSettings = () => {
                   Security
                 </TabsTrigger>
               </TabsList>
-
-              <TabsContent value="masterProfile" className="mt-6">
-                <MasterProfileTab />
-              </TabsContent>
 
               <TabsContent value="personal" className="mt-6">
                 <PersonalInfoForm 

@@ -40,6 +40,9 @@ import Footer from '@/components/Footer';
 import { Breadcrumbs, BreadcrumbItem } from '@/components/ui/breadcrumbs';
 import { ResumeSpawner } from '@/components/profile/ResumeSpawner';
 import { TranslationPanel } from '@/components/profile/TranslationPanel';
+import { PDFResumeUploader } from '@/components/profile/PDFResumeUploader';
+import { MasterProfileForm } from '@/components/profile/MasterProfileForm';
+import type { UserProfile } from '@/hooks/useUserProfile';
 
 interface MasterProfile {
   id: string;
@@ -61,7 +64,8 @@ export default function MasterProfilePage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [newName, setNewName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState<MasterProfile | null>(null);
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+  const [isSavingProfileData, setIsSavingProfileData] = useState(false);
 
   const breadcrumbItems: BreadcrumbItem[] = [
     { label: 'Home', href: '/' },
@@ -85,6 +89,30 @@ export default function MasterProfilePage() {
     },
     enabled: !!user?.id,
   });
+
+  // Always derived fresh from the query result (not a stale snapshot from
+  // whenever the user clicked) so edits/imports show up immediately.
+  const selectedProfile = profiles?.find((p) => p.id === selectedProfileId) ?? null;
+
+  const updateProfileData = async (updates: Partial<UserProfile>) => {
+    if (!selectedProfile || !user?.id) return;
+    setIsSavingProfileData(true);
+    try {
+      const merged = { ...(selectedProfile.profile_data as object), ...updates };
+      const { error } = await supabase
+        .from('master_profiles')
+        .update({ profile_data: merged })
+        .eq('id', selectedProfile.id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ['masterProfiles'] });
+    } catch (error: any) {
+      toast.error('Failed to save: ' + (error?.message || 'Unknown error'));
+    } finally {
+      setIsSavingProfileData(false);
+    }
+  };
 
   const createProfile = async () => {
     if (!user?.id || !newName.trim()) return;
@@ -125,7 +153,7 @@ export default function MasterProfilePage() {
 
       toast.success('Profile deleted.');
       queryClient.invalidateQueries({ queryKey: ['masterProfiles'] });
-      if (selectedProfile?.id === id) setSelectedProfile(null);
+      if (selectedProfileId === id) setSelectedProfileId(null);
     } catch (error: any) {
       toast.error('Failed to delete: ' + (error?.message || 'Unknown error'));
     }
@@ -257,7 +285,7 @@ export default function MasterProfilePage() {
                     {profiles.map((profile) => (
                       <button
                         key={profile.id}
-                        onClick={() => setSelectedProfile(profile)}
+                        onClick={() => setSelectedProfileId(profile.id)}
                         className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all ${
                           selectedProfile?.id === profile.id
                             ? isNeoBrutalism
@@ -354,6 +382,32 @@ export default function MasterProfilePage() {
                       </div>
                     </div>
                   </CardHeader>
+                </Card>
+
+                {/* PDF Import */}
+                <PDFResumeUploader
+                  onDataExtracted={(data: Partial<UserProfile>) => updateProfileData(data)}
+                />
+
+                {/* Edit Profile Data */}
+                <Card className={isNeoBrutalism ? 'border-3 border-foreground shadow-[6px_6px_0px_0px_hsl(var(--foreground))]' : ''}>
+                  <CardHeader>
+                    <CardTitle className={`text-base flex items-center gap-2 ${isNeoBrutalism ? 'uppercase font-black' : ''}`}>
+                      <Edit className="h-5 w-5" />
+                      Profile Data
+                      {isSavingProfileData && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
+                    </CardTitle>
+                    <CardDescription>
+                      Fill this in manually, or import it from a resume PDF above.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <MasterProfileForm
+                      profile={(selectedProfile.profile_data as Partial<UserProfile>) || {}}
+                      onUpdate={updateProfileData}
+                      isNeoBrutalism={isNeoBrutalism}
+                    />
+                  </CardContent>
                 </Card>
 
                 {/* Resume Spawner */}

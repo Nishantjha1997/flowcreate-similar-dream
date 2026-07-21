@@ -23,6 +23,7 @@ const CoverLetterBuilder = () => {
     isSaving,
     saveLetter,
     isLoading,
+    editId,
     userResumes,
     userId,
   } = useCoverLetterData();
@@ -39,8 +40,14 @@ const CoverLetterBuilder = () => {
     }
   };
 
-  const handleSave = () => {
-    saveLetter();
+  const handleSave = async () => {
+    const savedId = await saveLetter();
+    // On the very first save of a new letter there's no ?edit= in the URL
+    // yet, so the next save would insert another row instead of updating
+    // this one - lock the URL to the new id as soon as we have it.
+    if (savedId && !editId) {
+      navigate(`/cover-letter-builder?edit=${savedId}`, { replace: true });
+    }
   };
 
   if (isLoading) {
