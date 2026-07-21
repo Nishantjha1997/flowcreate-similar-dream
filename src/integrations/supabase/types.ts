@@ -20,35 +20,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      claim_due_blog_automation_runs: {
-        Args: { p_limit?: number }
-        Returns: {
-          run_id: string
-          schedule_id: string
-          scheduled_for: string
-        }[]
-      }
-      complete_blog_automation_run: {
-        Args: {
-          p_blog_post_id: string
-          p_generated_title: string
-          p_provider: string
-          p_run_id: string
-        }
-        Returns: boolean
-      }
-      fail_blog_automation_run: {
-        Args: {
-          p_error_code: string
-          p_error_message: string
-          p_run_id: string
-        }
-        Returns: boolean
-      }
-      next_blog_automation_run: {
-        Args: { p_current: string; p_frequency: string; p_now?: string; p_time_zone?: string }
-        Returns: string
-      }
       graphql: {
         Args: {
           extensions?: Json
@@ -2160,7 +2131,32 @@ export type Database = {
         Args: { profile_data: Json }
         Returns: number
       }
+      claim_due_blog_automation_runs: {
+        Args: { p_limit?: number }
+        Returns: {
+          run_id: string
+          schedule_id: string
+          scheduled_for: string
+        }[]
+      }
+      complete_blog_automation_run: {
+        Args: {
+          p_blog_post_id: string
+          p_generated_title: string
+          p_provider: string
+          p_run_id: string
+        }
+        Returns: boolean
+      }
       expire_subscriptions: { Args: never; Returns: undefined }
+      fail_blog_automation_run: {
+        Args: {
+          p_error_code: string
+          p_error_message: string
+          p_run_id: string
+        }
+        Returns: boolean
+      }
       generate_invoice_number: { Args: never; Returns: string }
       get_org_entitlements: { Args: { p_org_id: string }; Returns: Json }
       get_user_entitlements: { Args: { p_user_id?: string }; Returns: Json }
@@ -2183,6 +2179,15 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       is_org_member: { Args: { p_org_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      next_blog_automation_run: {
+        Args: {
+          p_current: string
+          p_frequency: string
+          p_now?: string
+          p_time_zone?: string
+        }
+        Returns: string
+      }
       org_has_members: { Args: { p_org_id: string }; Returns: boolean }
     }
     Enums: {

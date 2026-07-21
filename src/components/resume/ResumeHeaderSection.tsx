@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Share2, Save, Loader2, Printer } from 'lucide-react';
 import { EnhancedResumePreview } from '@/components/resume/ResumeVisualPreview';
+import { JobMatchAnalyzer } from '@/components/resume/JobMatchAnalyzer';
 import { ResumeData } from '@/utils/types';
 import { cn } from '@/lib/utils';
 import { AutoSaveIndicator } from '@/components/ui/auto-save-indicator';
@@ -81,6 +82,7 @@ export const ResumeHeaderSection = ({
           <Share2 className="h-3.5 w-3.5 mr-1.5" />
           Share
         </Button>
+        <JobMatchAnalyzer resume={resume} />
         <Button
           onClick={handlePrint}
           variant="outline"
