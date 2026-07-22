@@ -14,7 +14,7 @@ export const usePDFGenerator = (fileName: string = 'document') => {
    */
   const printResume = (element: HTMLElement | null) => {
     if (!element) {
-      toast.error('Could not prepare the resume for printing.');
+      toast.error('Could not prepare this document for printing.');
       return;
     }
 

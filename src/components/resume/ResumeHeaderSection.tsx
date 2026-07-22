@@ -1,8 +1,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Share2, Save, Loader2, Printer } from 'lucide-react';
+import { Share2, Save, Loader2 } from 'lucide-react';
 import { EnhancedResumePreview } from '@/components/resume/ResumeVisualPreview';
 import { JobMatchAnalyzer } from '@/components/resume/JobMatchAnalyzer';
+import { DocumentExportActions } from '@/components/export/DocumentExportActions';
 import { ResumeData } from '@/utils/types';
 import { cn } from '@/lib/utils';
 import { AutoSaveIndicator } from '@/components/ui/auto-save-indicator';
@@ -57,7 +58,7 @@ export const ResumeHeaderSection = ({
           {isEditing ? 'Update your professional resume' : 'Create a professional resume in minutes'}
         </p>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {onSave && (
           <Button
             onClick={onSave}
@@ -83,30 +84,11 @@ export const ResumeHeaderSection = ({
           Share
         </Button>
         <JobMatchAnalyzer resume={resume} />
-        <Button
-          onClick={handlePrint}
-          variant="outline"
-          size="sm"
-          className="rounded-full px-4 h-8 text-xs font-medium border-border/50 hover:bg-muted/60 transition-all duration-200"
-          title="Preserves selectable text and links"
-        >
-          <Printer className="h-3.5 w-3.5 mr-1.5" />
-          ATS PDF
-        </Button>
-        <Button
-          onClick={handleDownload}
-          variant="outline"
-          size="sm"
-          disabled={isGenerating}
-          className="rounded-full px-4 h-8 text-xs font-medium border-border/50 hover:bg-muted/60 transition-all duration-200"
-        >
-          {isGenerating ? (
-            <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-          ) : (
-            <Download className="h-3.5 w-3.5 mr-1.5" />
-          )}
-          {isGenerating ? 'Generating…' : 'Quick PDF'}
-        </Button>
+        <DocumentExportActions
+          onSemanticExport={handlePrint}
+          onImageExport={handleDownload}
+          isImageGenerating={isGenerating}
+        />
         <EnhancedResumePreview 
           resume={resume}
           templateId={templateId}
