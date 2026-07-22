@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -17,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ResumeData } from '@/utils/types';
 import { captureError } from '@/lib/monitoring';
 import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
+import { JobDescriptionInput } from '@/components/JobDescriptionInput';
 
 interface JobMatchAnalyzerProps {
   resume: ResumeData;
@@ -77,7 +77,7 @@ RESUME:
 ${buildResumeSummary(resume)}
 
 JOB DESCRIPTION:
-${jobDescription.trim().slice(0, 4000)}
+${jobDescription.trim().slice(0, 15000)}
 
 Return exactly this JSON shape:
 {"score": <0-100 integer match score>, "matchedKeywords": [<up to 10 skills/keywords from the job description already present in the resume>], "missingKeywords": [<up to 10 important skills/keywords from the job description missing from the resume>], "suggestions": [<3-5 short, specific, actionable suggestions to tailor this resume for this job>]}`;
@@ -135,12 +135,12 @@ Return exactly this JSON shape:
         </DialogHeader>
 
         <div className="space-y-4">
-          <Textarea
-            placeholder="Paste the full job description here..."
+          <JobDescriptionInput
             value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-            rows={8}
+            onChange={setJobDescription}
             disabled={loading}
+            rows={8}
+            placeholder="Paste the full job description here, or upload a file below..."
           />
 
           <Button onClick={handleAnalyze} disabled={loading} className="w-full">

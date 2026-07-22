@@ -10,7 +10,10 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const FALLBACK_GEMINI_KEY = Deno.env.get("GEMINI_API_KEY");
 
-const MAX_PROMPT_LENGTH = 5000;
+// Job match analysis and JD-tailored cover letters bundle a full resume
+// summary plus the entire pasted/uploaded job description into one prompt,
+// which easily exceeds a few thousand characters - keep this generous.
+const MAX_PROMPT_LENGTH = 24000;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -66,7 +69,7 @@ serve(async (req) => {
 
     // ── Cover letter tailored to a job description ──
     if (context === 'cover_letter_from_jd' && resumeId && typeof jobDescription === 'string') {
-      const trimmedJD = jobDescription.trim().slice(0, 6000);
+      const trimmedJD = jobDescription.trim().slice(0, 15000);
       if (trimmedJD.length < 40) {
         return new Response(
           JSON.stringify({ error: 'Job description is too short. Paste or upload the full posting.' }),
