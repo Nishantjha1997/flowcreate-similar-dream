@@ -1,6 +1,7 @@
 # FlowCreate — Product Enhancement & Polish Roadmap
 
-> **Written**: 2026-07-23, against commit `e3923fc`.
+> **Written**: 2026-07-23 from the `e3923fc` code baseline; reviewed against roadmap commit
+> `bac94ff` on 2026-07-23.
 > **Audience**: any developer or AI coding agent picking up work on this repo. This document is
 > self-contained: it describes the current state, the reasoning behind every task, exact file
 > pointers, and acceptance criteria. Read §1 (how to work in this repo) before touching anything.
@@ -48,6 +49,11 @@ Several AI agents work on this repo in parallel. Consequences observed repeatedl
 - **Never treat a git anomaly as data loss** without checking `origin/main` directly
   (`git fetch && git rev-parse origin/main` or the GitHub API).
 - Check `PROJECT.md`'s milestone table for in-flight work before touching shared files.
+- Reconcile `PROGRESS.md`, `git log -- <file>`, and live code before trusting a task's status.
+  Planning documents have already lagged completed implementation. If code and a plan disagree,
+  record the mismatch and update the plan instead of rebuilding the feature.
+- Treat every `PROJECT.md` milestone marked `IN_PROGRESS` as a file reservation. Split or defer a
+  task that would edit its files; do not make a competing implementation in the same branch.
 
 ### 1.4 Known traps in this codebase (each caused a real production bug)
 1. **Radix Select**: `<SelectItem value="">` throws at mount and (via the single global
@@ -70,15 +76,37 @@ Several AI agents work on this repo in parallel. Consequences observed repeatedl
    `subscription_plans.limits` via `get_user_entitlements` (Free = 0 → 403). Any new AI feature
    routed through it inherits metering for free; a new AI edge function must implement the same
    block (copy from `gemini-suggest/index.ts` §"Plan metering").
+7. **ATS claims require artifact evidence**: a semantic DOM and a button labelled “ATS” do not
+   prove the downloaded file parses correctly. Validate the actual PDF artifact, text order,
+   links, page breaks, and multi-column linearization before making or retaining ATS-safe claims.
 
 ### 1.5 Definition of Done (every task below)
 1. `tsc --noEmit` clean; 2. vitest suite passes (16+ tests — add regression tests for anything
 you fix); 3. production build succeeds; 4. affected edge functions deployed; 5. committed with a
-message explaining root cause / rationale (see git log for the house style); 6. pushed to `main`.
+message explaining root cause / rationale (see git log for the house style); 6. pushed to `main`;
+7. acceptance-specific evidence is recorded (artifact inspection for exports, two-user RLS test
+for owner-scoped data, free+premium accounts for gating, and 390px keyboard/touch checks for
+mobile work). A build alone is not evidence that a user flow works.
+
+If the quoted PowerShell `node.exe` command is mis-routed by the execution host, retry once and
+then use the semantically identical `node node_modules/<tool>/<entry> ...` form. This is an
+execution-host workaround, not permission to skip a gate.
 
 ---
 
 ## 2. Current feature inventory (2026-07-23)
+
+### 2.0 Reconciled implementation status
+- The registry and renderer currently contain **37** template keys, not 19. `PROJECT.md` still
+  reserves the registry/renderer for its in-flight template track, so do not modify either until
+  M4–M6 are reconciled by that track.
+- P4–P10 foundations are substantially present: A4 preview/pagination, mobile resume-builder
+  tabs, fixed-cadence autosave, DB-driven pricing, per-route SEO metadata, entitlements,
+  notifications, tests, CI, sharing, analytics, cover letters, and master profiles. Tasks below
+  marked **PARTIAL** describe only the remaining behavior; completed foundations must not be
+  rebuilt.
+- `PROGRESS.md`'s “Current task” is stale even though its Completed list records later phases.
+  Live code and git history are authoritative for task status.
 
 **Resume side (B2C)**
 - Resume Builder (`/resume-builder`): template registry (`src/templates/registry.ts` +
@@ -110,14 +138,17 @@ message explaining root cause / rationale (see git log for the house style); 6. 
 **ATS side (B2B)** — `/ats/*`: orgs, jobs, applications pipeline, candidate discovery, talent
 pools, plans (ATS Free/Starter/Growth/Enterprise). Candidate apply flow: `ATSApply.tsx`.
 
-**Admin** — `/admin`: user management, AI key management (`AIManagement.tsx` — keys tab real;
-Settings tab is **dead mock UI**, see S-5), blog manager + AI blog automation (`blog-ai` edge fn),
-payment notifications, website customization, ATS management.
+**Admin** — `/admin`: user management (including explicit monthly/yearly/lifetime manual grants),
+AI key management (`AIManagement.tsx` — keys tab real; Settings tab is **dead mock UI**, see S-5),
+blog manager + scheduled AI blog automation (`blog-ai` + `blog-scheduler`), payment
+notifications, website customization, ATS management.
 
-**Edge functions** (verify live set with `supabase functions list`): `gemini-suggest`,
-`extract-resume-data`, `extract-text-from-file`, `blog-ai`, `admin-create-user`,
-`create-razorpay-order`, `verify-razorpay-payment`, plus (per REFINED_PLAN, verify deployed):
-`stripe-webhook`, `create-stripe-checkout`, `razorpay-webhook`, `send-notification`.
+**Edge functions** (17 source directories; deployment still must be verified with
+`supabase functions list`): `admin-add-org-member`, `admin-create-user`, `admin-delete-user`,
+`admin-list-users`, `blog-ai`, `blog-scheduler`, `create-razorpay-order`,
+`create-stripe-checkout`, `extract-resume-data`, `extract-text-from-file`, `gemini-suggest`,
+`razorpay-webhook`, `self-delete-account`, `send-notification`, `stripe-webhook`,
+`track-resume-view`, `verify-razorpay-payment`.
 
 ---
 
@@ -144,20 +175,33 @@ Competitors: Zety, Resume.io, Rezi, Teal, Jobscan, Enhancv, Kickresume, Novoresu
 
 ## 4. Phase S — Stabilization (do these first; they gate everything else)
 
-### S-1 · Make text-based PDF the primary export ⭐ highest product-credibility item
+### S-1 · Make text-based PDF the primary export ⭐ highest product-credibility item — PARTIAL
 **Why**: `generatePDF` (the default "Download PDF" everywhere) rasterizes via html2canvas →
 JPEG-in-PDF: text not selectable, invisible to ATS parsers — fatal flaw for an ATS-branded
 product. A text-safe path already exists (`printResume` in `usePDFGenerator.tsx`) but is a
 secondary print-dialog flow users must discover.
-**What**: (a) swap button prominence: primary CTA = "Download PDF (ATS-friendly)" → `printResume`;
-demote image export to "Exact-look PDF (image)" with a tooltip explaining the tradeoff;
-(b) wire `printResume` into `CoverLetterBuilder.tsx` (currently image-only, `handleDownload`);
-(c) mid-term: direct text-PDF generation without the print dialog (evaluate `jspdf.html()` vs
-`@react-pdf/renderer` renderers for the top-5 templates — spike task, decide with data);
-(d) add `[data-resume-item]` attributes to any template sections missing them so
-`break-inside: avoid` works (see printStyles in `usePDFGenerator.tsx:44`).
-**Done when**: exported default PDF has selectable text; copy-paste from it preserves reading
-order; cover letter has the same option; both builders label the two modes clearly.
+**Current reality**: Resume Builder already exposes `ATS PDF` and `Quick PDF`, but both are
+outline buttons and the labels do not clearly state that Quick PDF is an image. Cover Letter
+Builder is image-only. The reusable `ResumePreview` still makes the image path primary, and
+`DocumentsDashboard` has a separate image-only exporter. Renderer entries already carry
+`data-resume-item`, so do not redo that subtask.
+**What**:
+- **S-1a (conflict-safe now)**: Resume Builder primary CTA = “Download PDF (ATS-friendly)” →
+  `printResume`; demote raster export to “Exact-look PDF (image)” in a secondary menu/outline CTA
+  with plain-language tradeoff copy.
+- **S-1b (conflict-safe now)**: wire `printResume` into `CoverLetterBuilder.tsx` as the primary
+  download; keep the image export clearly secondary.
+- **S-1c (after `PROJECT.md` M1 finishes)**: apply the same contract to `ResumePreview` and
+  `DocumentsDashboard`; do not edit `DocumentsDashboard` while M1 owns it.
+- **S-1d (spike, separate commit)**: evaluate direct semantic PDF generation without a print
+  dialog. Compare browser print, `jspdf.html()`, and `@react-pdf/renderer` on fidelity, selectable
+  text, links, reading order, bundle cost, and maintenance. Do not add a dependency before the
+  written decision.
+**Done when**: in Chrome and Edge, actual saved PDFs from `clean-slate`, one left-sidebar, one
+right-sidebar, a controlled two-page resume, and a cover letter have selectable text and clickable
+links; `pdftotext`/copy-paste order matches the Recruiter View; no section is clipped; both builders
+label semantic vs image modes clearly; a UI regression test proves the primary CTA calls
+`printResume` and the secondary CTA calls `generatePDF`.
 
 ### S-2 · Unify the two Master Profile systems
 **Why**: `Account.tsx`'s "Master Profile" tab edits the legacy `profiles` row while
@@ -173,13 +217,18 @@ profile via `useMasterProfile` (keep `profiles` for auth-y fields only: avatar,
 store; no code path writes profile content to `profiles` anymore.
 **Caution**: coordinate with `PROJECT.md` M1/M2 (Account overhaul in flight by another agent).
 
-### S-3 · Section-level ErrorBoundaries
+### S-3 · Section-level ErrorBoundaries — SPLIT FOR PARALLEL SAFETY
 **Why**: one render crash anywhere blanks the whole app (single boundary in `App.tsx`) — this
 turned a `.map` type bug into a full-app outage twice.
-**What**: reusable `<SectionBoundary name="...">` (fallback card: "This section hit an error" +
-retry + auto `captureError`) wrapped around: each resume-builder form panel, each Account tab's
-content, cover letter editor + preview, each admin panel, the PDF import modal.
-**Done when**: throwing inside `ProjectsForm` degrades only that card (add a test).
+**What**:
+- **S-3a (conflict-safe now)**: reusable `<SectionBoundary name="...">` (fallback card: “This
+  section hit an error” + retry + automatic `captureError`) around the active resume-builder form
+  panel/PDF import surface and the cover-letter editor and preview.
+- **S-3b (deferred)**: Account tabs after `PROJECT.md` M1/M2 and Admin panels after M3. Re-read
+  the merged files before wrapping them; do not patch either file while its milestone is active.
+**Done when**: a component that throws degrades only its named section; fallback is keyboard
+reachable, retry remounts the child, `captureError` receives boundary name + component stack, and
+tests cover failure and retry. Route-level boundary remains the final fallback.
 
 ### S-4 · Finish `getEdgeFunctionErrorMessage` rollout
 **Why**: only 4 of ~17 `supabase.functions.invoke` call sites unwrap real error messages; the
@@ -213,22 +262,24 @@ using an upsert with window reset in one statement; same pattern for
 **Done when**: two parallel requests can't both pass a limit of 1 (write a curl test); metering
 increments exactly once per successful AI call.
 
-### S-7 · CI pipeline
+### S-7 · CI pipeline — COMPLETE at `bac94ff`; monitor, do not rebuild
 **Why**: local Windows flakiness makes verification unreliable; parallel agents push without a
 shared gate.
 **What**: `.github/workflows/ci.yml`: on push/PR → install, `tsc --noEmit`, `vitest run`,
 `vite build`. Also run `npx update-browserslist-db@latest` once (build warns data is 21 months
 old).
-**Done when**: badge green on `main`; a PR with a type error fails.
+**Done when**: `.github/workflows/ci.yml` remains green on `main`; a PR with a type error fails.
 
-### S-8 · Regression tests for every bug class already hit
-**What**: (a) `parseExtractedJson` unit tests (string vs array `technologies`/`skills`/
+### S-8 · Regression tests for every bug class already hit — PARTIAL (3 files / 16 tests)
+**What**: retain the existing registry/adapter/customization tests, then add: (a)
+`parseExtractedJson` unit tests (string vs array `technologies`/`skills`/
 `languages` — port the function to a testable location or test via fixture);
 (b) a lint/test that fails on `<SelectItem value="">` (simple grep-based vitest);
 (c) cover-letter save flow: first save inserts then navigates to `?edit=<id>`, second save
 updates (mock supabase); (d) `getEdgeFunctionErrorMessage` unit tests (Response context, non-JSON
 body, plain Error).
-**Done when**: suite ≥ 30 tests, each mapping to a documented incident.
+**Done when**: every incident listed above has a failing-before/fixed-after test, and test names
+reference the behavior being protected. Test count is informational, not the acceptance bar.
 
 ### S-9 · Docs & hygiene
 **What**: (a) `.clinerules/09-edge-functions.md` is dangerously stale (claims Lovable
@@ -242,12 +293,17 @@ short README section pointing here.
 
 ## 5. Phase P — Polish existing features to "complete"
 
-### P-1 · Builder content-overflow & pagination UX
+### P-1 · Builder content-overflow & pagination UX — PARTIAL
 **Why**: market pain #7; long content silently overflows or splits mid-item in exports.
-**What**: live page-boundary indicator lines in the preview (A4 height math exists in
-`src/constants/pdfDimensions.ts`); per-item "this entry crosses a page" badge; soft character
-guidance on description fields (e.g. "3–5 bullets ≈ 400 chars").
-**Done when**: a 3-page resume shows two boundary lines that match the printed output.
+**Current reality**: live A4 boundary lines and `ResizeObserver` cleanup already exist in
+`ResumePreviewSection.tsx`. Remaining work is export-calibrated boundary placement, per-item
+crossing warnings, and soft character guidance.
+**What**: calibrate preview boundaries against the semantic print path; per-item “this entry
+crosses a page” badge; soft character guidance on description fields (e.g. “3–5 bullets ≈ 400
+chars”). Keep warnings outside the captured resume DOM.
+**Done when**: controlled one-, two-, and three-page fixtures show the same break positions in
+preview and actual printed PDF within 4 CSS px; warnings identify the exact crossing item and do
+not appear in either PDF mode; ResizeObserver disconnect behavior has a regression test.
 
 ### P-2 · AI quota transparency
 **Why**: market pain #6; today users discover limits via a 403 toast.
@@ -292,7 +348,9 @@ for a `confidence` per section, tint low ones amber in the preview.
 **Done when**: re-importing the same file with "Append" doesn't duplicate identical entries
 (dedupe by title+company/school); a .docx resume imports end-to-end.
 
-### P-6 · Mobile & responsive pass
+### P-6 · Mobile & responsive pass — PARTIAL
+**Current reality**: the resume builder has an Edit/Preview toggle at the `lg` breakpoint; the
+cover-letter preview remains hidden below `lg`.
 **What**: audit at 390px: resume builder panels (forms usable, preview reachable via toggle),
 cover letter (P-4e), account dashboards (tables → cards), Job Match dialog. Fix top offenders.
 **Done when**: core flows (build → AI → download; JD → letter; import) completable on mobile.
@@ -307,6 +365,25 @@ empty list gets a CTA empty-state (pattern exists in DocumentsDashboard); standa
 audit in dialogs, `aria-valuenow` on Progress/score, contrast check on badge color pairs
 (green-700-on-green-50 etc. are fine; verify template previews), keyboard path through the
 builder.
+
+### P-9 · Resume revision history and recovery
+**Why**: autosave protects recent edits but also makes accidental destructive edits immediate;
+users need a way back, especially when tailoring many versions.
+**What**: append-only `resume_revisions` snapshots written server-side on meaningful save
+boundaries (not every keystroke), owner-only RLS, a compact “Version history” drawer, preview and
+restore-as-new-revision. Cap retention by plan and never overwrite the current row silently.
+**Done when**: restoring an older revision creates a new current revision, the previous current
+state remains recoverable, cross-user reads fail under RLS, and rapid autosaves do not create a
+revision storm.
+
+### P-10 · AI privacy and factual-source controls
+**Why**: resumes and JDs contain personal data and all configured providers are third parties;
+the no-invention promise also needs visible evidence, not prompt text alone.
+**What**: disclose provider processing before first AI use; minimize prompt PII; add a clear
+“generated from these resume sections” summary for cover letters/interview prep; store no raw AI
+prompt in analytics; retain the no-invention instruction in every context.
+**Done when**: first AI use requires informed acknowledgement, telemetry contains no resume/JD
+body, and generated factual claims can be traced to supplied resume sections or are rejected.
 
 ---
 
@@ -354,12 +431,14 @@ the tracker entry and a button on Job Match results. Metered like everything els
 
 ### D-5 · Recruiter View (trust feature nobody else has)
 **Why**: market pain #2 — don't claim ATS-safe, demonstrate it.
-**What**: "See what an ATS sees" button in builder/preview: renders the resume through a plain
-text extraction of the ACTUAL export path (for print-PDF: serialize the DOM text in reading
-order; flag: images ignored, columns linearized in DOM order — which is exactly what parsers
-do). Show side-by-side with warnings ("your two-column template linearizes as: ...").
-**Done when**: view matches copy-paste from the exported text PDF; templates with risky
-structures show a warning badge in the template picker.
+**What**: “See what an ATS sees” must parse the ACTUAL semantic PDF artifact (or the exact same
+semantic document model used to produce it), not merely call `innerText` on the preview. Show the
+linearized result with explicit warnings for ignored photos/icons, ambiguous columns, missing
+headings, inaccessible links, and unusual glyphs. Maintain a fixture matrix for every active
+template and stop marketing a template as ATS-optimized when its fixture fails.
+**Done when**: normalized Recruiter View text equals `pdftotext` output for the one-/two-/three-
+page matrix; reading-order snapshots exist for every active template; risky templates display a
+warning in the picker; CI fails if a previously safe template changes extraction order.
 
 ### D-6 · DOCX export (premium)
 **What**: `docx` npm package, client-side; map `resume_data` → a clean single-column DOCX
@@ -377,6 +456,8 @@ context each. Cheap, high-perceived-value, drives AI quota usage → conversions
 ## 7. Phase G — Growth & retention
 
 ### G-1 · Onboarding wizard
+**Current reality**: `UserOnboarding` is a localStorage-backed builder tour, not the outcome-based
+wizard below. Keep it only if it does not compete with the new first-run path.
 First-run flow: Import (PDF/LinkedIn) or start fresh → template pick (3 suggested by role) →
 guided sections with completeness meter → first download. Track step conversion (G-4).
 **Done when**: a new signup reaches a downloaded resume without seeing an empty dashboard.
@@ -392,7 +473,10 @@ pain #1. Add plan-limit table (resumes, AI/mo, tracker slots, DOCX, interview pr
 
 ### G-4 · Product analytics
 PostHog (EU cloud or self-host) or a minimal `events` table: funnel signup → profile → first
-resume → download → AI use → subscribe. Without this, every prioritization above is a guess.
+resume → semantic download → image download → AI use → subscribe. The current
+`analytics-tracker.tsx` only stores events in localStorage and logs in development; it is not
+product analytics. Add consent/retention rules and never send resume/JD text. Without this,
+every prioritization above is a guess.
 
 ### G-5 · Programmatic SEO
 Expand `ResumeTemplateProfession` pages (exists) to role×template landing pages fed by the blog
@@ -413,21 +497,34 @@ attach chosen resume version; recruiters see parsed profile, not just a PDF).
 
 ---
 
-## 9. Suggested execution order (first 10 working sessions)
+## 9. Conflict map and revised execution order (first 10 working sessions)
+
+### 9.1 Active conflict map
+
+| Roadmap work | Reserved by `PROJECT.md` | Rule |
+|---|---|---|
+| S-1c document-dashboard export, S-2, S-3b Account, S-5a, responsive Account work | M1/M2 | Defer until both milestones are marked complete, then re-read merged code |
+| S-3b Admin | M3 | Defer until M3 is complete |
+| Any registry/renderer/template task | M4–M6 | Do not edit `registry.ts` or `resumeTemplates.tsx`; reconcile the already-present 37-template state first |
+| E2E tests around those shared surfaces | E2E/M7 | Add only task-specific regression tests outside files owned by that track; merge test plans afterward |
+
+### 9.2 First 10 working sessions
 
 | Session | Tasks | Rationale |
 |---|---|---|
-| 1 | S-1a/b (swap export prominence, cover letter print) + S-3 | Biggest credibility fix + stop full-app crashes; both small |
-| 2 | S-4 + S-5a + S-9b/c | Error-message rollout is mechanical; kill mock security tab |
-| 3 | S-6 + S-8 | DB-backed limits/metering + regression tests |
-| 4 | S-7 + S-9a | CI + docs so parallel agents stop tripping |
-| 5 | P-2 | Quota chips (small, immediately felt) |
-| 6 | S-2 | Master profile unification (coordinate with PROJECT.md M1/M2 first) |
-| 7 | P-3 | Job Match v2 (persistence + add-keyword) |
-| 8 | P-4 | Cover letter controls + mobile toggle |
-| 9–10 | D-1 | Job tracker MVP (table, kanban, links from Job Match/letter) |
+| 1 | S-1a/b | Fix the actual default export contract first; no shared-file collision |
+| 2 | S-1d decision spike + D-5 foundation | Prove ATS behavior from artifacts before advertising it |
+| 3 | P-1 remaining work | Preview/export page-break agreement is part of ATS credibility |
+| 4 | S-3a + S-4 | Contain crashes on conflict-safe surfaces and expose real server errors |
+| 5 | S-6 + S-8 | Make limits authoritative and lock incident fixes with tests |
+| 6 | S-5b + S-9 + P-2 | Remove AI mock controls, repair docs/hygiene, show quota before calls |
+| 7 | G-4 | Instrument privacy-safe funnel events before investing in large differentiators |
+| 8 | P-3 | Persist match improvements and validate the structured-output contract |
+| 9–10 | D-1 | Job tracker MVP only after metering, analytics, and match persistence are sound |
 
-Then: D-3 → D-2 → P-1 → D-5 → P-5 → D-6 → D-4 → G-1 → G-4 → rest.
+After `PROJECT.md` M1–M3 complete: S-1c → S-2 → S-3b → S-5a. Then D-3 → D-2 →
+P-4 → P-5 → D-6 → D-4 → P-9 → P-10 → G-1 → rest. S-7 is already complete and
+must not consume a session unless CI is red.
 
 ---
 
@@ -444,3 +541,27 @@ Task: <ID> <name>
 [ ] Edge functions deployed (list: ...)
 [ ] Committed (root-cause style message) & pushed; retried transient env errors
 ```
+
+---
+
+## Changelog
+
+### 2026-07-23 — critical review against `bac94ff`
+- Corrected the document baseline and reconciled live implementation: 37 registered templates,
+  17 edge-function source directories, working CI, 16 tests, A4 preview/pagination, autosave,
+  entitlements, notifications, SEO metadata, cover letters, sharing, and blog scheduling.
+- Added status-reconciliation, active-file reservation, ATS artifact-evidence, and
+  acceptance-evidence rules without removing or weakening any incident rule.
+- Rewrote S-1 around the real export surfaces, removed already-complete `data-resume-item` work,
+  split conflict-safe builder work from `PROJECT.md`-owned dashboard work, and made real PDF
+  parsing/link/page-break evidence mandatory.
+- Split S-3 so Resume/Cover Letter boundaries can ship without colliding with Account/Admin
+  milestones; tightened failure, retry, monitoring, and accessibility acceptance criteria.
+- Marked S-7 complete, marked S-8/P-1/P-6 partial, and replaced test-count/page-count proxies with
+  behavior-based acceptance criteria.
+- Strengthened D-5 so Recruiter View derives from the actual export model/artifact and added an
+  all-template extraction-order regression matrix.
+- Added P-9 revision history/recovery and P-10 AI privacy/factual-source controls, two product gaps
+  not covered by the original competitor analysis.
+- Moved ATS export proof, Recruiter View, and pagination ahead of large differentiators; moved
+  privacy-safe analytics before Job Tracker investment; deferred all active PROJECT.md conflicts.
