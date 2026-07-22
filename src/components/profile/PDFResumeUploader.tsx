@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfile } from '@/hooks/useUserProfile';
 import { PDFDataPreviewModal } from './PDFDataPreviewModal';
+import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 
 interface PDFResumeUploaderProps {
   onDataExtracted: (data: Partial<UserProfile>) => void;
@@ -51,7 +52,7 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
         body: formData,
       });
 
-      if (error) throw error;
+      if (error) throw new Error(await getEdgeFunctionErrorMessage(error, 'Failed to extract resume data'));
 
       // Check if API key is missing
       if (data.requiresApiKey) {

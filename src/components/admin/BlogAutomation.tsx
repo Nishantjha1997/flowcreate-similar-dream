@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { getEdgeFunctionErrorMessage } from "@/utils/edgeFunctionError";
 import type { Tables } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -339,7 +340,7 @@ export function BlogAutomation() {
       const { data, error } = await supabase.functions.invoke("blog-scheduler", {
         body: { action: "run_now", scheduleId },
       });
-      if (error) throw new Error(error.message || "The scheduler could not start.");
+      if (error) throw new Error(await getEdgeFunctionErrorMessage(error, "The scheduler could not start."));
       if (data?.error) throw new Error(String(data.error));
       return data;
     },

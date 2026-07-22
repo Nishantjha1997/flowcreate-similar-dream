@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useRazorpay } from '@/components/RazorpayProvider';
 import { captureError } from '@/lib/monitoring';
+import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 
 interface PaymentOptions {
   amount: number; // in paise
@@ -51,7 +52,7 @@ export const useRazorpayPayment = () => {
 
       if (orderError) {
         console.error('Order creation error:', orderError);
-        throw new Error(orderError.message);
+        throw new Error(await getEdgeFunctionErrorMessage(orderError, 'Failed to create payment order'));
       }
 
       console.log('Order created successfully:', orderData);
@@ -89,7 +90,7 @@ export const useRazorpayPayment = () => {
 
             if (verificationError) {
               console.error('Payment verification error:', verificationError);
-              throw new Error(verificationError.message || 'Payment verification failed');
+              throw new Error(await getEdgeFunctionErrorMessage(verificationError, 'Payment verification failed'));
             }
 
             console.log('Payment verification successful:', verificationData);

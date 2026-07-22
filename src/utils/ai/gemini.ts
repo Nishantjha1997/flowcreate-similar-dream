@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 
 /**
  * Enhanced utility to request resume enhancements from Gemini API via Supabase Edge Function.
@@ -30,10 +31,7 @@ export async function fetchGeminiSuggestions(request: SuggestionRequest): Promis
       });
 
       if (error) {
-        if (error.message?.toLowerCase().includes('authorization') || (error as any)?.code === 401) {
-          throw new Error("Authorization error: Please make sure you are logged in.");
-        }
-        throw new Error(error.message || "No suggestion returned from AI");
+        throw new Error(await getEdgeFunctionErrorMessage(error, 'AI suggestion failed'));
       }
 
       if (data?.suggestion) {

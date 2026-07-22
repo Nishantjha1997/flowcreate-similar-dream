@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { captureError } from '@/lib/monitoring';
+import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -114,7 +115,7 @@ export function SecuritySettingsForm() {
     setDeleting(true);
     try {
       const { error } = await supabase.functions.invoke('self-delete-account', {});
-      if (error) throw new Error(error.message || 'Failed to delete account');
+      if (error) throw new Error(await getEdgeFunctionErrorMessage(error, 'Failed to delete account'));
       toast({ title: 'Account deleted', description: 'Your account and all data have been permanently removed.' });
       await signOut();
       navigate('/');

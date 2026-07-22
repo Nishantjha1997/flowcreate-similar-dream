@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { UserPlus, Loader2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { getEdgeFunctionErrorMessage } from "@/utils/edgeFunctionError";
 
 interface AddUserModalProps {
   refetch: () => void;
@@ -50,7 +51,7 @@ export function AddUserModal({ refetch }: AddUserModalProps) {
       });
 
       if (error) {
-        throw new Error(error.message || 'Failed to create user');
+        throw new Error(await getEdgeFunctionErrorMessage(error, 'Failed to create user'));
       }
 
       toast({

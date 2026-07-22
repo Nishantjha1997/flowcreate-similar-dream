@@ -15,6 +15,7 @@ import {
   Bold, Italic, List, ListOrdered,
   Link2, Image, Send, Loader2, BookOpen, Lightbulb, Wand2, BarChart3
 } from 'lucide-react';
+import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 
 interface BlogPost {
   id: string; slug: string; title: string; excerpt: string; description: string;
@@ -46,7 +47,7 @@ async function callGemini(prompt: string, maxTokens?: number): Promise<string> {
   const body: Record<string, unknown> = { prompt };
   if (maxTokens) body.maxTokens = maxTokens;
   const { data, error } = await supabase.functions.invoke('blog-ai', { body });
-  if (error) throw new Error(error.message || 'AI request failed');
+  if (error) throw new Error(await getEdgeFunctionErrorMessage(error, 'AI request failed'));
   if (data?.error) throw new Error(data.error as string);
   if (!data?.suggestion) throw new Error('No response from AI');
   return data.suggestion as string;

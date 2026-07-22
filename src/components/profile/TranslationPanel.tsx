@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Json } from '@/integrations/supabase/types';
+import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 import {
   Sparkles,
   Loader2,
@@ -118,7 +119,7 @@ export function TranslationPanel({ resumeData, profileId, onTranslated }: Transl
       });
 
       if (funcError) {
-        throw new Error(funcError.message || 'Translation service unavailable');
+        throw new Error(await getEdgeFunctionErrorMessage(funcError, 'Translation service unavailable'));
       }
 
       setTranslatedText(funcData?.suggestion || '');

@@ -24,10 +24,20 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getEdgeFunctionErrorMessage } from "@/utils/edgeFunctionError";
 
 interface ATSManagementProps {
   isAdmin: boolean;
 }
+
+const invokeOrgMemberAdmin = async (body: Record<string, string>) => {
+  const { data, error } = await supabase.functions.invoke('admin-add-org-member', { body });
+  if (error) {
+    throw new Error(await getEdgeFunctionErrorMessage(error, 'Organization member request failed'));
+  }
+  if (data?.error) throw new Error(String(data.error));
+  return data;
+};
 
 export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
   const { data: stats, isLoading: loadingStats } = useAdminATSStats(isAdmin);
@@ -98,10 +108,7 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
     queryKey: ["admin-org-members", selectedOrg?.id],
     queryFn: async () => {
       if (!selectedOrg) return [];
-      const { data, error } = await supabase.functions.invoke('admin-add-org-member', {
-        body: { action: 'list', organizationId: selectedOrg.id }
-      });
-      if (error) throw error;
+      const data = await invokeOrgMemberAdmin({ action: 'list', organizationId: selectedOrg.id });
       return data?.members || [];
     },
     enabled: !!selectedOrg && isDetailsOpen,
@@ -146,8 +153,11 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
       // If owner email provided, add them as owner
       if (newOrgOwnerEmail.trim() && orgData) {
         try {
-          await supabase.functions.invoke('admin-add-org-member', {
-            body: { action: 'add', organizationId: orgData.id, email: newOrgOwnerEmail.trim(), role: 'owner' }
+          await invokeOrgMemberAdmin({
+            action: 'add',
+            organizationId: orgData.id,
+            email: newOrgOwnerEmail.trim(),
+            role: 'owner',
           });
         } catch (e: any) {
           toast({ title: "Warning", description: `Org created but could not add owner: ${e.message}` });
@@ -168,11 +178,12 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
     if (!addMemberEmail.trim() || !selectedOrg) return;
     setIsAddingMember(true);
     try {
-      const { data, error } = await supabase.functions.invoke('admin-add-org-member', {
-        body: { action: 'add', organizationId: selectedOrg.id, email: addMemberEmail.trim(), role: addMemberRole }
+      await invokeOrgMemberAdmin({
+        action: 'add',
+        organizationId: selectedOrg.id,
+        email: addMemberEmail.trim(),
+        role: addMemberRole,
       });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
       toast({ title: "Member added", description: `${addMemberEmail} added as ${addMemberRole}` });
       setAddMemberEmail("");
       refetchMembers();
@@ -185,10 +196,7 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
   const handleRemoveMember = async (memberId: string) => {
     setRemovingMemberId(memberId);
     try {
-      const { data, error } = await supabase.functions.invoke('admin-add-org-member', {
-        body: { action: 'remove', memberId }
-      });
-      if (error) throw error;
+      await invokeOrgMemberAdmin({ action: 'remove', memberId });
       toast({ title: "Member removed" });
       refetchMembers();
       refetch();
@@ -199,10 +207,7 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
 
   const handleUpdateMemberRole = async (memberId: string, newRole: string) => {
     try {
-      const { data, error } = await supabase.functions.invoke('admin-add-org-member', {
-        body: { action: 'update-role', memberId, role: newRole }
-      });
-      if (error) throw error;
+      await invokeOrgMemberAdmin({ action: 'update-role', memberId, role: newRole });
       toast({ title: "Role updated" });
       refetchMembers();
     } catch (error: any) {

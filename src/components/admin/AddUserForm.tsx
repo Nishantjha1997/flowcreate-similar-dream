@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { UserPlus } from "lucide-react";
+import { getEdgeFunctionErrorMessage } from "@/utils/edgeFunctionError";
 
 interface AddUserFormProps {
   onUserAdded: () => void;
@@ -68,7 +69,7 @@ export function AddUserForm({ onUserAdded }: AddUserFormProps) {
       });
 
       if (response.error) {
-        throw new Error(response.error.message || 'Failed to create user');
+        throw new Error(await getEdgeFunctionErrorMessage(response.error, 'Failed to create user'));
       }
 
       if (response.data?.error) {

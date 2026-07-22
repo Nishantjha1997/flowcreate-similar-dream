@@ -13,14 +13,24 @@ export async function getEdgeFunctionErrorMessage(
   const context = (error as { context?: unknown } | null)?.context;
   if (context instanceof Response) {
     try {
-      const body = await context.clone().json();
-      if (body?.error && typeof body.error === 'string') return body.error;
+      const body = await context.clone().json() as { error?: unknown; message?: unknown };
+      if (typeof body.error === 'string' && body.error.trim()) return body.error.trim();
+      if (typeof body.message === 'string' && body.message.trim()) return body.message.trim();
     } catch {
-      // Response wasn't JSON - fall through to the generic handling below.
+      try {
+        const responseText = await context.clone().text();
+        if (responseText.trim()) return responseText.trim();
+      } catch {
+        // The response body could not be read. Use the safe fallback below.
+      }
     }
   }
 
-  if (error instanceof Error && error.message && error.message !== 'Edge Function returned a non-2xx status code') {
+  if (
+    error instanceof Error
+    && error.message
+    && !error.message.includes('Edge Function returned a non-2xx status code')
+  ) {
     return error.message;
   }
 

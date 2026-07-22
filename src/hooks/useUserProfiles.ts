@@ -1,6 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { getEdgeFunctionErrorMessage } from "@/utils/edgeFunctionError";
 
 interface UserProfile {
   id: string;
@@ -36,7 +37,7 @@ export function useUserProfiles(isAdmin: boolean) {
 
         if (error) {
           console.error("Error fetching users from edge function:", error);
-          throw error;
+          throw new Error(await getEdgeFunctionErrorMessage(error, 'Failed to load users'));
         }
 
         return data?.users || [];

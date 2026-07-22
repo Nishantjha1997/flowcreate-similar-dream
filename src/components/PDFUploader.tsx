@@ -6,6 +6,7 @@ import { Upload, FileText, Loader2, AlertCircle, CheckCircle2 } from 'lucide-rea
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ResumeData } from '@/utils/types';
+import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 
 interface PDFUploaderProps {
   onDataExtracted: (extractedData: Partial<ResumeData>) => void;
@@ -77,7 +78,7 @@ export const PDFUploader: React.FC<PDFUploaderProps> = ({ onDataExtracted }) => 
         body: formData,
       });
 
-      if (error) throw error;
+      if (error) throw new Error(await getEdgeFunctionErrorMessage(error, 'Failed to extract resume data'));
 
       if (data.success && data.data) {
         const extractedData = data.data;

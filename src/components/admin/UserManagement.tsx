@@ -8,6 +8,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { getEdgeFunctionErrorMessage } from "@/utils/edgeFunctionError";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Search, Crown, Shield, Trash2, Users, Mail } from "lucide-react";
 import { AddUserModal } from "./AddUserModal";
@@ -204,7 +205,9 @@ export function UserManagement({ userProfiles, isLoading, refetch }: UserManagem
         body: { targetUserId: deleteTarget.id }
       });
 
-      if (error) throw error;
+      if (error) {
+        throw new Error(await getEdgeFunctionErrorMessage(error, 'Failed to delete user'));
+      }
       if (data?.error) throw new Error(data.error);
 
       toast({ title: "User deleted", description: `${deleteTarget.email} has been permanently removed.` });
