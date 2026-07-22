@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ResumeVisualPreview } from '@/components/resume/ResumeVisualPreview';
 import { ResumeData } from '@/utils/types';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { useDesignMode } from '@/hooks/useDesignMode';
 import { cn } from '@/lib/utils';
 import { A4_WIDTH_PX, A4_HEIGHT_PX } from '@/constants/pdfDimensions';
+import { ResumePaginationOverlay } from '@/components/resume/ResumePaginationOverlay';
 
 interface ResumePreviewSectionProps {
   resume: ResumeData;
@@ -25,68 +26,6 @@ interface ResumePreviewSectionProps {
   hiddenSections: string[];
   onDownload?: () => void;
 }
-
-const PageBreakIndicators = ({ containerRef }: { containerRef: React.RefObject<HTMLDivElement> }) => {
-  const [pages, setPages] = useState<number[]>([]);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    const checkHeight = () => {
-      const height = el.scrollHeight;
-      const pageHeight = A4_HEIGHT_PX;
-      // Subtract one pixel so content that fits exactly on a page does not
-      // incorrectly display a break and a phantom next page.
-      const pageCount = Math.floor(Math.max(0, height - 1) / pageHeight);
-      const newPages = [];
-      for (let i = 1; i <= pageCount; i++) {
-        newPages.push(i);
-      }
-      setPages((current) =>
-        current.length === newPages.length && current.every((value, index) => value === newPages[index])
-          ? current
-          : newPages,
-      );
-    };
-
-    checkHeight();
-    
-    const observer = new ResizeObserver(checkHeight);
-    observer.observe(el);
-    
-    window.addEventListener('resize', checkHeight);
-    
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', checkHeight);
-    };
-  }, [containerRef]);
-
-  if (pages.length === 0) return null;
-
-  return (
-    <div 
-      className="absolute inset-0 pointer-events-none z-10"
-    >
-      {pages.map((pageNum) => {
-        const topPos = pageNum * A4_HEIGHT_PX;
-        return (
-          <div 
-            key={pageNum} 
-            className="absolute left-0 right-0 flex items-center"
-            style={{ top: `${topPos}px`, transform: 'translateY(-50%)' }}
-          >
-            <div className="w-full border-t-2 border-dashed border-red-400/50" />
-            <span className="absolute right-4 bg-red-500 text-white text-[9px] font-semibold px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap uppercase tracking-wider">
-              Page {pageNum + 1}
-            </span>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
 
 export const ResumePreviewSection = ({ 
   resume, 
@@ -209,25 +148,30 @@ export const ResumePreviewSection = ({
           className="transition-transform duration-300 ease-out origin-top relative"
           style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
         >
-          <div 
-            className={cn(
-              "resume-container bg-white rounded-xl mx-auto transition-shadow duration-300 relative",
-              "shadow-[0_2px_8px_rgba(0,0,0,0.04),0_8px_32px_rgba(0,0,0,0.06)]",
-              "hover:shadow-[0_2px_8px_rgba(0,0,0,0.06),0_16px_48px_rgba(0,0,0,0.1)]",
-              isNeoBrutalism && "border-2 border-foreground shadow-[6px_6px_0_0_hsl(var(--foreground))] rounded-none"
-            )}
+          <div
+            className="relative mx-auto"
             style={{ width: `${A4_WIDTH_PX}px`, minHeight: `${A4_HEIGHT_PX}px` }}
-            id="resume-preview-container" 
-            ref={resumeRef}
           >
-            <ResumeVisualPreview 
-              resume={resume}
-              templateId={templateId}
-              templateNames={templateNames}
-              sectionOrder={sectionOrder}
-              hiddenSections={hiddenSections}
-            />
-            <PageBreakIndicators containerRef={resumeRef} />
+            <div
+              className={cn(
+                "resume-container relative bg-white rounded-xl transition-shadow duration-300",
+                "shadow-[0_2px_8px_rgba(0,0,0,0.04),0_8px_32px_rgba(0,0,0,0.06)]",
+                "hover:shadow-[0_2px_8px_rgba(0,0,0,0.06),0_16px_48px_rgba(0,0,0,0.1)]",
+                isNeoBrutalism && "border-2 border-foreground shadow-[6px_6px_0_0_hsl(var(--foreground))] rounded-none"
+              )}
+              style={{ width: `${A4_WIDTH_PX}px`, minHeight: `${A4_HEIGHT_PX}px` }}
+              id="resume-preview-container"
+              ref={resumeRef}
+            >
+              <ResumeVisualPreview
+                resume={resume}
+                templateId={templateId}
+                templateNames={templateNames}
+                sectionOrder={sectionOrder}
+                hiddenSections={hiddenSections}
+              />
+            </div>
+            <ResumePaginationOverlay containerRef={resumeRef} />
           </div>
         </div>
       </div>
