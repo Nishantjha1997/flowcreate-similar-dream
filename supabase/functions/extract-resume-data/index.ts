@@ -4,6 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { checkRateLimit, rateLimitResponse } from '../_shared/rateLimiter.ts'
 import { AIKeyManager } from '../_shared/aiKeyManager.ts'
 import { getAnyActiveKey, callTextModel } from '../_shared/aiProviders.ts'
+import { parseExtractedJson } from '../_shared/resumeParser.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -55,7 +56,7 @@ Return the data in this EXACT format (no additional text, only JSON):
     {
       "name": "project name",
       "description": "project description", 
-      "technologies": "technologies used",
+      "technologies": ["technology used"],
       "url": "project URL if available"
     }
   ],
@@ -76,40 +77,6 @@ Return the data in this EXACT format (no additional text, only JSON):
 }
 
 Only return valid JSON. If a section is not found, use empty arrays or empty strings. Extract ALL available information from the resume.`
-
-function parseExtractedJson(rawText: string) {
-  try {
-    const cleanedText = rawText.replace(/```json|```/g, '').trim()
-    const data = JSON.parse(cleanedText)
-    if (typeof data.skills === 'string') {
-      data.skills = data.skills.split(',').map((s: string) => s.trim()).filter(Boolean)
-    }
-    // The prompt asks for a "technologies used" STRING per project (line ~58),
-    // but the frontend's ProjectsForm renders technologies as a string[] and
-    // crashes ((str).map is not a function) if it isn't one - normalize here
-    // rather than trusting the model to ignore its own instructions.
-    if (Array.isArray(data.projects)) {
-      data.projects = data.projects.map((p: Record<string, unknown>) => ({
-        ...p,
-        technologies:
-          typeof p.technologies === 'string'
-            ? p.technologies.split(',').map((t: string) => t.trim()).filter(Boolean)
-            : Array.isArray(p.technologies) ? p.technologies : [],
-      }))
-    }
-    return data
-  } catch (_e) {
-    return {
-      personal: { name: "", email: "", phone: "", address: "", linkedin: "", website: "", summary: "" },
-      experience: [],
-      education: [],
-      skills: [],
-      projects: [],
-      certifications: [],
-      languages: []
-    }
-  }
-}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {

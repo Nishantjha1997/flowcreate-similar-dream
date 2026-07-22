@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -42,6 +42,11 @@ export function useCoverLetterData() {
 
   const [formData, setFormData] = useState<CoverLetterFormData>(DEFAULT_COVER_LETTER);
   const [isSaving, setIsSaving] = useState(false);
+  const persistedIdRef = useRef<string | null>(editId);
+
+  useEffect(() => {
+    persistedIdRef.current = editId;
+  }, [editId]);
 
   // Fetch existing cover letter if editing
   const { data: existingLetter, isLoading } = useQuery({
@@ -97,7 +102,8 @@ export function useCoverLetterData() {
 
     setIsSaving(true);
     try {
-      if (editId) {
+      const persistedId = editId ?? persistedIdRef.current;
+      if (persistedId) {
         const { error } = await supabase
           .from('cover_letters')
           .update({
@@ -108,13 +114,13 @@ export function useCoverLetterData() {
             customization: formData.customization as unknown as Json,
             updated_at: new Date().toISOString(),
           })
-          .eq('id', editId)
+          .eq('id', persistedId)
           .eq('user_id', user.id);
 
         if (error) throw error;
         toast.success('Cover letter saved!');
-        queryClient.invalidateQueries({ queryKey: ['coverLetter', editId] });
-        return editId;
+        queryClient.invalidateQueries({ queryKey: ['coverLetter', persistedId] });
+        return persistedId;
       } else {
         const { data, error } = await supabase
           .from('cover_letters')
@@ -131,7 +137,8 @@ export function useCoverLetterData() {
 
         if (error) throw error;
         toast.success('Cover letter saved!');
-        return data?.id || null;
+        persistedIdRef.current = data?.id || null;
+        return persistedIdRef.current;
       }
     } catch (error: any) {
       toast.error('Error saving: ' + (error?.message || 'Unknown error'));
