@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { AiSuggestionButton } from "@/components/resume/AiSuggestionButton";
 import { Plus, Trash2, GraduationCap, Building, BookOpen, Calendar, CheckCircle2, GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CharacterGuidance } from '@/components/resume/CharacterGuidance';
 
 interface EducationSectionProps {
   education: any[];
@@ -219,6 +220,11 @@ export const EducationSection = ({
                     isPremium={isPremium}
                     onUpsell={onAIFeatureUpsell}
                     additionalContext={`Education: ${edu.degree} in ${edu.field} from ${edu.school}`}
+                  />
+                  <CharacterGuidance
+                    value={edu.description || ''}
+                    recommendedMax={220}
+                    guidance="Include only relevant honors, coursework, activities, or GPA."
                   />
                 </div>
               </div>

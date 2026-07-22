@@ -7,6 +7,7 @@ import { ResumeData } from '@/utils/resumeAdapterUtils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Upload, X, UserCheck, FileText, CheckCircle2, AlertCircle, User, Mail, Phone, MapPin, Globe, Linkedin } from 'lucide-react';
+import { CharacterGuidance } from '@/components/resume/CharacterGuidance';
 import { AiSuggestionButton } from "@/components/resume/AiSuggestionButton";
 import { PDFUploader } from '@/components/PDFUploader';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -349,9 +350,11 @@ export const PersonalInfoSection = ({
           onUpsell={onAIFeatureUpsell}
           additionalContext="Professional summary for resume header"
         />
-        <p className="text-xs text-muted-foreground">
-          Tip: Keep it concise (2-3 sentences) and highlight your key achievements
-        </p>
+        <CharacterGuidance
+          value={personal.summary || ''}
+          recommendedMax={350}
+          guidance="Aim for 2–3 sentences focused on role, strengths, and measurable impact."
+        />
       </div>
     </div>
   );

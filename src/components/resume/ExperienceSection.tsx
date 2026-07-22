@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { AiSuggestionButton } from "@/components/resume/AiSuggestionButton";
 import { Plus, Trash2, Briefcase, Building2, MapPin, Calendar, CheckCircle2, GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CharacterGuidance } from '@/components/resume/CharacterGuidance';
 
 interface ExperienceSectionProps {
   experience: any[];
@@ -239,6 +240,11 @@ export const ExperienceSection = ({
                     isPremium={isPremium}
                     onUpsell={onAIFeatureUpsell}
                     additionalContext={`Work experience at ${exp.company} as ${exp.title}`}
+                  />
+                  <CharacterGuidance
+                    value={exp.description || ''}
+                    recommendedMax={400}
+                    guidance="Aim for 3–5 concise bullets with actions, outcomes, and numbers."
                   />
                 </div>
               </div>

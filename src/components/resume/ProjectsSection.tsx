@@ -8,6 +8,7 @@ import { Plus, FolderKanban, Trash2, Link, Code, X, CheckCircle2, GripVertical }
 import { ResumeData } from '@/utils/resumeAdapterUtils';
 import { AiSuggestionButton } from "@/components/resume/AiSuggestionButton";
 import { cn } from '@/lib/utils';
+import { CharacterGuidance } from '@/components/resume/CharacterGuidance';
 
 interface ProjectsSectionProps {
   projects: ResumeData['projects'];
@@ -188,6 +189,11 @@ export const ProjectsSection = ({
                     isPremium={isPremium}
                     onUpsell={onAIFeatureUpsell}
                     additionalContext={`Project: ${project.title}`}
+                  />
+                  <CharacterGuidance
+                    value={project.description || ''}
+                    recommendedMax={300}
+                    guidance="Cover the problem, your contribution, technologies, and result."
                   />
                 </div>
                 
