@@ -52,7 +52,7 @@ serve(async (req) => {
     const userId = userData.user.id as string;
 
     // Rate limit: 10 requests per user per hour
-    const rl = checkRateLimit(`gemini-suggest:${userId}`, 10, 60 * 60_000);
+    const rl = await checkRateLimit(`gemini-suggest:${userId}`, 10, 60 * 60_000);
     if (!rl.allowed) {
       return rateLimitResponse(corsHeaders, rl.resetAt);
     }
@@ -254,18 +254,41 @@ Keep the tone professional yet warm. Do NOT include placeholder brackets — wri
     }
 
     if (result.text) {
-      // Record usage (best-effort; a lost increment is acceptable, a blocked
-      // suggestion is not — so failures here never fail the request)
-      const { error: meterError } = await admin.from('usage_limits').upsert(
-        {
-          user_id: userId,
-          ai_requests: used + 1,
-          last_reset_at: resetDue || !usage?.last_reset_at ? new Date().toISOString() : usage.last_reset_at,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id' }
-      );
-      if (meterError) console.error('[AI Suggest] usage metering failed:', meterError.message);
+      // Consume the plan allowance only after the provider succeeds. The RPC
+      // locks this user's usage row, so concurrent requests at the quota edge
+      // cannot both return a suggestion or overwrite each other's increment.
+      const { data: meterData, error: meterError } = await admin.rpc('consume_ai_usage', {
+        p_user_id: userId,
+        p_max: cap,
+      });
+
+      if (meterError) {
+        console.error('[AI Suggest] durable usage metering failed:', meterError.message);
+        return new Response(
+          JSON.stringify({ error: 'AI usage could not be recorded. Please try again.' }),
+          { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        );
+      }
+
+      const meter = (Array.isArray(meterData) ? meterData[0] : meterData) as {
+        allowed?: unknown;
+        usage_count?: unknown;
+      } | null;
+      const meterAllowed = meter?.allowed;
+      const usageCount = meter?.usage_count;
+      if (typeof meterAllowed !== 'boolean' || typeof usageCount !== 'number') {
+        console.error('[AI Suggest] durable usage metering returned an invalid shape');
+        return new Response(
+          JSON.stringify({ error: 'AI usage could not be recorded. Please try again.' }),
+          { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        );
+      }
+      if (!meterAllowed) {
+        return new Response(
+          JSON.stringify({ error: `You've used all ${cap} AI suggestions in your plan for this month. Your quota resets automatically.` }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        );
+      }
 
       return new Response(
         JSON.stringify({ suggestion: result.text }),

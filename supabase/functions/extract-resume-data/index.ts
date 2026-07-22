@@ -109,7 +109,7 @@ serve(async (req) => {
     const userId = claimsData.claims.sub as string;
 
     // Rate limit
-    const rl = checkRateLimit(`extract-resume:${userId}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
+    const rl = await checkRateLimit(`extract-resume:${userId}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
     if (!rl.allowed) {
       return rateLimitResponse(corsHeaders, rl.resetAt);
     }

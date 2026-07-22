@@ -1540,6 +1540,33 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          created_at: string
+          key: string
+          request_count: number
+          reset_at: string
+          updated_at: string
+          window_started_at: string
+        }
+        Insert: {
+          created_at?: string
+          key: string
+          request_count?: number
+          reset_at: string
+          updated_at?: string
+          window_started_at?: string
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          request_count?: number
+          reset_at?: string
+          updated_at?: string
+          window_started_at?: string
+        }
+        Relationships: []
+      }
       resume_comments: {
         Row: {
           author_email: string | null
@@ -2147,6 +2174,22 @@ export type Database = {
           p_run_id: string
         }
         Returns: boolean
+      }
+      consume_ai_usage: {
+        Args: { p_max: number; p_user_id: string }
+        Returns: {
+          allowed: boolean
+          reset_at: string
+          usage_count: number
+        }[]
+      }
+      consume_rate_limit: {
+        Args: { p_key: string; p_max: number; p_window_ms: number }
+        Returns: {
+          allowed: boolean
+          remaining: number
+          reset_at: string
+        }[]
       }
       expire_subscriptions: { Args: never; Returns: undefined }
       fail_blog_automation_run: {

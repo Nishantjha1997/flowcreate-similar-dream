@@ -1,61 +1,96 @@
-// Simple in-memory rate limiter for edge functions
-// Note: Each edge function instance has its own memory, so this provides
-// per-instance rate limiting. For distributed rate limiting, use Redis/Upstash.
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-interface RateLimitEntry {
-  count: number;
-  resetAt: number;
+export interface RateLimitResult {
+  allowed: boolean
+  remaining: number
+  resetAt: number
 }
 
-const store = new Map<string, RateLimitEntry>();
-
-// Clean up expired entries periodically
-function cleanup() {
-  const now = Date.now();
-  for (const [key, entry] of store) {
-    if (now >= entry.resetAt) {
-      store.delete(key);
-    }
-  }
+interface RateLimitRow {
+  allowed?: unknown
+  remaining?: unknown
+  reset_at?: unknown
 }
 
-// Run cleanup every 60 seconds
-setInterval(cleanup, 60_000);
+interface FallbackEntry {
+  count: number
+  resetAt: number
+}
 
-/**
- * Check rate limit for a given identifier.
- * @param identifier - Unique key (e.g., user ID or IP)
- * @param maxRequests - Max requests allowed in the window
- * @param windowMs - Time window in milliseconds
- * @returns { allowed: boolean, remaining: number, resetAt: number }
- */
-export function checkRateLimit(
-  identifier: string,
-  maxRequests: number,
-  windowMs: number
-): { allowed: boolean; remaining: number; resetAt: number } {
-  const now = Date.now();
-  const entry = store.get(identifier);
+const fallbackStore = new Map<string, FallbackEntry>()
+
+function consumeFallback(identifier: string, maxRequests: number, windowMs: number): RateLimitResult {
+  const now = Date.now()
+  const entry = fallbackStore.get(identifier)
 
   if (!entry || now >= entry.resetAt) {
-    // New window
-    store.set(identifier, { count: 1, resetAt: now + windowMs });
-    return { allowed: true, remaining: maxRequests - 1, resetAt: now + windowMs };
+    const resetAt = now + windowMs
+    fallbackStore.set(identifier, { count: 1, resetAt })
+    return { allowed: true, remaining: Math.max(maxRequests - 1, 0), resetAt }
   }
 
-  if (entry.count >= maxRequests) {
-    return { allowed: false, remaining: 0, resetAt: entry.resetAt };
+  entry.count = Math.min(entry.count + 1, maxRequests + 1)
+  return {
+    allowed: entry.count <= maxRequests,
+    remaining: Math.max(maxRequests - entry.count, 0),
+    resetAt: entry.resetAt,
   }
-
-  entry.count++;
-  return { allowed: true, remaining: maxRequests - entry.count, resetAt: entry.resetAt };
 }
 
 /**
- * Create a rate-limited response (429 Too Many Requests)
+ * Atomically consumes one request from the shared Postgres rate-limit window.
+ * A small in-isolate fallback is retained only for a transient database outage;
+ * normal enforcement is durable across cold starts and Edge instances.
  */
+export async function checkRateLimit(
+  identifier: string,
+  maxRequests: number,
+  windowMs: number,
+): Promise<RateLimitResult> {
+  if (!identifier.trim() || maxRequests < 1 || windowMs < 1) {
+    throw new Error('Invalid rate-limit configuration')
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    if (!supabaseUrl || !serviceRoleKey) throw new Error('Supabase service credentials are unavailable')
+
+    const admin = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    })
+    const { data, error } = await admin.rpc('consume_rate_limit', {
+      p_key: identifier,
+      p_max: maxRequests,
+      p_window_ms: windowMs,
+    })
+    if (error) throw error
+
+    const row = (Array.isArray(data) ? data[0] : data) as RateLimitRow | null
+    const allowed = row?.allowed
+    const remaining = row?.remaining
+    const resetAt = typeof row?.reset_at === 'string' ? Date.parse(row.reset_at) : Number.NaN
+    if (
+      typeof allowed !== 'boolean'
+      || typeof remaining !== 'number'
+      || !Number.isFinite(resetAt)
+    ) {
+      throw new Error('Rate-limit RPC returned an invalid shape')
+    }
+
+    return {
+      allowed,
+      remaining: Math.max(0, remaining),
+      resetAt,
+    }
+  } catch (error) {
+    console.error('[Rate Limit] Durable limiter unavailable; using isolate fallback', error)
+    return consumeFallback(identifier, maxRequests, windowMs)
+  }
+}
+
 export function rateLimitResponse(corsHeaders: Record<string, string>, resetAt: number): Response {
-  const retryAfter = Math.ceil((resetAt - Date.now()) / 1000);
+  const retryAfter = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000))
   return new Response(
     JSON.stringify({ error: 'Too many requests. Please try again later.' }),
     {
@@ -65,6 +100,6 @@ export function rateLimitResponse(corsHeaders: Record<string, string>, resetAt: 
         'Content-Type': 'application/json',
         'Retry-After': String(retryAfter),
       },
-    }
-  );
+    },
+  )
 }

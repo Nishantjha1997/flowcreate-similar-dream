@@ -76,7 +76,7 @@ serve(async (req) => {
     }
 
     // Rate limit: 30 blog-AI operations per admin per hour.
-    const rl = checkRateLimit(`blog-ai:${userId}`, 30, 60 * 60_000);
+    const rl = await checkRateLimit(`blog-ai:${userId}`, 30, 60 * 60_000);
     if (!rl.allowed) return rateLimitResponse(corsHeaders, rl.resetAt);
 
     const body = await req.json();

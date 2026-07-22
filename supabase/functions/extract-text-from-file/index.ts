@@ -45,7 +45,7 @@ serve(async (req) => {
     }
     const userId = claimsData.claims.sub as string;
 
-    const rl = checkRateLimit(`extract-text:${userId}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
+    const rl = await checkRateLimit(`extract-text:${userId}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
     if (!rl.allowed) {
       return rateLimitResponse(corsHeaders, rl.resetAt);
     }

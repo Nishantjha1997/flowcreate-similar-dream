@@ -105,7 +105,7 @@ serve(async (req) => {
     const callerUserId = userData.user.id
 
     // Rate limit: 10 verification attempts per user per 5 minutes
-    const rl = checkRateLimit(`verify-payment:${callerUserId}`, 10, 5 * 60_000);
+    const rl = await checkRateLimit(`verify-payment:${callerUserId}`, 10, 5 * 60_000);
     if (!rl.allowed) {
       return rateLimitResponse(corsHeaders, rl.resetAt);
     }

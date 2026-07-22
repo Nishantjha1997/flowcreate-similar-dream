@@ -46,7 +46,7 @@ serve(async (req) => {
     }
 
     // Rate limit: 3 attempts per user per 10 minutes (irreversible action)
-    const rl = checkRateLimit(`self-delete-account:${user.id}`, 3, 10 * 60_000)
+    const rl = await checkRateLimit(`self-delete-account:${user.id}`, 3, 10 * 60_000)
     if (!rl.allowed) {
       return rateLimitResponse(corsHeaders, rl.resetAt)
     }

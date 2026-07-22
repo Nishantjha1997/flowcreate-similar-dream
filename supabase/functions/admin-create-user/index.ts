@@ -90,7 +90,7 @@ serve(async (req) => {
     }
 
     // Rate limit: 10 user creations per admin per hour
-    const rl = checkRateLimit(`admin-create-user:${user.id}`, 10, 60 * 60_000);
+    const rl = await checkRateLimit(`admin-create-user:${user.id}`, 10, 60 * 60_000);
     if (!rl.allowed) {
       return rateLimitResponse(corsHeaders, rl.resetAt);
     }

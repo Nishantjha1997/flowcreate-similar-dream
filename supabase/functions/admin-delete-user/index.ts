@@ -51,7 +51,7 @@ serve(async (req) => {
     }
 
     // Rate limit: 5 deletions per admin per minute
-    const rl = checkRateLimit(`admin-delete-user:${user.id}`, 5, 60_000)
+    const rl = await checkRateLimit(`admin-delete-user:${user.id}`, 5, 60_000)
     if (!rl.allowed) {
       return rateLimitResponse(corsHeaders, rl.resetAt)
     }

@@ -51,7 +51,7 @@ serve(async (req) => {
     }
 
     // Rate limit: 20 requests per admin per minute
-    const rl = checkRateLimit(`admin-list-users:${user.id}`, 20, 60_000)
+    const rl = await checkRateLimit(`admin-list-users:${user.id}`, 20, 60_000)
     if (!rl.allowed) {
       return rateLimitResponse(corsHeaders, rl.resetAt)
     }

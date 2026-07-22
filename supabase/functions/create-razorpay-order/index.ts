@@ -50,7 +50,7 @@ serve(async (req) => {
     }
 
     // Rate limit per user
-    const rl = checkRateLimit(`razorpay-order:${userData.user.id}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
+    const rl = await checkRateLimit(`razorpay-order:${userData.user.id}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
     if (!rl.allowed) {
       return rateLimitResponse(corsHeaders, rl.resetAt);
     }

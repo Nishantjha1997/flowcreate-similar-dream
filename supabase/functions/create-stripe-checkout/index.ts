@@ -58,8 +58,9 @@ serve(async (req) => {
     if (userError || !userData?.user) return json({ error: 'Unauthorized' }, 401)
     const user = userData.user
 
-    if (!checkRateLimit(`stripe-checkout:${user.id}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
-      return rateLimitResponse(corsHeaders)
+    const rl = await checkRateLimit(`stripe-checkout:${user.id}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)
+    if (!rl.allowed) {
+      return rateLimitResponse(corsHeaders, rl.resetAt)
     }
 
     // --- Validate plan against the DB (never trust client amounts) ---
