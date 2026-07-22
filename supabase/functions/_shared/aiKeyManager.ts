@@ -120,4 +120,49 @@ export class AIKeyManager {
       return null;
     }
   }
+
+  // "Set Primary" / "Set Fallback" in Admin > AI Management clear the flag on
+  // every row before setting it on the chosen one (see useAIApiKeys.ts), so
+  // is_primary/is_fallback are each unique across the WHOLE table, not scoped
+  // per-provider - this is the actual "admin's chosen default LLM" setting,
+  // independent of which provider it happens to belong to.
+  async getGlobalPrimaryKey(): Promise<{ provider: string; key: string } | null> {
+    try {
+      const { data, error } = await this.supabaseClient
+        .from('ai_api_keys')
+        .select('*')
+        .eq('is_active', true)
+        .eq('is_primary', true)
+        .maybeSingle();
+
+      if (data && !error) {
+        await this.trackUsage(data.id);
+        return { provider: data.provider, key: data.key };
+      }
+      return null;
+    } catch (error) {
+      console.error('[AI Key Manager] Error getting global primary key:', error);
+      return null;
+    }
+  }
+
+  async getGlobalFallbackKey(): Promise<{ provider: string; key: string } | null> {
+    try {
+      const { data, error } = await this.supabaseClient
+        .from('ai_api_keys')
+        .select('*')
+        .eq('is_active', true)
+        .eq('is_fallback', true)
+        .maybeSingle();
+
+      if (data && !error) {
+        await this.trackUsage(data.id);
+        return { provider: data.provider, key: data.key };
+      }
+      return null;
+    } catch (error) {
+      console.error('[AI Key Manager] Error getting global fallback key:', error);
+      return null;
+    }
+  }
 }

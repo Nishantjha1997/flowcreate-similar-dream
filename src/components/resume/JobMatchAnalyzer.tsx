@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ResumeData } from '@/utils/types';
 import { captureError } from '@/lib/monitoring';
+import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 
 interface JobMatchAnalyzerProps {
   resume: ResumeData;
@@ -85,7 +86,7 @@ Return exactly this JSON shape:
         body: { prompt, maxTokens: 1200 },
       });
 
-      if (fnError) throw new Error(fnError.message || 'AI request failed');
+      if (fnError) throw new Error(await getEdgeFunctionErrorMessage(fnError, 'AI request failed'));
       if (data?.error) throw new Error(data.error as string);
       if (!data?.suggestion) throw new Error('No response from AI');
 

@@ -59,12 +59,66 @@ serve(async (req) => {
     const context = body?.context;
     const resumeId = body?.resumeId;
     const currentContent = body?.currentContent;
+    const jobDescription = body?.jobDescription;
     const maxTokensParam = typeof body?.maxTokens === 'number' ? body.maxTokens : undefined;
 
     let finalPrompt: string;
 
-    // ── Cover letter context mode ──
-    if (context === 'cover_letter' && resumeId) {
+    // ── Cover letter tailored to a job description ──
+    if (context === 'cover_letter_from_jd' && resumeId && typeof jobDescription === 'string') {
+      const trimmedJD = jobDescription.trim().slice(0, 6000);
+      if (trimmedJD.length < 40) {
+        return new Response(
+          JSON.stringify({ error: 'Job description is too short. Paste or upload the full posting.' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const { data: resumeData, error: resumeError } = await supabase
+        .from('resumes')
+        .select('resume_data')
+        .eq('id', resumeId)
+        .eq('user_id', userId)
+        .single();
+
+      if (resumeError || !resumeData) {
+        return new Response(
+          JSON.stringify({ error: 'Linked resume not found.' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const rd = resumeData.resume_data as Record<string, any>;
+      const name = rd?.personal?.name || 'the applicant';
+      const summary = rd?.personal?.summary || rd?.summary || '';
+      const skills = Array.isArray(rd?.skills) ? rd.skills.join(', ') : '';
+      const experienceLines = Array.isArray(rd?.experience)
+        ? rd.experience.map((e: any) => `- ${e.title || ''} at ${e.company || ''}: ${e.description || ''}`).join('\n')
+        : '';
+      const educationLines = Array.isArray(rd?.education)
+        ? rd.education.map((e: any) => `- ${e.degree || ''}, ${e.school || e.institution || ''}`).join('\n')
+        : '';
+
+      finalPrompt = `You are an expert cover letter writer. Write a complete, ready-to-send, ATS-friendly cover letter for ${name}, tailored specifically to the job description below using the candidate's real resume background - do not invent experience they don't have.
+
+CANDIDATE RESUME:
+Summary: ${summary || 'Not specified'}
+Skills: ${skills || 'Not specified'}
+Experience:
+${experienceLines || 'Not specified'}
+Education:
+${educationLines || 'Not specified'}
+
+JOB DESCRIPTION:
+${trimmedJD}
+
+Write in standard business letter format:
+1. A strong opening paragraph expressing genuine interest in this specific role (infer the role/company name from the job description if it's mentioned)
+2. 1-2 body paragraphs directly connecting the candidate's real skills and experience above to the requirements in the job description - reference specific matching keywords from the posting
+3. A closing paragraph with a clear call to action
+
+Keep the tone professional yet warm. Do NOT include placeholder brackets like [Company Name] - infer specifics from the job description where possible, and simply omit anything you can't infer rather than leaving a placeholder. Return ONLY the finished cover letter text, no explanations, headers, or markdown.`;
+    } else if (context === 'cover_letter' && resumeId) {
       // Fetch linked resume for context data (using the user's auth client)
       const { data: resumeData, error: resumeError } = await supabase
         .from('resumes')

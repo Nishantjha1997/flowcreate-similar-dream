@@ -104,6 +104,21 @@ export async function callTextModel(
 export async function getAnyActiveKey(
   keyManager: AIKeyManager
 ): Promise<{ provider: AIProvider; key: string } | null> {
+  // The admin's explicit "Set Primary"/"Set Fallback" choice in AI Management
+  // is a single global setting (not per-provider - see getGlobalPrimaryKey),
+  // so it IS the intended default LLM for every text-generation feature and
+  // must win regardless of which provider it happens to be. Only fall back to
+  // the fixed provider order below if the admin hasn't designated one.
+  const globalPrimary = await keyManager.getGlobalPrimaryKey();
+  if (globalPrimary) {
+    return { provider: globalPrimary.provider as AIProvider, key: globalPrimary.key };
+  }
+
+  const globalFallback = await keyManager.getGlobalFallbackKey();
+  if (globalFallback) {
+    return { provider: globalFallback.provider as AIProvider, key: globalFallback.key };
+  }
+
   const providers: AIProvider[] = ['gemini', 'deepseek', 'openai'];
   for (const provider of providers) {
     const key = await keyManager.getActiveKey(provider);

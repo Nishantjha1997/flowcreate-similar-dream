@@ -15,6 +15,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { CoverLetterFormData } from '@/hooks/useCoverLetterData';
 import { coverLetterTemplateNames } from '@/utils/coverLetterTemplates';
+import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
+import { JobDescriptionGenerator } from './JobDescriptionGenerator';
 
 const TEMPLATE_OPTIONS = Object.entries(coverLetterTemplateNames).map(([value, label]) => ({ value, label }));
 
@@ -54,7 +56,8 @@ export const CoverLetterEditor = ({
         }
       );
 
-      if (funcError) throw funcError;
+      if (funcError) throw new Error(await getEdgeFunctionErrorMessage(funcError, 'AI suggestion failed'));
+      if (funcData?.error) throw new Error(funcData.error as string);
       if (funcData?.suggestion) {
         setFormData({ ...formData, content: funcData.suggestion });
         toast.success('AI suggestion generated!');
@@ -121,6 +124,11 @@ export const CoverLetterEditor = ({
           </SelectContent>
         </Select>
       </div>
+
+      <JobDescriptionGenerator
+        resumeId={formData.resume_id}
+        onGenerated={(content) => setFormData({ ...formData, content })}
+      />
 
       <div className="flex-1 space-y-2">
         <div className="flex items-center justify-between">
