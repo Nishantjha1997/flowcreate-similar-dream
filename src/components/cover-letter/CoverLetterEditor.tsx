@@ -101,14 +101,15 @@ export const CoverLetterEditor = ({
       <div className="space-y-2">
         <Label htmlFor="cl-resume">Link Resume (for AI context)</Label>
         <Select
-          value={formData.resume_id || ''}
-          onValueChange={(v) => setFormData({ ...formData, resume_id: v || null })}
+          value={formData.resume_id || 'none'}
+          onValueChange={(v) => setFormData({ ...formData, resume_id: v === 'none' ? null : v })}
         >
           <SelectTrigger className="bg-background">
             <SelectValue placeholder="None — select a resume" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">None</SelectItem>
+            {/* Radix SelectItem throws if value="" - it reserves empty string for clearing the selection */}
+            <SelectItem value="none">None</SelectItem>
             {userResumes.map((r) => {
               const name = r.resume_data?.personal?.name || 'Untitled Resume';
               return (

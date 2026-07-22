@@ -83,7 +83,20 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
           // Store structured data
           work_experience: extractedData.experience || [],
           education: extractedData.education || [],
-          projects: extractedData.projects || [],
+          // ProjectsForm renders technologies as a string[] and crashes if a
+          // project's technologies comes back as a plain string - the edge
+          // function normalizes this now too, but coerce again here as a
+          // safety net (e.g. against a stale/cached function deployment).
+          projects: Array.isArray(extractedData.projects)
+            ? extractedData.projects.map((p: any) => ({
+                ...p,
+                technologies: Array.isArray(p?.technologies)
+                  ? p.technologies
+                  : typeof p?.technologies === 'string'
+                    ? p.technologies.split(',').map((t: string) => t.trim()).filter(Boolean)
+                    : [],
+              }))
+            : [],
           certifications: extractedData.certifications || [],
           languages: extractedData.languages || [],
         };

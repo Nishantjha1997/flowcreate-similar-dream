@@ -241,9 +241,9 @@ export const PDFDataPreviewModal: React.FC<PDFDataPreviewModalProps> = ({
       case 'languages':
         return (
           <div className="flex flex-wrap gap-1">
-            {data.map((lang: string, index: number) => (
+            {data.map((lang: string | { language: string; proficiency?: string }, index: number) => (
               <Badge key={index} variant="outline" className="text-xs">
-                {lang}
+                {typeof lang === 'string' ? lang : [lang.language, lang.proficiency].filter(Boolean).join(' — ')}
               </Badge>
             ))}
           </div>

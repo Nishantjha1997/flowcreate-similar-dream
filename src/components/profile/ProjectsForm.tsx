@@ -21,8 +21,8 @@ export const ProjectsForm = ({ profile, onUpdate, isNeoBrutalism = false }: Proj
   const addProject = () => { if (!newProject.title || !newProject.description) return; onUpdate({ projects: [...projects, { id: Date.now(), ...newProject } as Project] }); setNewProject({ title: '', description: '', link: '', technologies: [] }); };
   const removeProject = (id: number) => onUpdate({ projects: projects.filter(p => p.id !== id) });
   const updateProject = (id: number, updates: Partial<Project>) => onUpdate({ projects: projects.map(p => p.id === id ? { ...p, ...updates } : p) });
-  const addTechToNew = () => { if (newTechnology.trim()) { setNewProject(p => ({ ...p, technologies: [...(p.technologies || []), newTechnology.trim()] })); setNewTechnology(''); } };
-  const removeTechFromNew = (i: number) => setNewProject(p => ({ ...p, technologies: (p.technologies || []).filter((_, idx) => idx !== i) }));
+  const addTechToNew = () => { if (newTechnology.trim()) { setNewProject(p => ({ ...p, technologies: [...(Array.isArray(p.technologies) ? p.technologies : []), newTechnology.trim()] })); setNewTechnology(''); } };
+  const removeTechFromNew = (i: number) => setNewProject(p => ({ ...p, technologies: (Array.isArray(p.technologies) ? p.technologies : []).filter((_, idx) => idx !== i) }));
 
   return (
     <Card className={isNeoBrutalism ? 'border-3 border-foreground shadow-[6px_6px_0px_0px_hsl(var(--foreground))]' : ''}>
@@ -40,7 +40,7 @@ export const ProjectsForm = ({ profile, onUpdate, isNeoBrutalism = false }: Proj
                 <div className="space-y-2"><Label className={labelClass}>Link</Label><div className="flex gap-2"><Input value={p.link || ''} onChange={(e) => updateProject(p.id, { link: e.target.value })} className={inputClass} />{p.link && <Button variant="outline" size="sm" asChild><a href={p.link} target="_blank" rel="noopener noreferrer"><ExternalLink className="h-4 w-4" /></a></Button>}</div></div>
               </div>
               <div className="space-y-2 mb-4"><Label className={labelClass}>Description</Label><Textarea value={p.description} onChange={(e) => updateProject(p.id, { description: e.target.value })} rows={3} className={inputClass} /></div>
-              <div className="space-y-2"><Label className={labelClass}>Technologies</Label><div className="flex flex-wrap gap-2">{(p.technologies || []).map((t, i) => <Badge key={i} variant="secondary" className={isNeoBrutalism ? 'border-2 border-foreground' : ''}>{t}<button onClick={() => updateProject(p.id, { technologies: p.technologies?.filter((_, idx) => idx !== i) })} className="ml-1"><X className="h-3 w-3" /></button></Badge>)}</div></div>
+              <div className="space-y-2"><Label className={labelClass}>Technologies</Label><div className="flex flex-wrap gap-2">{(Array.isArray(p.technologies) ? p.technologies : []).map((t, i) => <Badge key={i} variant="secondary" className={isNeoBrutalism ? 'border-2 border-foreground' : ''}>{t}<button onClick={() => updateProject(p.id, { technologies: p.technologies?.filter((_, idx) => idx !== i) })} className="ml-1"><X className="h-3 w-3" /></button></Badge>)}</div></div>
             </CardContent>
           </Card>
         ))}
