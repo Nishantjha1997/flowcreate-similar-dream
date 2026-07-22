@@ -22,6 +22,7 @@ import { Zap } from 'lucide-react';
 import { ShareManagement } from '@/components/sharing/ShareManagement';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { getTemplate, resolveTemplateKey } from '@/templates/registry';
+import { SectionBoundary } from '@/components/ui/section-boundary';
 
 const ResumeBuilder = () => {
   const navigate = useNavigate();
@@ -255,38 +256,40 @@ const ResumeBuilder = () => {
                 />
               </div>
               <div className="flex-1 lg:min-h-0">
-                <ResumeBuilderSidebar
-                  activeSection={activeSection}
-                  onSectionChange={handleSectionChange}
-                  currentTemplateId={templateId}
-                  onTemplateChange={handleTemplateChange}
-                  resume={resume}
-                  handlePersonalInfoChange={handlers.handlePersonalInfoChange}
-                  onProfileImageChange={handleProfileImageChange}
-                  handleExperienceChange={handlers.handleExperienceChange}
-                  handleCurrentJobToggle={handlers.handleCurrentJobToggle}
-                  addExperience={handlers.addExperience}
-                  removeExperience={handlers.removeExperience}
-                  handleEducationChange={handlers.handleEducationChange}
-                  addEducation={handlers.addEducation}
-                  removeEducation={handlers.removeEducation}
-                  handleSkillsChange={handlers.handleSkillsChange}
-                  handleProjectChange={handlers.handleProjectChange}
-                  addProject={handlers.addProject}
-                  removeProject={handlers.removeProject}
-                  handleCustomizationChange={handlers.handleCustomizationChange}
-                  onAIFeatureUpsell={handleAIFeatureUpsell}
-                  isPremium={premium?.isPremium}
-                  activeSections={activeSections}
-                  hiddenSections={hiddenSections}
-                  sectionTitles={resume.customization.sectionTitles ?? {}}
-                  onSectionsChange={handleSectionLayoutChange}
-                  onSectionTitleChange={handleSectionTitleChange}
-                  onPopulateFromProfile={populateFromProfile}
-                  hasProfileData={hasProfileData}
-                  canFillFromProfile={canFillFromProfile}
-                  onPDFDataExtracted={handlePDFDataExtracted}
-                />
+                <SectionBoundary name="Resume editor and PDF import">
+                  <ResumeBuilderSidebar
+                    activeSection={activeSection}
+                    onSectionChange={handleSectionChange}
+                    currentTemplateId={templateId}
+                    onTemplateChange={handleTemplateChange}
+                    resume={resume}
+                    handlePersonalInfoChange={handlers.handlePersonalInfoChange}
+                    onProfileImageChange={handleProfileImageChange}
+                    handleExperienceChange={handlers.handleExperienceChange}
+                    handleCurrentJobToggle={handlers.handleCurrentJobToggle}
+                    addExperience={handlers.addExperience}
+                    removeExperience={handlers.removeExperience}
+                    handleEducationChange={handlers.handleEducationChange}
+                    addEducation={handlers.addEducation}
+                    removeEducation={handlers.removeEducation}
+                    handleSkillsChange={handlers.handleSkillsChange}
+                    handleProjectChange={handlers.handleProjectChange}
+                    addProject={handlers.addProject}
+                    removeProject={handlers.removeProject}
+                    handleCustomizationChange={handlers.handleCustomizationChange}
+                    onAIFeatureUpsell={handleAIFeatureUpsell}
+                    isPremium={premium?.isPremium}
+                    activeSections={activeSections}
+                    hiddenSections={hiddenSections}
+                    sectionTitles={resume.customization.sectionTitles ?? {}}
+                    onSectionsChange={handleSectionLayoutChange}
+                    onSectionTitleChange={handleSectionTitleChange}
+                    onPopulateFromProfile={populateFromProfile}
+                    hasProfileData={hasProfileData}
+                    canFillFromProfile={canFillFromProfile}
+                    onPDFDataExtracted={handlePDFDataExtracted}
+                  />
+                </SectionBoundary>
               </div>
             </div>
 

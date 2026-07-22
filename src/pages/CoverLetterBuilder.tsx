@@ -10,6 +10,7 @@ import { useCoverLetterData } from '@/hooks/useCoverLetterData';
 import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { DocumentExportActions } from '@/components/export/DocumentExportActions';
+import { SectionBoundary } from '@/components/ui/section-boundary';
 
 const CoverLetterBuilder = () => {
   const navigate = useNavigate();
@@ -109,21 +110,25 @@ const CoverLetterBuilder = () => {
       <div className="flex flex-1 overflow-hidden">
         {/* Left: Editor */}
         <div className="w-full lg:w-[420px] xl:w-[480px] border-r border-border/50 bg-card/30 overflow-y-auto flex-shrink-0">
-          <CoverLetterEditor
-            formData={formData}
-            setFormData={setFormData}
-            isSaving={isSaving}
-            onSave={handleSave}
-            userResumes={userResumes}
-          />
+          <SectionBoundary name="Cover letter editor">
+            <CoverLetterEditor
+              formData={formData}
+              setFormData={setFormData}
+              isSaving={isSaving}
+              onSave={handleSave}
+              userResumes={userResumes}
+            />
+          </SectionBoundary>
         </div>
 
         {/* Right: Preview */}
         <div className="hidden lg:flex flex-1 items-start justify-center p-8 overflow-auto bg-muted/20">
-          <CoverLetterPreview
-            formData={formData}
-            previewRef={previewRef}
-          />
+          <SectionBoundary name="Cover letter preview">
+            <CoverLetterPreview
+              formData={formData}
+              previewRef={previewRef}
+            />
+          </SectionBoundary>
         </div>
       </div>
     </div>
