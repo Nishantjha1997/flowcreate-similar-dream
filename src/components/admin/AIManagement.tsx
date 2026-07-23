@@ -17,13 +17,10 @@ import {
   Trash2, 
   Eye, 
   EyeOff, 
-  Settings, 
   BarChart3, 
   CheckCircle, 
   AlertCircle,
   Star,
-  Shield,
-  Zap,
   Activity,
   DollarSign,
   TrendingUp,
@@ -168,10 +165,9 @@ export function AIManagement() {
       </div>
 
       <Tabs defaultValue="keys" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="keys">API Keys</TabsTrigger>
           <TabsTrigger value="usage">Token Usage</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="keys" className="space-y-6">
@@ -478,149 +474,6 @@ export function AIManagement() {
           )}
         </TabsContent>
 
-        <TabsContent value="settings" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Settings className="w-5 h-5 mr-2" />
-                  AI Configuration
-                </CardTitle>
-                <CardDescription>
-                  Configure global AI settings for all users
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-3">
-                  <Label className="text-base font-semibold">Auto Fallback</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Automatically switch to fallback API when primary fails
-                  </p>
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <span className="text-sm font-medium">Enable auto fallback</span>
-                    <input type="checkbox" defaultChecked className="rounded scale-125" />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-base font-semibold">Rate Limiting</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Limit API requests per user to manage costs
-                  </p>
-                  <div className="space-y-2">
-                    <Input placeholder="100" type="number" className="text-center" />
-                    <p className="text-xs text-muted-foreground text-center">Requests per hour per user</p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-base font-semibold">Model Selection</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Default AI model for new requests
-                  </p>
-                  <Select defaultValue="gpt-4">
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="gpt-4">GPT-4 (Recommended)</SelectItem>
-                      <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo (Faster)</SelectItem>
-                      <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Shield className="w-5 h-5 mr-2" />
-                  Security Settings
-                </CardTitle>
-                <CardDescription>
-                  Manage API security and access controls
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-3">
-                  <Label className="text-base font-semibold">Key Rotation</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Automatically rotate API keys for enhanced security
-                  </p>
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <span className="text-sm font-medium">Auto-rotate keys (30 days)</span>
-                    <input type="checkbox" className="rounded scale-125" />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-base font-semibold">Usage Alerts</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Get notified when usage thresholds are exceeded
-                  </p>
-                  <div className="space-y-2">
-                    <Input placeholder="80" type="number" className="text-center" />
-                    <p className="text-xs text-muted-foreground text-center">Alert threshold (% of daily limit)</p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-base font-semibold">Access Logging</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Log all API key usage for audit purposes
-                  </p>
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <span className="text-sm font-medium">Enable access logging</span>
-                    <input type="checkbox" defaultChecked className="rounded scale-125" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Zap className="w-5 h-5 mr-2" />
-                Performance Optimization
-              </CardTitle>
-              <CardDescription>
-                Configure AI performance and caching settings
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-3">
-                  <Label className="text-base font-semibold">Response Caching</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Cache similar requests to reduce API calls
-                  </p>
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <span className="text-sm font-medium">Enable caching</span>
-                    <input type="checkbox" defaultChecked className="rounded scale-125" />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-base font-semibold">Request Timeout</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Maximum wait time for API responses
-                  </p>
-                  <div className="space-y-2">
-                    <Input placeholder="30" type="number" className="text-center" />
-                    <p className="text-xs text-muted-foreground text-center">Seconds</p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-base font-semibold">Retry Attempts</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Number of retries for failed requests
-                  </p>
-                  <div className="space-y-2">
-                    <Input placeholder="3" type="number" className="text-center" />
-                    <p className="text-xs text-muted-foreground text-center">Attempts</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );
