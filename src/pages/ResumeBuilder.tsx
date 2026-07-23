@@ -267,8 +267,10 @@ const ResumeBuilder = () => {
               templateNames={templateNames}
               sectionOrder={activeSections}
               hiddenSections={hiddenSections}
-              saveStatus={saveStatus}
-              lastSaved={lastSaved}
+              // A draft lives locally until its first explicit save; do not
+              // claim server autosave is active before it has a database id.
+              saveStatus={editResumeId ? saveStatus : undefined}
+              lastSaved={editResumeId ? lastSaved : null}
             />
           </div>
 

@@ -1,4 +1,4 @@
-import { Component, Fragment, type ErrorInfo, type ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -59,6 +59,9 @@ export class SectionBoundary extends Component<SectionBoundaryProps, SectionBoun
       );
     }
 
-    return <Fragment key={this.state.retryKey}>{this.props.children}</Fragment>;
+    // `contents` preserves the child layout while avoiding a React Fragment.
+    // The development annotation plugin decorates fragments with data props,
+    // which React warns about and pollutes the browser console on every edit.
+    return <div key={this.state.retryKey} className="contents">{this.props.children}</div>;
   }
 }
