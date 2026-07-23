@@ -55,7 +55,7 @@ export async function callTextModel(
         },
         signal: AbortSignal.timeout(timeoutMs),
         body: JSON.stringify({
-          model: 'deepseek-chat',
+          model: 'deepseek-v4-flash',
           messages: [{ role: 'user', content: prompt }],
           temperature,
           max_tokens: maxTokens,

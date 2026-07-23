@@ -21,37 +21,37 @@ const FALLBACK_PLANS = [
     price_inr: 0,
     price_usd: 0,
     billing_interval: 'free',
-    features: ['All templates included', 'Live preview', 'Basic editing features', 'Save 1 resume', '❌ AI suggestions', '❌ Unlimited resumes', '❌ Version history', '❌ Cloud backup', '❌ Premium support']
+    features: ['All standard templates', 'Live preview', 'ATS-friendly PDF export', 'Save 1 resume', '0 AI actions / 30 days', '❌ Unlimited resumes', '❌ Version history', '❌ Cloud backup', '❌ Premium support']
   },
   {
     id: 'monthly',
     name: 'Monthly',
     slug: 'monthly',
-    description: 'Unlimited resumes, full AI and all premium features.',
+    description: 'Unlimited resumes with 100 AI actions every rolling 30 days.',
     price_inr: 29900,
     price_usd: 499,
     billing_interval: 'month',
-    features: ['Everything in Free', 'Unlimited resumes', 'Unlimited AI suggestions', 'Version history', 'Cloud backup', 'Premium support']
+    features: ['Everything in Free', 'Unlimited resumes', '100 AI actions / 30 days', 'Version history', 'Cloud backup', 'Premium support']
   },
   {
     id: 'yearly',
     name: 'Yearly',
     slug: 'yearly',
-    description: 'Save compared to monthly!',
+    description: 'Best value with 150 AI actions every rolling 30 days.',
     price_inr: 249900,
     price_usd: 3999,
     billing_interval: 'year',
-    features: ['Everything in Monthly', '2 months free', 'Priority support', 'Advanced features', 'Version history', 'Cloud backup']
+    features: ['Everything in Monthly', '150 AI actions / 30 days', '2 months free', 'Priority support', 'Advanced features', 'Version history', 'Cloud backup']
   },
   {
     id: 'lifetime',
     name: 'Lifetime',
     slug: 'lifetime',
-    description: 'One-time payment, lifetime access',
+    description: 'Lifetime access with 150 AI actions every rolling 30 days.',
     price_inr: 499900,
     price_usd: 7999,
     billing_interval: 'lifetime',
-    features: ['Everything in Yearly', 'Lifetime updates', 'Future template updates', 'Advanced customization', 'Dedicated support']
+    features: ['Everything in Yearly', '150 AI actions / 30 days', 'Lifetime updates', 'Future template updates', 'Advanced customization', 'Dedicated support', 'Fair-use access']
   }
 ];
 
@@ -138,7 +138,7 @@ const getIntervalText = (interval: string) => {
 const Pricing = () => {
   usePageMeta({
     title: 'Pricing — Free Resume Builder Plans | FlowCreate',
-    description: 'FlowCreate is free forever. Upgrade for unlimited resumes, AI suggestions, version history and cloud backup. Plans from ₹299/month. No hidden fees.',
+    description: 'FlowCreate is free forever. Upgrade for unlimited resumes and a generous AI allowance. Plans from ₹299/month. No hidden fees.',
   });
 
   // FAQ structured data for Google rich snippets
@@ -270,10 +270,16 @@ const Pricing = () => {
               Simple, Transparent Pricing
             </h1>
             <p className="mt-6 text-xl text-muted-foreground">
-              FlowCreate is free for 1 resume, with Premium plans for unlimited resumes and power users.
+              FlowCreate is free for 1 resume, with Premium plans for unlimited resumes and generous AI allowances.
             </p>
           </div>
           </ScrollReveal>
+
+          <p className="mx-auto mt-6 max-w-3xl text-center text-sm text-muted-foreground">
+            AI actions reset every 30 days. One action covers a successful resume suggestion,
+            job-match analysis, cover-letter generation, or translation. PDF import has separate
+            protection and does not consume this allowance.
+          </p>
           <ScrollReveal delay={100}>
           <div className="max-w-7xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {plans.map((plan) => {
@@ -368,7 +374,7 @@ const Pricing = () => {
               <div className="rounded-lg border p-6">
                 <h3 className="text-lg font-semibold mb-2">What's included in the Premium plans?</h3>
                 <p className="text-muted-foreground">
-                  Premium includes unlimited resumes, AI-powered content suggestions, cloud backup, 
+                  Premium includes unlimited resumes, a plan-based AI allowance, cloud backup, 
                   version history, advanced customization options, and priority support.
                 </p>
               </div>
@@ -385,7 +391,8 @@ const Pricing = () => {
                 <h3 className="text-lg font-semibold mb-2">Can I cancel anytime?</h3>
                 <p className="text-muted-foreground">
                   Yes! You can cancel your Premium subscription at any time. You'll continue to have 
-                  access to Premium features until the end of your billing period.
+                  access to Premium features until the end of your billing period. AI allowances
+                  reset every 30 days.
                 </p>
               </div>
               

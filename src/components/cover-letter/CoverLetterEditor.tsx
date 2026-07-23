@@ -163,7 +163,7 @@ export const CoverLetterEditor = ({
             ? 'Checking AI quota...'
             : quota.isUnlimited
               ? 'Unlimited AI uses'
-              : `${quota.used}/${quota.cap} AI uses this month`}
+              : `${quota.used}/${quota.cap} AI uses / 30 days`}
         </p>
         <Textarea
           id="cl-content"

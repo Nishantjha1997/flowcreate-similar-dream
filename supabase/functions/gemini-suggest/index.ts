@@ -214,7 +214,7 @@ Keep the tone professional yet warm. Do NOT include placeholder brackets — wri
     }
     if (cap !== -1 && used >= cap) {
       return new Response(
-        JSON.stringify({ error: `You've used all ${cap} AI suggestions in your plan for this month. Your quota resets automatically.` }),
+        JSON.stringify({ error: `You've used all ${cap} AI actions in your plan for 30 days. Your quota resets automatically.` }),
         { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -285,7 +285,7 @@ Keep the tone professional yet warm. Do NOT include placeholder brackets — wri
       }
       if (!meterAllowed) {
         return new Response(
-          JSON.stringify({ error: `You've used all ${cap} AI suggestions in your plan for this month. Your quota resets automatically.` }),
+          JSON.stringify({ error: `You've used all ${cap} AI actions in your plan for 30 days. Your quota resets automatically.` }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
         );
       }

@@ -50,7 +50,7 @@ export function QuickActions({ refetch }: QuickActionsProps) {
   };
 
   const handleGrantPremiumToAll = async () => {
-    if (!window.confirm("Are you sure you want to grant premium access to ALL users? This action cannot be undone easily.")) {
+    if (!window.confirm("Grant Pro Monthly (100 AI actions / 30 days) to ALL users? This action cannot be undone easily.")) {
       return;
     }
 
@@ -63,19 +63,44 @@ export function QuickActions({ refetch }: QuickActionsProps) {
 
       if (usersError) throw usersError;
 
-      // Grant premium to all users
+      const { data: monthlyPlan, error: planError } = await supabase
+        .from("subscription_plans")
+        .select("id, slug, billing_interval")
+        .eq("product", "resume")
+        .eq("slug", "monthly")
+        .eq("is_active", true)
+        .maybeSingle();
+
+      if (planError) throw planError;
+      if (!monthlyPlan) throw new Error("The Pro Monthly plan is not configured.");
+
+      const periodStart = new Date();
+      const periodEnd = new Date(periodStart);
+      periodEnd.setMonth(periodEnd.getMonth() + 1);
+
+      // Always write a concrete plan. A bare is_premium=true row can resolve
+      // to the wrong entitlement catalog entry and hide the intended quota.
       const premiumPromises = users.map(user => 
         supabase
           .from("subscriptions")
           .upsert({
             user_id: user.user_id,
             is_premium: true,
+            plan_id: monthlyPlan.id,
+            plan_type: monthlyPlan.slug,
+            provider: "manual",
+            status: "active",
+            current_period_start: periodStart.toISOString(),
+            current_period_end: periodEnd.toISOString(),
+            expires_at: periodEnd.toISOString(),
+            cancel_at_period_end: false,
+            updated_at: new Date().toISOString(),
           }, { onConflict: "user_id" })
       );
 
       await Promise.all(premiumPromises);
 
-      toast({ title: "Success", description: "Premium access granted to all users." });
+      toast({ title: "Success", description: "Pro Monthly access granted to all users." });
       refetch();
     } catch (error: any) {
       toast({ 
@@ -147,7 +172,7 @@ export function QuickActions({ refetch }: QuickActionsProps) {
               className="w-full"
             >
               <Crown className="w-4 h-4 mr-2" />
-              Grant Premium to All Users
+              Grant Pro Monthly to All Users
             </Button>
             <Button 
               onClick={refetch}

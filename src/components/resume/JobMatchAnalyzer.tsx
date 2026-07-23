@@ -162,7 +162,7 @@ Return exactly this JSON shape:
               ? 'Checking AI quota...'
               : quota.isUnlimited
                 ? 'Unlimited AI analyses'
-                : `${quota.used}/${quota.cap} AI analyses this month`}
+                : `${quota.used}/${quota.cap} AI analyses / 30 days`}
           </p>
 
           {error && (
