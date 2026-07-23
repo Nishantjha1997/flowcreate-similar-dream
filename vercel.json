@@ -3,7 +3,6 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
     { "source": "/resume-templates", "destination": "/templates", "permanent": true },
