@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sparkles, Loader2, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,10 +12,14 @@ import { JobDescriptionInput } from '@/components/JobDescriptionInput';
 interface JobDescriptionGeneratorProps {
   resumeId: string | null;
   onGenerated: (content: string) => void;
+  onOptionsChange?: (options: { tone: string; length: string; instructions: string }) => void;
 }
 
-export const JobDescriptionGenerator = ({ resumeId, onGenerated }: JobDescriptionGeneratorProps) => {
+export const JobDescriptionGenerator = ({ resumeId, onGenerated, onOptionsChange }: JobDescriptionGeneratorProps) => {
   const [jobDescription, setJobDescription] = useState('');
+  const [tone, setTone] = useState('professional');
+  const [length, setLength] = useState('standard');
+  const [instructions, setInstructions] = useState('');
   const [generating, setGenerating] = useState(false);
 
   const handleGenerate = async () => {
@@ -33,6 +39,9 @@ export const JobDescriptionGenerator = ({ resumeId, onGenerated }: JobDescriptio
           context: 'cover_letter_from_jd',
           resumeId,
           jobDescription: jobDescription.trim(),
+          tone,
+          length,
+          instructions: instructions.trim(),
           maxTokens: 1200,
         },
       });
@@ -63,6 +72,11 @@ export const JobDescriptionGenerator = ({ resumeId, onGenerated }: JobDescriptio
         rows={5}
         textareaClassName="text-xs font-mono bg-background resize-y"
       />
+      <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-1"><Label className="text-[11px]">Tone</Label><Select value={tone} onValueChange={(value) => { setTone(value); onOptionsChange?.({ tone: value, length, instructions }); }}><SelectTrigger className="h-8 text-xs bg-background"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="professional">Professional</SelectItem><SelectItem value="warm">Warm</SelectItem><SelectItem value="bold">Bold</SelectItem></SelectContent></Select></div>
+        <div className="space-y-1"><Label className="text-[11px]">Length</Label><Select value={length} onValueChange={(value) => { setLength(value); onOptionsChange?.({ tone, length: value, instructions }); }}><SelectTrigger className="h-8 text-xs bg-background"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="short">Short · 180 words</SelectItem><SelectItem value="standard">Standard · 300 words</SelectItem><SelectItem value="long">Detailed · 450 words</SelectItem></SelectContent></Select></div>
+      </div>
+      <Textarea value={instructions} onChange={(event) => { setInstructions(event.target.value); onOptionsChange?.({ tone, length, instructions: event.target.value }); }} placeholder="Optional: emphasize a specific project or skill" rows={2} className="text-xs bg-background" />
       <Button
         onClick={handleGenerate}
         disabled={generating}

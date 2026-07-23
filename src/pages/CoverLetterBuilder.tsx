@@ -1,6 +1,6 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Eye, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
@@ -15,6 +15,7 @@ import { SectionBoundary } from '@/components/ui/section-boundary';
 const CoverLetterBuilder = () => {
   const navigate = useNavigate();
   const previewRef = useRef<HTMLDivElement>(null);
+  const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
   usePageMeta({
     title: 'Cover Letter Builder',
     description: 'Write a compelling, AI-assisted cover letter that matches your resume. Free, fast, and ready to download as PDF.',
@@ -44,6 +45,16 @@ const CoverLetterBuilder = () => {
 
   const handleAtsDownload = () => {
     printResume(previewRef.current);
+  };
+
+  const handleTextDownload = () => {
+    const blob = new Blob([formData.content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${formData.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'cover_letter'}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleSave = async () => {
@@ -104,12 +115,17 @@ const CoverLetterBuilder = () => {
           onImageExport={handleDownload}
           isImageGenerating={isGenerating}
         />
+        <Button variant="outline" size="sm" onClick={handleTextDownload} className="h-8 text-xs">TXT</Button>
       </div>
 
       {/* Main split layout */}
       <div className="flex flex-1 overflow-hidden">
+        <div className="lg:hidden flex absolute top-[6.1rem] right-3 z-10 rounded-md border bg-background p-1 shadow-sm">
+          <Button size="sm" variant={mobileTab === 'edit' ? 'default' : 'ghost'} onClick={() => setMobileTab('edit')}><Pencil className="mr-1 h-3 w-3" />Edit</Button>
+          <Button size="sm" variant={mobileTab === 'preview' ? 'default' : 'ghost'} onClick={() => setMobileTab('preview')}><Eye className="mr-1 h-3 w-3" />Preview</Button>
+        </div>
         {/* Left: Editor */}
-        <div className="w-full lg:w-[420px] xl:w-[480px] border-r border-border/50 bg-card/30 overflow-y-auto flex-shrink-0">
+        <div className={`${mobileTab === 'edit' ? 'flex' : 'hidden'} lg:flex w-full lg:w-[420px] xl:w-[480px] border-r border-border/50 bg-card/30 overflow-y-auto flex-shrink-0`}>
           <SectionBoundary name="Cover letter editor">
             <CoverLetterEditor
               formData={formData}
@@ -122,7 +138,7 @@ const CoverLetterBuilder = () => {
         </div>
 
         {/* Right: Preview */}
-        <div className="hidden lg:flex flex-1 items-start justify-center p-8 overflow-auto bg-muted/20">
+        <div className={`${mobileTab === 'preview' ? 'flex' : 'hidden'} lg:flex flex-1 items-start justify-center p-8 overflow-auto bg-muted/20`}>
           <SectionBoundary name="Cover letter preview">
             <CoverLetterPreview
               formData={formData}

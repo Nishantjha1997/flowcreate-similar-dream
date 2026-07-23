@@ -141,6 +141,9 @@ serve(async (req) => {
     const currentContent = body?.currentContent;
     const jobDescription = body?.jobDescription;
     const resumePayload = body?.resume;
+    const tone = typeof body?.tone === 'string' ? body.tone : 'professional';
+    const length = typeof body?.length === 'string' ? body.length : 'standard';
+    const instructions = typeof body?.instructions === 'string' ? body.instructions.slice(0, 1000) : '';
     const maxTokensParam = typeof body?.maxTokens === 'number' ? body.maxTokens : undefined;
 
     let finalPrompt: string;
@@ -212,6 +215,9 @@ ${educationLines || 'Not specified'}
 
 JOB DESCRIPTION:
 ${trimmedJD}
+
+STYLE: tone=${['professional', 'warm', 'bold'].includes(tone) ? tone : 'professional'}; length=${['short', 'standard', 'long'].includes(length) ? length : 'standard'}.
+USER INSTRUCTIONS: ${instructions || 'None'}
 
 Write in standard business letter format:
 1. A strong opening paragraph expressing genuine interest in this specific role (infer the role/company name from the job description if it's mentioned)

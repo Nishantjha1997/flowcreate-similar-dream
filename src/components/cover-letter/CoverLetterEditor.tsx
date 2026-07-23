@@ -138,6 +138,7 @@ export const CoverLetterEditor = ({
       <JobDescriptionGenerator
         resumeId={formData.resume_id}
         onGenerated={(content) => setFormData({ ...formData, content })}
+        onOptionsChange={(options) => setFormData({ ...formData, customization: { ...formData.customization, ...options } })}
       />
 
       <div className="flex-1 space-y-2">
