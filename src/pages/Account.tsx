@@ -109,7 +109,7 @@ const Account = () => {
     enabled: !!user?.id
   });
 
-  const handleUpdatePassword = (e: React.FormEvent) => {
+  const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsUpdating(true);
     
@@ -123,16 +123,44 @@ const Account = () => {
       return;
     }
     
-    setTimeout(() => {
+    if (!user?.email) {
+      toast({
+        title: "Unable to update password",
+        description: "Please sign in again before changing your password.",
+        variant: "destructive",
+      });
+      setIsUpdating(false);
+      return;
+    }
+
+    try {
+      const { error: reauthError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+      if (reauthError) throw reauthError;
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      if (updateError) throw updateError;
+
       toast({
         title: "Password updated",
-        description: "Your password has been updated successfully.",
+        description: "Your password has been changed successfully.",
       });
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+    } catch (error) {
+      toast({
+        title: "Password update failed",
+        description: error instanceof Error ? error.message : "Please check your current password and try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsUpdating(false);
-    }, 1000);
+    }
   };
 
   const handleProfileUpdate = (updates: any) => {
