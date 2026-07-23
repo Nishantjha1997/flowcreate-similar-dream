@@ -443,6 +443,7 @@ const Account = () => {
 
               <TabsContent value="profile" className="mt-0 animate-fade-in space-y-6">
                 <PDFResumeUploader
+                  currentProfile={mergedProfile}
                   onDataExtracted={(data: Partial<UserProfile>) => handleProfileUpdate(data)}
                 />
 

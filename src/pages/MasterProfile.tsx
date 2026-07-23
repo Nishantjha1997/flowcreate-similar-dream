@@ -386,6 +386,7 @@ export default function MasterProfilePage() {
 
                 {/* PDF Import */}
                 <PDFResumeUploader
+                  currentProfile={(selectedProfile.profile_data as Partial<UserProfile>) || {}}
                   onDataExtracted={(data: Partial<UserProfile>) => updateProfileData(data)}
                 />
 

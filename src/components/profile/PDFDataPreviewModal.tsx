@@ -6,13 +6,15 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { CheckCircle2, FileText, User, Briefcase, GraduationCap, Code, FolderOpen, Award, Languages } from 'lucide-react';
+import { CheckCircle2, FileText, User, Briefcase, GraduationCap, Code, FolderOpen, Award, Languages, Plus, Replace, SkipForward } from 'lucide-react';
 import { UserProfile } from '@/hooks/useUserProfile';
+import { isProfileImportArray, mergeProfileImport, ProfileImportMode } from '@/utils/profileImport';
 
 interface PDFDataPreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   extractedData: Partial<UserProfile>;
+  currentProfile?: Partial<UserProfile>;
   onImport: (selectedData: Partial<UserProfile>) => void;
 }
 
@@ -22,12 +24,14 @@ interface SelectableSection {
   icon: React.ReactNode;
   data: any;
   selected: boolean;
+  mode: ProfileImportMode;
 }
 
 export const PDFDataPreviewModal: React.FC<PDFDataPreviewModalProps> = ({
   isOpen,
   onClose,
   extractedData,
+  currentProfile,
   onImport,
 }) => {
   const [selectableSections, setSelectableSections] = useState<SelectableSection[]>(() => {
@@ -47,6 +51,7 @@ export const PDFDataPreviewModal: React.FC<PDFDataPreviewModalProps> = ({
           website_url: extractedData.website_url,
         },
         selected: true,
+        mode: 'replace',
       });
     }
 
@@ -57,6 +62,7 @@ export const PDFDataPreviewModal: React.FC<PDFDataPreviewModalProps> = ({
         icon: <FileText className="w-4 h-4" />,
         data: extractedData.professional_summary,
         selected: true,
+        mode: 'replace',
       });
     }
 
@@ -67,6 +73,7 @@ export const PDFDataPreviewModal: React.FC<PDFDataPreviewModalProps> = ({
         icon: <Briefcase className="w-4 h-4" />,
         data: extractedData.work_experience,
         selected: true,
+        mode: Array.isArray(currentProfile?.work_experience) && currentProfile.work_experience.length ? 'append' : 'replace',
       });
     }
 
@@ -77,6 +84,7 @@ export const PDFDataPreviewModal: React.FC<PDFDataPreviewModalProps> = ({
         icon: <GraduationCap className="w-4 h-4" />,
         data: extractedData.education,
         selected: true,
+        mode: Array.isArray(currentProfile?.education) && currentProfile.education.length ? 'append' : 'replace',
       });
     }
 
@@ -87,6 +95,7 @@ export const PDFDataPreviewModal: React.FC<PDFDataPreviewModalProps> = ({
         icon: <Code className="w-4 h-4" />,
         data: extractedData.technical_skills,
         selected: true,
+        mode: Array.isArray(currentProfile?.technical_skills) && currentProfile.technical_skills.length ? 'append' : 'replace',
       });
     }
 
@@ -97,6 +106,7 @@ export const PDFDataPreviewModal: React.FC<PDFDataPreviewModalProps> = ({
         icon: <FolderOpen className="w-4 h-4" />,
         data: extractedData.projects,
         selected: true,
+        mode: Array.isArray(currentProfile?.projects) && currentProfile.projects.length ? 'append' : 'replace',
       });
     }
 
@@ -107,6 +117,7 @@ export const PDFDataPreviewModal: React.FC<PDFDataPreviewModalProps> = ({
         icon: <Award className="w-4 h-4" />,
         data: extractedData.certifications,
         selected: true,
+        mode: Array.isArray(currentProfile?.certifications) && currentProfile.certifications.length ? 'append' : 'replace',
       });
     }
 
@@ -117,6 +128,7 @@ export const PDFDataPreviewModal: React.FC<PDFDataPreviewModalProps> = ({
         icon: <Languages className="w-4 h-4" />,
         data: extractedData.languages,
         selected: true,
+        mode: Array.isArray(currentProfile?.languages) && currentProfile.languages.length ? 'append' : 'replace',
       });
     }
 
@@ -138,21 +150,18 @@ export const PDFDataPreviewModal: React.FC<PDFDataPreviewModalProps> = ({
     );
   };
 
+  const setSectionMode = (index: number, mode: ProfileImportMode) => {
+    setSelectableSections(prev => prev.map((section, i) =>
+      i === index ? { ...section, mode, selected: mode !== 'skip' } : section,
+    ));
+  };
+
   const handleImportSelected = () => {
-    const selectedData: Partial<UserProfile> = {};
-    
-    selectableSections.forEach(section => {
-      if (section.selected) {
-        if (section.key === 'full_name') {
-          // Handle personal information as a group
-          Object.assign(selectedData, section.data);
-        } else {
-          (selectedData as any)[section.key] = section.data;
-        }
-      }
-    });
-    
-    onImport(selectedData);
+    onImport(mergeProfileImport(currentProfile, selectableSections.map(section => ({
+      key: section.key,
+      data: section.data,
+      mode: section.selected ? section.mode : 'skip',
+    }))));
     onClose();
   };
 
@@ -266,8 +275,7 @@ export const PDFDataPreviewModal: React.FC<PDFDataPreviewModalProps> = ({
             Resume Data Extracted Successfully
           </DialogTitle>
           <DialogDescription>
-            Review and select the information you want to import into your profile.
-            You can choose specific sections or import everything at once.
+            Review every section before import. Replace swaps current data; Add keeps current data and removes duplicates.
           </DialogDescription>
         </DialogHeader>
         
@@ -322,6 +330,19 @@ export const PDFDataPreviewModal: React.FC<PDFDataPreviewModalProps> = ({
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
+                  {isProfileImportArray(section.key) && (
+                    <div className="mb-3 flex flex-wrap gap-2" aria-label={`${section.label} import mode`}>
+                      <Button type="button" variant={section.mode === 'replace' ? 'default' : 'outline'} size="sm" onClick={() => setSectionMode(index, 'replace')}>
+                        <Replace className="mr-1 h-3.5 w-3.5" /> Replace
+                      </Button>
+                      <Button type="button" variant={section.mode === 'append' ? 'default' : 'outline'} size="sm" onClick={() => setSectionMode(index, 'append')}>
+                        <Plus className="mr-1 h-3.5 w-3.5" /> Add
+                      </Button>
+                      <Button type="button" variant={!section.selected ? 'default' : 'outline'} size="sm" onClick={() => setSectionMode(index, 'skip')}>
+                        <SkipForward className="mr-1 h-3.5 w-3.5" /> Skip
+                      </Button>
+                    </div>
+                  )}
                   {renderSectionPreview(section)}
                 </CardContent>
               </Card>

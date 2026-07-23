@@ -11,10 +11,12 @@ import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 
 interface PDFResumeUploaderProps {
   onDataExtracted: (data: Partial<UserProfile>) => void;
+  currentProfile?: Partial<UserProfile>;
 }
 
 export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
   onDataExtracted,
+  currentProfile,
 }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
@@ -216,6 +218,7 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
           isOpen={showPreviewModal}
           onClose={handleCloseModal}
           extractedData={extractedData}
+          currentProfile={currentProfile}
           onImport={handleImportData}
         />
       )}
