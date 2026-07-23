@@ -89,5 +89,16 @@ A modern, full-stack resume builder application with an integrated Applicant Tra
 
 The codebase has undergone a major 9-phase overhaul for stability, feature-completeness, and monetization:
 - **[OVERHAUL_PLAN.md](./OVERHAUL_PLAN.md)** - The master phase-by-phase implementation plan.
+
+## Product roadmap
+
+The active execution plan is [ROADMAP.md](./ROADMAP.md). It supersedes the
+older planning documents for implementation order and acceptance criteria.
+
+- [PLAN_REVIEW.md](./PLAN_REVIEW.md) records the live-code review and ratings.
+- [REFINED_PLAN.md](./REFINED_PLAN.md) records the Supabase/SaaS schema history.
+- [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) and
+  [OVERHAUL_PLAN.md](./OVERHAUL_PLAN.md) remain historical design references;
+  do not use them to reorder current work.
 - **[PROGRESS.md](./PROGRESS.md)** - The chronological execution log of the overhaul.
 - **[GEMINI_MASTER_PROMPT.md](./GEMINI_MASTER_PROMPT.md)** - The architectural guidelines and agent instructions used during the overhaul.

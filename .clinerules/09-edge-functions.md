@@ -1,195 +1,65 @@
-# ⚡ Edge Functions
+# Edge Functions
 
-## Overview
-Supabase Edge Functions provide serverless backend logic. Written in TypeScript/Deno.
+Supabase Edge Functions live in `supabase/functions/<name>/index.ts` and run on
+the linked project `ufzxrojekrrvlweadnkq`.
 
-## Location
-`supabase/functions/`
+## Current functions
 
-## Deployed Functions
+Admin and account operations: `admin-add-org-member`, `admin-create-user`,
+`admin-delete-user`, `admin-list-users`, and `self-delete-account`.
 
-### 1. admin-create-user
-**Path**: `/supabase/functions/admin-create-user/index.ts`
-**Purpose**: Allow admins to create new users
+AI and document flows: `gemini-suggest`, `extract-resume-data`,
+`extract-text-from-file`, and `blog-ai`.
 
-**Request**:
-```typescript
-POST /functions/v1/admin-create-user
-{
-  email: string;
-  password: string;
-  role?: 'admin' | 'moderator' | 'user';
-}
+Payments and billing: `create-razorpay-order`, `verify-razorpay-payment`,
+`razorpay-webhook`, `create-stripe-checkout`, and `stripe-webhook`.
+
+Content and notifications: `blog-scheduler`, `send-notification`, and
+`track-resume-view`.
+
+Shared code is under `supabase/functions/_shared/`. The shared rate limiter
+uses atomic Postgres RPCs, and AI calls must enforce plan metering before
+returning a successful result.
+
+## Request contracts
+
+Do not change an existing request or response shape without updating every
+caller and its tests. The frontend calls `gemini-suggest` with a JSON body
+containing `prompt`; resume extraction receives multipart form data with a
+`file`; Razorpay order creation receives `{ planType }`; payment verification
+receives Razorpay IDs, signature, and `planType`. Stripe and Razorpay webhooks
+receive provider-native HTTP payloads and verify their signatures.
+
+Every AI endpoint must validate input, normalize provider output, apply the
+durable rate limit, and meter successful usage. Never trust a model to follow
+the requested JSON shape.
+
+## Secrets
+
+Required secrets depend on the function. Common values are `SUPABASE_URL`,
+`SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`. Provider secrets include
+`GEMINI_API_KEY`, `OPENAI_API_KEY`, `DEEPSEEK_API_KEY`, `RAZORPAY_KEY_ID`,
+`RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`, `STRIPE_SECRET_KEY`,
+`STRIPE_WEBHOOK_SECRET`, and optional `RESEND_API_KEY`.
+
+Service-role keys are server-only. Never put them in `VITE_*` variables or
+return them to the browser.
+
+## Error handling
+
+Frontend callers must use `getEdgeFunctionErrorMessage()` from
+`src/utils/edgeFunctionError.ts`. Do not expose the generic
+`FunctionsHttpError.message` value to users. Edge functions should return a
+safe public error and log internal details only on the server.
+
+## Deployment and verification
+
+Edge functions do not deploy from a Git push. Deploy each changed function:
+
+```powershell
+supabase functions deploy <name> --project-ref ufzxrojekrrvlweadnkq
 ```
 
-### 2. create-razorpay-order
-**Path**: `/supabase/functions/create-razorpay-order/index.ts`
-**Purpose**: Create Razorpay payment order for subscriptions
-
-**Request**:
-```typescript
-POST /functions/v1/create-razorpay-order
-{
-  amount: number;
-  plan_type: string;
-}
-```
-
-**Response**:
-```typescript
-{
-  order_id: string;
-  amount: number;
-  currency: string;
-}
-```
-
-### 3. verify-razorpay-payment
-**Path**: `/supabase/functions/verify-razorpay-payment/index.ts`
-**Purpose**: Verify Razorpay payment and activate subscription
-
-**Request**:
-```typescript
-POST /functions/v1/verify-razorpay-payment
-{
-  razorpay_order_id: string;
-  razorpay_payment_id: string;
-  razorpay_signature: string;
-  plan_type: string;
-}
-```
-
-### 4. extract-resume-data
-**Path**: `/supabase/functions/extract-resume-data/index.ts`
-**Purpose**: Parse PDF resume and extract structured data using AI
-
-**Request**:
-```typescript
-POST /functions/v1/extract-resume-data
-Content-Type: multipart/form-data
-{
-  file: File (PDF)
-}
-```
-
-**Response**:
-```typescript
-{
-  personal: { name, email, phone, ... };
-  experience: [...];
-  education: [...];
-  skills: [...];
-}
-```
-
-**Dependencies**:
-- Requires `GEMINI_API_KEY` secret
-- Uses Gemini AI for parsing
-
-### 5. gemini-suggest
-**Path**: `/supabase/functions/gemini-suggest/index.ts`
-**Purpose**: Generate AI suggestions for resume content
-
-**Request**:
-```typescript
-POST /functions/v1/gemini-suggest
-{
-  type: 'summary' | 'experience' | 'skills';
-  context: {
-    currentContent?: string;
-    jobTitle?: string;
-    industry?: string;
-  };
-}
-```
-
-**Response**:
-```typescript
-{
-  suggestion: string;
-}
-```
-
-## Shared Utilities
-
-### AI Key Manager
-**Path**: `/supabase/functions/_shared/aiKeyManager.ts`
-
-Manages multiple AI API keys with rotation:
-```typescript
-export async function getActiveAIKey(provider: string): Promise<string>;
-export async function recordKeyUsage(keyId: string): Promise<void>;
-```
-
-## Required Secrets
-
-| Secret Name | Purpose |
-|-------------|---------|
-| `SUPABASE_URL` | Supabase project URL |
-| `SUPABASE_ANON_KEY` | Supabase anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Admin operations |
-| `RAZORPAY_KEY_ID` | Razorpay public key |
-| `RAZORPAY_KEY_SECRET` | Razorpay secret key |
-| `GEMINI_API_KEY` | Google Gemini AI |
-| `OPENAI_API_KEY` | OpenAI (optional fallback) |
-
-## Calling Edge Functions from Frontend
-
-```typescript
-import { supabase } from '@/integrations/supabase/client';
-
-// With authentication
-const { data, error } = await supabase.functions.invoke('function-name', {
-  body: { /* request body */ }
-});
-
-// Handle response
-if (error) {
-  console.error('Function error:', error);
-} else {
-  console.log('Response:', data);
-}
-```
-
-## CORS Configuration
-Edge functions include CORS headers for browser requests:
-```typescript
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-```
-
-## Error Handling Pattern
-```typescript
-try {
-  // Function logic
-  return new Response(JSON.stringify(data), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    status: 200,
-  });
-} catch (error) {
-  return new Response(JSON.stringify({ error: error.message }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    status: 500,
-  });
-}
-```
-
-## Deployment
-Edge functions are automatically deployed when code is pushed. No manual deployment needed in Lovable.
-
-## Local Development
-```bash
-# Start Supabase locally
-supabase start
-
-# Serve functions locally
-supabase functions serve
-
-# Test function
-curl -X POST http://localhost:54321/functions/v1/function-name \
-  -H "Authorization: Bearer <anon_key>" \
-  -H "Content-Type: application/json" \
-  -d '{"key": "value"}'
-```
+Before committing, run `tsc --noEmit`, `vitest run`, and `npm run build`.
+After schema changes, apply the append-only migration with
+`supabase db push --linked` and regenerate `src/integrations/supabase/types.ts`.
