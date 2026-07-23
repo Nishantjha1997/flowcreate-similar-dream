@@ -17,6 +17,8 @@ import { CoverLetterFormData } from '@/hooks/useCoverLetterData';
 import { coverLetterTemplateNames } from '@/utils/coverLetterTemplates';
 import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 import { JobDescriptionGenerator } from './JobDescriptionGenerator';
+import { useAuth } from '@/hooks/useAuth';
+import { useAIQuota } from '@/hooks/useAIQuota';
 
 const TEMPLATE_OPTIONS = Object.entries(coverLetterTemplateNames).map(([value, label]) => ({ value, label }));
 
@@ -35,9 +37,16 @@ export const CoverLetterEditor = ({
   onSave,
   userResumes,
 }: CoverLetterEditorProps) => {
+  const { user } = useAuth();
+  const quota = useAIQuota(user?.id);
   const [aiLoading, setAiLoading] = useState(false);
 
   const handleGenerateSuggestion = async () => {
+    if (!quota.isLoading && !quota.canUse) {
+      window.location.assign('/pricing');
+      return;
+    }
+
     if (!formData.resume_id) {
       toast.info('Link a resume first to use AI suggestions.');
       return;
@@ -60,6 +69,7 @@ export const CoverLetterEditor = ({
       if (funcData?.error) throw new Error(funcData.error as string);
       if (funcData?.suggestion) {
         setFormData({ ...formData, content: funcData.suggestion });
+        void quota.refresh();
         toast.success('AI suggestion generated!');
       }
     } catch (error: any) {
@@ -145,9 +155,16 @@ export const CoverLetterEditor = ({
             ) : (
               <Sparkles className="h-3 w-3" />
             )}
-            AI Suggest
+            {!quota.isLoading && !quota.canUse ? 'Upgrade for AI' : 'AI Suggest'}
           </Button>
         </div>
+        <p className="text-right text-xs text-muted-foreground">
+          {quota.isLoading
+            ? 'Checking AI quota...'
+            : quota.isUnlimited
+              ? 'Unlimited AI uses'
+              : `${quota.used}/${quota.cap} AI uses this month`}
+        </p>
         <Textarea
           id="cl-content"
           value={formData.content}

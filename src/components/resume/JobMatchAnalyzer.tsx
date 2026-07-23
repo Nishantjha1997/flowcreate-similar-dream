@@ -17,6 +17,8 @@ import { ResumeData } from '@/utils/types';
 import { captureError } from '@/lib/monitoring';
 import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 import { JobDescriptionInput } from '@/components/JobDescriptionInput';
+import { useAuth } from '@/hooks/useAuth';
+import { useAIQuota } from '@/hooks/useAIQuota';
 
 interface JobMatchAnalyzerProps {
   resume: ResumeData;
@@ -54,6 +56,8 @@ function extractJson(text: string): any {
 }
 
 export function JobMatchAnalyzer({ resume }: JobMatchAnalyzerProps) {
+  const { user } = useAuth();
+  const quota = useAIQuota(user?.id);
   const [open, setOpen] = useState(false);
   const [jobDescription, setJobDescription] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,6 +65,11 @@ export function JobMatchAnalyzer({ resume }: JobMatchAnalyzerProps) {
   const [error, setError] = useState('');
 
   const handleAnalyze = async () => {
+    if (!quota.isLoading && !quota.canUse) {
+      window.location.assign('/pricing');
+      return;
+    }
+
     if (jobDescription.trim().length < 40) {
       toast.error('Paste the full job description first (at least a few sentences).');
       return;
@@ -97,6 +106,7 @@ Return exactly this JSON shape:
         missingKeywords: Array.isArray(parsed.missingKeywords) ? parsed.missingKeywords.slice(0, 10) : [],
         suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions.slice(0, 5) : [],
       });
+      void quota.refresh();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Analysis failed. Please try again.';
       // Server-side entitlement gating (free plan) surfaces as a plain error
@@ -145,8 +155,15 @@ Return exactly this JSON shape:
 
           <Button onClick={handleAnalyze} disabled={loading} className="w-full">
             {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Target className="h-4 w-4 mr-2" />}
-            {loading ? 'Analyzing...' : 'Analyze Match'}
+            {loading ? 'Analyzing...' : !quota.isLoading && !quota.canUse ? 'Upgrade to Analyze' : 'Analyze Match'}
           </Button>
+          <p className="text-center text-xs text-muted-foreground">
+            {quota.isLoading
+              ? 'Checking AI quota...'
+              : quota.isUnlimited
+                ? 'Unlimited AI analyses'
+                : `${quota.used}/${quota.cap} AI analyses this month`}
+          </p>
 
           {error && (
             <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive flex items-start gap-2">

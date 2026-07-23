@@ -18,6 +18,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { useAIQuota } from "@/hooks/useAIQuota";
 
 interface AiSuggestionButtonProps {
   value: string;
@@ -60,6 +62,8 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
   company,
   additionalContext
 }) => {
+  const { user } = useAuth();
+  const quota = useAIQuota(user?.id);
   const [loading, setLoading] = React.useState(false);
   const [suggestions, setSuggestions] = React.useState<string[]>([]);
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
@@ -95,6 +99,11 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
       return;
     }
 
+    if (!quota.isLoading && !quota.canUse) {
+      setShowUpgradeDialog(true);
+      return;
+    }
+
     if (!value.trim()) {
       toast.error("Please enter some content first to get AI suggestions.");
       return;
@@ -115,6 +124,7 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
       });
       
       setSuggestions(results);
+      void quota.refresh();
       toast.success(`Generated ${results.length} AI suggestions!`);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Failed to get AI suggestions';
@@ -187,7 +197,15 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
         </div>
         
         <span className="text-xs text-muted-foreground">
-          {isPremium ? "Powered by Gemini AI - Multiple suggestions available" : "Premium Feature - ₹199/month"}
+          <span>
+            {isPremium
+              ? quota.isLoading
+                ? "Checking AI quota..."
+                : quota.isUnlimited
+                  ? "Unlimited AI uses"
+                  : `${quota.used}/${quota.cap} AI uses this month`
+              : "Premium Feature - ₹199/month"}
+          </span>
         </span>
         
         {suggestions.length > 0 && (

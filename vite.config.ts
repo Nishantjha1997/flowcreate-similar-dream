@@ -31,5 +31,11 @@ export default defineConfig(({ mode }) => ({
   test: {
     environment: 'jsdom',
     globals: true,
+    // Keep CI and Windows development runs deterministic. The default fork
+    // pool intermittently exits workers before Vitest can report results.
+    pool: 'threads',
+    fileParallelism: false,
+    maxWorkers: 1,
+    minWorkers: 1,
   },
 }));
