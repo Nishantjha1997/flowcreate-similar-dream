@@ -346,14 +346,16 @@ const ResumeBuilder = () => {
 
             {/* Right Preview */}
             <div className={`lg:col-span-7 lg:h-full ${activeMobileTab !== 'preview' ? 'hidden lg:block' : ''}`} data-tour="preview">
-              <ResumePreviewSection
-                resume={resume}
-                templateId={templateId}
-                templateNames={templateNames}
-                resumeRef={resumeElementRef}
-                sectionOrder={activeSections}
-                hiddenSections={hiddenSections}
-              />
+              <SectionBoundary name="Live resume preview">
+                <ResumePreviewSection
+                  resume={resume}
+                  templateId={templateId}
+                  templateNames={templateNames}
+                  resumeRef={resumeElementRef}
+                  sectionOrder={activeSections}
+                  hiddenSections={hiddenSections}
+                />
+              </SectionBoundary>
             </div>
           </div>
         </div>

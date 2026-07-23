@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { ResumeVisualPreview } from '@/components/resume/ResumeVisualPreview';
 import { ResumeData } from '@/utils/types';
 import { Button } from '@/components/ui/button';
@@ -45,6 +45,16 @@ export const ResumePreviewSection = ({
   const resetZoom = useCallback(() => setZoom(70), []);
   const toggleFullscreen = useCallback(() => setIsFullscreen(prev => !prev), []);
 
+  useEffect(() => {
+    if (!isFullscreen) return;
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsFullscreen(false);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [isFullscreen]);
+
   return (
     <div className={cn(
       "h-full flex flex-col rounded-2xl border border-border/50 bg-card overflow-hidden transition-all duration-300 shadow-sm",
@@ -83,7 +93,7 @@ export const ResumePreviewSection = ({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={zoomOut} disabled={zoom <= 30}>
+              <Button aria-label="Zoom out" size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={zoomOut} disabled={zoom <= 30}>
                 <ZoomOut className="h-3.5 w-3.5" />
               </Button>
             </TooltipTrigger>
@@ -98,7 +108,7 @@ export const ResumePreviewSection = ({
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={zoomIn} disabled={zoom >= 150}>
+              <Button aria-label="Zoom in" size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={zoomIn} disabled={zoom >= 150}>
                 <ZoomIn className="h-3.5 w-3.5" />
               </Button>
             </TooltipTrigger>
@@ -109,7 +119,7 @@ export const ResumePreviewSection = ({
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={resetZoom}>
+              <Button aria-label="Reset zoom" size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={resetZoom}>
                 <RotateCcw className="h-3.5 w-3.5" />
               </Button>
             </TooltipTrigger>
@@ -118,7 +128,7 @@ export const ResumePreviewSection = ({
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={toggleFullscreen}>
+              <Button aria-label={isFullscreen ? 'Exit fullscreen preview' : 'Fullscreen preview'} size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={toggleFullscreen}>
                 {isFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
               </Button>
             </TooltipTrigger>
@@ -128,7 +138,7 @@ export const ResumePreviewSection = ({
           {onDownload && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={onDownload}>
+                <Button aria-label="Download PDF" size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={onDownload}>
                   <Download className="h-3.5 w-3.5" />
                 </Button>
               </TooltipTrigger>
@@ -180,6 +190,7 @@ export const ResumePreviewSection = ({
         <button
           className="absolute top-3 right-3 p-2 bg-background/90 backdrop-blur-sm rounded-xl hover:bg-background transition-colors border border-border/40 shadow-sm"
           onClick={toggleFullscreen}
+          aria-label="Exit fullscreen preview"
         >
           <Minimize2 className="h-4 w-4" />
         </button>
