@@ -45,4 +45,11 @@ describe('DocumentExportActions', () => {
     const generatingButton = screen.getByRole('button', { name: 'Creating exact-look PDF…' });
     expect((generatingButton as HTMLButtonElement).disabled).toBe(true);
   });
+
+  it('shows DOCX export only as a premium action', () => {
+    const onDocxExport = vi.fn();
+    render(<DocumentExportActions onSemanticExport={vi.fn()} onImageExport={vi.fn()} onDocxExport={onDocxExport} isPremium />);
+    fireEvent.click(screen.getByRole('button', { name: 'Download DOCX' }));
+    expect(onDocxExport).toHaveBeenCalledTimes(1);
+  });
 });

@@ -26,6 +26,7 @@ import { SectionBoundary } from '@/components/ui/section-boundary';
 import { supabase } from '@/integrations/supabase/client';
 import { Json } from '@/integrations/supabase/types';
 import { useAuth } from '@/hooks/useAuth';
+import { exportResumeDocx } from '@/utils/docxExport';
 
 const ResumeBuilder = () => {
   const navigate = useNavigate();
@@ -159,6 +160,11 @@ const ResumeBuilder = () => {
     }
   };
 
+  const handleDocxExport = async () => {
+    if (!premium?.isPremium) { navigate('/pricing'); return; }
+    await exportResumeDocx(resume, `${resumeName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.docx`);
+  };
+
   const handleManualSave = async () => {
     const result = await handleSaveResume(resume);
     if (result.success && result.resumeId && !editResumeId) {
@@ -255,6 +261,8 @@ const ResumeBuilder = () => {
               resumeId={editResumeId}
               onResumeChange={handleAIResumeChange}
               onCreateTailoredVersion={handleCreateTailoredVersion}
+              onDocxExport={() => void handleDocxExport()}
+              isPremium={premium?.isPremium}
               templateId={templateId}
               templateNames={templateNames}
               sectionOrder={activeSections}

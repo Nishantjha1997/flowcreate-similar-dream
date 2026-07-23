@@ -1,4 +1,4 @@
-import { Download, Loader2, Printer } from 'lucide-react';
+import { Download, FileText, Loader2, Printer } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -7,6 +7,8 @@ interface DocumentExportActionsProps {
   onSemanticExport: () => void;
   onImageExport: () => void;
   isImageGenerating?: boolean;
+  onDocxExport?: () => void;
+  isPremium?: boolean;
   className?: string;
 }
 
@@ -19,6 +21,8 @@ export function DocumentExportActions({
   onSemanticExport,
   onImageExport,
   isImageGenerating = false,
+  onDocxExport,
+  isPremium = false,
   className,
 }: DocumentExportActionsProps) {
   return (
@@ -37,6 +41,12 @@ export function DocumentExportActions({
         <Printer className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
         Download PDF (ATS-friendly)
       </Button>
+      {onDocxExport && (
+        <Button type="button" variant="outline" size="sm" onClick={onDocxExport} className="h-8 rounded-full border-border/50 px-4 text-xs font-medium" title={isPremium ? 'Download an ATS-friendly Word document' : 'DOCX export is a Premium feature'}>
+          <FileText className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
+          {isPremium ? 'Download DOCX' : 'DOCX · Premium'}
+        </Button>
+      )}
 
       <Button
         type="button"

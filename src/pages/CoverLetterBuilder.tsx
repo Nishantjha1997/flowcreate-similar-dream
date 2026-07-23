@@ -11,6 +11,8 @@ import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { DocumentExportActions } from '@/components/export/DocumentExportActions';
 import { SectionBoundary } from '@/components/ui/section-boundary';
+import { exportCoverLetterDocx } from '@/utils/docxExport';
+import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 
 const CoverLetterBuilder = () => {
   const navigate = useNavigate();
@@ -30,6 +32,7 @@ const CoverLetterBuilder = () => {
     userResumes,
     userId,
   } = useCoverLetterData();
+  const { data: premium } = usePremiumStatus(userId);
 
   const { isGenerating, generatePDF, printResume } = usePDFGenerator(
     `${formData.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'cover_letter'}.pdf`
@@ -55,6 +58,11 @@ const CoverLetterBuilder = () => {
     link.download = `${formData.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'cover_letter'}.txt`;
     link.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleDocxDownload = async () => {
+    if (!premium?.isPremium) { navigate('/pricing'); return; }
+    await exportCoverLetterDocx(formData.title, formData.content, `${formData.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'cover_letter'}.docx`);
   };
 
   const handleSave = async () => {
@@ -114,6 +122,8 @@ const CoverLetterBuilder = () => {
           onSemanticExport={handleAtsDownload}
           onImageExport={handleDownload}
           isImageGenerating={isGenerating}
+          onDocxExport={() => void handleDocxDownload()}
+          isPremium={premium?.isPremium}
         />
         <Button variant="outline" size="sm" onClick={handleTextDownload} className="h-8 text-xs">TXT</Button>
       </div>

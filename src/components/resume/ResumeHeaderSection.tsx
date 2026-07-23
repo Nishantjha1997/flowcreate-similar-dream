@@ -22,6 +22,8 @@ interface ResumeHeaderSectionProps {
   resumeId?: string | null;
   onResumeChange?: (resume: ResumeData) => Promise<void> | void;
   onCreateTailoredVersion?: (resume: ResumeData) => Promise<void>;
+  onDocxExport?: () => void;
+  isPremium?: boolean;
   templateId: string;
   templateNames: Record<string, string>;
   sectionOrder: string[];
@@ -44,6 +46,8 @@ export const ResumeHeaderSection = ({
   resumeId,
   onResumeChange,
   onCreateTailoredVersion,
+  onDocxExport,
+  isPremium = false,
   templateId,
   templateNames,
   sectionOrder,
@@ -99,6 +103,8 @@ export const ResumeHeaderSection = ({
           onSemanticExport={handlePrint}
           onImageExport={handleDownload}
           isImageGenerating={isGenerating}
+          onDocxExport={onDocxExport}
+          isPremium={isPremium}
         />
         <EnhancedResumePreview 
           resume={resume}
