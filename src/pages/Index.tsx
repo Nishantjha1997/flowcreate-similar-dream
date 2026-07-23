@@ -17,8 +17,10 @@ const Index = () => {
   });
 
   useEffect(() => {
+    document.getElementById('seo-structured-data')?.remove();
     const script = document.createElement('script');
     script.type = 'application/ld+json';
+    script.id = 'seo-structured-data';
     script.textContent = JSON.stringify({
       '@context': 'https://schema.org',
       '@graph': [
@@ -55,7 +57,7 @@ const Index = () => {
     });
     document.head.appendChild(script);
     return () => {
-      document.head.removeChild(script);
+      document.getElementById('seo-structured-data')?.remove();
     };
   }, []);
 

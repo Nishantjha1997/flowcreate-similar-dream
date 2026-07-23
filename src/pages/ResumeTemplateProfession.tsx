@@ -23,9 +23,10 @@ const ResumeTemplateProfession = () => {
 
   useEffect(() => {
     if (!data) return;
+    document.getElementById('seo-structured-data')?.remove();
     const script = document.createElement('script');
     script.type = 'application/ld+json';
-    script.id = 'profession-structured-data';
+    script.id = 'seo-structured-data';
     script.textContent = JSON.stringify({
       '@context': 'https://schema.org',
       '@graph': [
@@ -49,7 +50,7 @@ const ResumeTemplateProfession = () => {
     });
     document.head.appendChild(script);
     return () => {
-      const el = document.getElementById('profession-structured-data');
+      const el = document.getElementById('seo-structured-data');
       if (el) el.remove();
     };
   }, [data]);

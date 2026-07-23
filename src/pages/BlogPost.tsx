@@ -14,8 +14,9 @@ import { SITE_URL, absoluteUrl } from '@/lib/seo';
 interface BlogPost {
   id: string; slug: string; title: string; excerpt: string;
   description: string; content: string; category: string;
-  read_time: string; published_at: string; created_at: string; keywords: string[];
+  read_time: string; published_at: string; created_at: string; updated_at?: string; keywords: string[];
   author?: string;
+  image_url?: string;
 }
 
 const BlogPost = () => {
@@ -60,6 +61,10 @@ const BlogPost = () => {
     title: post ? `${post.title} | FlowCreate Blog` : 'Blog Post',
     description: post?.description || 'Resume tips and career advice from FlowCreate.',
     noindex: !isLoading && (isError || !post),
+    type: 'article',
+    image: post?.image_url || '/og-image.png',
+    publishedTime: post?.published_at || post?.created_at,
+    modifiedTime: post?.updated_at || post?.published_at || post?.created_at,
   });
 
   // Count one view per published post per browser session (guards against
@@ -89,7 +94,7 @@ const BlogPost = () => {
       }
     }
 
-    const jsonLd: any = {
+    const jsonLd: { '@context': string; '@graph': Record<string, unknown>[] } = {
       '@context': 'https://schema.org',
       '@graph': [
         {
@@ -129,13 +134,14 @@ const BlogPost = () => {
       });
     }
 
+    document.getElementById('seo-structured-data')?.remove();
     const script = document.createElement('script');
     script.type = 'application/ld+json';
-    script.id = 'blog-structured-data';
+    script.id = 'seo-structured-data';
     script.textContent = JSON.stringify(jsonLd);
     document.head.appendChild(script);
     return () => {
-      const el = document.getElementById('blog-structured-data');
+      const el = document.getElementById('seo-structured-data');
       if (el) el.remove();
     };
   }, [post]);

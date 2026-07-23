@@ -6,8 +6,14 @@ import {
   Users, Target, TrendingUp, Clock, BarChart3, 
   Shield, Zap, MessageSquare, Award, CheckCircle2 
 } from 'lucide-react';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 const ATSLanding = () => {
+  usePageMeta({
+    title: 'Applicant Tracking System for Collaborative Hiring',
+    description: 'Manage jobs, candidates, hiring pipelines, team feedback, and recruiting analytics with FlowCreate ATS.',
+  });
+
   const features = [
     {
       icon: <Users className="h-12 w-12 text-primary" />,

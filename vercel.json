@@ -3,14 +3,107 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/resume-templates", "destination": "/templates", "permanent": true },
+    { "source": "/cv-builder", "destination": "/resume-builder", "permanent": true },
+    { "source": "/resume", "destination": "/resume-builder", "permanent": true },
+    { "source": "/career", "destination": "/career-advice", "permanent": true }
+  ],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/login", "destination": "/index.html" },
+    { "source": "/register", "destination": "/index.html" },
+    { "source": "/forgot-password", "destination": "/index.html" },
+    { "source": "/account/:path*", "destination": "/index.html" },
+    { "source": "/admin/:path*", "destination": "/index.html" },
+    { "source": "/master-profiles", "destination": "/index.html" },
+    { "source": "/r/:path*", "destination": "/index.html" },
+    { "source": "/ats/login", "destination": "/index.html" },
+    { "source": "/ats/signup", "destination": "/index.html" },
+    { "source": "/ats/onboarding", "destination": "/index.html" },
+    { "source": "/ats/dashboard", "destination": "/index.html" },
+    { "source": "/ats/settings", "destination": "/index.html" },
+    { "source": "/ats/jobs/new", "destination": "/index.html" },
+    { "source": "/ats/jobs/:jobId((?!browse|new)[^/]+)", "destination": "/index.html" },
+    { "source": "/ats/applications/:applicationId", "destination": "/index.html" },
+    { "source": "/ats/apply/:jobId", "destination": "/index.html" },
+    { "source": "/ats/talent-pools", "destination": "/index.html" },
+    { "source": "/ats/candidates", "destination": "/index.html" }
   ],
   "headers": [
     {
-      "source": "/assets/(.*)",
+      "source": "/assets/:path*",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/:file(sitemap\\.xml|robots\\.txt|rss\\.xml)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400" }
+      ]
+    },
+    {
+      "source": "/login",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }
+      ]
+    },
+    {
+      "source": "/register",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }
+      ]
+    },
+    {
+      "source": "/forgot-password",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }
+      ]
+    },
+    {
+      "source": "/account/:path*",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }
+      ]
+    },
+    {
+      "source": "/admin/:path*",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }
+      ]
+    },
+    {
+      "source": "/master-profiles",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }
+      ]
+    },
+    {
+      "source": "/r/:path*",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }
+      ]
+    },
+    {
+      "source": "/ats/:section(login|signup|onboarding|dashboard|settings|applications|apply|talent-pools|candidates)/:path*",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }
+      ]
+    },
+    {
+      "source": "/ats/jobs/new",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }
+      ]
+    },
+    {
+      "source": "/:path*",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
       ]
     }
   ]

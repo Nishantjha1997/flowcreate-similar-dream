@@ -13,6 +13,7 @@ import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
 
 import { TEMPLATE_REGISTRY } from '@/templates/registry';
 import { usePageMeta } from '@/hooks/usePageMeta';
+import { professions } from '@/data/professions';
 
 // Derive category chips from the registry so new templates automatically
 // surface their category (order: All first, then registry order, de-duped).
@@ -182,6 +183,31 @@ const Templates = () => {
               </Button>
             </div>
           )}
+
+          <section className="mt-20" aria-labelledby="profession-template-heading">
+            <div className="mx-auto max-w-4xl text-center mb-8">
+              <h2 id="profession-template-heading" className="text-2xl md:text-3xl font-semibold tracking-tight mb-3">
+                Resume Templates by Profession
+              </h2>
+              <p className="text-muted-foreground">
+                Start with a job-specific guide, then customize the layout and content for your experience.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {professions.map((profession) => (
+                <Link
+                  key={profession.slug}
+                  to={`/resume-template/${profession.slug}`}
+                  className="rounded-xl border border-border/60 bg-background p-4 text-sm font-medium transition-colors hover:border-primary hover:text-primary"
+                >
+                  {profession.title.replace(' Resume Template', '')}
+                  <span className="mt-1 block text-xs font-normal text-muted-foreground">
+                    {profession.category}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
 
           <div className="mt-20 rounded-3xl bg-[hsl(var(--surface-dark))] p-12 md:p-16 text-center">
             <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-4 text-[hsl(var(--surface-dark-foreground))]">Can't find the perfect template?</h2>

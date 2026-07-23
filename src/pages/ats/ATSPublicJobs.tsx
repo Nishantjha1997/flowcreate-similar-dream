@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -10,6 +10,7 @@ import {
   Briefcase, MapPin, Clock, DollarSign, Search, Building2, Filter
 } from 'lucide-react';
 import Header from '@/components/Header';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 interface Job {
   id: string;
@@ -28,6 +29,12 @@ interface Job {
   };
 }
 
+interface Organization {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 const ATSPublicJobs = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -37,13 +44,17 @@ const ATSPublicJobs = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [organization, setOrganization] = useState<any>(null);
+  const [organization, setOrganization] = useState<Organization | null>(null);
 
-  useEffect(() => {
-    loadJobs();
-  }, [orgSlug]);
+  usePageMeta({
+    title: organization ? `Open Jobs at ${organization.name}` : 'Browse Open Jobs',
+    description: organization
+      ? `Browse current job openings at ${organization.name} and apply online.`
+      : 'Browse current job openings published by hiring teams using FlowCreate ATS.',
+    canonicalPath: '/ats/jobs/browse',
+  });
 
-  const loadJobs = async () => {
+  const loadJobs = useCallback(async () => {
     try {
       let query = supabase
         .from('jobs')
@@ -73,7 +84,7 @@ const ATSPublicJobs = () => {
           .single();
         
         if (orgData) {
-          setOrganization(orgData);
+          setOrganization(orgData as Organization);
           query = query.eq('organization_id', orgData.id);
         }
       }
@@ -82,16 +93,20 @@ const ATSPublicJobs = () => {
 
       if (error) throw error;
       setJobs(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error loading jobs",
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Unable to load job openings.',
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [orgSlug, toast]);
+
+  useEffect(() => {
+    loadJobs();
+  }, [loadJobs]);
 
   const filteredJobs = jobs.filter(job =>
     job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

@@ -1,14 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /admin
-Disallow: /account
-Disallow: /login
-Disallow: /register
-Disallow: /forgot-password
-Disallow: /ats/dashboard
-Disallow: /ats/settings
-Disallow: /ats/onboarding
-Disallow: /ats/login
-Disallow: /ats/signup
 
 Sitemap: https://flowcreate-similar-dream.vercel.app/sitemap.xml
