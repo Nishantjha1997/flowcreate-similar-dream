@@ -19,6 +19,9 @@ interface ResumeHeaderSectionProps {
   isSaving?: boolean;
   isEditing?: boolean;
   resume: ResumeData;
+  resumeId?: string | null;
+  onResumeChange?: (resume: ResumeData) => Promise<void> | void;
+  onCreateTailoredVersion?: (resume: ResumeData) => Promise<void>;
   templateId: string;
   templateNames: Record<string, string>;
   sectionOrder: string[];
@@ -38,6 +41,9 @@ export const ResumeHeaderSection = ({
   isSaving = false,
   isEditing = false,
   resume,
+  resumeId,
+  onResumeChange,
+  onCreateTailoredVersion,
   templateId,
   templateNames,
   sectionOrder,
@@ -83,7 +89,12 @@ export const ResumeHeaderSection = ({
           <Share2 className="h-3.5 w-3.5 mr-1.5" />
           Share
         </Button>
-        <JobMatchAnalyzer resume={resume} />
+        <JobMatchAnalyzer
+          resume={resume}
+          resumeId={resumeId}
+          onResumeChange={onResumeChange}
+          onCreateTailoredVersion={onCreateTailoredVersion}
+        />
         <DocumentExportActions
           onSemanticExport={handlePrint}
           onImageExport={handleDownload}

@@ -23,6 +23,9 @@ import { ShareManagement } from '@/components/sharing/ShareManagement';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { getTemplate, resolveTemplateKey } from '@/templates/registry';
 import { SectionBoundary } from '@/components/ui/section-boundary';
+import { supabase } from '@/integrations/supabase/client';
+import { Json } from '@/integrations/supabase/types';
+import { useAuth } from '@/hooks/useAuth';
 
 const ResumeBuilder = () => {
   const navigate = useNavigate();
@@ -35,6 +38,7 @@ const ResumeBuilder = () => {
   const [activeMobileTab, setActiveMobileTab] = useState<'edit' | 'preview'>('edit');
   
   const { resume, setResume, templateId, isExample, editResumeId, loadingExistingResume } = useResumeData();
+  const { user } = useAuth();
   const handlers = useResumeHandlers(setResume);
   const { isSaving, handleSaveResume, handleAIFeatureUpsell, premium, resumeCount } = useResumeSave(editResumeId);
   const { activeSection, activeSections, hiddenSections, handleSectionChange, handleSectionsChange } = useSectionManagement(
@@ -165,6 +169,42 @@ const ResumeBuilder = () => {
     }
   };
 
+  const handleAIResumeChange = async (updatedResume: ResumeData) => {
+    setResume(updatedResume);
+    if (editResumeId) await handleSaveResume(updatedResume);
+  };
+
+  const handleCreateTailoredVersion = async (tailoredResume: ResumeData) => {
+    if (!user || !editResumeId) {
+      toast.info('Save this resume first, then create a tailored copy.');
+      return;
+    }
+    if (!premium?.isPremium) {
+      toast.info('Tailored resume versions are included with Premium.');
+      navigate('/pricing');
+      return;
+    }
+    const role = tailoredResume.experience?.[0]?.title || 'Target Role';
+    const { data, error } = await supabase
+      .from('resumes')
+      .insert({
+        user_id: user.id,
+        resume_data: tailoredResume as unknown as Json,
+        template_id: resolveTemplateKey(tailoredResume.selectedTemplate),
+        parent_resume_id: editResumeId,
+        version_label: `${role} — Tailored`,
+        is_tailored: true,
+      })
+      .select('id')
+      .single();
+    if (error) {
+      toast.error(`Could not create tailored copy: ${error.message}`);
+      return;
+    }
+    toast.success('Tailored copy created. Your original resume is unchanged.');
+    navigate(`/resume-builder?template=${templateId}&edit=${data.id}`);
+  };
+
   if (loadingExistingResume) {
     return <ResumeSkeleton />;
   }
@@ -212,6 +252,9 @@ const ResumeBuilder = () => {
               isSaving={isSaving}
               isEditing={!!editResumeId}
               resume={resume}
+              resumeId={editResumeId}
+              onResumeChange={handleAIResumeChange}
+              onCreateTailoredVersion={handleCreateTailoredVersion}
               templateId={templateId}
               templateNames={templateNames}
               sectionOrder={activeSections}

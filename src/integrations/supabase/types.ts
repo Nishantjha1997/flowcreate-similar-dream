@@ -875,6 +875,65 @@ export type Database = {
           },
         ]
       }
+      job_match_reports: {
+        Row: {
+          company: string | null
+          created_at: string
+          id: string
+          jd_hash: string | null
+          jd_text: string
+          job_title: string | null
+          matched_keywords: Json
+          missing_keywords: Json
+          recommendations: Json
+          resume_id: string | null
+          score: number
+          score_breakdown: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          id?: string
+          jd_hash?: string | null
+          jd_text: string
+          job_title?: string | null
+          matched_keywords?: Json
+          missing_keywords?: Json
+          recommendations?: Json
+          resume_id?: string | null
+          score: number
+          score_breakdown?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          id?: string
+          jd_hash?: string | null
+          jd_text?: string
+          job_title?: string | null
+          matched_keywords?: Json
+          missing_keywords?: Json
+          recommendations?: Json
+          resume_id?: string | null
+          score?: number
+          score_breakdown?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_match_reports_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_offers: {
         Row: {
           application_id: string
@@ -1701,29 +1760,38 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_tailored: boolean
           master_profile_id: string | null
+          parent_resume_id: string | null
           resume_data: Json
           template_id: string
           updated_at: string
           user_id: string
+          version_label: string | null
         }
         Insert: {
           created_at?: string
           id?: string
+          is_tailored?: boolean
           master_profile_id?: string | null
+          parent_resume_id?: string | null
           resume_data: Json
           template_id?: string
           updated_at?: string
           user_id: string
+          version_label?: string | null
         }
         Update: {
           created_at?: string
           id?: string
+          is_tailored?: boolean
           master_profile_id?: string | null
+          parent_resume_id?: string | null
           resume_data?: Json
           template_id?: string
           updated_at?: string
           user_id?: string
+          version_label?: string | null
         }
         Relationships: [
           {
@@ -1731,6 +1799,13 @@ export type Database = {
             columns: ["master_profile_id"]
             isOneToOne: false
             referencedRelation: "master_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resumes_parent_resume_id_fkey"
+            columns: ["parent_resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
             referencedColumns: ["id"]
           },
         ]

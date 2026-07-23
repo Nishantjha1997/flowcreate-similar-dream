@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -10,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Target, Loader2, CheckCircle2, XCircle, Lightbulb, Crown } from 'lucide-react';
+import { Target, Loader2, CheckCircle2, XCircle, Lightbulb, Crown, Wand2, History, Undo2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ResumeData } from '@/utils/types';
@@ -19,50 +20,48 @@ import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 import { JobDescriptionInput } from '@/components/JobDescriptionInput';
 import { useAuth } from '@/hooks/useAuth';
 import { useAIQuota } from '@/hooks/useAIQuota';
+import {
+  applyJobRecommendation,
+  hashJobDescription,
+  normalizeJobMatchResult,
+  type JobMatchResult,
+  type JobRecommendation,
+} from '@/utils/jobMatch';
 
 interface JobMatchAnalyzerProps {
   resume: ResumeData;
+  resumeId?: string | null;
+  onResumeChange?: (resume: ResumeData) => Promise<void> | void;
+  onCreateTailoredVersion?: (resume: ResumeData) => Promise<void>;
 }
 
-interface MatchResult {
-  score: number;
-  matchedKeywords: string[];
-  missingKeywords: string[];
-  suggestions: string[];
-}
-
-function buildResumeSummary(resume: ResumeData): string {
-  const parts: string[] = [];
-  if (resume.personal?.summary) parts.push(`Summary: ${resume.personal.summary}`);
-  if (resume.skills?.length) parts.push(`Skills: ${resume.skills.join(', ')}`);
-  if (resume.experience?.length) {
-    parts.push(
-      'Experience:\n' +
-        resume.experience
-          .map((e) => `- ${e.title} at ${e.company}: ${e.description}`)
-          .join('\n')
-    );
-  }
-  if (resume.education?.length) {
-    parts.push('Education:\n' + resume.education.map((e) => `- ${e.degree}, ${e.school}`).join('\n'));
-  }
-  return parts.join('\n\n') || 'No resume content yet.';
-}
-
-function extractJson(text: string): any {
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('Could not parse AI response');
-  return JSON.parse(match[0]);
-}
-
-export function JobMatchAnalyzer({ resume }: JobMatchAnalyzerProps) {
+export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTailoredVersion }: JobMatchAnalyzerProps) {
   const { user } = useAuth();
   const quota = useAIQuota(user?.id);
   const [open, setOpen] = useState(false);
   const [jobDescription, setJobDescription] = useState('');
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<MatchResult | null>(null);
+  const [result, setResult] = useState<JobMatchResult | null>(null);
+  const [appliedIds, setAppliedIds] = useState<string[]>([]);
   const [error, setError] = useState('');
+  const [workingResume, setWorkingResume] = useState(resume);
+
+  useEffect(() => setWorkingResume(resume), [resume]);
+
+  const history = useQuery({
+    queryKey: ['job-match-reports', resumeId],
+    enabled: !!resumeId,
+    queryFn: async () => {
+      const { data, error: queryError } = await supabase
+        .from('job_match_reports')
+        .select('id, score, job_title, company, created_at, recommendations')
+        .eq('resume_id', resumeId!)
+        .order('created_at', { ascending: false })
+        .limit(10);
+      if (queryError) throw queryError;
+      return data ?? [];
+    },
+  });
 
   const handleAnalyze = async () => {
     if (!quota.isLoading && !quota.canUse) {
@@ -80,32 +79,41 @@ export function JobMatchAnalyzer({ resume }: JobMatchAnalyzerProps) {
     setResult(null);
 
     try {
-      const prompt = `You are an ATS resume-matching expert. Compare this candidate's resume against the job description and return ONLY a JSON object, no other text.
-
-RESUME:
-${buildResumeSummary(resume)}
-
-JOB DESCRIPTION:
-${jobDescription.trim().slice(0, 15000)}
-
-Return exactly this JSON shape:
-{"score": <0-100 integer match score>, "matchedKeywords": [<up to 10 skills/keywords from the job description already present in the resume>], "missingKeywords": [<up to 10 important skills/keywords from the job description missing from the resume>], "suggestions": [<3-5 short, specific, actionable suggestions to tailor this resume for this job>]}`;
-
       const { data, error: fnError } = await supabase.functions.invoke('gemini-suggest', {
-        body: { prompt, maxTokens: 1200 },
+        body: {
+          context: 'job_match',
+          resume,
+          jobDescription: jobDescription.trim(),
+          maxTokens: 1800,
+        },
       });
 
       if (fnError) throw new Error(await getEdgeFunctionErrorMessage(fnError, 'AI request failed'));
       if (data?.error) throw new Error(data.error as string);
       if (!data?.suggestion) throw new Error('No response from AI');
 
-      const parsed = extractJson(data.suggestion as string);
-      setResult({
-        score: typeof parsed.score === 'number' ? Math.max(0, Math.min(100, parsed.score)) : 0,
-        matchedKeywords: Array.isArray(parsed.matchedKeywords) ? parsed.matchedKeywords.slice(0, 10) : [],
-        missingKeywords: Array.isArray(parsed.missingKeywords) ? parsed.missingKeywords.slice(0, 10) : [],
-        suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions.slice(0, 5) : [],
-      });
+      const parsed = data.jobMatch ?? JSON.parse(data.suggestion as string);
+      const normalized = normalizeJobMatchResult(parsed);
+      setResult(normalized);
+      setAppliedIds([]);
+      const jdHash = await hashJobDescription(jobDescription);
+      const { data: report, error: reportError } = await supabase
+        .from('job_match_reports')
+        .insert({
+          user_id: user?.id,
+          resume_id: resumeId || null,
+          jd_text: jobDescription.trim(),
+          jd_hash: jdHash,
+          score: normalized.score,
+          score_breakdown: normalized.breakdown,
+          matched_keywords: normalized.matchedKeywords,
+          missing_keywords: normalized.missingKeywords,
+          recommendations: normalized.recommendations,
+        })
+        .select('id')
+        .maybeSingle();
+      if (reportError) throw reportError;
+      void history.refetch();
       void quota.refresh();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Analysis failed. Please try again.';
@@ -116,6 +124,42 @@ Return exactly this JSON shape:
     } finally {
       setLoading(false);
     }
+  };
+
+  const applyRecommendation = async (recommendation: JobRecommendation) => {
+    const updated = applyJobRecommendation(workingResume, recommendation);
+    if (!updated) {
+      toast.error('This suggestion no longer matches the current resume text. Re-run the analysis.');
+      return;
+    }
+    setWorkingResume(updated);
+    await onResumeChange?.(updated);
+    setAppliedIds((current) => [...new Set([...current, recommendation.id])]);
+    toast.success('Approved change applied to your resume.');
+  };
+
+  const revertRecommendation = async (recommendation: JobRecommendation) => {
+    if (recommendation.section === 'personal' && recommendation.type === 'improve_summary' && recommendation.currentText !== undefined) {
+      const restored = { ...workingResume, personal: { ...workingResume.personal, summary: recommendation.currentText } };
+      setWorkingResume(restored);
+      await onResumeChange?.(restored);
+    } else if (recommendation.section === 'experience' && typeof recommendation.entryIndex === 'number' && recommendation.currentText !== undefined) {
+      const experience = workingResume.experience.map((entry, index) => index === recommendation.entryIndex
+        ? { ...entry, description: recommendation.currentText }
+        : entry);
+      const restored = { ...workingResume, experience };
+      setWorkingResume(restored);
+      await onResumeChange?.(restored);
+    } else if (recommendation.section === 'skills' && recommendation.skill) {
+      const restored = {
+        ...workingResume,
+        skills: workingResume.skills.filter((skill) => skill.toLowerCase() !== recommendation.skill!.toLowerCase()),
+      };
+      setWorkingResume(restored);
+      await onResumeChange?.(restored);
+    }
+    setAppliedIds((current) => current.filter((id) => id !== recommendation.id));
+    toast.success('Change undone.');
   };
 
   const scoreColor = (score: number) =>
@@ -180,6 +224,15 @@ Return exactly this JSON shape:
                 <Progress value={result.score} className="mt-2" />
               </div>
 
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {Object.entries(result.breakdown).map(([label, value]) => (
+                  <div key={label} className="rounded-lg border bg-muted/30 p-2 text-center">
+                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
+                    <p className="text-lg font-semibold">{value}%</p>
+                  </div>
+                ))}
+              </div>
+
               {result.matchedKeywords.length > 0 && (
                 <div>
                   <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
@@ -220,6 +273,72 @@ Return exactly this JSON shape:
                       <li key={i}>{s}</li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+              {result.recommendations.length > 0 && (
+                <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold flex items-center gap-1.5">
+                        <Wand2 className="h-4 w-4 text-primary" /> Recommended fixes
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">Review each change. FlowCreate never changes your resume silently.</p>
+                    </div>
+                    {onCreateTailoredVersion && resumeId && (
+                      <Button size="sm" variant="outline" onClick={() => void onCreateTailoredVersion(workingResume)}>
+                        Save tailored copy
+                      </Button>
+                    )}
+                  </div>
+                  {result.recommendations.map((recommendation) => {
+                    const applied = appliedIds.includes(recommendation.id);
+                    return (
+                      <div key={recommendation.id} className="rounded-lg border bg-background p-3 space-y-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium">{recommendation.reason}</p>
+                            {recommendation.currentText && (
+                              <p className="mt-1 text-xs text-muted-foreground line-through">{recommendation.currentText}</p>
+                            )}
+                            <p className="mt-1 text-sm text-foreground">{recommendation.proposedText}</p>
+                            {recommendation.evidence.length > 0 && (
+                              <p className="mt-1 text-[11px] text-muted-foreground">Based on: {recommendation.evidence.join(', ')}</p>
+                            )}
+                          </div>
+                          {applied ? (
+                            <Button size="sm" variant="ghost" onClick={() => void revertRecommendation(recommendation)}>
+                              <Undo2 className="h-3.5 w-3.5 mr-1" /> Undo
+                            </Button>
+                          ) : (
+                            <Button size="sm" onClick={() => void applyRecommendation(recommendation)} disabled={!onResumeChange}>
+                              <Wand2 className="h-3.5 w-3.5 mr-1" /> Apply
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {history.data && history.data.length > 1 && (
+                <div className="rounded-lg border p-3">
+                  <p className="text-sm font-medium flex items-center gap-1.5 mb-2">
+                    <History className="h-4 w-4" /> Score history
+                  </p>
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    {history.data.slice(0, 6).map((report) => (
+                      <Badge key={report.id} variant="secondary">
+                        {report.score}% · {new Date(report.created_at).toLocaleDateString()}
+                      </Badge>
+                    ))}
+                  </div>
+                  {history.data[1] && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Change from previous analysis: {result.score >= history.data[1].score ? '+' : ''}{result.score - history.data[1].score} points
+                    </p>
+                  )}
                 </div>
               )}
             </div>

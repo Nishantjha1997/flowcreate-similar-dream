@@ -15,6 +15,83 @@ const FALLBACK_GEMINI_KEY = Deno.env.get("GEMINI_API_KEY");
 // which easily exceeds a few thousand characters - keep this generous.
 const MAX_PROMPT_LENGTH = 24000;
 
+type JobMatchRecommendation = {
+  id: string;
+  type: 'rewrite_bullet' | 'improve_summary' | 'add_skill' | 'grammar' | 'remove_repetition';
+  section: 'experience' | 'personal' | 'skills';
+  entryIndex?: number;
+  skill?: string;
+  currentText?: string;
+  proposedText: string;
+  reason: string;
+  evidence: string[];
+  confidence: number;
+  requiresConfirmation: true;
+};
+
+function clamp(value: unknown, fallback = 0): number {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? Math.max(0, Math.min(100, Math.round(value)))
+    : fallback;
+}
+
+function stringList(value: unknown, max: number): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+      .map((item) => item.trim()).slice(0, max)
+    : [];
+}
+
+function normalizeJobMatch(value: unknown) {
+  const raw = (value && typeof value === 'object' ? value : {}) as Record<string, unknown>;
+  const breakdown = (raw.breakdown && typeof raw.breakdown === 'object' ? raw.breakdown : {}) as Record<string, unknown>;
+  const allowedTypes = new Set(['rewrite_bullet', 'improve_summary', 'add_skill', 'grammar', 'remove_repetition']);
+  const allowedSections = new Set(['experience', 'personal', 'skills']);
+  const recommendations: JobMatchRecommendation[] = Array.isArray(raw.recommendations)
+    ? raw.recommendations.flatMap((item, index) => {
+      if (!item || typeof item !== 'object') return [];
+      const candidate = item as Record<string, unknown>;
+      const type = String(candidate.type || '');
+      const section = String(candidate.section || '');
+      const proposedText = typeof candidate.proposedText === 'string' ? candidate.proposedText.trim().slice(0, 2000) : '';
+      if (!allowedTypes.has(type) || !allowedSections.has(section) || !proposedText) return [];
+      return [{
+        id: typeof candidate.id === 'string' ? candidate.id.slice(0, 80) : `recommendation-${index + 1}`,
+        type: type as JobMatchRecommendation['type'],
+        section: section as JobMatchRecommendation['section'],
+        entryIndex: typeof candidate.entryIndex === 'number' ? Math.max(0, Math.floor(candidate.entryIndex)) : undefined,
+        skill: typeof candidate.skill === 'string' ? candidate.skill.trim().slice(0, 120) : undefined,
+        currentText: typeof candidate.currentText === 'string' ? candidate.currentText.slice(0, 2000) : undefined,
+        proposedText,
+        reason: typeof candidate.reason === 'string' ? candidate.reason.trim().slice(0, 500) : 'Suggested improvement',
+        evidence: stringList(candidate.evidence, 4),
+        confidence: clamp(candidate.confidence, 70) / 100,
+        requiresConfirmation: true as const,
+      }];
+    }).slice(0, 12)
+    : [];
+
+  return {
+    score: clamp(raw.score),
+    breakdown: {
+      skills: clamp(breakdown.skills),
+      experience: clamp(breakdown.experience),
+      keywords: clamp(breakdown.keywords),
+      education: clamp(breakdown.education),
+    },
+    matchedKeywords: stringList(raw.matchedKeywords, 15),
+    missingKeywords: stringList(raw.missingKeywords, 15),
+    suggestions: stringList(raw.suggestions, 8),
+    recommendations,
+  };
+}
+
+function extractJsonObject(text: string): unknown {
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) return {};
+  try { return JSON.parse(match[0]); } catch { return {}; }
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -63,12 +140,33 @@ serve(async (req) => {
     const resumeId = body?.resumeId;
     const currentContent = body?.currentContent;
     const jobDescription = body?.jobDescription;
+    const resumePayload = body?.resume;
     const maxTokensParam = typeof body?.maxTokens === 'number' ? body.maxTokens : undefined;
 
     let finalPrompt: string;
 
+    // ── Structured Job Match v2 ──
+    if (context === 'job_match' && typeof jobDescription === 'string' && resumePayload && typeof resumePayload === 'object') {
+      const rd = resumePayload as Record<string, any>;
+      const experience = Array.isArray(rd.experience)
+        ? rd.experience.map((e: any, i: number) => `[${i}] ${e.title || ''} at ${e.company || ''}: ${e.description || ''}`).join('\n')
+        : 'Not specified';
+      finalPrompt = `You are an ATS resume-matching expert. Compare the resume to the job description. Return ONLY valid JSON.
+
+RESUME:
+Summary: ${rd.personal?.summary || 'Not specified'}
+Skills: ${Array.isArray(rd.skills) ? rd.skills.join(', ') : 'Not specified'}
+Experience:\n${experience}
+Education:\n${Array.isArray(rd.education) ? rd.education.map((e: any) => `- ${e.degree || ''}, ${e.school || ''}`).join('\n') : 'Not specified'}
+
+JOB DESCRIPTION:\n${jobDescription.trim().slice(0, 15000)}
+
+Return this exact shape:
+{"score":0,"breakdown":{"skills":0,"experience":0,"keywords":0,"education":0},"matchedKeywords":[],"missingKeywords":[],"suggestions":[],"recommendations":[]}
+
+Recommendations may only improve existing text or add a keyword the user can confirm. Never invent employers, dates, skills, metrics, certifications, or experience. Each recommendation must include type, section, entryIndex when experience, currentText, proposedText, reason, evidence, confidence. All recommendations require user confirmation.`;
     // ── Cover letter tailored to a job description ──
-    if (context === 'cover_letter_from_jd' && resumeId && typeof jobDescription === 'string') {
+    } else if (context === 'cover_letter_from_jd' && resumeId && typeof jobDescription === 'string') {
       const trimmedJD = jobDescription.trim().slice(0, 15000);
       if (trimmedJD.length < 40) {
         return new Response(
@@ -290,8 +388,9 @@ Keep the tone professional yet warm. Do NOT include placeholder brackets — wri
         );
       }
 
+      const jobMatch = context === 'job_match' ? normalizeJobMatch(extractJsonObject(result.text)) : null;
       return new Response(
-        JSON.stringify({ suggestion: result.text }),
+        JSON.stringify(jobMatch ? { suggestion: JSON.stringify(jobMatch), jobMatch } : { suggestion: result.text }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     } else {

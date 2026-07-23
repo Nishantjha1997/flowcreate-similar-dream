@@ -314,7 +314,7 @@ buttons become upsell CTAs linking to `/pricing`. Free plan (cap 0) shows "Premi
 instead of erroring after click.
 **Done when**: no AI button ever produces the 403 path for a user who could have known.
 
-### P-3 · Job Match Analyzer v2
+### P-3 · Job Match Analyzer v2 — IMPLEMENTED (2026-07-23)
 **Why**: currently one-shot and ephemeral; Jobscan's stickiness comes from tracked improvement.
 **What**: (a) new table `job_match_reports` (id, user_id, resume_id, jd_text, jd_hash, score,
 matched jsonb, missing jsonb, suggestions jsonb, created_at; RLS `auth.uid() = user_id`);
@@ -323,8 +323,15 @@ shows delta ("62% → 78%"); (d) per-keyword "Add to skills" one-click insert (w
 `resume_data.skills`, marked as user-confirmed — never silent edits); (e) score breakdown
 sections (skills / title / experience) — extend the JSON contract in `JobMatchAnalyzer.tsx`
 prompt, with server-side shape normalization per trap §1.4-3.
-**Done when**: analyses persist across sessions; the add-keyword flow round-trips into the saved
-resume.
+**Implemented**: reports persist with owner-only RLS; the metered `gemini-suggest` context now
+normalizes a score breakdown and bounded recommendation patch list server-side; the analyzer
+shows original/proposed text, evidence, Apply/Undo controls, and score history; approved edits
+update the active resume and existing saved resumes autosave; Premium users can create a new
+tailored copy with `parent_resume_id`, leaving the source untouched. The client has a second
+normalization layer and stale-text guard tests.
+
+**Remaining refinement**: keyword-specific “Add to skills” UI and explicit job/company extraction
+can follow later. The candidate Job Tracker is intentionally out of scope for now.
 
 ### P-4 · Cover letter generation controls & template parity
 **What**: (a) tone (`professional | warm | bold`) + length (`short ≈180w | standard ≈300w`)
