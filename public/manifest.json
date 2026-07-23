@@ -4,11 +4,11 @@
   "description": "Build a professional, ATS-friendly resume online for free.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0057D9",
+  "background_color": "#F8FAFC",
+  "theme_color": "#0A5CF5",
   "icons": [
     {
-      "src": "/logo.svg",
+      "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

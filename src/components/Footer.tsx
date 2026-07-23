@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useDesignMode } from '@/hooks/useDesignMode';
 import { professions } from '@/data/professions';
+import { BrandMark, BrandWordmark } from './BrandLogo';
 
 // A stable subset of profession pages, cross-linked from every page via the
 // footer so crawlers can discover them without depending solely on the sitemap.
@@ -15,7 +16,7 @@ const Footer = () => {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
             <div className="col-span-1 sm:col-span-2 lg:col-span-2">
-              <Link to="/" className="inline-flex items-center gap-2"><img src="/logo.svg" alt="" className="h-8 w-8 rounded-lg" /><span className="text-2xl font-bold uppercase tracking-wider text-primary">Flow</span><span className="text-2xl font-bold uppercase tracking-wider text-foreground">Create</span></Link>
+              <Link to="/" className="inline-flex items-center gap-2"><BrandMark className="h-8 w-8" /><span className="text-2xl font-bold uppercase tracking-wider text-primary">Flow</span><span className="text-2xl font-bold uppercase tracking-wider text-foreground">Create</span></Link>
               <p className="mt-4 text-sm text-foreground font-medium">Create professional resumes and cover letters online in minutes.</p>
             </div>
             {[
@@ -59,9 +60,8 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
           <div className="col-span-2 lg:col-span-2 mb-4">
-            <Link to="/" className="inline-flex items-center gap-2 mb-4">
-              <img src="/logo.svg" alt="" className="h-7 w-7 rounded-lg" />
-              <span className="text-lg font-semibold tracking-tight text-white">FlowCreate</span>
+            <Link to="/" className="mb-4" aria-label="FlowCreate home">
+              <BrandWordmark className="h-7" textClassName="text-lg font-semibold tracking-tight" />
             </Link>
             <p className="text-sm text-white/40 leading-relaxed max-w-xs">
               Create professional resumes and cover letters online in minutes with AI-powered tools.
