@@ -91,3 +91,12 @@
 
 ## Baseline notes
 - build: OK @ 2026-07-16, tsc: OK @ 2026-07-16
+
+## 2026-07-23 — Gate Zero reconciliation (see PROJECT.md, POLISH_PLAN.md §B)
+`PROJECT.md`'s M1-M6 milestones were marked IN_PROGRESS/PLANNED while their Interface Contracts
+were already satisfied in live code (evidence and commit shas recorded directly in `PROJECT.md`'s
+milestone table). Reconciled all six to DONE with evidence; M7 and the E2E track remain correctly
+NOT DONE (no `TEST_READY.md` artifact exists). File reservations on `Account.tsx`, `Admin.tsx`,
+`registry.ts`, `resumeTemplates.tsx`, `DocumentsDashboard.tsx`, and `MasterProfileForm.tsx` are
+released as of this reconciliation. This unblocks `POLISH_PLAN.md` tasks F-5 (master profile
+unification), F-6 (export parity), and F-8 (Account/Admin section boundaries).

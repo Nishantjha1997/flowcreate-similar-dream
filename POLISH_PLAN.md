@@ -316,3 +316,12 @@ One task-block = one commit minimum granularity; sessions 3–10 each end with t
   (done), S-3a (done), S-4 (done), S-5a (done — real re-auth password change), S-5b (done),
   S-6 (done), P-2 (done), P-3 (done, residuals in F-3), P-4a/b/e/f (done), P-6 builder+cover
   letter (done), D-6 (done), D-3 partial (tailored copy), D-5 foundation (engine only).
+- 2026-07-23 (Session 1) — **Gate Zero executed.** Diffed each of `PROJECT.md`'s M1-M6 Interface
+  Contracts against live code: all six satisfied (M1 4-tab Account + DocumentsDashboard querying
+  resumes+cover_letters; M2 MasterProfileForm with contracted props; M3 Admin sidebar+NAV_GROUPS
+  layout; M4 40-entry registry, 19 `featured:false`; M5/M6 58 template style entries with safe
+  fallback) and marked DONE in `PROJECT.md` with commit evidence. E2E/M7 confirmed NOT delivered
+  (no `TEST_READY.md`) and left open, superseded by this plan's own S-8/U-6/U-7 tasks. File
+  reservations on `Account.tsx`, `Admin.tsx`, `registry.ts`, `resumeTemplates.tsx`,
+  `DocumentsDashboard.tsx`, `MasterProfileForm.tsx` released — F-5/F-6/F-8 now eligible.
+  Reconciliation also logged in `PROGRESS.md`.
