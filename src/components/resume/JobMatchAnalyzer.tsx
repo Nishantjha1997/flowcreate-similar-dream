@@ -23,6 +23,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAIQuota } from '@/hooks/useAIQuota';
 import {
   applyJobRecommendation,
+  buildAddSkillRecommendation,
+  formatRoleAtCompany,
   hashJobDescription,
   normalizeJobMatchResult,
   type JobMatchResult,
@@ -33,7 +35,7 @@ interface JobMatchAnalyzerProps {
   resume: ResumeData;
   resumeId?: string | null;
   onResumeChange?: (resume: ResumeData) => Promise<void> | void;
-  onCreateTailoredVersion?: (resume: ResumeData) => Promise<void>;
+  onCreateTailoredVersion?: (resume: ResumeData, suggestedName?: string) => Promise<void>;
 }
 
 export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTailoredVersion }: JobMatchAnalyzerProps) {
@@ -103,6 +105,8 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
         .insert({
           user_id: user?.id,
           resume_id: resumeId || null,
+          job_title: normalized.role || null,
+          company: normalized.company || null,
           jd_text: jobDescription.trim(),
           jd_hash: jdHash,
           score: normalized.score,
@@ -220,6 +224,11 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
           {result && (
             <div className="space-y-4">
               <div className="text-center py-2">
+                {formatRoleAtCompany(result.role, result.company) && (
+                  <p className="text-sm font-medium text-foreground mb-1">
+                    {formatRoleAtCompany(result.role, result.company)}
+                  </p>
+                )}
                 <div className={`text-4xl font-bold ${scoreColor(result.score)}`}>{result.score}%</div>
                 <p className="text-sm text-muted-foreground">Match Score</p>
                 <Progress value={result.score} className="mt-2" />
@@ -255,11 +264,28 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
                     <XCircle className="h-4 w-4 text-warning" /> Missing from your resume
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {result.missingKeywords.map((kw, i) => (
-                      <Badge key={i} variant="outline" className="text-warning border-warning/30 bg-warning/10">
-                        {kw}
-                      </Badge>
-                    ))}
+                    {result.missingKeywords.map((kw, i) => {
+                      const recommendation = buildAddSkillRecommendation(kw);
+                      const added = appliedIds.includes(recommendation.id);
+                      return (
+                        <Badge
+                          key={i}
+                          variant="outline"
+                          className="text-warning border-warning/30 bg-warning/10 gap-1 pr-1"
+                        >
+                          {kw}
+                          <button
+                            type="button"
+                            onClick={() => void (added ? revertRecommendation(recommendation) : applyRecommendation(recommendation))}
+                            disabled={!onResumeChange}
+                            className="ml-0.5 rounded-full px-1.5 py-0.5 text-xs font-medium bg-warning/20 hover:bg-warning/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                            title={onResumeChange ? undefined : 'Open this resume in the builder to apply changes'}
+                          >
+                            {added ? 'Added ✓' : '+ Add to skills'}
+                          </button>
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -287,7 +313,11 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
                       <p className="text-xs text-muted-foreground mt-1">Review each change. FlowCreate never changes your resume silently.</p>
                     </div>
                     {onCreateTailoredVersion && resumeId && (
-                      <Button size="sm" variant="outline" onClick={() => void onCreateTailoredVersion(workingResume)}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => void onCreateTailoredVersion(workingResume, formatRoleAtCompany(result.role, result.company) ?? undefined)}
+                      >
                         Save tailored copy
                       </Button>
                     )}
@@ -337,7 +367,8 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
                   </div>
                   {history.data[1] && (
                     <p className="mt-2 text-xs text-muted-foreground">
-                      Change from previous analysis: {result.score >= history.data[1].score ? '+' : ''}{result.score - history.data[1].score} points
+                      Since your last analysis: {history.data[1].score}% → {result.score}%
+                      {' '}({result.score >= history.data[1].score ? '+' : ''}{result.score - history.data[1].score} points)
                     </p>
                   )}
                 </div>

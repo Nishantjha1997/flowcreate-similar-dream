@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { applyJobRecommendation, normalizeJobMatchResult } from './jobMatch';
+import {
+  applyJobRecommendation,
+  buildAddSkillRecommendation,
+  formatRoleAtCompany,
+  normalizeJobMatchResult,
+} from './jobMatch';
 import type { ResumeData } from './types';
 
 const resume: ResumeData = {
@@ -35,5 +40,35 @@ describe('job match safeguards', () => {
     }).recommendations[0];
     expect(applyJobRecommendation(resume, recommendation)?.experience[0].description).toBe('Built reliable tools');
     expect(applyJobRecommendation({ ...resume, experience: [{ ...resume.experience[0], description: 'Changed manually' }] }, recommendation)).toBeNull();
+  });
+
+  it('extracts company/role verbatim and defaults to empty strings, never omitting the fields (F-3b)', () => {
+    const withBoth = normalizeJobMatchResult({ score: 80, company: '  Acme Corp  ', role: '  Senior Engineer  ' });
+    expect(withBoth.company).toBe('Acme Corp');
+    expect(withBoth.role).toBe('Senior Engineer');
+
+    const withNeither = normalizeJobMatchResult({ score: 80 });
+    expect(withNeither.company).toBe('');
+    expect(withNeither.role).toBe('');
+  });
+
+  it('formats "{Role} @ {Company}" for the tailored-copy name, falling back gracefully (F-3b)', () => {
+    expect(formatRoleAtCompany('Product Manager', 'Acme Corp')).toBe('Product Manager @ Acme Corp');
+    expect(formatRoleAtCompany('Product Manager', '')).toBe('Product Manager');
+    expect(formatRoleAtCompany('', 'Acme Corp')).toBe('Acme Corp');
+    expect(formatRoleAtCompany('', '')).toBeNull();
+  });
+
+  it('"+ Add to skills" reuses the same confirmed-patch path as AI recommendations, and is idempotent (F-3a)', () => {
+    const recommendation = buildAddSkillRecommendation('Kubernetes');
+    expect(recommendation.type).toBe('add_skill');
+    expect(recommendation.section).toBe('skills');
+    expect(recommendation.requiresConfirmation).toBe(true);
+
+    const updated = applyJobRecommendation(resume, recommendation);
+    expect(updated?.skills).toEqual(['TypeScript', 'Kubernetes']);
+
+    const alreadyHasSkill = buildAddSkillRecommendation('TypeScript');
+    expect(applyJobRecommendation(resume, alreadyHasSkill)?.skills).toEqual(['TypeScript']);
   });
 });

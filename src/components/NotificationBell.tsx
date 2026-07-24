@@ -1,4 +1,4 @@
-import { Bell } from 'lucide-react';
+import { Bell, BellOff } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useDesignMode } from '@/hooks/useDesignMode';
 import { Link, useNavigate } from 'react-router-dom';
@@ -62,8 +62,9 @@ export const NotificationBell = () => {
           </div>
           <ScrollArea className="h-[300px]">
             {notifications.length === 0 ? (
-              <div className="p-4 text-center text-sm text-muted-foreground font-medium">
-                No notifications
+              <div className="p-6 text-center">
+                <BellOff className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground font-medium">No notifications</p>
               </div>
             ) : (
               <div className="flex flex-col">
@@ -136,8 +137,9 @@ export const NotificationBell = () => {
         </div>
         <ScrollArea className="h-[300px]">
           {notifications.length === 0 ? (
-            <div className="p-8 text-center text-sm text-muted-foreground">
-              You're all caught up!
+            <div className="p-8 text-center">
+              <BellOff className="h-6 w-6 mx-auto mb-2 text-muted-foreground/60" />
+              <p className="text-sm text-muted-foreground">You're all caught up!</p>
             </div>
           ) : (
             <div className="flex flex-col">

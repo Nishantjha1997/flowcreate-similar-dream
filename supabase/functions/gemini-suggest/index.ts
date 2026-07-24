@@ -71,6 +71,9 @@ function normalizeJobMatch(value: unknown) {
     }).slice(0, 12)
     : [];
 
+  const company = typeof raw.company === 'string' ? raw.company.trim().slice(0, 200) : '';
+  const role = typeof raw.role === 'string' ? raw.role.trim().slice(0, 200) : '';
+
   return {
     score: clamp(raw.score),
     breakdown: {
@@ -83,6 +86,10 @@ function normalizeJobMatch(value: unknown) {
     missingKeywords: stringList(raw.missingKeywords, 15),
     suggestions: stringList(raw.suggestions, 8),
     recommendations,
+    // Empty string (not omitted) when the model can't infer one, so the
+    // client can distinguish "not extracted" from "field absent" uniformly.
+    company,
+    role,
   };
 }
 
@@ -174,7 +181,12 @@ Education:\n${Array.isArray(rd.education) ? rd.education.map((e: any) => `- ${e.
 JOB DESCRIPTION:\n${jobDescription.trim().slice(0, 15000)}
 
 Return this exact shape:
-{"score":0,"breakdown":{"skills":0,"experience":0,"keywords":0,"education":0},"matchedKeywords":[],"missingKeywords":[],"suggestions":[],"recommendations":[]}
+{"score":0,"breakdown":{"skills":0,"experience":0,"keywords":0,"education":0},"matchedKeywords":[],"missingKeywords":[],"suggestions":[],"recommendations":[],"company":"","role":""}
+
+"company" and "role" are the hiring company name and job title stated in
+the job description - extract them verbatim if present, otherwise return
+an empty string for whichever one isn't mentioned. Never guess or invent
+either.
 
 Recommendations may only improve existing text or add a keyword the user can confirm. Never invent employers, dates, skills, metrics, certifications, or experience. Each recommendation must include type, section, entryIndex when experience, currentText, proposedText, reason, evidence, confidence. All recommendations require user confirmation.`;
     // ── Cover letter tailored to a job description ──

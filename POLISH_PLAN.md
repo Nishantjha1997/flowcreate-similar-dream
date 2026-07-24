@@ -383,3 +383,36 @@ One task-block = one commit minimum granularity; sessions 3–10 each end with t
   - **Recommended next pass for U-1/U-2 completion**, if picked up later: knock out the remaining
     color/spinner/size instances file-by-file using the same semantic-vs-decorative judgment call
     documented above, then do U-2d.
+- 2026-07-25 (Session 4) — **F-3 done; U-3 spot-checked (real gaps found and fixed, not
+  exhaustive).**
+  - **F-3a (Add to skills):** `buildAddSkillRecommendation()` synthesizes a normal `add_skill`
+    `JobRecommendation` for a missing keyword, reusing `applyJobRecommendation`/
+    `applyRecommendation`/`revertRecommendation` verbatim - no separate silent write path. Each
+    missing-keyword badge now has an inline "+ Add to skills" toggle that flips to "Added ✓" (and
+    can be undone) via the existing `appliedIds` state.
+  - **F-3b (company/role extraction):** `gemini-suggest`'s `job_match` prompt now asks for
+    `company`/`role` (extract verbatim or return empty string, never invent); `normalizeJobMatch`
+    (server) and `normalizeJobMatchResult`/`formatRoleAtCompany` (client, `jobMatch.ts`) carry them
+    through. Populated the previously-unused `job_match_reports.job_title`/`.company` columns
+    (schema already had them from the original v2 migration; nothing wired them until now).
+    Displayed as a report subtitle, and threaded through `onCreateTailoredVersion` (extended to
+    `(resume, suggestedName?)` across `JobMatchAnalyzer` → `ResumeHeaderSection` →
+    `ResumeBuilder.handleCreateTailoredVersion`) so the tailored copy's `version_label` uses the
+    JD's real role/company instead of guessing from the candidate's own most recent job title.
+  - **F-3c (score history/delta):** was already substantially built (history badges + a delta
+    line) from the original Job Match v2 work; reworded the delta to the plan's literal
+    "62% → 78%" arrow format alongside the existing +/- points figure.
+  - Extended the existing `jobMatch.test.ts` (didn't know it existed until Glob under-reported it -
+    confirmed present via a direct filesystem check, then matched its established fixture/import
+    style rather than overwriting).
+  - **U-3:** did not attempt the full "throttled-network walkthrough of 8 core routes" - that
+    requires an interactive browser session this environment doesn't have. Instead spot-checked
+    the plan's named surfaces against real code: `DocumentsDashboard` (done in Session 1),
+    `MasterProfile.tsx` and `ResumeViewAnalytics.tsx` had a skeleton and an icon+copy empty state
+    but no actual CTA button - added one to each. `NotificationBell.tsx` empty states had no icon -
+    added one. Admin tables (`UserManagement.tsx` spot-checked) already have skeletons and empty
+    copy - didn't find a real gap there. Job Match's own history section intentionally shows
+    nothing until a 2nd report exists, which is correct (not a list needing its own empty state).
+    Full CLS/Slow-3G verification remains open for whoever has a browser session to run it.
+  - Verified: tsc clean, 23 test files / 69 tests passing, production build succeeds. Deployed:
+    `gemini-suggest`.

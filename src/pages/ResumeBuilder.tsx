@@ -180,7 +180,7 @@ const ResumeBuilder = () => {
     if (editResumeId) await handleSaveResume(updatedResume);
   };
 
-  const handleCreateTailoredVersion = async (tailoredResume: ResumeData) => {
+  const handleCreateTailoredVersion = async (tailoredResume: ResumeData, suggestedName?: string) => {
     if (!user || !editResumeId) {
       toast.info('Save this resume first, then create a tailored copy.');
       return;
@@ -190,7 +190,9 @@ const ResumeBuilder = () => {
       navigate('/pricing');
       return;
     }
-    const role = tailoredResume.experience?.[0]?.title || 'Target Role';
+    // Prefer the role/company the Job Match analysis extracted from the JD
+    // itself over guessing from the candidate's own most recent job title.
+    const label = suggestedName || tailoredResume.experience?.[0]?.title || 'Target Role';
     const { data, error } = await supabase
       .from('resumes')
       .insert({
@@ -198,7 +200,7 @@ const ResumeBuilder = () => {
         resume_data: tailoredResume as unknown as Json,
         template_id: resolveTemplateKey(tailoredResume.selectedTemplate),
         parent_resume_id: editResumeId,
-        version_label: `${role} — Tailored`,
+        version_label: `${label} — Tailored`,
         is_tailored: true,
       })
       .select('id')

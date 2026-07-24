@@ -21,7 +21,7 @@ interface ResumeHeaderSectionProps {
   resume: ResumeData;
   resumeId?: string | null;
   onResumeChange?: (resume: ResumeData) => Promise<void> | void;
-  onCreateTailoredVersion?: (resume: ResumeData) => Promise<void>;
+  onCreateTailoredVersion?: (resume: ResumeData, suggestedName?: string) => Promise<void>;
   onDocxExport?: () => void;
   isPremium?: boolean;
   templateId: string;

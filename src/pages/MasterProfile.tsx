@@ -276,8 +276,16 @@ export default function MasterProfilePage() {
                   <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
                     <Layers className="h-6 w-6 text-muted-foreground" />
                   </div>
-                  <p className="text-sm text-muted-foreground">No master profiles yet</p>
-                  <p className="text-xs text-muted-foreground/60 mt-1">Create one to get started</p>
+                  <p className="text-sm text-muted-foreground mb-3">No master profiles yet</p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setCreateOpen(true)}
+                    className={isNeoBrutalism ? 'border-2 border-foreground' : ''}
+                  >
+                    <Plus className="h-3.5 w-3.5 mr-1.5" />
+                    Create your first profile
+                  </Button>
                 </div>
               ) : (
                 <ScrollArea className="max-h-[500px]">
@@ -349,7 +357,7 @@ export default function MasterProfilePage() {
                         <CardTitle className={`text-lg flex items-center gap-2 ${isNeoBrutalism ? 'uppercase font-black' : ''}`}>
                           {selectedProfile.name}
                           {selectedProfile.is_default && (
-                            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 text-[10px]">
+                            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">
                               <Star className="h-3 w-3 mr-1 fill-yellow-500" />
                               Default
                             </Badge>

@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   BarChart,
@@ -155,9 +157,12 @@ export function ResumeViewAnalytics({ isNeoBrutalism = false }: { isNeoBrutalism
             <Eye className="h-8 w-8 text-muted-foreground" />
           </div>
           <h3 className="text-lg font-semibold mb-2">No views yet</h3>
-          <p className="text-sm text-muted-foreground max-w-sm">
+          <p className="text-sm text-muted-foreground max-w-sm mb-4">
             Share your resume to start tracking views. View analytics will appear here once someone visits your shared link.
           </p>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/account">Go to My Documents to share a resume</Link>
+          </Button>
         </CardContent>
       </Card>
     );

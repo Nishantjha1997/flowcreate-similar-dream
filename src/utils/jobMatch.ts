@@ -33,6 +33,9 @@ export interface JobMatchResult {
   missingKeywords: string[];
   suggestions: string[];
   recommendations: JobRecommendation[];
+  /** Extracted verbatim from the job description by the model; empty string if not stated. */
+  company: string;
+  role: string;
 }
 
 const recommendationTypes = new Set<JobRecommendationType>([
@@ -86,6 +89,8 @@ export function normalizeJobMatchResult(value: unknown): JobMatchResult {
     missingKeywords: strings(raw.missingKeywords, 15),
     suggestions: strings(raw.suggestions, 8),
     recommendations,
+    company: typeof raw.company === 'string' ? raw.company.trim().slice(0, 200) : '',
+    role: typeof raw.role === 'string' ? raw.role.trim().slice(0, 200) : '',
   };
 }
 
@@ -109,6 +114,35 @@ export function applyJobRecommendation(resume: ResumeData, recommendation: JobRe
     return next;
   }
   return null;
+}
+
+/**
+ * Synthesizes a JobRecommendation for a missing keyword so "+ Add to skills"
+ * (F-3a) can reuse the exact same confirmed-patch path (applyJobRecommendation
+ * / applyRecommendation / revertRecommendation) as AI-suggested
+ * recommendations - never a silent, separate write path.
+ */
+export function buildAddSkillRecommendation(keyword: string): JobRecommendation {
+  const trimmed = keyword.trim();
+  return {
+    id: `add-skill-${trimmed.toLowerCase().replace(/\s+/g, '-')}`,
+    type: 'add_skill',
+    section: 'skills',
+    skill: trimmed,
+    proposedText: trimmed,
+    reason: 'Missing keyword from the job description',
+    evidence: [],
+    confidence: 1,
+    requiresConfirmation: true,
+  };
+}
+
+/** "{Role} @ {Company}" for prefilling a tailored-copy name; null if neither was extracted. */
+export function formatRoleAtCompany(role: string, company: string): string | null {
+  const r = role.trim();
+  const c = company.trim();
+  if (r && c) return `${r} @ ${c}`;
+  return r || c || null;
 }
 
 export async function hashJobDescription(value: string): Promise<string> {
