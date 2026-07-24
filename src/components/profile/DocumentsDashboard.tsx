@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,12 +6,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 import { resolveTemplateKey } from '@/templates/registry';
 import { ResumeData } from '@/utils/types';
+import { exportResumeDocx } from '@/utils/docxExport';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  FileText, Plus, Edit, Download, Trash2, Copy, Share2, Eye, 
-  ExternalLink, Loader2, FilePlus, ChevronRight 
+import {
+  FileText, Plus, Edit, Trash2, Copy, Share2, Eye,
+  ExternalLink, Loader2, FilePlus, ChevronRight
 } from 'lucide-react';
 import {
   Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle
@@ -19,6 +20,7 @@ import {
 import { AppDialogContent } from '@/components/ui/app-dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { DocumentExportActions } from '@/components/export/DocumentExportActions';
 
 interface DocumentsDashboardProps {
   isNeoBrutalism?: boolean;
@@ -32,11 +34,20 @@ export const DocumentsDashboard = ({
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { generatePDF } = usePDFGenerator();
+  const { isGenerating, generatePDF, printResume } = usePDFGenerator();
 
   const [deletingResumeId, setDeletingResumeId] = useState<string | null>(null);
   const [deletingLetterId, setDeletingLetterId] = useState<string | null>(null);
   const [cloningId, setCloningId] = useState<string | null>(null);
+  const [downloadingResumeId, setDownloadingResumeId] = useState<string | null>(null);
+
+  // usePDFGenerator's isGenerating is shared across the whole dashboard (one
+  // hook instance, many cards); since downloads run one at a time, pairing it
+  // with downloadingResumeId is enough to show the spinner on only the card
+  // that's actually generating.
+  useEffect(() => {
+    if (!isGenerating) setDownloadingResumeId(null);
+  }, [isGenerating]);
   
   // Sharing state
   const [sharingResumeId, setSharingResumeId] = useState<string | null>(null);
@@ -86,95 +97,87 @@ export const DocumentsDashboard = ({
     }
   };
 
-  const handleDownloadResume = async (resume: any) => {
+  // Renders a resume off-screen so it can be handed to usePDFGenerator's
+  // printResume (semantic/ATS) or generatePDF (image) - same two functions
+  // the resume builder itself uses, instead of a third hand-rolled
+  // html2canvas/jsPDF pagination implementation.
+  const mountResumeOffscreen = async (resume: any) => {
+    const resumeData = resume.resume_data as unknown as ResumeData;
+
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '-9999px';
+    container.style.width = '794px'; // A4 width
+    container.style.backgroundColor = 'white';
+    container.style.boxSizing = 'border-box';
+
+    const resumeElement = document.createElement('div');
+    resumeElement.className = 'resume-content bg-white p-6';
+
+    const { default: ResumeTemplate } = await import('@/utils/resumeTemplates');
+    const ReactDOM = await import('react-dom/client');
+    const React = await import('react');
+
+    const root = ReactDOM.createRoot(resumeElement);
+    root.render(
+      React.createElement(ResumeTemplate, {
+        data: resumeData,
+        templateName: resolveTemplateKey(resume.template_id)
+      })
+    );
+
+    document.body.appendChild(container);
+    container.appendChild(resumeElement);
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    return {
+      container,
+      cleanup: () => {
+        root.unmount();
+        if (container.parentNode) document.body.removeChild(container);
+      }
+    };
+  };
+
+  const handleDownloadResumeSemantic = async (resume: any) => {
     try {
-      const resumeData = resume.resume_data as unknown as ResumeData;
-      const resumeName = resumeData.personal?.name || 'resume';
-      
-      const tempContainer = document.createElement('div');
-      tempContainer.style.position = 'absolute';
-      tempContainer.style.left = '-9999px';
-      tempContainer.style.top = '-9999px';
-      tempContainer.style.width = '794px'; // A4 width
-      tempContainer.style.backgroundColor = 'white';
-      tempContainer.style.boxSizing = 'border-box';
-      
-      const resumeElement = document.createElement('div');
-      resumeElement.className = 'resume-content bg-white p-6';
-      
-      const { default: ResumeTemplate } = await import('@/utils/resumeTemplates');
-      const ReactDOM = await import('react-dom/client');
-      const React = await import('react');
-      
-      const root = ReactDOM.createRoot(resumeElement);
-      root.render(
-        React.createElement(ResumeTemplate, {
-          data: resumeData,
-          templateName: resolveTemplateKey(resume.template_id)
-        })
-      );
-      
-      document.body.appendChild(tempContainer);
-      tempContainer.appendChild(resumeElement);
-      
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const html2canvasModule = await import('html2canvas');
-      const { jsPDF } = await import('jspdf');
-      
-      const canvas = await html2canvasModule.default(resumeElement, {
-        scale: 3,
-        useCORS: true,
-        logging: false,
-        width: 794,
-        height: resumeElement.scrollHeight
-      });
-      
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      // Calculate how many pages based on scrollHeight
-      const canvasHeight = canvas.height;
-      const canvasWidth = canvas.width;
-      const pageHeightCanvas = (pdfHeight / pdfWidth) * canvasWidth;
-      
-      let heightLeft = canvasHeight;
-      let position = 0;
-      let pageCount = 0;
-      
-      while (heightLeft >= 0) {
-        if (pageCount > 0) {
-          pdf.addPage();
-        }
-        
-        pdf.addImage(
-          imgData, 
-          'JPEG', 
-          0, 
-          position, 
-          pdfWidth, 
-          (canvasHeight * pdfWidth) / canvasWidth
-        );
-        
-        heightLeft -= pageHeightCanvas;
-        position -= pdfHeight;
-        pageCount++;
-      }
-      
-      pdf.save(`${resumeName}.pdf`);
-      
-      root.unmount();
-      if (tempContainer.parentNode) {
-        document.body.removeChild(tempContainer);
-      }
-      
-      toast.success('Resume downloaded successfully!');
+      const resumeName = (resume.resume_data as ResumeData).personal?.name || 'resume';
+      const { container, cleanup } = await mountResumeOffscreen(resume);
+      // printResume clones the content synchronously before opening the print
+      // popup, so it's safe to unmount our off-screen copy right away.
+      printResume(container, `${resumeName}.pdf`);
+      cleanup();
+    } catch (error) {
+      console.error('Error preparing resume for print:', error);
+      toast.error('Could not prepare this resume for printing.');
+    }
+  };
+
+  const handleDownloadResumeImage = async (resume: any) => {
+    setDownloadingResumeId(resume.id);
+    try {
+      const resumeName = (resume.resume_data as ResumeData).personal?.name || 'resume';
+      const { container, cleanup } = await mountResumeOffscreen(resume);
+      // generatePDF also clones synchronously before its own async render
+      // step, and cleans up its own clone - safe to unmount ours right away.
+      generatePDF(container, `${resumeName}.pdf`);
+      cleanup();
     } catch (error) {
       console.error('Error downloading resume:', error);
       toast.error('Download failed. Please try again.');
+      setDownloadingResumeId(null);
     }
+  };
+
+  const handleDownloadResumeDocx = async (resume: any) => {
+    if (!isPremium) {
+      navigate('/pricing');
+      return;
+    }
+    const resumeData = resume.resume_data as unknown as ResumeData;
+    const name = (resumeData.personal?.name || 'resume').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    await exportResumeDocx(resumeData, `${name}.docx`);
   };
 
   const handleCloneResume = async (resume: any) => {
@@ -355,58 +358,59 @@ export const DocumentsDashboard = ({
                 <CardContent className="py-2 text-xs text-muted-foreground flex-1">
                   Last updated {new Date(resume.updated_at).toLocaleDateString()}
                 </CardContent>
-                <div className="border-t bg-muted/20 p-3 grid grid-cols-5 gap-1.5">
-                  <Link to={`/resume-builder?id=${resume.id}`} className="col-span-1">
-                    <Button variant="outline" size="icon" className="w-full h-9" title="Edit">
-                      <Edit className="w-4 h-4" />
+                <div className="border-t bg-muted/20 p-3 space-y-2">
+                  <div className="grid grid-cols-4 gap-1.5">
+                    <Link to={`/resume-builder?id=${resume.id}`} className="col-span-1">
+                      <Button variant="outline" size="icon" className="w-full h-9" title="Edit">
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="col-span-1"
+                      onClick={() => handleCloneResume(resume)}
+                      disabled={cloningId === resume.id}
+                      title="Clone / Duplicate"
+                    >
+                      {cloningId === resume.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
                     </Button>
-                  </Link>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="col-span-1"
-                    onClick={() => handleCloneResume(resume)}
-                    disabled={cloningId === resume.id}
-                    title="Clone / Duplicate"
-                  >
-                    {cloningId === resume.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="col-span-1"
-                    onClick={() => handleDownloadResume(resume)}
-                    title="Download PDF"
-                  >
-                    <Download className="w-4 h-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="col-span-1"
-                    onClick={() => {
-                      setSharingResumeId(resume.id);
-                      setSharingResumeTitle(getResumeName(resume.resume_data));
-                      setActiveShareUrl(null);
-                    }}
-                    title="Share Link"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="col-span-1 text-destructive hover:bg-destructive/10"
-                    onClick={() => handleDeleteResume(resume.id)}
-                    disabled={deletingResumeId === resume.id}
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="col-span-1"
+                      onClick={() => {
+                        setSharingResumeId(resume.id);
+                        setSharingResumeTitle(getResumeName(resume.resume_data));
+                        setActiveShareUrl(null);
+                      }}
+                      title="Share Link"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="col-span-1 text-destructive hover:bg-destructive/10"
+                      onClick={() => handleDeleteResume(resume.id)}
+                      disabled={deletingResumeId === resume.id}
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <DocumentExportActions
+                    onSemanticExport={() => handleDownloadResumeSemantic(resume)}
+                    onImageExport={() => handleDownloadResumeImage(resume)}
+                    isImageGenerating={isGenerating && downloadingResumeId === resume.id}
+                    onDocxExport={() => handleDownloadResumeDocx(resume)}
+                    isPremium={isPremium}
+                    className="justify-start"
+                  />
                 </div>
               </Card>
             ))}

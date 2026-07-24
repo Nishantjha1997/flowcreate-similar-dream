@@ -463,3 +463,35 @@ One task-block = one commit minimum granularity; sessions 3–10 each end with t
       can't drive.
   - Verified: tsc clean, 23 test files / 69 tests passing, production build succeeds. No edge
     functions touched by F-5.
+- 2026-07-25 (Session 6) — **F-6 done: export parity everywhere (S-1c).**
+  - **`ResumePreview.tsx`** (the "Preview & Download" dialog rendered live in the resume builder's
+    header via `EnhancedResumePreview`) had its own ad-hoc button pair with image-PDF listed
+    *first* ("Download PDF") and semantic/ATS PDF second ("ATS PDF / Print") — the exact inversion
+    the plan's done-when criterion calls out. Replaced both buttons with `DocumentExportActions`,
+    wiring the same `printResume`/`generatePDF` from `usePDFGenerator` it already had, just in the
+    correct semantic-primary/image-secondary order and with the shared component's styling.
+  - **`DocumentsDashboard.tsx`** had the worse case: each resume card's only download action was a
+    single icon button calling a third, independent image-PDF implementation (hand-rolled
+    html2canvas/jsPDF pagination, duplicated from `usePDFGenerator`, with the classic
+    `heightLeft -= pageHeightCanvas` loop that's fragile across page boundaries) — image-PDF as the
+    *only* download, not just the primary one. Fixed by:
+    - Adding an optional per-call filename override to `usePDFGenerator`'s `printResume`/
+      `generatePDF` (`(element, fileNameOverride?)`, falling back to the hook's constructor
+      argument) — needed because `DocumentsDashboard` renders many resumes from one shared hook
+      instance, unlike every other caller which instantiates the hook per-document. Backward
+      compatible; no other call site passes the new argument.
+    - Extracting the existing off-screen-mount logic into `mountResumeOffscreen()` and handing the
+      result to `printResume`/`generatePDF` directly, deleting the duplicated pagination code
+      entirely rather than writing a fourth implementation.
+    - Adding DOCX export too (`exportResumeDocx` from `docxExport.ts` already takes a plain
+      `ResumeData` + filename — no DOM rendering needed), gated on the `isPremium` prop the
+      component already receives, matching the premium-gate pattern in `ResumeBuilder.tsx`.
+    - Restructuring each resume card's action footer into two rows (icon row: Edit/Clone/Share/
+      Delete; `DocumentExportActions` row below) since the previous single 5-column icon grid had
+      no room for text-labeled pill buttons.
+  - **Done-when grep verified**: `generatePDF(` now appears at exactly 4 sites app-wide —
+    `DocumentsDashboard.tsx`, `ResumePreview.tsx`, `ResumeBuilder.tsx`, `CoverLetterBuilder.tsx` —
+    and all four are the intentional secondary/image-export callback wired into a
+    `DocumentExportActions` instance, not a primary or standalone download path.
+  - Verified: tsc clean, 23 test files / 69 tests passing, production build succeeds. No edge
+    functions touched by F-6.

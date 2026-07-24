@@ -3,9 +3,10 @@ import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ResumeData } from '@/utils/types';
-import { Download, Eye, Printer, Share2, Mail, Link, Smartphone } from 'lucide-react';
+import { Eye, Share2, Mail, Link, Smartphone } from 'lucide-react';
 import { toast } from 'sonner';
 import { usePDFGenerator } from '@/hooks/usePDFGenerator';
+import { DocumentExportActions } from '@/components/export/DocumentExportActions';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -95,23 +96,11 @@ export const ResumePreview = ({
           </div>
           
           <div className="flex justify-center gap-3 mt-4">
-            <Button 
-              onClick={handleDownload} 
-              disabled={isGenerating}
-              className="flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              {isGenerating ? "Generating PDF..." : "Download PDF"}
-            </Button>
-            
-            <Button 
-              onClick={handlePrint} 
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Printer className="h-4 w-4" />
-              ATS PDF / Print
-            </Button>
+            <DocumentExportActions
+              onSemanticExport={handlePrint}
+              onImageExport={handleDownload}
+              isImageGenerating={isGenerating}
+            />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

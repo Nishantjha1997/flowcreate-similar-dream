@@ -12,11 +12,12 @@ export const usePDFGenerator = (fileName: string = 'document') => {
    * HTML text. Saving this dialog as PDF preserves selectable text and links,
    * which is materially more ATS-friendly than the image-based quick export.
    */
-  const printResume = (element: HTMLElement | null) => {
+  const printResume = (element: HTMLElement | null, fileNameOverride?: string) => {
     if (!element) {
       toast.error('Could not prepare this document for printing.');
       return;
     }
+    const effectiveFileName = fileNameOverride || fileName;
 
     const resumeContent =
       element.querySelector<HTMLElement>('.resume-content')
@@ -34,7 +35,7 @@ export const usePDFGenerator = (fileName: string = 'document') => {
     printDocument.open();
     printDocument.write('<!doctype html><html><head></head><body></body></html>');
     printDocument.close();
-    printDocument.title = fileName.replace(/\.pdf$/i, '') || 'resume';
+    printDocument.title = effectiveFileName.replace(/\.pdf$/i, '') || 'resume';
 
     document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]').forEach((link) => {
       printDocument.head.appendChild(link.cloneNode(true));
@@ -72,11 +73,12 @@ export const usePDFGenerator = (fileName: string = 'document') => {
     toast.info('Choose “Save as PDF” in the print dialog for an ATS-friendly file.');
   };
 
-  const generatePDF = (element: HTMLElement | null) => {
+  const generatePDF = (element: HTMLElement | null, fileNameOverride?: string) => {
     if (!element) {
       toast.error("Could not generate PDF. Please try again.");
       return;
     }
+    const effectiveFileName = fileNameOverride || fileName;
 
     setIsGenerating(true);
     toast.info("Generating PDF...", { duration: 3000 });
@@ -173,7 +175,7 @@ export const usePDFGenerator = (fileName: string = 'document') => {
           pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
         }
 
-        pdf.save(fileName);
+        pdf.save(effectiveFileName);
         setIsGenerating(false);
         toast.success("Resume downloaded successfully!");
       } catch (error) {
