@@ -572,3 +572,16 @@ Task: <ID> <name>
   not covered by the original competitor analysis.
 - Moved ATS export proof, Recruiter View, and pagination ahead of large differentiators; moved
   privacy-safe analytics before Job Tracker investment; deferred all active PROJECT.md conflicts.
+
+### 2026-07-23 (later) — execution wave landed; see POLISH_PLAN.md for current status
+- Sessions 1–8 of §9.2 were executed same-day (commits `923ac53`…`59a6288`): semantic export
+  primacy (S-1a/b/d), extraction preflight (D-5 foundation), pagination guidance (P-1), section
+  boundaries on builder/cover-letter (S-3a), error-message rollout (S-4), real password change
+  (S-5a), AI mock-control removal (S-5b), durable rate limits + atomic metering (S-6), incident
+  regression tests (S-8), quota transparency (P-2), Job Match v2 (P-3), cover-letter
+  controls/mobile/TXT (P-4a/b/e/f), import dedupe (P-5a), DOCX export (D-6), SEO/sitemap work,
+  and FC branding.
+- **`POLISH_PLAN.md` now carries the authoritative, code-verified status audit and the active
+  execution queue** (feature completion F-1…F-11 + UI polish workstreams U-1…U-8, including
+  Gate Zero: reconciling PROJECT.md's stale M1–M6 reservations that still block S-1c/S-2/S-3b).
+  Where a status line in this file disagrees with POLISH_PLAN.md §A, POLISH_PLAN.md wins.
