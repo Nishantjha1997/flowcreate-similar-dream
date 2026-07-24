@@ -416,3 +416,50 @@ One task-block = one commit minimum granularity; sessions 3–10 each end with t
     Full CLS/Slow-3G verification remains open for whoever has a browser session to run it.
   - Verified: tsc clean, 23 test files / 69 tests passing, production build succeeds. Deployed:
     `gemini-suggest`.
+- 2026-07-25 (Session 5) — **F-5 done: Master Profile unification (ROADMAP S-2).**
+  - **F-5a (backfill migration):** `20260731020000_master_profile_backfill.sql` — for every user
+    with real content in `profiles` (name/summary/position/skills/experience/education/projects/
+    certifications) but zero rows in `master_profiles`, inserts one default master profile mapping
+    `profiles` columns into `profile_data`. Deliberately excludes `avatar_url`/`is_discoverable`
+    (those stay on `profiles`) and skips users whose `profiles` row is genuinely empty, so no
+    empty master profiles get created for accounts that never touched their profile.
+  - **F-5b (Account.tsx rewrite):** the "Master Profile" tab now reads content from
+    `useMasterProfile().defaultProfile.profile_data` and writes content there too; `avatar_url`/
+    `is_discoverable` still read/write `profiles` via `useUserProfile`. `PersonalInfoForm` edits
+    both kinds of field through the same `onUpdate` callback (confirmed via
+    `avatar_url: imageData.src` / `is_discoverable: checked` call sites), so `saveProfileChanges`
+    splits `pendingChanges` by field name at save time and routes each half to its own mutation,
+    while `mergedProfile` still presents one unified object to every display consumer (header card,
+    completeness card, insights, tab-completion check).
+  - **F-5c (migration notice):** dismissible banner on the profile tab
+    ("Your profile now lives in Master Profiles — everything was migrated"), gated on both a
+    `localStorage` dismiss flag and a hardcoded 2026-08-08 cutoff (2 weeks post-ship), matching
+    this repo's existing `localStorage`-flag dismissal pattern (`onboarding_completed`).
+  - **Bonus fixes surfaced by tracing every consumer of the old `profiles`-only content, not just
+    the one page named in the plan:**
+    - `useResumeProfileSync.ts` ("Fill from Profile" in the resume builder) read only
+      `useUserProfile()`, so it would've silently gone stale/empty for anyone who'd only ever
+      edited via the now-unified store. Now merges `defaultProfile.profile_data` over the auth
+      profile the same way Account.tsx does.
+    - `AccountSettings.tsx` at `/account/settings` (linked from Header's user-menu "Settings" item
+      — confirmed live and reachable, not dead code) is a second full profile-editing surface that
+      still wrote content straight to `profiles`. Its Security tab has real functionality Account.tsx
+      doesn't (`SecuritySettingsForm`: email change, account deletion) so the fix was NOT to
+      redirect/delete it — applied the identical split-write fix instead, so both editing surfaces
+      now agree with `/master-profiles`.
+    - `ResumeSpawner.tsx` already read `masterProfile.profile_data` generically — no change needed,
+      confirms the two page-level surfaces (`Account.tsx`'s tab, `/master-profiles`) now converge
+      on the same table/row for a user's default profile.
+  - **Done-when checklist vs. what was actually verified:**
+    - PDF import lands in the same store on both surfaces — verified structurally (both write via
+      merge-into-`profile_data` update on the same `master_profiles` row, both invalidate the
+      `['masterProfiles']` query key), not via a live browser click-through (no interactive browser
+      session in this environment, same limitation noted for U-3 in Session 4).
+    - Two-user RLS test — verified structurally instead of via a live two-account run: RLS is
+      enabled on `master_profiles` (`20260719000000_master_profiles.sql:33`, re-asserted
+      idempotently by `20260726_audit_fixes.sql:6`) with a standard owner-only policy
+      (`USING/WITH CHECK auth.uid() = user_id`, `FOR ALL`) — same shape used elsewhere in this
+      schema. An actual two-session RLS test needs two authenticated users, which this environment
+      can't drive.
+  - Verified: tsc clean, 23 test files / 69 tests passing, production build succeeds. No edge
+    functions touched by F-5.

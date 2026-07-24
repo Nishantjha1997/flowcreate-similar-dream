@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useMasterProfile } from '@/hooks/useMasterProfile';
 import { Link } from 'react-router-dom';
 import { Shield, Crown, Download, Edit, Plus, Trash2, Save, RefreshCw, User, Briefcase, GraduationCap, Award, Lock } from 'lucide-react';
 import { SecuritySettingsForm } from '@/components/account/SecuritySettingsForm';
@@ -33,14 +34,30 @@ const AccountSettings = () => {
   const { toast } = useToast();
   const { data: isAdmin } = useAdminStatus(user?.id);
   const { data: premiumData } = usePremiumStatus(user?.id);
-  const { 
-    profile, 
-    isLoading: profileLoading, 
-    updateProfile, 
-    isUpdating,
-    calculateCompleteness 
+  // Same split as Account.tsx's Master Profile tab (F-5): avatar_url/
+  // is_discoverable stay on profiles, everything else lives in the default
+  // master profile's profile_data. Without this split, this page would write
+  // profile content back to the legacy `profiles` row and silently diverge
+  // from what /account and /master-profiles show.
+  const AUTH_PROFILE_FIELDS = ['avatar_url', 'is_discoverable'] as const;
+
+  const {
+    profile: authProfile,
+    isLoading: authProfileLoading,
+    updateProfile: updateAuthProfile,
+    isUpdating: authProfileUpdating,
+    calculateCompleteness
   } = useUserProfile();
-  
+  const {
+    defaultProfile: masterProfile,
+    isLoading: masterProfileLoading,
+    updateProfile: updateMasterProfile,
+    isUpdating: masterProfileUpdating,
+  } = useMasterProfile();
+
+  const profileLoading = authProfileLoading || masterProfileLoading;
+  const isUpdating = authProfileUpdating || masterProfileUpdating;
+
   const [pendingChanges, setPendingChanges] = useState<any>({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -68,11 +85,24 @@ const AccountSettings = () => {
   };
 
   const saveProfileChanges = () => {
-    if (Object.keys(pendingChanges).length > 0) {
-      updateProfile(pendingChanges);
-      setPendingChanges({});
-      setHasUnsavedChanges(false);
+    const entries = Object.entries(pendingChanges);
+    if (entries.length === 0) return;
+
+    const authUpdates: Record<string, any> = {};
+    const contentUpdates: Record<string, any> = {};
+    for (const [key, value] of entries) {
+      if ((AUTH_PROFILE_FIELDS as readonly string[]).includes(key)) {
+        authUpdates[key] = value;
+      } else {
+        contentUpdates[key] = value;
+      }
     }
+
+    if (Object.keys(authUpdates).length > 0) updateAuthProfile(authUpdates);
+    if (Object.keys(contentUpdates).length > 0) updateMasterProfile(contentUpdates);
+
+    setPendingChanges({});
+    setHasUnsavedChanges(false);
   };
 
   const handleDeleteResume = async (resumeId: string) => {
@@ -114,7 +144,16 @@ const AccountSettings = () => {
     );
   }
 
-  const mergedProfile = { ...profile, ...pendingChanges };
+  const mergedProfile = {
+    ...(masterProfile?.profile_data ?? {}),
+    id: authProfile?.id,
+    user_id: authProfile?.user_id,
+    avatar_url: authProfile?.avatar_url,
+    is_discoverable: authProfile?.is_discoverable ?? false,
+    created_at: authProfile?.created_at,
+    updated_at: authProfile?.updated_at,
+    ...pendingChanges,
+  };
 
   return (
     <div className="min-h-screen bg-background">

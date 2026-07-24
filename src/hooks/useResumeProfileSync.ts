@@ -1,5 +1,6 @@
 import { useEffect, useCallback } from 'react';
-import { useUserProfile } from '@/hooks/useUserProfile';
+import { useUserProfile, UserProfile } from '@/hooks/useUserProfile';
+import { useMasterProfile } from '@/hooks/useMasterProfile';
 import { useAuth } from '@/hooks/useAuth';
 import { ResumeData } from '@/utils/types';
 import { toast } from 'sonner';
@@ -10,13 +11,27 @@ interface UseResumeProfileSyncProps {
   shouldAutoPopulate?: boolean;
 }
 
-export const useResumeProfileSync = ({ 
-  resume, 
-  setResume, 
-  shouldAutoPopulate = false 
+export const useResumeProfileSync = ({
+  resume,
+  setResume,
+  shouldAutoPopulate = false
 }: UseResumeProfileSyncProps) => {
   const { user } = useAuth();
-  const { profile, isLoading, populateResumeFromProfile } = useUserProfile();
+  const {
+    profile: authProfile,
+    isLoading: authProfileLoading,
+    populateResumeFromProfile,
+  } = useUserProfile();
+  const { defaultProfile: masterProfile, isLoading: masterProfileLoading } = useMasterProfile();
+  const isLoading = authProfileLoading || masterProfileLoading;
+  // Content fields (experience, skills, etc.) live in the default master
+  // profile since F-5; avatar_url/is_discoverable and id/timestamps still
+  // come from the profiles row. Same merge Account.tsx uses to display one
+  // unified profile, so "Fill from Profile" here matches what a user just
+  // edited in either Account > Master Profile or /master-profiles.
+  const profile: UserProfile | null = authProfile
+    ? { ...authProfile, ...(masterProfile?.profile_data ?? {}) }
+    : null;
 
   // Auto-populate resume from profile on initial load
   useEffect(() => {

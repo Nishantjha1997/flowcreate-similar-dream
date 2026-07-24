@@ -11,10 +11,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useMasterProfile } from '@/hooks/useMasterProfile';
 import { Link } from 'react-router-dom';
 import {
   Shield, Crown, Save, User, Lock, FileText,
-  CheckCircle, Circle, Loader2, Eye, Upload, LayoutTemplate, FilePlus
+  CheckCircle, Circle, Loader2, Eye, Upload, LayoutTemplate, FilePlus, Sparkles, X
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -68,16 +69,29 @@ const Account = () => {
   const { toast } = useToast();
   const { data: isAdmin, isLoading: loadingAdmin } = useAdminStatus(user?.id);
   const { data: premiumData, isLoading: loadingPremium } = usePremiumStatus(user?.id);
-  const { 
-    profile, 
-    isLoading: profileLoading, 
-    updateProfile, 
-    isUpdating: profileUpdating,
-    calculateCompleteness 
+  // avatar_url / is_discoverable are "auth-y" fields and stay on the profiles
+  // table; every other profile field lives in the default master profile's
+  // profile_data (see F-5, ROADMAP S-2). PersonalInfoForm edits both kinds
+  // through the same onUpdate callback, so pendingChanges is a mixed bag that
+  // gets split by field name at save time (see saveProfileChanges below).
+  const AUTH_PROFILE_FIELDS = ['avatar_url', 'is_discoverable'] as const;
+
+  const {
+    profile: authProfile,
+    isLoading: authProfileLoading,
+    updateProfile: updateAuthProfile,
+    isUpdating: authProfileUpdating,
+    calculateCompleteness
   } = useUserProfile();
+  const {
+    defaultProfile: masterProfile,
+    isLoading: masterProfileLoading,
+    updateProfile: updateMasterProfile,
+    isUpdating: masterProfileUpdating,
+  } = useMasterProfile();
   const { designMode } = useDesignMode();
   const isNeoBrutalism = designMode === 'neo-brutalism';
-  
+
   const [isUpdating, setIsUpdating] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -85,6 +99,20 @@ const Account = () => {
   const [pendingChanges, setPendingChanges] = useState<any>({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [activeTab, setActiveTab] = useState('documents');
+  const [migrationNoticeDismissed, setMigrationNoticeDismissed] = useState(
+    () => localStorage.getItem('master_profile_migration_notice_dismissed') === 'true'
+  );
+
+  const profileLoading = authProfileLoading || masterProfileLoading;
+  const profileUpdating = authProfileUpdating || masterProfileUpdating;
+  // Notice ships 2026-07-25; hide it automatically two weeks after ship date
+  // regardless of whether the user dismisses it.
+  const showMigrationNotice = !migrationNoticeDismissed && Date.now() < new Date('2026-08-08T00:00:00Z').getTime();
+
+  const dismissMigrationNotice = () => {
+    localStorage.setItem('master_profile_migration_notice_dismissed', 'true');
+    setMigrationNoticeDismissed(true);
+  };
 
   const breadcrumbItems: BreadcrumbItem[] = [
     { label: 'Home', href: '/' },
@@ -169,14 +197,39 @@ const Account = () => {
   };
 
   const saveProfileChanges = () => {
-    if (Object.keys(pendingChanges).length > 0) {
-      updateProfile(pendingChanges);
-      setPendingChanges({});
-      setHasUnsavedChanges(false);
+    const entries = Object.entries(pendingChanges);
+    if (entries.length === 0) return;
+
+    const authUpdates: Record<string, any> = {};
+    const contentUpdates: Record<string, any> = {};
+    for (const [key, value] of entries) {
+      if ((AUTH_PROFILE_FIELDS as readonly string[]).includes(key)) {
+        authUpdates[key] = value;
+      } else {
+        contentUpdates[key] = value;
+      }
     }
+
+    if (Object.keys(authUpdates).length > 0) updateAuthProfile(authUpdates);
+    if (Object.keys(contentUpdates).length > 0) updateMasterProfile(contentUpdates);
+
+    setPendingChanges({});
+    setHasUnsavedChanges(false);
   };
 
-  const mergedProfile = { ...profile, ...pendingChanges };
+  // One display object for the whole page: content fields come from the
+  // default master profile, auth-y fields from `profiles`, unsaved edits
+  // from pendingChanges regardless of which store they'll land in.
+  const mergedProfile = {
+    ...(masterProfile?.profile_data ?? {}),
+    id: authProfile?.id,
+    user_id: authProfile?.user_id,
+    avatar_url: authProfile?.avatar_url,
+    is_discoverable: authProfile?.is_discoverable ?? false,
+    created_at: authProfile?.created_at,
+    updated_at: authProfile?.updated_at,
+    ...pendingChanges,
+  };
   const tabConfig = getTabConfig(mergedProfile);
   const completedTabs = tabConfig.filter(t => t.isComplete).length;
   const tabProgress = Math.round((completedTabs / tabConfig.length) * 100);
@@ -456,6 +509,22 @@ const Account = () => {
               </TabsContent>
 
               <TabsContent value="profile" className="mt-0 animate-fade-in space-y-6">
+                {showMigrationNotice && (
+                  <div className={`flex items-start gap-3 p-3 rounded-lg text-sm ${isNeoBrutalism ? 'border-2 border-foreground bg-primary/10' : 'bg-primary/5 border border-primary/20'}`}>
+                    <Sparkles className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
+                    <p className="flex-1 text-muted-foreground">
+                      Your profile now lives in Master Profiles — everything here was migrated automatically, nothing to redo.
+                    </p>
+                    <button
+                      onClick={dismissMigrationNotice}
+                      aria-label="Dismiss"
+                      className="shrink-0 text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+
                 <PDFResumeUploader
                   currentProfile={mergedProfile}
                   onDataExtracted={(data: Partial<UserProfile>) => handleProfileUpdate(data)}
