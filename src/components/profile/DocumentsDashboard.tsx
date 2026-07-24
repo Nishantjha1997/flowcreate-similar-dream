@@ -413,7 +413,13 @@ export const DocumentsDashboard = ({
         ) : (
           <div className="text-center py-12 border-2 border-dashed rounded-xl bg-muted/10">
             <FileText className="w-8 h-8 mx-auto text-muted-foreground mb-3" />
-            <p className="text-sm text-muted-foreground">No resumes created yet.</p>
+            <p className="text-sm text-muted-foreground mb-4">No resumes created yet.</p>
+            <Link to="/resume-builder">
+              <Button size="sm" variant="outline" className={isNeoBrutalism ? 'border-2 border-foreground' : ''}>
+                <Plus className="w-4 h-4 mr-2" />
+                Create your first resume
+              </Button>
+            </Link>
           </div>
         )}
       </section>
@@ -498,7 +504,13 @@ export const DocumentsDashboard = ({
         ) : (
           <div className="text-center py-12 border-2 border-dashed rounded-xl bg-muted/10">
             <FilePlus className="w-8 h-8 mx-auto text-muted-foreground mb-3" />
-            <p className="text-sm text-muted-foreground">No cover letters created yet.</p>
+            <p className="text-sm text-muted-foreground mb-4">No cover letters created yet.</p>
+            <Link to="/cover-letter-builder">
+              <Button size="sm" variant="outline" className={isNeoBrutalism ? 'border-2 border-foreground' : ''}>
+                <Plus className="w-4 h-4 mr-2" />
+                Write your first cover letter
+              </Button>
+            </Link>
           </div>
         )}
       </section>

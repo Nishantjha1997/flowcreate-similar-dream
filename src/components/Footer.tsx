@@ -20,7 +20,7 @@ const Footer = () => {
               <p className="mt-4 text-sm text-foreground font-medium">Create professional resumes and cover letters online in minutes.</p>
             </div>
             {[
-              { title: 'Product', links: [{ to: '/templates', label: 'Templates' }, { to: '/examples', label: 'Examples' }, { to: '/features', label: 'Features' }, { to: '/pricing', label: 'Pricing' }] },
+              { title: 'Product', links: [{ to: '/resume-builder', label: 'Resume Builder' }, { to: '/cover-letter-builder', label: 'Cover Letter Builder' }, { to: '/master-profiles', label: 'Master Profiles' }, { to: '/templates', label: 'Templates' }, { to: '/examples', label: 'Examples' }, { to: '/features', label: 'Features' }, { to: '/pricing', label: 'Pricing' }] },
               { title: 'Resources', links: [{ to: '/blog', label: 'Blog' }, { to: '/resources', label: 'Resources' }, { to: '/help', label: 'Help Center' }, { to: '/career-advice', label: 'Career Advice' }] },
               { title: 'Company', links: [{ to: '/about', label: 'About' }, { to: '/privacy', label: 'Privacy' }, { to: '/terms', label: 'Terms' }, { to: '/shipping-policy', label: 'Shipping Policy' }] },
             ].map((section) => (
@@ -50,7 +50,7 @@ const Footer = () => {
 
   // Dark materialistic footer
   const footerSections = [
-    { title: 'Product', links: [{ to: '/templates', label: 'Templates' }, { to: '/examples', label: 'Example Resumes' }, { to: '/features', label: 'Features' }, { to: '/pricing', label: 'Pricing' }] },
+    { title: 'Product', links: [{ to: '/resume-builder', label: 'Resume Builder' }, { to: '/cover-letter-builder', label: 'Cover Letter Builder' }, { to: '/master-profiles', label: 'Master Profiles' }, { to: '/templates', label: 'Templates' }, { to: '/examples', label: 'Example Resumes' }, { to: '/features', label: 'Features' }, { to: '/pricing', label: 'Pricing' }] },
     { title: 'Resources', links: [{ to: '/blog', label: 'Blog' }, { to: '/resources', label: 'Resources' }, { to: '/help', label: 'Help Center' }, { to: '/career-advice', label: 'Career Advice' }] },
     { title: 'Company', links: [{ to: '/about', label: 'About' }, { to: '/privacy', label: 'Privacy Policy' }, { to: '/terms', label: 'Terms of Use' }, { to: '/shipping-policy', label: 'Shipping Policy' }] }
   ];

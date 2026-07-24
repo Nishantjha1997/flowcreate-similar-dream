@@ -12,9 +12,9 @@ import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Link } from 'react-router-dom';
-import { 
+import {
   Shield, Crown, Save, User, Lock, FileText,
-  CheckCircle, Circle, Loader2, Eye, Upload, LayoutTemplate
+  CheckCircle, Circle, Loader2, Eye, Upload, LayoutTemplate, FilePlus
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -296,7 +296,7 @@ const Account = () => {
 
         {/* Quick Action Cards */}
         <ScrollReveal delay={100}>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
           <Link to="/resume-builder">
             <Card className={`h-full transition-all hover:scale-[1.02] cursor-pointer ${isNeoBrutalism ? 'border-3 border-foreground hover:shadow-[6px_6px_0px_0px_hsl(var(--foreground))] hover:-translate-y-1' : 'hover:shadow-md'}`}>
               <CardContent className="flex items-center gap-3 p-3 sm:p-4">
@@ -310,12 +310,26 @@ const Account = () => {
               </CardContent>
             </Card>
           </Link>
-          
+
+          <Link to="/cover-letter-builder">
+            <Card className={`h-full transition-all hover:scale-[1.02] cursor-pointer ${isNeoBrutalism ? 'border-3 border-foreground hover:shadow-[6px_6px_0px_0px_hsl(var(--foreground))] hover:-translate-y-1' : 'hover:shadow-md'}`}>
+              <CardContent className="flex items-center gap-3 p-3 sm:p-4">
+                <div className={`p-2 sm:p-3 rounded-lg ${isNeoBrutalism ? 'bg-purple-600 border-2 border-foreground' : 'bg-purple-100 dark:bg-purple-900/30'}`}>
+                  <FilePlus className={`h-4 w-4 sm:h-5 sm:w-5 ${isNeoBrutalism ? 'text-white' : 'text-purple-600 dark:text-purple-400'}`} />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-sm sm:text-base truncate">Cover Letters</h3>
+                  <p className="text-xs text-muted-foreground hidden sm:block">Write a cover letter</p>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
           <Link to="/templates">
             <Card className={`h-full transition-all hover:scale-[1.02] cursor-pointer ${isNeoBrutalism ? 'border-3 border-foreground hover:shadow-[6px_6px_0px_0px_hsl(var(--foreground))] hover:-translate-y-1' : 'hover:shadow-md'}`}>
               <CardContent className="flex items-center gap-3 p-3 sm:p-4">
-                <div className={`p-2 sm:p-3 rounded-lg ${isNeoBrutalism ? 'bg-purple-500 border-2 border-foreground' : 'bg-purple-100 dark:bg-purple-900/30'}`}>
-                  <LayoutTemplate className={`h-4 w-4 sm:h-5 sm:w-5 ${isNeoBrutalism ? 'text-white' : 'text-purple-600 dark:text-purple-400'}`} />
+                <div className={`p-2 sm:p-3 rounded-lg ${isNeoBrutalism ? 'bg-amber-500 border-2 border-foreground' : 'bg-amber-100 dark:bg-amber-900/30'}`}>
+                  <LayoutTemplate className={`h-4 w-4 sm:h-5 sm:w-5 ${isNeoBrutalism ? 'text-white' : 'text-amber-600 dark:text-amber-400'}`} />
                 </div>
                 <div className="min-w-0">
                   <h3 className="font-semibold text-sm sm:text-base truncate">Templates</h3>
@@ -324,7 +338,7 @@ const Account = () => {
               </CardContent>
             </Card>
           </Link>
-          
+
           {isAdmin ? (
             <Link to="/admin">
               <Card className={`h-full transition-all hover:scale-[1.02] cursor-pointer ${isNeoBrutalism ? 'border-3 border-foreground hover:shadow-[6px_6px_0px_0px_hsl(var(--foreground))] hover:-translate-y-1 bg-destructive/10' : 'hover:shadow-md bg-red-50 dark:bg-red-950/20'}`}>

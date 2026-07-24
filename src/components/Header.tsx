@@ -1,8 +1,8 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { MenuIcon, X, User, Settings, LogOut, Shield } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { MenuIcon, X, User, Settings, LogOut, Shield, ChevronDown } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
@@ -24,7 +24,8 @@ const Header = () => {
   const { user, signOut } = useAuth();
   const { data: isAdmin } = useAdminStatus(user?.id);
   const { isNeoBrutalism } = useDesignMode();
-  
+  const location = useLocation();
+
   const handleSignOut = async () => {
     await signOut();
   };
@@ -34,6 +35,14 @@ const Header = () => {
     return user.email.charAt(0).toUpperCase();
   };
 
+  // "Build" groups the actual document builders - these had zero header/footer
+  // entry points before, so users who found them at all did so by luck.
+  const toolsItems = [
+    { to: '/resume-builder', label: 'Resume Builder' },
+    { to: '/cover-letter-builder', label: 'Cover Letters' },
+    { to: '/master-profiles', label: 'Master Profiles' },
+  ];
+
   const navItems = [
     { to: '/templates', label: 'Templates' },
     { to: '/blog', label: 'Blog' },
@@ -41,6 +50,10 @@ const Header = () => {
     { to: '/ats', label: 'For Companies' },
     { to: '/help', label: 'Help' },
   ];
+
+  const isRouteActive = (to: string) =>
+    location.pathname === to || location.pathname.startsWith(`${to}/`);
+  const isBuildActive = toolsItems.some((item) => isRouteActive(item.to));
 
   if (isNeoBrutalism) {
     return (
@@ -53,8 +66,28 @@ const Header = () => {
               <span className="text-2xl font-bold uppercase tracking-wider text-foreground">Create</span>
             </Link>
             <nav className="hidden md:flex md:items-center md:space-x-6">
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className={`flex items-center gap-1 uppercase tracking-wide font-bold text-xs outline-none ${isBuildActive ? 'text-primary' : 'text-foreground hover:text-primary'}`}
+                >
+                  Build <ChevronDown className="h-3 w-3" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-52 border-3 border-foreground rounded-none shadow-[4px_4px_0px_0px_hsl(var(--foreground))]">
+                  {toolsItems.map(({ to, label }) => (
+                    <DropdownMenuItem key={to} asChild>
+                      <Link to={to} className={`cursor-pointer font-bold uppercase text-xs ${isRouteActive(to) ? 'text-primary' : ''}`}>
+                        {label}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
               {navItems.map(({ to, label }) => (
-                <Link key={to} to={to} className="uppercase tracking-wide text-foreground hover:text-primary font-bold text-xs">
+                <Link
+                  key={to}
+                  to={to}
+                  className={`uppercase tracking-wide font-bold text-xs ${isRouteActive(to) ? 'text-primary' : 'text-foreground hover:text-primary'}`}
+                >
                   {label}
                 </Link>
               ))}
@@ -107,7 +140,29 @@ const Header = () => {
               <button onClick={() => setMobileMenuOpen(false)} className="border-2 border-foreground p-2"><X className="h-5 w-5" /></button>
             </div>
             <div className="mt-6 space-y-6 py-6">
-              {navItems.map(({ to, label }) => (<Link key={to} to={to} className="block uppercase tracking-wide text-foreground font-bold hover:text-primary" onClick={() => setMobileMenuOpen(false)}>{label}</Link>))}
+              <div className="space-y-3">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground font-black">Build</p>
+                {toolsItems.map(({ to, label }) => (
+                  <Link
+                    key={to}
+                    to={to}
+                    className={`block uppercase tracking-wide font-bold ${isRouteActive(to) ? 'text-primary' : 'text-foreground hover:text-primary'}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </div>
+              {navItems.map(({ to, label }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`block uppercase tracking-wide font-bold ${isRouteActive(to) ? 'text-primary' : 'text-foreground hover:text-primary'}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {label}
+                </Link>
+              ))}
             </div>
             <div className="mt-6 space-y-2">
               {!user && (<><Link to="/login" className="block w-full" onClick={() => setMobileMenuOpen(false)}><Button variant="outline" className="w-full rounded-none border-2 border-foreground font-bold uppercase">Sign in</Button></Link><Link to="/register" className="block w-full" onClick={() => setMobileMenuOpen(false)}><Button className="w-full rounded-none border-2 border-foreground font-bold uppercase">Sign up</Button></Link></>)}
@@ -131,11 +186,28 @@ const Header = () => {
           </div>
           
           <nav className="hidden md:flex md:items-center md:space-x-7" role="navigation" aria-label="Main navigation">
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={`flex items-center gap-1 text-xs font-normal transition-colors duration-300 outline-none ${isBuildActive ? 'text-foreground' : 'text-foreground/80 hover:text-foreground'}`}
+                aria-label="Build menu"
+              >
+                Build <ChevronDown className="h-3 w-3" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 z-50 rounded-xl border border-border/50 shadow-lg bg-background/95 backdrop-blur-xl">
+                {toolsItems.map(({ to, label }) => (
+                  <DropdownMenuItem key={to} asChild>
+                    <Link to={to} className={`cursor-pointer ${isRouteActive(to) ? 'font-medium text-foreground' : ''}`}>
+                      {label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             {navItems.map(({ to, label }) => (
-              <Link 
+              <Link
                 key={to}
-                to={to} 
-                className="text-xs font-normal text-foreground/80 hover:text-foreground transition-colors duration-300"
+                to={to}
+                className={`text-xs font-normal transition-colors duration-300 ${isRouteActive(to) ? 'text-foreground' : 'text-foreground/80 hover:text-foreground'}`}
               >
                 {label}
               </Link>
@@ -284,11 +356,22 @@ const Header = () => {
             </div>
             <div className="mt-8 flow-root">
               <div className="space-y-1">
+                <p className="pt-1 pb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Build</p>
+                {toolsItems.map(({ to, label }) => (
+                  <Link
+                    key={to}
+                    to={to}
+                    className={`block py-3 text-2xl font-semibold tracking-apple-tight transition-colors border-b border-border/30 ${isRouteActive(to) ? 'text-primary' : 'text-foreground hover:text-primary'}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {label}
+                  </Link>
+                ))}
                 {navItems.map(({ to, label }) => (
                   <Link
                     key={to}
                     to={to}
-                    className="block py-3 text-2xl font-semibold text-foreground tracking-apple-tight hover:text-primary transition-colors border-b border-border/30"
+                    className={`block py-3 text-2xl font-semibold tracking-apple-tight transition-colors border-b border-border/30 ${isRouteActive(to) ? 'text-primary' : 'text-foreground hover:text-primary'}`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {label}
