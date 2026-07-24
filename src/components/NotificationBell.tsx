@@ -32,8 +32,10 @@ export const NotificationBell = () => {
           <Button variant="ghost" size="icon" className="relative rounded-full border-2 border-foreground h-9 w-9">
             <Bell className="h-4 w-4" />
             {unreadCount > 0 && (
-              <Badge 
-                variant="destructive" 
+              <Badge
+                variant="destructive"
+                // text-xs (12px) doesn't fit "99+" inside this fixed 20px circle -
+                // documented type-scale exception (U-1b), not an oversight.
                 className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-[10px] rounded-full border-2 border-foreground shadow-[1px_1px_0px_0px_hsl(var(--foreground))]"
               >
                 {unreadCount > 99 ? '99+' : unreadCount}
@@ -86,7 +88,7 @@ export const NotificationBell = () => {
                         {notification.body}
                       </p>
                     )}
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                    <span className="text-xs font-bold text-muted-foreground uppercase">
                       {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                     </span>
                   </div>
@@ -105,7 +107,9 @@ export const NotificationBell = () => {
         <Button variant="ghost" size="icon" className="relative rounded-full h-8 w-8 text-foreground/80 hover:text-foreground">
           <Bell className="h-4 w-4" />
           {unreadCount > 0 && (
-            <Badge 
+            <Badge
+              // Same fixed-badge type-scale exception as above, at an even
+              // smaller 16px circle.
               className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-[9px] rounded-full bg-destructive text-destructive-foreground border-none"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
@@ -158,7 +162,7 @@ export const NotificationBell = () => {
                       {notification.body}
                     </p>
                   )}
-                  <span className="text-[10px] text-muted-foreground/70">
+                  <span className="text-xs text-muted-foreground/70">
                     {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                   </span>
                 </div>

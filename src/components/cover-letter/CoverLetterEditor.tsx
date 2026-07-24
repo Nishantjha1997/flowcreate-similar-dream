@@ -10,12 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Sparkles, Save, RefreshCw } from 'lucide-react';
+import { Sparkles, Save } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { CoverLetterFormData } from '@/hooks/useCoverLetterData';
 import { coverLetterTemplateNames } from '@/utils/coverLetterTemplates';
 import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
+import { toastActionFailed, toastActionDone } from '@/utils/toastMessages';
 import { JobDescriptionGenerator } from './JobDescriptionGenerator';
 import { useAuth } from '@/hooks/useAuth';
 import { useAIQuota } from '@/hooks/useAIQuota';
@@ -70,10 +72,10 @@ export const CoverLetterEditor = ({
       if (funcData?.suggestion) {
         setFormData((prev) => ({ ...prev, content: funcData.suggestion }));
         void quota.refresh();
-        toast.success('AI suggestion generated!');
+        toastActionDone('AI suggestion generated.');
       }
     } catch (error: any) {
-      toast.error('AI suggestion failed: ' + (error?.message || 'Unknown error'));
+      toastActionFailed('generate an AI suggestion', error?.message, 'Try again in a moment.');
     } finally {
       setAiLoading(false);
     }
@@ -153,7 +155,7 @@ export const CoverLetterEditor = ({
             className="h-7 gap-1 text-xs"
           >
             {aiLoading ? (
-              <RefreshCw className="h-3 w-3 animate-spin" />
+              <Spinner size="xs" />
             ) : (
               <Sparkles className="h-3 w-3" />
             )}

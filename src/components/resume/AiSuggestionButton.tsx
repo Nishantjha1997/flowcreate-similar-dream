@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { AppDialogContent } from "@/components/ui/app-dialog";
 import {
   Select,
   SelectContent,
@@ -369,7 +370,7 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
 
       {/* Premium Upgrade Dialog */}
       <Dialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>
-        <DialogContent className="sm:max-w-md bg-background border shadow-lg">
+        <AppDialogContent size="sm" className="bg-background border shadow-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Crown className="h-5 w-5 text-yellow-600" aria-hidden="true" />
@@ -416,7 +417,7 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
               Upgrade Now
             </Button>
           </div>
-        </DialogContent>
+        </AppDialogContent>
       </Dialog>
     </>
   );

@@ -37,11 +37,11 @@ export function AutoSaveIndicator({ status, lastSaved, className }: AutoSaveIndi
   const getColorClass = () => {
     switch (status) {
       case 'saving':
-        return 'text-blue-600 dark:text-blue-400';
+        return 'text-info';
       case 'saved':
-        return 'text-green-600 dark:text-green-400';
+        return 'text-success';
       case 'error':
-        return 'text-red-600 dark:text-red-400';
+        return 'text-destructive';
       default:
         return 'text-muted-foreground';
     }

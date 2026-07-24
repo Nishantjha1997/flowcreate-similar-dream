@@ -4,11 +4,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sparkles, Loader2, Wand2 } from 'lucide-react';
+import { Sparkles, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 import { JobDescriptionInput } from '@/components/JobDescriptionInput';
+import { Spinner } from '@/components/ui/spinner';
+import { toastActionFailed, toastActionDone } from '@/utils/toastMessages';
 
 interface JobDescriptionGeneratorOptions {
   tone: string;
@@ -74,17 +76,17 @@ export const JobDescriptionGenerator = ({ resumeId, currentContent, onGenerated,
       // A generation overwrites whatever the user had already written - never
       // let that be silently unrecoverable.
       if (previousContent.trim().length > 0) {
-        toast.success('Cover letter drafted! Review and edit it below.', {
+        toastActionDone('Cover letter drafted. Review and edit it below.', {
           action: {
             label: 'Undo',
             onClick: () => onGenerated(previousContent),
           },
         });
       } else {
-        toast.success('Cover letter drafted! Review and edit it below.');
+        toastActionDone('Cover letter drafted. Review and edit it below.');
       }
     } catch (err: any) {
-      toast.error(err?.message || 'Failed to generate cover letter.');
+      toastActionFailed('generate the cover letter', err?.message, 'Try again in a moment.');
     } finally {
       setGenerating(false);
     }
@@ -98,7 +100,7 @@ export const JobDescriptionGenerator = ({ resumeId, currentContent, onGenerated,
       </div>
       <div className="grid grid-cols-2 gap-2">
         <div className="space-y-1">
-          <Label className="text-[11px]">Company (optional)</Label>
+          <Label className="text-xs">Company (optional)</Label>
           <Input
             value={company}
             onChange={(e) => {
@@ -111,7 +113,7 @@ export const JobDescriptionGenerator = ({ resumeId, currentContent, onGenerated,
           />
         </div>
         <div className="space-y-1">
-          <Label className="text-[11px]">Role (optional)</Label>
+          <Label className="text-xs">Role (optional)</Label>
           <Input
             value={role}
             onChange={(e) => {
@@ -133,7 +135,7 @@ export const JobDescriptionGenerator = ({ resumeId, currentContent, onGenerated,
       />
       <div className="grid grid-cols-2 gap-2">
         <div className="space-y-1">
-          <Label className="text-[11px]">Tone</Label>
+          <Label className="text-xs">Tone</Label>
           <Select value={tone} onValueChange={(value) => { setTone(value); emitOptions({ tone: value }); }}>
             <SelectTrigger className="h-8 text-xs bg-background"><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -144,7 +146,7 @@ export const JobDescriptionGenerator = ({ resumeId, currentContent, onGenerated,
           </Select>
         </div>
         <div className="space-y-1">
-          <Label className="text-[11px]">Length</Label>
+          <Label className="text-xs">Length</Label>
           <Select value={length} onValueChange={(value) => { setLength(value); emitOptions({ length: value }); }}>
             <SelectTrigger className="h-8 text-xs bg-background"><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -172,7 +174,7 @@ export const JobDescriptionGenerator = ({ resumeId, currentContent, onGenerated,
         size="sm"
         className="w-full h-7 gap-1.5 text-xs"
       >
-        {generating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
+        {generating ? <Spinner size="xs" /> : <Wand2 className="h-3 w-3" />}
         {generating ? 'Writing...' : 'Generate Cover Letter'}
       </Button>
     </div>

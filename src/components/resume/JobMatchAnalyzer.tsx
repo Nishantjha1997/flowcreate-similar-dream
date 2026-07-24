@@ -5,13 +5,14 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Target, Loader2, CheckCircle2, XCircle, Lightbulb, Crown, Wand2, History, Undo2 } from 'lucide-react';
+import { AppDialogContent } from '@/components/ui/app-dialog';
+import { Target, CheckCircle2, XCircle, Lightbulb, Crown, Wand2, History, Undo2 } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ResumeData } from '@/utils/types';
@@ -163,7 +164,7 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
   };
 
   const scoreColor = (score: number) =>
-    score >= 75 ? 'text-green-600' : score >= 50 ? 'text-yellow-600' : 'text-red-600';
+    score >= 75 ? 'text-success' : score >= 50 ? 'text-warning' : 'text-destructive';
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -177,7 +178,7 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
           Job Match
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+      <AppDialogContent size="lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Target className="h-5 w-5 text-primary" /> AI Job Match Analyzer
@@ -198,7 +199,7 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
           />
 
           <Button onClick={handleAnalyze} disabled={loading} className="w-full">
-            {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Target className="h-4 w-4 mr-2" />}
+            {loading ? <Spinner size="sm" className="mr-2" /> : <Target className="h-4 w-4 mr-2" />}
             {loading ? 'Analyzing...' : !quota.isLoading && !quota.canUse ? 'Upgrade to Analyze' : 'Analyze Match'}
           </Button>
           <p className="text-center text-xs text-muted-foreground">
@@ -227,7 +228,7 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {Object.entries(result.breakdown).map(([label, value]) => (
                   <div key={label} className="rounded-lg border bg-muted/30 p-2 text-center">
-                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
                     <p className="text-lg font-semibold">{value}%</p>
                   </div>
                 ))}
@@ -236,11 +237,11 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
               {result.matchedKeywords.length > 0 && (
                 <div>
                   <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" /> Already in your resume
+                    <CheckCircle2 className="h-4 w-4 text-success" /> Already in your resume
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {result.matchedKeywords.map((kw, i) => (
-                      <Badge key={i} variant="outline" className="text-green-700 border-green-300 bg-green-50">
+                      <Badge key={i} variant="outline" className="text-success border-success/30 bg-success/10">
                         {kw}
                       </Badge>
                     ))}
@@ -251,11 +252,11 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
               {result.missingKeywords.length > 0 && (
                 <div>
                   <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
-                    <XCircle className="h-4 w-4 text-amber-600" /> Missing from your resume
+                    <XCircle className="h-4 w-4 text-warning" /> Missing from your resume
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {result.missingKeywords.map((kw, i) => (
-                      <Badge key={i} variant="outline" className="text-amber-700 border-amber-300 bg-amber-50">
+                      <Badge key={i} variant="outline" className="text-warning border-warning/30 bg-warning/10">
                         {kw}
                       </Badge>
                     ))}
@@ -303,7 +304,7 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
                             )}
                             <p className="mt-1 text-sm text-foreground">{recommendation.proposedText}</p>
                             {recommendation.evidence.length > 0 && (
-                              <p className="mt-1 text-[11px] text-muted-foreground">Based on: {recommendation.evidence.join(', ')}</p>
+                              <p className="mt-1 text-xs text-muted-foreground">Based on: {recommendation.evidence.join(', ')}</p>
                             )}
                           </div>
                           {applied ? (
@@ -344,7 +345,7 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
             </div>
           )}
         </div>
-      </DialogContent>
+      </AppDialogContent>
     </Dialog>
   );
 }

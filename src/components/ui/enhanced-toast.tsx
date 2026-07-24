@@ -28,10 +28,10 @@ const toastVariants = cva(
     variants: {
       variant: {
         default: "border-white/20 bg-white/95 text-foreground shadow-xl",
-        destructive: "border-red-200/50 bg-red-50/95 text-red-900 shadow-xl shadow-red-500/20",
-        success: "border-green-200/50 bg-green-50/95 text-green-900 shadow-xl shadow-green-500/20",
-        warning: "border-yellow-200/50 bg-yellow-50/95 text-yellow-900 shadow-xl shadow-yellow-500/20",
-        info: "border-blue-200/50 bg-blue-50/95 text-blue-900 shadow-xl shadow-blue-500/20",
+        destructive: "border-destructive/30 bg-destructive/10 text-destructive shadow-xl shadow-destructive/20",
+        success: "border-success/30 bg-success/10 text-success shadow-xl shadow-success/20",
+        warning: "border-warning/30 bg-warning/10 text-warning shadow-xl shadow-warning/20",
+        info: "border-info/30 bg-info/10 text-info shadow-xl shadow-info/20",
       },
     },
     defaultVariants: {
@@ -122,13 +122,13 @@ const EnhancedToast = React.forwardRef<
   const getIcon = () => {
     switch (variant) {
       case "success":
-        return <CheckCircle className="h-5 w-5 text-green-600" />
+        return <CheckCircle className="h-5 w-5 text-success" />
       case "destructive":
-        return <AlertCircle className="h-5 w-5 text-red-600" />
+        return <AlertCircle className="h-5 w-5 text-destructive" />
       case "warning":
-        return <AlertTriangle className="h-5 w-5 text-yellow-600" />
+        return <AlertTriangle className="h-5 w-5 text-warning" />
       case "info":
-        return <Info className="h-5 w-5 text-blue-600" />
+        return <Info className="h-5 w-5 text-info" />
       default:
         return null
     }

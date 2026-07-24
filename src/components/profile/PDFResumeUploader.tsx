@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Upload, FileText, Loader2, AlertCircle, CheckCircle2, Key } from 'lucide-react';
+import { Upload, FileText, AlertCircle, CheckCircle2, Key } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfile } from '@/hooks/useUserProfile';
@@ -168,7 +169,7 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
                   <span className="cursor-pointer">
                     {uploading ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        <Spinner size="sm" className="mr-2" />
                         Processing with AI...
                       </>
                     ) : (
@@ -184,19 +185,19 @@ export const PDFResumeUploader: React.FC<PDFResumeUploaderProps> = ({
           </div>
 
           {uploadSuccess && (
-            <Alert className="border-green-200 bg-green-50">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-800">
+            <Alert className="border-success/30 bg-success/10">
+              <CheckCircle2 className="h-4 w-4 text-success" />
+              <AlertDescription className="text-success">
                 Resume data successfully extracted! Review the preview to select what to import.
               </AlertDescription>
             </Alert>
           )}
 
           {apiKeyMissing && (
-            <Alert className="border-orange-200 bg-orange-50">
-              <Key className="h-4 w-4 text-orange-600" />
-              <AlertDescription className="text-orange-800">
-                <strong>AI Parsing Not Configured:</strong> This feature requires an AI key (Gemini, DeepSeek, or OpenAI) to be configured. 
+            <Alert className="border-warning/30 bg-warning/10">
+              <Key className="h-4 w-4 text-warning" />
+              <AlertDescription className="text-warning">
+                <strong>AI Parsing Not Configured:</strong> This feature requires an AI key (Gemini, DeepSeek, or OpenAI) to be configured.
                 Please contact the administrator to add an AI key in Admin → AI Management, or manually enter your profile information.
               </AlertDescription>
             </Alert>

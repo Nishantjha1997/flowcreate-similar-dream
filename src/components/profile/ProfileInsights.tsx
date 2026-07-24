@@ -178,10 +178,10 @@ export const ProfileInsights: React.FC<ProfileInsightsProps> = ({
       }
     }
     switch (type) {
-      case 'strength': return 'text-green-700 bg-green-50 border-green-200 dark:text-green-300 dark:bg-green-950/30 dark:border-green-800';
-      case 'improvement': return 'text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-300 dark:bg-blue-950/30 dark:border-blue-800';
-      case 'opportunity': return 'text-yellow-700 bg-yellow-50 border-yellow-200 dark:text-yellow-300 dark:bg-yellow-950/30 dark:border-yellow-800';
-      case 'warning': return 'text-red-700 bg-red-50 border-red-200 dark:text-red-300 dark:bg-red-950/30 dark:border-red-800';
+      case 'strength': return 'text-success bg-success/10 border-success/30';
+      case 'improvement': return 'text-info bg-info/10 border-info/30';
+      case 'opportunity': return 'text-warning bg-warning/10 border-warning/30';
+      case 'warning': return 'text-destructive bg-destructive/10 border-destructive/30';
       default: return 'text-muted-foreground bg-muted border-border';
     }
   };
@@ -197,10 +197,10 @@ export const ProfileInsights: React.FC<ProfileInsightsProps> = ({
       }
     }
     switch (type) {
-      case 'strength': return 'bg-green-50 border border-green-200 dark:bg-green-950/30 dark:border-green-800';
-      case 'improvement': return 'bg-blue-50 border border-blue-200 dark:bg-blue-950/30 dark:border-blue-800';
-      case 'opportunity': return 'bg-yellow-50 border border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-800';
-      case 'warning': return 'bg-red-50 border border-red-200 dark:bg-red-950/30 dark:border-red-800';
+      case 'strength': return 'bg-success/10 border border-success/30';
+      case 'improvement': return 'bg-info/10 border border-info/30';
+      case 'opportunity': return 'bg-warning/10 border border-warning/30';
+      case 'warning': return 'bg-destructive/10 border border-destructive/30';
       default: return 'bg-muted border border-border';
     }
   };
@@ -234,20 +234,20 @@ export const ProfileInsights: React.FC<ProfileInsightsProps> = ({
         {/* Overview Stats */}
         <div className="grid grid-cols-2 gap-2">
           <div className={`text-center p-2 rounded-lg ${getStatColor('strength')}`}>
-            <div className={`text-lg font-bold ${isNeoBrutalism ? 'text-foreground' : 'text-green-700 dark:text-green-300'}`}>{strengthsCount}</div>
-            <div className={`text-xs ${isNeoBrutalism ? 'text-foreground font-medium' : 'text-green-600 dark:text-green-400'}`}>Strengths</div>
+            <div className={`text-lg font-bold ${isNeoBrutalism ? 'text-foreground' : 'text-success'}`}>{strengthsCount}</div>
+            <div className={`text-xs ${isNeoBrutalism ? 'text-foreground font-medium' : 'text-success'}`}>Strengths</div>
           </div>
           <div className={`text-center p-2 rounded-lg ${getStatColor('improvement')}`}>
-            <div className={`text-lg font-bold ${isNeoBrutalism ? 'text-foreground' : 'text-blue-700 dark:text-blue-300'}`}>{improvementsCount}</div>
-            <div className={`text-xs ${isNeoBrutalism ? 'text-foreground font-medium' : 'text-blue-600 dark:text-blue-400'}`}>To Improve</div>
+            <div className={`text-lg font-bold ${isNeoBrutalism ? 'text-foreground' : 'text-info'}`}>{improvementsCount}</div>
+            <div className={`text-xs ${isNeoBrutalism ? 'text-foreground font-medium' : 'text-info'}`}>To Improve</div>
           </div>
           <div className={`text-center p-2 rounded-lg ${getStatColor('opportunity')}`}>
-            <div className={`text-lg font-bold ${isNeoBrutalism ? 'text-foreground' : 'text-yellow-700 dark:text-yellow-300'}`}>{opportunitiesCount}</div>
-            <div className={`text-xs ${isNeoBrutalism ? 'text-foreground font-medium' : 'text-yellow-600 dark:text-yellow-400'}`}>Opportunities</div>
+            <div className={`text-lg font-bold ${isNeoBrutalism ? 'text-foreground' : 'text-warning'}`}>{opportunitiesCount}</div>
+            <div className={`text-xs ${isNeoBrutalism ? 'text-foreground font-medium' : 'text-warning'}`}>Opportunities</div>
           </div>
           <div className={`text-center p-2 rounded-lg ${getStatColor('warning')}`}>
-            <div className={`text-lg font-bold ${isNeoBrutalism ? 'text-foreground' : 'text-red-700 dark:text-red-300'}`}>{warningsCount}</div>
-            <div className={`text-xs ${isNeoBrutalism ? 'text-foreground font-medium' : 'text-red-600 dark:text-red-400'}`}>Warnings</div>
+            <div className={`text-lg font-bold ${isNeoBrutalism ? 'text-foreground' : 'text-destructive'}`}>{warningsCount}</div>
+            <div className={`text-xs ${isNeoBrutalism ? 'text-foreground font-medium' : 'text-destructive'}`}>Warnings</div>
           </div>
         </div>
 

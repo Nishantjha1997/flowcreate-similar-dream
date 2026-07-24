@@ -13,9 +13,10 @@ import {
   FileText, Plus, Edit, Download, Trash2, Copy, Share2, Eye, 
   ExternalLink, Loader2, FilePlus, ChevronRight 
 } from 'lucide-react';
-import { 
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle 
+import {
+  Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle
 } from '@/components/ui/dialog';
+import { AppDialogContent } from '@/components/ui/app-dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 
@@ -517,7 +518,7 @@ export const DocumentsDashboard = ({
 
       {/* Share Dialog */}
       <Dialog open={sharingResumeId !== null} onOpenChange={(open) => !open && setSharingResumeId(null)}>
-        <DialogContent className={isNeoBrutalism ? 'border-4 border-foreground' : ''}>
+        <AppDialogContent size="sm" className={isNeoBrutalism ? 'border-4 border-foreground' : ''}>
           <DialogHeader>
             <DialogTitle>Share: {sharingResumeTitle}</DialogTitle>
             <DialogDescription>
@@ -569,7 +570,7 @@ export const DocumentsDashboard = ({
               {isCreatingShare ? 'Generating...' : activeShareUrl ? 'Re-Copy Link' : 'Generate Link'}
             </Button>
           </DialogFooter>
-        </DialogContent>
+        </AppDialogContent>
       </Dialog>
     </div>
   );

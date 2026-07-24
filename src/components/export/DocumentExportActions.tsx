@@ -1,6 +1,7 @@
-import { Download, FileText, Loader2, Printer, FileType } from 'lucide-react';
+import { Download, FileText, Printer, FileType } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 
 interface DocumentExportActionsProps {
@@ -55,7 +56,7 @@ export function DocumentExportActions({
         title="Creates an image-based PDF with exact visual fidelity; text may not be ATS-readable"
       >
         {isImageGenerating ? (
-          <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+          <Spinner size="xs" className="mr-1.5" />
         ) : (
           <Download className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
         )}

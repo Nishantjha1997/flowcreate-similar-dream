@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Upload, FileText, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Upload, FileText, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ResumeData } from '@/utils/types';
@@ -169,7 +170,7 @@ export const PDFUploader: React.FC<PDFUploaderProps> = ({ onDataExtracted }) => 
               <span className="cursor-pointer">
                 {uploading ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Spinner size="sm" className="mr-2" />
                     Processing...
                   </>
                 ) : (
@@ -185,9 +186,9 @@ export const PDFUploader: React.FC<PDFUploaderProps> = ({ onDataExtracted }) => 
       </div>
 
       {uploadSuccess && (
-        <Alert className="border-green-200 bg-green-50">
-          <CheckCircle2 className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-800">
+        <Alert className="border-success/30 bg-success/10">
+          <CheckCircle2 className="h-4 w-4 text-success" />
+          <AlertDescription className="text-success">
             Resume data successfully extracted and applied to your resume builder!
           </AlertDescription>
         </Alert>

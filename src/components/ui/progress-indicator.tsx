@@ -33,9 +33,9 @@ export function ProgressIndicator({ resume, onSectionClick }: ProgressIndicatorP
           <span className="text-xs font-semibold text-foreground tracking-tight">{completedCount}/{sections.length} Complete</span>
         </div>
         <span className={cn(
-          "text-[11px] font-bold tabular-nums px-2 py-0.5 rounded-full",
+          "text-xs font-bold tabular-nums px-2 py-0.5 rounded-full",
           totalProgress === 100
-            ? "bg-green-500/10 text-green-600"
+            ? "bg-success/10 text-success"
             : "bg-muted text-muted-foreground"
         )}>
           {Math.round(totalProgress)}%
@@ -47,7 +47,7 @@ export function ProgressIndicator({ resume, onSectionClick }: ProgressIndicatorP
         <div 
           className={cn(
             "h-full rounded-full transition-all duration-700 ease-out",
-            totalProgress === 100 ? "bg-green-500" : "bg-foreground"
+            totalProgress === 100 ? "bg-success" : "bg-foreground"
           )}
           style={{ width: `${totalProgress}%` }}
         />
@@ -77,7 +77,7 @@ export function ProgressIndicator({ resume, onSectionClick }: ProgressIndicatorP
               )}
             </div>
             <span className={cn(
-              "text-[10px] font-medium transition-colors",
+              "text-xs font-medium transition-colors",
               section.completed ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
             )}>
               {section.name}

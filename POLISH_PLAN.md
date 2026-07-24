@@ -335,3 +335,51 @@ One task-block = one commit minimum granularity; sessions 3–10 each end with t
   AI generation overwrites existing content, which also surfaced and fixed a stale-closure risk in
   `CoverLetterEditor`'s setFormData usage (F-2e). New tests: `coverLetterTemplates.test.ts`,
   extended `DocumentExportActions.test.tsx`, new `JobDescriptionGenerator.test.tsx`.
+- 2026-07-25 (Session 3) — **U-1 and U-2 infrastructure built; real but partial usage migration
+  (honest scope below, per this plan's own PARTIAL convention).**
+  - **U-1a/d (done):** added `success`/`warning`/`info` CSS token pairs to `:root`/`.dark`/
+    `.neo-brutalism` in `index.css` (matching the existing `destructive` pattern) plus the
+    corresponding `tailwind.config.ts` color entries, documented inline. Caught a real bug the
+    build (not tsc, not vitest) surfaced: a `*/` inside the token doc-comment prematurely closed
+    it, breaking the CSS build - fixed and re-verified.
+  - **U-1b (partial, by design):** migrated 10 files where raw green/amber/red genuinely
+    communicate status (Job Match score/keyword badges, PDF-upload success/warning alerts, the
+    enhanced-toast variant system, autosave/progress/error/section-boundary indicators, Profile
+    Insights). Left ~50 files untouched where the color is decorative/categorical (dashboard
+    metric-card color-coding, admin stat tiles, marketing accent colors) - not status
+    communication, so out of scope per U-1's own stated intent. Full remaining inventory: grep
+    `bg-green-|text-green-|border-green-|bg-amber-|text-amber-|border-amber-|bg-red-|text-red-|
+    border-red-` under `src` excluding templates.
+  - **U-1c (partial):** fixed the plan's literal named offender
+    (`JobDescriptionGenerator.tsx`'s `text-[11px]`) plus `NotificationBell.tsx`,
+    `JobMatchAnalyzer.tsx`, `progress-indicator.tsx`. Two `NotificationBell.tsx` instances
+    (`text-[10px]`/`text-[9px]`) are a documented, deliberate exception - they size digits inside
+    fixed 16-20px circular unread-count badges where `text-xs` (12px) would overflow. ~55 more
+    arbitrary sizes remain (`ResumeBuilderSidebar.tsx` alone has 15), mostly in admin/customization
+    panels not yet audited.
+  - **U-2a (done + partial usage):** built `src/components/ui/spinner.tsx`, a single
+    `<Spinner size="xs"|"sm"|"md"|"lg" />` primitive replacing the app's two prior idioms (bare
+    `Loader2`, and `RefreshCw` specifically in `CoverLetterEditor`, both with inconsistent sizes).
+    Migrated the 7 AI/import/export-flow files already touched this session
+    (`CoverLetterEditor`, `JobDescriptionGenerator`, `JobMatchAnalyzer`, `PDFResumeUploader`,
+    `PDFUploader`, `DocumentExportActions`, `JobDescriptionInput`). ~58 more `animate-spin` sites
+    remain on the old idiom.
+  - **U-2b (done, at its actual stated scope - "toasts across builders"):** added
+    `src/utils/toastMessages.ts` (`toastActionFailed`/`toastActionDone`) encoding the
+    what-failed/why/next-step and past-tense-confirmation convention; applied in
+    `CoverLetterEditor.tsx` and `JobDescriptionGenerator.tsx`. Not applied app-wide (the plan's own
+    "Done when" scopes this to the builders, not every toast call in the app).
+  - **U-2c (5 of the 6 named dialogs):** built `src/components/ui/app-dialog.tsx`
+    (`AppDialogContent` with `size="sm"|"md"|"lg"|"xl"`, standardized scroll/max-height). Adopted
+    in Job Match (`JobMatchAnalyzer.tsx`), PDF preview/import (`PDFDataPreviewModal.tsx`), template
+    preview (`TemplatePreviewModal.tsx`), share (`DocumentsDashboard.tsx`), and upgrade
+    (`AiSuggestionButton.tsx`). Delete-confirm dialogs use `AlertDialog`, a structurally different
+    Radix primitive (no close button, different semantics for destructive confirmation) with its
+    own reasonable shadcn defaults - deliberately left as-is rather than forced into a
+    `Dialog`-shaped wrapper.
+  - **U-2d (deferred):** icon size discipline audit not started - needs its own pass.
+  - New tests: `spinner.test.tsx`, `toastMessages.test.ts`, `app-dialog.test.tsx`. Full suite
+    (23 files / 66 tests) stayed green throughout this session's changes.
+  - **Recommended next pass for U-1/U-2 completion**, if picked up later: knock out the remaining
+    color/spinner/size instances file-by-file using the same semantic-vs-decorative judgment call
+    documented above, then do U-2d.

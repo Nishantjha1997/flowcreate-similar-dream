@@ -1,5 +1,6 @@
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AppDialogContent } from "@/components/ui/app-dialog";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Eye } from "lucide-react";
@@ -22,7 +23,7 @@ interface TemplatePreviewModalProps {
 const TemplatePreviewModal = ({ isOpen, onClose, template, onCustomize }: TemplatePreviewModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl">
+      <AppDialogContent size="xl">
         <DialogHeader>
           <DialogTitle>{template.name}</DialogTitle>
         </DialogHeader>
@@ -73,7 +74,7 @@ const TemplatePreviewModal = ({ isOpen, onClose, template, onCustomize }: Templa
             </div>
           </div>
         </div>
-      </DialogContent>
+      </AppDialogContent>
     </Dialog>
   );
 };

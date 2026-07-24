@@ -1,10 +1,11 @@
 import { useId, useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Upload, Loader2 } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
+import { Spinner } from '@/components/ui/spinner';
 
 interface JobDescriptionInputProps {
   value: string;
@@ -101,7 +102,7 @@ export const JobDescriptionInput = ({
         <label htmlFor={inputId}>
           <Button asChild variant="outline" size="sm" disabled={uploading || disabled} className="h-7 text-xs">
             <span className="cursor-pointer gap-1.5 max-w-[220px] truncate">
-              {uploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+              {uploading ? <Spinner size="xs" /> : <Upload className="h-3 w-3" />}
               {fileName ?? 'Upload JD file (PDF/.txt)'}
             </span>
           </Button>

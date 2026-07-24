@@ -45,10 +45,10 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <Card className="max-w-md mx-auto mt-8">
           <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+            <div className="mx-auto w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center mb-4">
+              <AlertTriangle className="w-6 h-6 text-destructive" />
             </div>
-            <CardTitle className="text-red-600 dark:text-red-400">Something went wrong</CardTitle>
+            <CardTitle className="text-destructive">Something went wrong</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground text-sm">

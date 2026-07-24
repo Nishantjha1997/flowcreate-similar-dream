@@ -39,15 +39,15 @@ export class SectionBoundary extends Component<SectionBoundaryProps, SectionBoun
   render() {
     if (this.state.error) {
       return (
-        <Card className="m-3 border-amber-300 bg-amber-50/80 dark:border-amber-900 dark:bg-amber-950/20" role="alert">
+        <Card className="m-3 border-warning/30 bg-warning/10" role="alert">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base text-amber-900 dark:text-amber-200">
+            <CardTitle className="flex items-center gap-2 text-base text-warning">
               <AlertTriangle className="h-4 w-4" aria-hidden="true" />
               This section hit an error
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-sm text-amber-900/80 dark:text-amber-100/80">
+            <p className="text-sm text-warning/80">
               {this.props.name} could not load. Your other work is still available.
             </p>
             <Button type="button" size="sm" variant="outline" onClick={this.handleRetry}>
