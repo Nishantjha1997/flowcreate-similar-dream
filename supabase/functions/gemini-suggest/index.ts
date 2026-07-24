@@ -86,6 +86,13 @@ function normalizeJobMatch(value: unknown) {
   };
 }
 
+const COVER_LETTER_TONE_GUIDANCE: Record<string, string> = {
+  professional: 'Keep the tone polished, professional, and warm throughout.',
+  warm: 'Keep the tone warm, personable, and genuine while remaining professional - write like a real person, not a template.',
+  bold: 'Keep the tone confident and bold - lead with impact, use assertive language, and avoid hedging or generic filler.',
+};
+const COVER_LETTER_WORD_TARGETS: Record<string, number> = { short: 180, standard: 300, long: 450 };
+
 function extractJsonObject(text: string): unknown {
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) return {};
@@ -144,6 +151,8 @@ serve(async (req) => {
     const tone = typeof body?.tone === 'string' ? body.tone : 'professional';
     const length = typeof body?.length === 'string' ? body.length : 'standard';
     const instructions = typeof body?.instructions === 'string' ? body.instructions.slice(0, 1000) : '';
+    const companyOverride = typeof body?.company === 'string' ? body.company.trim().slice(0, 200) : '';
+    const roleOverride = typeof body?.role === 'string' ? body.role.trim().slice(0, 200) : '';
     const maxTokensParam = typeof body?.maxTokens === 'number' ? body.maxTokens : undefined;
 
     let finalPrompt: string;
@@ -203,8 +212,16 @@ Recommendations may only improve existing text or add a keyword the user can con
         ? rd.education.map((e: any) => `- ${e.degree || ''}, ${e.school || e.institution || ''}`).join('\n')
         : '';
 
-      finalPrompt = `You are an expert cover letter writer. Write a complete, ready-to-send, ATS-friendly cover letter for ${name}, tailored specifically to the job description below using the candidate's real resume background - do not invent experience they don't have.
+      const safeTone = ['professional', 'warm', 'bold'].includes(tone) ? tone : 'professional';
+      const safeLength = ['short', 'standard', 'long'].includes(length) ? length : 'standard';
+      const targetWords = COVER_LETTER_WORD_TARGETS[safeLength];
+      const hasOverride = Boolean(companyOverride || roleOverride);
+      const overrideBlock = hasOverride
+        ? `\nAUTHORITATIVE DETAILS (use these exactly - they override anything inferred from the job description below): ${companyOverride ? `Company: ${companyOverride}. ` : ''}${roleOverride ? `Role: ${roleOverride}.` : ''}\n`
+        : '';
 
+      finalPrompt = `You are an expert cover letter writer. Write a complete, ready-to-send, ATS-friendly cover letter for ${name}, tailored specifically to the job description below using the candidate's real resume background - do not invent experience they don't have.
+${overrideBlock}
 CANDIDATE RESUME:
 Summary: ${summary || 'Not specified'}
 Skills: ${skills || 'Not specified'}
@@ -216,15 +233,15 @@ ${educationLines || 'Not specified'}
 JOB DESCRIPTION:
 ${trimmedJD}
 
-STYLE: tone=${['professional', 'warm', 'bold'].includes(tone) ? tone : 'professional'}; length=${['short', 'standard', 'long'].includes(length) ? length : 'standard'}.
+STYLE: ${COVER_LETTER_TONE_GUIDANCE[safeTone]} Target approximately ${targetWords} words total (${safeLength} length) - this is a firm target, not a suggestion.
 USER INSTRUCTIONS: ${instructions || 'None'}
 
 Write in standard business letter format:
-1. A strong opening paragraph expressing genuine interest in this specific role (infer the role/company name from the job description if it's mentioned)
+1. A strong opening paragraph expressing genuine interest in this specific role${hasOverride ? '' : " (infer the role/company name from the job description if it's mentioned)"}
 2. 1-2 body paragraphs directly connecting the candidate's real skills and experience above to the requirements in the job description - reference specific matching keywords from the posting
 3. A closing paragraph with a clear call to action
 
-Keep the tone professional yet warm. Do NOT include placeholder brackets like [Company Name] - infer specifics from the job description where possible, and simply omit anything you can't infer rather than leaving a placeholder. Return ONLY the finished cover letter text, no explanations, headers, or markdown.`;
+Do NOT include placeholder brackets like [Company Name] - ${hasOverride ? 'use the authoritative company/role details above' : 'infer specifics from the job description where possible'}, and simply omit anything you can't infer rather than leaving a placeholder. Return ONLY the finished cover letter text, no explanations, headers, or markdown.`;
     } else if (context === 'cover_letter' && resumeId) {
       // Fetch linked resume for context data (using the user's auth client)
       const { data: resumeData, error: resumeError } = await supabase

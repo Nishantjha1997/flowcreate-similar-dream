@@ -123,9 +123,9 @@ const CoverLetterBuilder = () => {
           onImageExport={handleDownload}
           isImageGenerating={isGenerating}
           onDocxExport={() => void handleDocxDownload()}
+          onTxtExport={handleTextDownload}
           isPremium={premium?.isPremium}
         />
-        <Button variant="outline" size="sm" onClick={handleTextDownload} className="h-8 text-xs">TXT</Button>
       </div>
 
       {/* Main split layout */}

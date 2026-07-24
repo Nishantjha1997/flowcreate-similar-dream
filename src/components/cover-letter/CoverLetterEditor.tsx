@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,7 +24,7 @@ const TEMPLATE_OPTIONS = Object.entries(coverLetterTemplateNames).map(([value, l
 
 interface CoverLetterEditorProps {
   formData: CoverLetterFormData;
-  setFormData: (data: CoverLetterFormData) => void;
+  setFormData: Dispatch<SetStateAction<CoverLetterFormData>>;
   isSaving: boolean;
   onSave: () => void;
   userResumes: Array<{ id: string; resume_data: any }>;
@@ -68,7 +68,7 @@ export const CoverLetterEditor = ({
       if (funcError) throw new Error(await getEdgeFunctionErrorMessage(funcError, 'AI suggestion failed'));
       if (funcData?.error) throw new Error(funcData.error as string);
       if (funcData?.suggestion) {
-        setFormData({ ...formData, content: funcData.suggestion });
+        setFormData((prev) => ({ ...prev, content: funcData.suggestion }));
         void quota.refresh();
         toast.success('AI suggestion generated!');
       }
@@ -137,8 +137,9 @@ export const CoverLetterEditor = ({
 
       <JobDescriptionGenerator
         resumeId={formData.resume_id}
-        onGenerated={(content) => setFormData({ ...formData, content })}
-        onOptionsChange={(options) => setFormData({ ...formData, customization: { ...formData.customization, ...options } })}
+        currentContent={formData.content}
+        onGenerated={(content) => setFormData((prev) => ({ ...prev, content }))}
+        onOptionsChange={(options) => setFormData((prev) => ({ ...prev, customization: { ...prev.customization, ...options } }))}
       />
 
       <div className="flex-1 space-y-2">

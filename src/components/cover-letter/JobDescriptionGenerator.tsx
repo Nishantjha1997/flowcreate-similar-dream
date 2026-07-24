@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,18 +10,33 @@ import { supabase } from '@/integrations/supabase/client';
 import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 import { JobDescriptionInput } from '@/components/JobDescriptionInput';
 
-interface JobDescriptionGeneratorProps {
-  resumeId: string | null;
-  onGenerated: (content: string) => void;
-  onOptionsChange?: (options: { tone: string; length: string; instructions: string }) => void;
+interface JobDescriptionGeneratorOptions {
+  tone: string;
+  length: string;
+  instructions: string;
+  company: string;
+  role: string;
 }
 
-export const JobDescriptionGenerator = ({ resumeId, onGenerated, onOptionsChange }: JobDescriptionGeneratorProps) => {
+interface JobDescriptionGeneratorProps {
+  resumeId: string | null;
+  currentContent: string;
+  onGenerated: (content: string) => void;
+  onOptionsChange?: (options: JobDescriptionGeneratorOptions) => void;
+}
+
+export const JobDescriptionGenerator = ({ resumeId, currentContent, onGenerated, onOptionsChange }: JobDescriptionGeneratorProps) => {
   const [jobDescription, setJobDescription] = useState('');
+  const [company, setCompany] = useState('');
+  const [role, setRole] = useState('');
   const [tone, setTone] = useState('professional');
   const [length, setLength] = useState('standard');
   const [instructions, setInstructions] = useState('');
   const [generating, setGenerating] = useState(false);
+
+  const emitOptions = (overrides: Partial<JobDescriptionGeneratorOptions> = {}) => {
+    onOptionsChange?.({ tone, length, instructions, company, role, ...overrides });
+  };
 
   const handleGenerate = async () => {
     if (!resumeId) {
@@ -32,6 +48,7 @@ export const JobDescriptionGenerator = ({ resumeId, onGenerated, onOptionsChange
       return;
     }
 
+    const previousContent = currentContent;
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('gemini-suggest', {
@@ -39,6 +56,8 @@ export const JobDescriptionGenerator = ({ resumeId, onGenerated, onOptionsChange
           context: 'cover_letter_from_jd',
           resumeId,
           jobDescription: jobDescription.trim(),
+          company: company.trim(),
+          role: role.trim(),
           tone,
           length,
           instructions: instructions.trim(),
@@ -51,7 +70,19 @@ export const JobDescriptionGenerator = ({ resumeId, onGenerated, onOptionsChange
       if (!data?.suggestion) throw new Error('No response from AI');
 
       onGenerated(data.suggestion as string);
-      toast.success('Cover letter drafted! Review and edit it below.');
+
+      // A generation overwrites whatever the user had already written - never
+      // let that be silently unrecoverable.
+      if (previousContent.trim().length > 0) {
+        toast.success('Cover letter drafted! Review and edit it below.', {
+          action: {
+            label: 'Undo',
+            onClick: () => onGenerated(previousContent),
+          },
+        });
+      } else {
+        toast.success('Cover letter drafted! Review and edit it below.');
+      }
     } catch (err: any) {
       toast.error(err?.message || 'Failed to generate cover letter.');
     } finally {
@@ -65,6 +96,34 @@ export const JobDescriptionGenerator = ({ resumeId, onGenerated, onOptionsChange
         <Sparkles className="h-3.5 w-3.5 text-primary" />
         <Label className="text-xs font-medium">Generate from a job description</Label>
       </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-1">
+          <Label className="text-[11px]">Company (optional)</Label>
+          <Input
+            value={company}
+            onChange={(e) => {
+              setCompany(e.target.value);
+              emitOptions({ company: e.target.value });
+            }}
+            placeholder="e.g., Acme Corp"
+            className="h-8 text-xs bg-background"
+            disabled={generating}
+          />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-[11px]">Role (optional)</Label>
+          <Input
+            value={role}
+            onChange={(e) => {
+              setRole(e.target.value);
+              emitOptions({ role: e.target.value });
+            }}
+            placeholder="e.g., Product Manager"
+            className="h-8 text-xs bg-background"
+            disabled={generating}
+          />
+        </div>
+      </div>
       <JobDescriptionInput
         value={jobDescription}
         onChange={setJobDescription}
@@ -73,10 +132,40 @@ export const JobDescriptionGenerator = ({ resumeId, onGenerated, onOptionsChange
         textareaClassName="text-xs font-mono bg-background resize-y"
       />
       <div className="grid grid-cols-2 gap-2">
-        <div className="space-y-1"><Label className="text-[11px]">Tone</Label><Select value={tone} onValueChange={(value) => { setTone(value); onOptionsChange?.({ tone: value, length, instructions }); }}><SelectTrigger className="h-8 text-xs bg-background"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="professional">Professional</SelectItem><SelectItem value="warm">Warm</SelectItem><SelectItem value="bold">Bold</SelectItem></SelectContent></Select></div>
-        <div className="space-y-1"><Label className="text-[11px]">Length</Label><Select value={length} onValueChange={(value) => { setLength(value); onOptionsChange?.({ tone, length: value, instructions }); }}><SelectTrigger className="h-8 text-xs bg-background"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="short">Short · 180 words</SelectItem><SelectItem value="standard">Standard · 300 words</SelectItem><SelectItem value="long">Detailed · 450 words</SelectItem></SelectContent></Select></div>
+        <div className="space-y-1">
+          <Label className="text-[11px]">Tone</Label>
+          <Select value={tone} onValueChange={(value) => { setTone(value); emitOptions({ tone: value }); }}>
+            <SelectTrigger className="h-8 text-xs bg-background"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="professional">Professional</SelectItem>
+              <SelectItem value="warm">Warm</SelectItem>
+              <SelectItem value="bold">Bold</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1">
+          <Label className="text-[11px]">Length</Label>
+          <Select value={length} onValueChange={(value) => { setLength(value); emitOptions({ length: value }); }}>
+            <SelectTrigger className="h-8 text-xs bg-background"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="short">Short · 180 words</SelectItem>
+              <SelectItem value="standard">Standard · 300 words</SelectItem>
+              <SelectItem value="long">Detailed · 450 words</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
-      <Textarea value={instructions} onChange={(event) => { setInstructions(event.target.value); onOptionsChange?.({ tone, length, instructions: event.target.value }); }} placeholder="Optional: emphasize a specific project or skill" rows={2} className="text-xs bg-background" />
+      <Textarea
+        value={instructions}
+        onChange={(event) => {
+          setInstructions(event.target.value);
+          emitOptions({ instructions: event.target.value });
+        }}
+        placeholder="Optional: emphasize a specific project or skill"
+        rows={2}
+        className="text-xs bg-background"
+        disabled={generating}
+      />
       <Button
         onClick={handleGenerate}
         disabled={generating}

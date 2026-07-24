@@ -1,4 +1,4 @@
-import { Download, FileText, Loader2, Printer } from 'lucide-react';
+import { Download, FileText, Loader2, Printer, FileType } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -8,20 +8,23 @@ interface DocumentExportActionsProps {
   onImageExport: () => void;
   isImageGenerating?: boolean;
   onDocxExport?: () => void;
+  onTxtExport?: () => void;
   isPremium?: boolean;
   className?: string;
 }
 
 /**
  * Keeps the export contract identical across document builders: semantic HTML
- * printing is the primary ATS-friendly path, while the rasterized PDF remains
- * available for users who prioritize exact visual fidelity.
+ * printing is the primary ATS-friendly path, while the rasterized PDF, DOCX,
+ * and plain-text options remain available as secondary formats. onTxtExport
+ * is optional since not every document type has a meaningful plain-text form.
  */
 export function DocumentExportActions({
   onSemanticExport,
   onImageExport,
   isImageGenerating = false,
   onDocxExport,
+  onTxtExport,
   isPremium = false,
   className,
 }: DocumentExportActionsProps) {
@@ -29,7 +32,7 @@ export function DocumentExportActions({
     <div
       className={cn('flex flex-wrap items-center gap-2', className)}
       role="group"
-      aria-label="PDF download options"
+      aria-label="Download options"
     >
       <Button
         type="button"
@@ -41,12 +44,6 @@ export function DocumentExportActions({
         <Printer className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
         Download PDF (ATS-friendly)
       </Button>
-      {onDocxExport && (
-        <Button type="button" variant="outline" size="sm" onClick={onDocxExport} className="h-8 rounded-full border-border/50 px-4 text-xs font-medium" title={isPremium ? 'Download an ATS-friendly Word document' : 'DOCX export is a Premium feature'}>
-          <FileText className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
-          {isPremium ? 'Download DOCX' : 'DOCX · Premium'}
-        </Button>
-      )}
 
       <Button
         type="button"
@@ -64,6 +61,20 @@ export function DocumentExportActions({
         )}
         {isImageGenerating ? 'Creating exact-look PDF…' : 'Exact-look PDF (image)'}
       </Button>
+
+      {onDocxExport && (
+        <Button type="button" variant="outline" size="sm" onClick={onDocxExport} className="h-8 rounded-full border-border/50 px-4 text-xs font-medium" title={isPremium ? 'Download an ATS-friendly Word document' : 'DOCX export is a Premium feature'}>
+          <FileText className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
+          {isPremium ? 'Download DOCX' : 'DOCX · Premium'}
+        </Button>
+      )}
+
+      {onTxtExport && (
+        <Button type="button" variant="outline" size="sm" onClick={onTxtExport} className="h-8 rounded-full border-border/50 px-4 text-xs font-medium" title="Download as plain text, ready to paste into an application form">
+          <FileType className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
+          TXT
+        </Button>
+      )}
     </div>
   );
 }
