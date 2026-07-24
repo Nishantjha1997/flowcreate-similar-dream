@@ -325,3 +325,13 @@ One task-block = one commit minimum granularity; sessions 3–10 each end with t
   reservations on `Account.tsx`, `Admin.tsx`, `registry.ts`, `resumeTemplates.tsx`,
   `DocumentsDashboard.tsx`, `MasterProfileForm.tsx` released — F-5/F-6/F-8 now eligible.
   Reconciliation also logged in `PROGRESS.md`.
+- 2026-07-25 (Session 2) — **F-2 done.** Company/Role fields added and injected as authoritative
+  overrides server-side (F-2a); the cover_letter_from_jd prompt's tone/length handling fixed —
+  tone-conditional guidance replaces a fixed "professional yet warm" line, and length now maps to
+  an explicit word-count target instead of being ignored (F-2b); grew coverLetterTemplateStyles
+  from 3 to 8 templates, same inline-hex/px-string export-safety discipline as resume templates
+  (F-2c); folded the standalone TXT button into `DocumentExportActions` via a new optional
+  `onTxtExport` prop, reordered to ATS PDF → Image PDF → DOCX → TXT (F-2d); added stash+Undo when
+  AI generation overwrites existing content, which also surfaced and fixed a stale-closure risk in
+  `CoverLetterEditor`'s setFormData usage (F-2e). New tests: `coverLetterTemplates.test.ts`,
+  extended `DocumentExportActions.test.tsx`, new `JobDescriptionGenerator.test.tsx`.
