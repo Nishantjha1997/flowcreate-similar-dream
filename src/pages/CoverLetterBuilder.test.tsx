@@ -34,6 +34,12 @@ vi.mock('@/hooks/usePDFGenerator', () => ({
   usePDFGenerator: () => ({ isGenerating: false, generatePDF: vi.fn(), printResume: vi.fn() }),
 }));
 vi.mock('@/hooks/usePageMeta', () => ({ usePageMeta: vi.fn() }));
+// Added when this test started failing after CoverLetterBuilder started
+// calling usePremiumStatus (react-query) directly for DOCX-export gating -
+// this suite mocks every external hook rather than providing real providers.
+vi.mock('@/hooks/usePremiumStatus', () => ({
+  usePremiumStatus: () => ({ data: { isPremium: false } }),
+}));
 vi.mock('@/components/Header', () => ({ default: () => null }));
 vi.mock('@/components/cover-letter/CoverLetterEditor', () => ({
   CoverLetterEditor: ({ onSave }: { onSave: () => void }) => <button onClick={onSave}>Save letter</button>,
