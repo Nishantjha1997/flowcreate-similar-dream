@@ -10,6 +10,7 @@ import { useCoverLetterData } from '@/hooks/useCoverLetterData';
 import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { DocumentExportActions } from '@/components/export/DocumentExportActions';
+import { RecruiterView } from '@/components/export/RecruiterView';
 import { SectionBoundary } from '@/components/ui/section-boundary';
 import { exportCoverLetterDocx } from '@/utils/docxExport';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
@@ -118,14 +119,17 @@ const CoverLetterBuilder = () => {
             Cover Letter Builder
           </span>
         </div>
-        <DocumentExportActions
-          onSemanticExport={handleAtsDownload}
-          onImageExport={handleDownload}
-          isImageGenerating={isGenerating}
-          onDocxExport={() => void handleDocxDownload()}
-          onTxtExport={handleTextDownload}
-          isPremium={premium?.isPremium}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          <DocumentExportActions
+            onSemanticExport={handleAtsDownload}
+            onImageExport={handleDownload}
+            isImageGenerating={isGenerating}
+            onDocxExport={() => void handleDocxDownload()}
+            onTxtExport={handleTextDownload}
+            isPremium={premium?.isPremium}
+          />
+          <RecruiterView getElement={() => previewRef.current} />
+        </div>
       </div>
 
       {/* Main split layout */}

@@ -4,6 +4,7 @@ import { Share2, Save, Loader2 } from 'lucide-react';
 import { EnhancedResumePreview } from '@/components/resume/ResumeVisualPreview';
 import { JobMatchAnalyzer } from '@/components/resume/JobMatchAnalyzer';
 import { DocumentExportActions } from '@/components/export/DocumentExportActions';
+import { RecruiterView } from '@/components/export/RecruiterView';
 import { ResumeData } from '@/utils/types';
 import { cn } from '@/lib/utils';
 import { AutoSaveIndicator } from '@/components/ui/auto-save-indicator';
@@ -106,7 +107,8 @@ export const ResumeHeaderSection = ({
           onDocxExport={onDocxExport}
           isPremium={isPremium}
         />
-        <EnhancedResumePreview 
+        <RecruiterView getElement={() => resumeElementRef.current} />
+        <EnhancedResumePreview
           resume={resume}
           templateId={templateId}
           templateNames={templateNames}

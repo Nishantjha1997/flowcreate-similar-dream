@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Crown } from 'lucide-react';
+import { Crown, AlertTriangle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -82,9 +82,18 @@ export const TemplateSelector = ({ currentTemplateId, onTemplateChange }: Templa
                       {locked ? 'Premium' : 'Pro'}
                     </Badge>
                   )}
-                  {template.atsOptimized && (
+                  {template.atsOptimized ? (
                     <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-green-50 text-green-700 border border-green-200">
                       ATS ✓
+                    </Badge>
+                  ) : (
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] px-1.5 py-0 bg-amber-50 text-amber-700 border border-amber-200"
+                      title="This layout may not extract cleanly for an applicant tracking system"
+                    >
+                      <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
+                      Complex layout
                     </Badge>
                   )}
                 </div>

@@ -495,3 +495,38 @@ One task-block = one commit minimum granularity; sessions 3–10 each end with t
     `DocumentExportActions` instance, not a primary or standalone download path.
   - Verified: tsc clean, 23 test files / 69 tests passing, production build succeeds. No edge
     functions touched by F-6.
+  - **Addendum (same day): F-7 done — Recruiter View (D-5 completion).** The plan's own execution
+    order (§E) puts F-7 in this session alongside F-6; missed it on the first pass and closed the
+    gap rather than leave it for later.
+    - **`RecruiterView`** (`src/components/export/RecruiterView.tsx`): a "See what an ATS sees"
+      button + dialog that runs `extractAtsSemanticDocument` — the same engine the semantic PDF
+      export already relies on — against the live rendered preview, on demand when opened. Shows
+      the linearized reading-order text plus any warnings (columns, ignored images, inaccessible
+      links, unusual glyphs). Wired into `ResumeHeaderSection.tsx` (reading the resume builder's
+      existing `resumeElementRef`, the same live preview element the export buttons already use)
+      and `CoverLetterBuilder.tsx` (reading `previewRef`) — both builders, per the plan's literal
+      requirement, both pointed at the exact element their own exports already read from so the
+      preview can never drift from what gets downloaded.
+    - **Risky-template badges**: both template pickers (`TemplateSelector.tsx` in the builder,
+      `Templates.tsx` the standalone gallery) only ever showed a positive "ATS ✓ / ATS-Friendly"
+      badge when `atsOptimized: true` — templates flagged `false` got no signal at all. Added an
+      explicit amber "Complex layout" warning badge for the `false` case in both, so the ~14
+      non-optimized templates are now visibly flagged instead of silently unmarked.
+    - **Fixture matrix** (`atsSemanticDocument.templates.test.tsx`): renders every entry in
+      `TEMPLATE_REGISTRY` with its mock data through `extractAtsSemanticDocument` and snapshots the
+      reading order + warning codes — a real CI regression gate (any layout change that reorders
+      content or newly triggers a warning fails the snapshot) — plus an assertion that
+      `atsOptimized: true` templates don't trip `ambiguous-columns`. Running this immediately
+      surfaced a real, pre-existing mismatch: `cobalt-edge` and `charcoal-glow`
+      (both described in the registry itself as having a "modular content grid" body) were flagged
+      `atsOptimized: true` but structurally trip the columns warning — corrected both to `false` in
+      `registry.ts` rather than loosen the assertion, since the mismatch was real, not a false
+      positive from the heuristic.
+    - **Scope cut, stated honestly**: this does NOT deliver ROADMAP D-5's literal acceptance bar
+      (normalized view byte-matches `pdftotext` of the actual saved PDF artifact, for a 1/2/3-page
+      fixture matrix, in CI). That needs a real pipeline — headless browser PDF capture plus a
+      `pdftotext`/poppler-utils binary in CI — which doesn't exist in this repo and is a CI
+      infrastructure task on its own, not a code change achievable alongside the rest of this
+      session. What shipped is the real, working DOM-level version of the same regression gate,
+      running today in the existing vitest suite; the PDF-artifact-level version remains open.
+    - Verified: tsc clean, 24 test files / 106 tests passing (37 new), production build succeeds.

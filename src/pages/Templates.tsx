@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
-import { Search, Star, CheckCircle, Award, Briefcase, Code, Palette, Building2, Zap, Crown } from 'lucide-react';
+import { Search, Star, CheckCircle, Award, Briefcase, Code, Palette, Building2, Zap, Crown, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -137,7 +137,14 @@ const Templates = () => {
                   {/* Badges row — outside preview, no overlap */}
                   <div className="flex flex-wrap items-center gap-1.5 px-4 pt-3">
                     {template.featured && <Badge className="bg-primary text-xs">Featured</Badge>}
-                    {template.atsOptimized && <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 text-xs">ATS-Friendly</Badge>}
+                    {template.atsOptimized ? (
+                      <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 text-xs">ATS-Friendly</Badge>
+                    ) : (
+                      <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs" title="This layout may not extract cleanly for an applicant tracking system - use Recruiter View in the builder to check.">
+                        <AlertTriangle className="h-3 w-3 mr-1" />
+                        Complex layout
+                      </Badge>
+                    )}
                     {template.premium ? (
                       <Badge className="bg-amber-500 text-white text-xs"><Crown className="h-3 w-3 mr-1" />Premium</Badge>
                     ) : (
