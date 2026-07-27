@@ -280,9 +280,10 @@ const ResumeBuilder = () => {
           <div className="flex lg:hidden mb-4 p-1 bg-muted rounded-xl border border-border/40">
             <button
               onClick={() => setActiveMobileTab('edit')}
-              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
-                activeMobileTab === 'edit' 
-                  ? "bg-background text-foreground shadow-sm" 
+              aria-pressed={activeMobileTab === 'edit'}
+              className={`flex-1 min-h-[44px] py-2 text-xs font-semibold rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                activeMobileTab === 'edit'
+                  ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -290,9 +291,10 @@ const ResumeBuilder = () => {
             </button>
             <button
               onClick={() => setActiveMobileTab('preview')}
-              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
-                activeMobileTab === 'preview' 
-                  ? "bg-background text-foreground shadow-sm" 
+              aria-pressed={activeMobileTab === 'preview'}
+              className={`flex-1 min-h-[44px] py-2 text-xs font-semibold rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                activeMobileTab === 'preview'
+                  ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >

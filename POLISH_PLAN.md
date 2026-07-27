@@ -530,3 +530,36 @@ One task-block = one commit minimum granularity; sessions 3–10 each end with t
       session. What shipped is the real, working DOM-level version of the same regression gate,
       running today in the existing vitest suite; the PDF-artifact-level version remains open.
     - Verified: tsc clean, 24 test files / 106 tests passing (37 new), production build succeeds.
+- 2026-07-25 (Session 7) — **U-5 and U-4: the concretely-fixable subset shipped; the
+  device/browser-verification halves stated as open, per this plan's own PARTIAL convention.**
+  - **U-5 named offender (fixed):** `CoverLetterBuilder.tsx`'s mobile Edit/Preview toggle was
+    `absolute top-[6.1rem] right-3` — a magic-number guess at the top bar's height that broke the
+    moment the top bar grew a second wrapped row (which F-6/F-7 this same week made more likely,
+    adding `RecruiterView` next to `DocumentExportActions`). Rebuilt the top bar as a normal
+    two-row flex column instead: title/export row, then the mobile toggle as a real flow child
+    below it (`lg:hidden`, no absolute positioning) — it can no longer overlap anything regardless
+    of how many rows the toolbar wraps to. Bumped both toggle buttons here and in
+    `ResumeBuilder.tsx`'s equivalent mobile tab switcher to `min-h-[44px]` (previously ~32px).
+  - **U-5 scope not attempted:** the plan's literal "Done when" is a live one-handed walkthrough of
+    four flows at 390×844 with screen recordings, plus a sticky bottom action bar for
+    builder save/download on mobile. No interactive browser/device session exists in this
+    environment (the same limitation noted for U-3 in Session 4), and a `fixed`-position bottom bar
+    is exactly the kind of change that's easy to ship broken (z-index conflicts, safe-area insets,
+    double controls) without being able to see it — building it unverified was judged higher-risk
+    than leaving it open. Both remain for whoever has a device/browser session.
+  - **U-4 done:** added a global `prefers-reduced-motion` rule to `index.css` collapsing every
+    animation/transition duration to near-instant (covers the `@keyframes` in this file and the
+    Radix data-state dialog/sheet animations from `tailwindcss-animate` alike) — state changes
+    still happen, they just stop moving. Also found and fixed a real, unrelated gap while auditing
+    interactive components for focus-visible states: `TemplateSelector.tsx`'s template cards were
+    plain `<div onClick>` with no `role`, `tabIndex`, keyboard handler, or focus ring at all —
+    completely unreachable by keyboard. Added `role="button"`, `tabIndex`, an Enter/Space handler,
+    `aria-pressed`, and a `focus-visible:ring`. (`Templates.tsx`'s gallery and `Pricing.tsx`'s plan
+    cards were checked too and already use real `Link`/`Button` elements — no fix needed there.)
+  - **U-4 scope not attempted:** the plan's "Done when" also calls for a documented interaction
+    inventory across the 12 most-used components and a reduced-motion Chrome-emulation recording —
+    both need an interactive session this environment doesn't have. Only the concretely-checkable
+    subset above was audited; the rest of the 12-component sweep is open.
+  - Verified: tsc clean, 24 test files / 106 tests passing, production build succeeds (`index.css`
+    changes get exercised by the actual build step, not just tsc/vitest, per this plan's own
+    standing lesson from Session 3's `*/`-in-a-comment incident).

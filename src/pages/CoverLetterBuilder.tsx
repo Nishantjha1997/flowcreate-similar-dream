@@ -104,40 +104,45 @@ const CoverLetterBuilder = () => {
       <Header />
 
       {/* Top bar */}
-      <div className="border-b border-border/50 bg-card/50 px-4 py-2 flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/account')}
-            className="h-8 gap-1 text-xs"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back
-          </Button>
-          <span className="text-sm font-medium text-foreground">
-            Cover Letter Builder
-          </span>
+      <div className="border-b border-border/50 bg-card/50 px-4 py-2 flex flex-col gap-2 flex-shrink-0">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/account')}
+              className="h-8 gap-1 text-xs"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back
+            </Button>
+            <span className="text-sm font-medium text-foreground">
+              Cover Letter Builder
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <DocumentExportActions
+              onSemanticExport={handleAtsDownload}
+              onImageExport={handleDownload}
+              isImageGenerating={isGenerating}
+              onDocxExport={() => void handleDocxDownload()}
+              onTxtExport={handleTextDownload}
+              isPremium={premium?.isPremium}
+            />
+            <RecruiterView getElement={() => previewRef.current} />
+          </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <DocumentExportActions
-            onSemanticExport={handleAtsDownload}
-            onImageExport={handleDownload}
-            isImageGenerating={isGenerating}
-            onDocxExport={() => void handleDocxDownload()}
-            onTxtExport={handleTextDownload}
-            isPremium={premium?.isPremium}
-          />
-          <RecruiterView getElement={() => previewRef.current} />
+        {/* Edit/Preview toggle flows in the toolbar itself on mobile - no
+            absolute positioning, so it can never overlap content above it
+            regardless of how many rows the toolbar wraps to. */}
+        <div className="lg:hidden flex items-center gap-1 self-start rounded-md border bg-background p-1 shadow-sm">
+          <Button size="sm" className="h-11 min-w-[44px]" variant={mobileTab === 'edit' ? 'default' : 'ghost'} onClick={() => setMobileTab('edit')}><Pencil className="mr-1 h-3 w-3" />Edit</Button>
+          <Button size="sm" className="h-11 min-w-[44px]" variant={mobileTab === 'preview' ? 'default' : 'ghost'} onClick={() => setMobileTab('preview')}><Eye className="mr-1 h-3 w-3" />Preview</Button>
         </div>
       </div>
 
       {/* Main split layout */}
       <div className="flex flex-1 overflow-hidden">
-        <div className="lg:hidden flex absolute top-[6.1rem] right-3 z-10 rounded-md border bg-background p-1 shadow-sm">
-          <Button size="sm" variant={mobileTab === 'edit' ? 'default' : 'ghost'} onClick={() => setMobileTab('edit')}><Pencil className="mr-1 h-3 w-3" />Edit</Button>
-          <Button size="sm" variant={mobileTab === 'preview' ? 'default' : 'ghost'} onClick={() => setMobileTab('preview')}><Eye className="mr-1 h-3 w-3" />Preview</Button>
-        </div>
         {/* Left: Editor */}
         <div className={`${mobileTab === 'edit' ? 'flex' : 'hidden'} lg:flex w-full lg:w-[420px] xl:w-[480px] border-r border-border/50 bg-card/30 overflow-y-auto flex-shrink-0`}>
           <SectionBoundary name="Cover letter editor">

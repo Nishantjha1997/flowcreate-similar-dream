@@ -60,10 +60,20 @@ export const TemplateSelector = ({ currentTemplateId, onTemplateChange }: Templa
           return (
             <div
               key={template.key}
-              className={`cursor-pointer border rounded-lg overflow-hidden transition-all hover:shadow-md group ${
+              role="button"
+              tabIndex={0}
+              aria-pressed={isActive}
+              aria-label={`${template.name}${locked ? ' (Premium)' : ''}`}
+              className={`cursor-pointer border rounded-lg overflow-hidden transition-all hover:shadow-md group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                 isActive ? 'ring-2 ring-primary shadow-md' : 'hover:border-primary/50'
               }`}
               onClick={() => handleSelect(template.key, template.premium)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSelect(template.key, template.premium);
+                }
+              }}
             >
               <div className="relative aspect-[3/4] overflow-hidden bg-muted/30">
                 <ResumeTemplatePreview
