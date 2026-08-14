@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 
 interface UseScrollAnimationOptions {
   threshold?: number;
@@ -49,23 +49,25 @@ export function ScrollReveal({
 }) {
   const { ref, isVisible } = useScrollAnimation();
 
-  const directionStyles: Record<string, string> = {
-    up: 'translate-y-8',
-    down: '-translate-y-8',
-    left: 'translate-x-8',
-    right: '-translate-x-8',
-    none: '',
+  const directionOffsets: Record<string, { x: string; y: string }> = {
+    up: { x: '0px', y: '48px' },
+    down: { x: '0px', y: '-48px' },
+    left: { x: '48px', y: '0px' },
+    right: { x: '-48px', y: '0px' },
+    none: { x: '0px', y: '0px' },
   };
+  const offset = directionOffsets[direction];
+  const style = {
+    '--reveal-x': offset.x,
+    '--reveal-y': offset.y,
+    '--reveal-delay': `${delay}ms`,
+  } as CSSProperties;
 
-  return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ease-out ${className} ${
-        isVisible
-          ? 'opacity-100 translate-x-0 translate-y-0'
-          : `opacity-0 ${directionStyles[direction]}`
-      }`}
-      style={{ transitionDelay: `${delay}ms` }}
+    return (
+      <div
+        ref={ref}
+      className={`flow-scroll-reveal ${isVisible ? 'is-visible' : ''} ${className}`}
+      style={style}
     >
       {children}
     </div>

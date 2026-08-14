@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useDesignMode } from '@/hooks/useDesignMode';
 import { ResumeTemplatePreview } from '@/components/ResumeTemplatePreview';
+import ScrollScene from '@/components/ScrollScene';
 
 const HeroSection = () => {
   const { isNeoBrutalism } = useDesignMode();
@@ -43,6 +44,7 @@ const HeroSection = () => {
   // Apple-inspired dark hero — materialistic
   return (
     <section className="relative overflow-hidden bg-[hsl(var(--surface-dark))]">
+      <ScrollScene />
       {/* Subtle gradient mesh */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-primary/[0.08] rounded-full blur-[120px]" />

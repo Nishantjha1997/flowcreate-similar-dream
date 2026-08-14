@@ -10,6 +10,8 @@ import { RazorpayProvider } from "./components/RazorpayProvider";
 import { LoadingFallback } from "./components/ui/loading-fallback";
 import { ErrorBoundary } from "./components/ui/error-boundary";
 import { DesignModeProvider } from "./hooks/useDesignMode";
+import SplashScreen from "./components/SplashScreen";
+import ScrollProgress from "./components/ScrollProgress";
 // Lazy load pages for better initial bundle size
 const Index = lazy(() => import("./pages/Index"));
 const Templates = lazy(() => import("./pages/Templates"));
@@ -66,7 +68,10 @@ const queryClient = new QueryClient({
 });
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  <>
+    <SplashScreen />
+    <ScrollProgress />
+    <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="light">
       <DesignModeProvider>
         <ErrorBoundary>
@@ -143,7 +148,8 @@ const App = () => (
         </ErrorBoundary>
       </DesignModeProvider>
     </ThemeProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </>
 );
 
 export default App;
