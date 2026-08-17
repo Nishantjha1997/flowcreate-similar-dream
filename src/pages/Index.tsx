@@ -1,5 +1,6 @@
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
+import HowItWorksSection from '@/components/HowItWorksSection';
 import TemplatesCarousel from '@/components/TemplatesCarousel';
 import FeaturesSection from '@/components/FeaturesSection';
 import TestimonialsSection from '@/components/TestimonialsSection';
@@ -13,7 +14,7 @@ import { useEffect } from 'react';
 const Index = () => {
   usePageMeta({
     title: 'Free Online Resume Builder — Create Professional Resumes',
-    description: 'Build a professional resume online free with FlowCreate. 30+ ATS-friendly templates, AI-powered suggestions, and instant PDF download. No credit card required.',
+    description: 'Build a professional resume online free with MakeCV. 30+ ATS-friendly templates, AI-powered suggestions, and instant PDF download. No credit card required.',
   });
 
   useEffect(() => {
@@ -26,7 +27,7 @@ const Index = () => {
       '@graph': [
         {
           '@type': 'WebApplication',
-          name: 'FlowCreate',
+          name: 'MakeCV',
           url: SITE_URL,
           description: 'Free online resume builder with 30+ professional templates, AI-powered suggestions, and instant PDF download.',
           applicationCategory: 'BusinessApplication',
@@ -39,13 +40,13 @@ const Index = () => {
         },
         {
           '@type': 'Organization',
-          name: 'FlowCreate',
+          name: 'MakeCV',
           url: SITE_URL,
           logo: `${SITE_URL}/logo.svg`,
         },
         {
           '@type': 'WebSite',
-          name: 'FlowCreate',
+          name: 'MakeCV',
           url: SITE_URL,
           potentialAction: {
             '@type': 'SearchAction',
@@ -66,6 +67,9 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
+        <ScrollReveal>
+          <HowItWorksSection />
+        </ScrollReveal>
         <ScrollReveal>
           <TemplatesCarousel />
         </ScrollReveal>

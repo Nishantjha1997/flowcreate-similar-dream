@@ -60,7 +60,7 @@ function extractKeywords(text: string): string[] {
   // Common tech keywords / patterns
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9\s\+\#\.]/g, ' ')
+    .replace(/[^a-z0-9\s+.#]/g, ' ')
     .split(/\s+/)
     .filter(w => w.length > 2)
     .filter((v, i, a) => a.indexOf(v) === i);

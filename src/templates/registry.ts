@@ -270,9 +270,9 @@ export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
     defaultAccent: '#111111',
   },
 
-  // ─── FlowCreate Studio collection ───────────────────────────────────────────
+  // ─── MakeCV Studio collection ───────────────────────────────────────────
   // These retain their original internal keys for saved-resume compatibility,
-  // but use distinct FlowCreate names and positioning in the customer-facing UI.
+  // but use distinct MakeCV names and positioning in the customer-facing UI.
 
   {
     key: 'atlantic-blue',

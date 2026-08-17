@@ -122,6 +122,79 @@ serve(async (req) => {
 
   try {
     switch (eventType) {
+      case 'subscription.authenticated':
+      case 'subscription.activated':
+      case 'subscription.charged':
+      case 'subscription.pending':
+      case 'subscription.halted':
+      case 'subscription.cancelled':
+      case 'subscription.completed': {
+        // Subscription events are the source of truth for recurring plans.
+        // They are correlated to the server-created checkout ledger rather
+        // than trusting a browser-supplied user id.
+        // deno-lint-ignore no-explicit-any
+        const subscription = (payload as any)?.payload?.subscription?.entity
+        if (!subscription?.id) throw new Error(`${eventType} without subscription entity`)
+        const { data: checkout } = await admin.from('razorpay_subscription_checkouts')
+          .select('user_id,plan_id,status')
+          .eq('razorpay_subscription_id', subscription.id)
+          .maybeSingle()
+        const userId = checkout?.user_id ?? subscription.notes?.user_id
+        if (!userId) throw new Error(`subscription ${subscription.id} has no checkout owner`)
+        const statusMap: Record<string, string> = {
+          'subscription.authenticated': 'active',
+          'subscription.activated': 'active',
+          'subscription.charged': 'active',
+          'subscription.pending': 'past_due',
+          'subscription.halted': 'past_due',
+          'subscription.cancelled': 'canceled',
+          'subscription.completed': 'expired',
+        }
+        const localStatus = statusMap[eventType]
+        const premium = !['canceled', 'expired'].includes(localStatus)
+        const start = subscription.current_start ? new Date(subscription.current_start * 1000).toISOString() : null
+        const end = subscription.current_end ? new Date(subscription.current_end * 1000).toISOString() : null
+        const { data: localSub, error: subError } = await admin.from('subscriptions').upsert({
+          user_id: userId,
+          plan_id: checkout?.plan_id ?? null,
+          plan_type: subscription.notes?.plan_type ?? 'monthly',
+          is_premium: premium,
+          provider: 'razorpay',
+          razorpay_subscription_id: subscription.id,
+          razorpay_plan_id: subscription.plan_id ?? null,
+          status: localStatus,
+          provider_status: subscription.status ?? eventType,
+          current_period_start: start,
+          current_period_end: end,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' }).select('id').single()
+        if (subError) throw subError
+
+        // Every recurring charge is a separate financial record. The unique
+        // payment id and webhook event ledger make retries harmless.
+        // deno-lint-ignore no-explicit-any
+        const payment = (payload as any)?.payload?.payment?.entity
+        if (payment?.id && localSub?.id) {
+          const { error: paymentError } = await admin.from('payments').upsert({
+            user_id: userId,
+            subscription_id: localSub.id,
+            provider: 'razorpay',
+            razorpay_payment_id: payment.id,
+            razorpay_subscription_id: subscription.id,
+            amount: payment.amount ?? 0,
+            currency: payment.currency ?? 'INR',
+            status: payment.status ?? (eventType === 'subscription.charged' ? 'captured' : eventType),
+            payment_method: payment.method ?? null,
+          }, { onConflict: 'razorpay_payment_id', ignoreDuplicates: true })
+          if (paymentError) throw paymentError
+        }
+        if (checkout) {
+          const checkoutStatus = localStatus === 'active' ? 'active' : localStatus === 'canceled' ? 'cancelled' : localStatus === 'expired' ? 'completed' : 'failed'
+          await admin.from('razorpay_subscription_checkouts').update({ status: checkoutStatus }).eq('razorpay_subscription_id', subscription.id)
+        }
+        break
+      }
+
       case 'payment.captured': {
         // deno-lint-ignore no-explicit-any
         const payment = (payload as any)?.payload?.payment?.entity
@@ -195,7 +268,7 @@ serve(async (req) => {
           user_id: userId,
           type: 'billing_payment_success',
           title: 'Payment successful',
-          body: `Your ${planType} plan is now active. Welcome to FlowCreate Pro!`,
+          body: `Your ${planType} plan is now active. Welcome to MakeCV Pro!`,
           action_url: '/account',
           send_email: true,
         })

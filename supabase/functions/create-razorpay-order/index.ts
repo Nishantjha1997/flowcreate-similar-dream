@@ -12,13 +12,6 @@ const corsHeaders = {
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 
-// Server-side pricing constants (amounts in paise)
-const PLAN_PRICES: Record<string, number> = {
-  monthly: 29900,   // ₹299
-  yearly: 249900,   // ₹2499
-  lifetime: 499900,  // ₹4999
-} as const;
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -26,7 +19,7 @@ serve(async (req) => {
   }
 
   try {
-    const { planType } = await req.json()
+    const { planType, currency = 'INR' } = await req.json()
 
     // Require authenticated user
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
@@ -56,7 +49,7 @@ serve(async (req) => {
     }
 
     // Validate planType and derive amount server-side
-    if (!planType || !(planType in PLAN_PRICES)) {
+    if (!['lifetime'].includes(planType) || !['INR', 'USD'].includes(currency)) {
       return new Response(
         JSON.stringify({ error: 'Invalid plan type' }),
         { 
@@ -66,11 +59,20 @@ serve(async (req) => {
       )
     }
 
-    const amount = PLAN_PRICES[planType]
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    const admin = createClient(supabaseUrl, serviceRoleKey)
+    const { data: plan, error: planError } = await admin
+      .from('subscription_plans')
+      .select('id,price_inr,price_usd')
+      .eq('product', 'resume').eq('slug', planType).eq('is_active', true).maybeSingle()
+    if (planError || !plan) {
+      return new Response(JSON.stringify({ error: 'Plan is not configured' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 })
+    }
+    const amount = currency === 'USD' ? plan.price_usd : plan.price_inr
+    if (!amount) return new Response(JSON.stringify({ error: `The ${currency} plan is not configured` }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 503 })
 
     // Checks Admin > Payments (payment_gateway_keys) first, falls back to
     // RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET secrets if not configured there.
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     const { keyId: razorpayKeyId, keySecret: razorpayKeySecret } =
       await getPaymentGatewayKeys(supabaseUrl, serviceRoleKey, 'razorpay')
 
@@ -87,12 +89,14 @@ serve(async (req) => {
     // Create Razorpay order with server-controlled amount
     const orderData = {
       amount: amount,
-      currency: 'INR',
+      currency,
       receipt: `order_${Date.now()}`,
       notes: {
         plan_type: planType,
         user_id: userData.user.id,
-        expected_amount: amount
+        expected_amount: amount,
+        currency,
+        plan_id: plan.id,
       }
     }
 

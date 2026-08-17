@@ -1,4 +1,4 @@
-// FlowCreate AI blog scheduler
+// MakeCV AI blog scheduler
 //
 // Cron request:
 //   POST { "action": "tick" }
@@ -12,6 +12,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import { AIKeyManager } from "../_shared/aiKeyManager.ts";
 import { callTextModel, type AIProvider } from "../_shared/aiProviders.ts";
+import { submitSitemapToSearchConsole } from "../_shared/searchConsole.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
@@ -151,9 +152,12 @@ function stripCodeFence(value: string): string {
 
 function cleanPlainText(value: unknown, maxLength: number): string {
   if (typeof value !== "string") return "";
-  return value
+  const withoutControlCharacters = Array.from(value, (character) => {
+    const code = character.charCodeAt(0);
+    return code < 32 || code === 127 ? " " : character;
+  }).join("");
+  return withoutControlCharacters
     .replace(/<[^>]*>/g, " ")
-    .replace(/[\u0000-\u001F\u007F]/g, " ")
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, maxLength);
@@ -285,7 +289,7 @@ function buildArticlePrompt(schedule: BlogSchedule, existingTitles: string[]): s
     ? existingTitles.map((title) => `- ${title}`).join("\n")
     : "- No prior titles supplied";
 
-  return `You are the senior editor for FlowCreate, a resume builder and applicant tracking platform.
+  return `You are the senior editor for MakeCV, a resume builder and applicant tracking platform.
 Create one original, useful, evidence-aware article for job seekers. Never invent statistics, studies, quotations, product features, or legal claims. Do not copy another publication.
 
 Editorial brief:
@@ -421,6 +425,38 @@ async function requestSitemapRebuild(): Promise<void> {
   }
 }
 
+async function recordIndexingStatus(
+  adminClient: ReturnType<typeof createClient>,
+  runId: string,
+  status: "queued" | "submitted" | "not_configured" | "failed",
+  error?: string,
+): Promise<void> {
+  const { error: updateError } = await adminClient.from("blog_automation_runs").update({
+    indexing_status: status,
+    indexing_error: error?.slice(0, 1000) ?? null,
+    indexed_at: status === "submitted" ? new Date().toISOString() : null,
+  }).eq("id", runId);
+  if (updateError) console.error(`[blog-scheduler] Could not record indexing status for ${runId}`, updateError);
+}
+
+async function publishAndSubmitSitemap(
+  adminClient: ReturnType<typeof createClient>,
+  runId: string,
+): Promise<void> {
+  await recordIndexingStatus(adminClient, runId, "queued");
+  try {
+    // Trigger the deployment that regenerates sitemap.xml/RSS from the newly
+    // published post, then submit the canonical sitemap to Search Console.
+    await requestSitemapRebuild();
+    const result = await submitSitemapToSearchConsole();
+    await recordIndexingStatus(adminClient, runId, result.submitted ? "submitted" : "not_configured", result.reason);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Search Console submission failed";
+    console.error(`[blog-scheduler] ${message}`);
+    await recordIndexingStatus(adminClient, runId, "failed", message);
+  }
+}
+
 async function processRun(
   adminClient: ReturnType<typeof createClient>,
   keyManager: AIKeyManager,
@@ -460,7 +496,9 @@ async function processRun(
     const slug = await findUniqueSlug(adminClient, article.slug, run.run_id);
     const wordCount = countWords(article.content);
     const readTime = `${Math.max(1, Math.ceil(wordCount / 220))} min read`;
-    const publishedAt = schedule.publish_mode === "published" ? new Date().toISOString() : null;
+    // Product policy: automation publishes only after the validation gates in
+    // parseArticle. There is no unattended draft queue to forget to review.
+    const publishedAt = new Date().toISOString();
 
     let { data: post, error: postError } = await adminClient
       .from("blog_posts")
@@ -471,9 +509,9 @@ async function processRun(
         description: article.description,
         content: article.content,
         category: schedule.category,
-        status: schedule.publish_mode,
+        status: "published",
         keywords: article.keywords,
-        author: cleanPlainText(schedule.author, 120) || "FlowCreate Team",
+        author: cleanPlainText(schedule.author, 120) || "MakeCV Team",
         read_time: readTime,
         image_url: "",
         published_at: publishedAt,
@@ -494,9 +532,9 @@ async function processRun(
           description: article.description,
           content: article.content,
           category: schedule.category,
-          status: schedule.publish_mode,
+          status: "published",
           keywords: article.keywords,
-          author: cleanPlainText(schedule.author, 120) || "FlowCreate Team",
+          author: cleanPlainText(schedule.author, 120) || "MakeCV Team",
           read_time: readTime,
           image_url: "",
           published_at: publishedAt,
@@ -528,11 +566,12 @@ async function processRun(
       throw new SchedulerError("run_finalize_failed", "Generated article could not be finalized");
     }
 
+    await publishAndSubmitSitemap(adminClient, run.run_id);
     return {
       success: true,
       runId: run.run_id,
       blogPostId: post.id,
-      postStatus: schedule.publish_mode,
+      postStatus: "published",
     };
   } catch (error) {
     console.error(`[blog-scheduler] Run ${run.run_id} failed`, error);
@@ -648,10 +687,6 @@ serve(async (req) => {
         runs.map((run) => processRun(adminClient, keyManager, run)),
       );
       const succeeded = results.filter((result) => result.success).length;
-      if (results.some((result) => result.success && result.postStatus === "published")) {
-        await requestSitemapRebuild();
-      }
-
       return jsonResponse({
         success: true,
         claimed: runs.length,
@@ -675,8 +710,6 @@ serve(async (req) => {
       if (!result.success) {
         return jsonResponse({ error: "Article generation failed", run_id: run.run_id }, 502);
       }
-      if (result.postStatus === "published") await requestSitemapRebuild();
-
       return jsonResponse({
         success: true,
         run_id: run.run_id,

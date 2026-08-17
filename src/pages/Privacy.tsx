@@ -5,8 +5,8 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 
 const Privacy = () => {
   usePageMeta({
-    title: 'Privacy Policy - FlowCreate',
-    description: 'Learn how FlowCreate collects, uses, and protects your personal information and resume data.',
+    title: 'Privacy Policy - MakeCV',
+    description: 'Learn how MakeCV collects, uses, and protects your personal information and resume data.',
   });
 
   return (
@@ -127,7 +127,7 @@ const Privacy = () => {
                 <li><strong>Opt-out:</strong> Unsubscribe from marketing communications</li>
               </ul>
               <p className="mt-4">
-                To exercise these rights, contact us at privacy@flowcreate.com
+                To exercise these rights, contact us at support.makecv@gmail.com
               </p>
             </section>
 
@@ -174,8 +174,8 @@ const Privacy = () => {
                 If you have any questions about this Privacy Policy, please contact us:
               </p>
               <p className="mt-2">
-                <strong>Email:</strong> privacy@flowcreate.com<br />
-                <strong>Support:</strong> support@flowcreate.com<br />
+                <strong>Email:</strong> support.makecv@gmail.com<br />
+                <strong>Support:</strong> support.makecv@gmail.com<br />
                 <strong>Response Time:</strong> Within 48 hours
               </p>
             </section>

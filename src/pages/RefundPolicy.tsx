@@ -5,8 +5,8 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 
 const RefundPolicy = () => {
   usePageMeta({
-    title: 'Refund Policy - FlowCreate',
-    description: 'Review our cancellation and refund policies for FlowCreate subscriptions and services.',
+    title: 'Refund Policy - MakeCV',
+    description: 'Review our cancellation and refund policies for MakeCV subscriptions and services.',
   });
 
   return (
@@ -27,7 +27,7 @@ const RefundPolicy = () => {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">1. Subscription Cancellation</h2>
               <p className="mb-4">
-                You can cancel your FlowCreate subscription at any time through your account settings:
+                You can cancel your MakeCV subscription at any time through your account settings:
               </p>
               <ul className="list-disc list-inside space-y-2">
                 <li>Log into your account and navigate to Account Settings</li>
@@ -60,14 +60,14 @@ const RefundPolicy = () => {
                 <li>All subscription purchases are considered final</li>
                 <li>Premium features are activated immediately upon payment confirmation</li>
                 <li>Refunds are not provided for unused portions of active subscriptions</li>
-                <li>This policy applies to both monthly (₹199) and annual (₹1999) plans</li>
+                <li>This policy applies to Monthly (₹299/$5), Yearly (₹2,499/$39), and Lifetime (₹4,999/$79) plans</li>
               </ul>
             </section>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">4. Free Trial Information</h2>
               <p className="mb-4">
-                Currently, FlowCreate does not offer free trial periods. All subscriptions begin immediately upon successful payment and provide instant access to premium features.
+                Currently, MakeCV does not offer free trial periods. All subscriptions begin immediately upon successful payment and provide instant access to premium features.
               </p>
             </section>
 
@@ -90,7 +90,7 @@ const RefundPolicy = () => {
                 If you experience any technical issues with our service:
               </p>
               <ul className="list-disc list-inside space-y-2">
-                <li>Contact our support team at support@flowcreate.com</li>
+                <li>Contact our support team at support.makecv@gmail.com</li>
                 <li>We're committed to resolving technical problems promptly</li>
                 <li>Our team will work with you to ensure you can access your premium features</li>
                 <li>Response time is typically within 24 hours</li>
@@ -103,7 +103,7 @@ const RefundPolicy = () => {
                 For any billing-related questions:
               </p>
               <ul className="list-disc list-inside space-y-2">
-                <li>Contact support@flowcreate.com with your account details</li>
+                <li>Contact support.makecv@gmail.com with your account details</li>
                 <li>Include your transaction ID and billing email</li>
                 <li>We'll investigate any legitimate billing concerns</li>
                 <li>Please reach out within 30 days of the transaction</li>
@@ -136,7 +136,7 @@ const RefundPolicy = () => {
                 For questions about cancellations, billing, or this policy:
               </p>
               <p className="mt-2">
-                <strong>Email:</strong> support@flowcreate.com<br />
+                <strong>Email:</strong> support.makecv@gmail.com<br />
                 <strong>Response Time:</strong> Within 24 hours<br />
                 <strong>Business Hours:</strong> Monday to Friday, 9 AM - 6 PM IST
               </p>

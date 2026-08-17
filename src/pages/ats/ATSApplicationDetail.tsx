@@ -321,7 +321,7 @@ const ATSApplicationDetail = () => {
             </Card>
 
             <Tabs defaultValue="application" className="w-full">
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5">
                 <TabsTrigger value="application">Application</TabsTrigger>
                 <TabsTrigger value="resume">Resume</TabsTrigger>
                 <TabsTrigger value="interviews">Interviews ({interviews.length})</TabsTrigger>

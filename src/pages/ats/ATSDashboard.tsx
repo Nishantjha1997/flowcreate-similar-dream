@@ -173,7 +173,7 @@ const ATSDashboard = () => {
           <div className="max-w-2xl mx-auto text-center">
             <div className="bg-card border border-border rounded-xl shadow-lg p-12">
               <Users className="h-16 w-16 text-primary mx-auto mb-6" />
-              <h1 className="text-3xl font-bold mb-4">Welcome to FlowCreate ATS!</h1>
+              <h1 className="text-3xl font-bold mb-4">Welcome to MakeCV ATS!</h1>
               <p className="text-lg text-muted-foreground mb-8">
                 Let's get started by creating your organization workspace where your team can collaborate on hiring.
               </p>

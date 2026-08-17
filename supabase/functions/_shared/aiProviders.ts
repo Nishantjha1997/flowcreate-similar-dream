@@ -1,5 +1,11 @@
 import { AIKeyManager } from './aiKeyManager.ts';
 
+// Keep the model configurable so a provider can be rotated without another
+// frontend release. The previous default (gemini-1.5-flash) is no longer a
+// safe production default and can return a 404 for otherwise valid keys.
+const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.5-flash';
+const GEMINI_FALLBACK_MODEL = 'gemini-2.5-flash';
+
 export type AIProvider = 'gemini' | 'deepseek' | 'openai';
 
 export interface TextModelResult {
@@ -19,31 +25,52 @@ export async function callTextModel(
 
   try {
     if (provider === 'gemini') {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': apiKey,
-          },
-          signal: AbortSignal.timeout(timeoutMs),
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              temperature,
-              maxOutputTokens: maxTokens,
+      const models = GEMINI_MODEL === GEMINI_FALLBACK_MODEL
+        ? [GEMINI_MODEL]
+        : [GEMINI_MODEL, GEMINI_FALLBACK_MODEL];
+      let lastError = 'Gemini returned no text';
+
+      for (const model of models) {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-goog-api-key': apiKey,
             },
-          }),
+            signal: AbortSignal.timeout(timeoutMs),
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: {
+                temperature,
+                maxOutputTokens: maxTokens,
+              },
+            }),
+          },
+        );
+
+        if (!response.ok) {
+          const errText = (await response.text().catch(() => response.statusText)).slice(0, 600);
+          lastError = `Gemini ${model} error ${response.status}: ${errText}`;
+          // A model retirement or account-level model mismatch should not take
+          // the whole feature down when a compatible fallback is available.
+          if (response.status === 400 || response.status === 404) continue;
+          return { text: null, error: lastError };
         }
-      );
-      if (!response.ok) {
-        const errText = await response.text().catch(() => response.statusText);
-        return { text: null, error: `Gemini API error ${response.status}: ${errText}` };
+
+        const json = await response.json();
+        const text = Array.isArray(json?.candidates?.[0]?.content?.parts)
+          ? json.candidates[0].content.parts
+            .map((part: { text?: unknown }) => typeof part.text === 'string' ? part.text : '')
+            .join('')
+            .trim()
+          : '';
+        if (text) return { text };
+        lastError = `Gemini ${model} returned no text`;
       }
-      const json = await response.json();
-      const text: string | null = json?.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
-      return { text };
+
+      return { text: null, error: lastError };
     }
 
     if (provider === 'deepseek') {

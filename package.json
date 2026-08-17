@@ -9,7 +9,10 @@
     "build": "vite build",
     "postbuild": "node scripts/generate-static-seo-pages.mjs",
     "seo:validate": "node scripts/validate-seo.mjs",
+    "test:blog": "node scripts/test-blog-automation.mjs",
+    "test:edge": "node scripts/check-edge-syntax.mjs",
     "build:dev": "vite build --mode development",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run"
@@ -96,6 +99,6 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1",
-    "vitest": "^4.1.10"
+    "vitest": "^2.1.9"
   }
 }

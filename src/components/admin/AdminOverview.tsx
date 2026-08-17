@@ -453,7 +453,7 @@ export function AdminOverview({ onNavigate }: AdminOverviewProps) {
             <div className="rounded-xl border border-dashed p-7 text-center">
               <Sparkles className="mx-auto h-7 w-7 text-muted-foreground/60" />
               <p className="mt-2 text-sm font-medium">No automation runs yet</p>
-              <p className="mt-1 text-xs text-muted-foreground">Create a draft schedule to test the workflow safely.</p>
+              <p className="mt-1 text-xs text-muted-foreground">Create a schedule to publish validated articles automatically.</p>
               <Button variant="outline" size="sm" className="mt-4" onClick={() => onNavigate("blog-automation")}>Set up automation</Button>
             </div>
           ) : (

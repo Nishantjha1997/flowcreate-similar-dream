@@ -22,7 +22,7 @@
 // Response: { success: true, notification_id?: string, emailed: boolean }
 //
 // Secrets: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY (optional),
-//          NOTIFY_FROM_EMAIL (e.g. "FlowCreate <notifications@yourdomain.com>")
+//          NOTIFY_FROM_EMAIL (e.g. "MakeCV <notifications@yourdomain.com>")
 // Deploy:  supabase functions deploy send-notification
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"

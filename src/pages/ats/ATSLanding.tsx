@@ -11,7 +11,7 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 const ATSLanding = () => {
   usePageMeta({
     title: 'Applicant Tracking System for Collaborative Hiring',
-    description: 'Manage jobs, candidates, hiring pipelines, team feedback, and recruiting analytics with FlowCreate ATS.',
+    description: 'Manage jobs, candidates, hiring pipelines, team feedback, and recruiting analytics with MakeCV ATS.',
   });
 
   const features = [
@@ -186,7 +186,7 @@ const ATSLanding = () => {
             <div className="bg-background p-8 rounded-xl border border-border">
               <Award className="h-12 w-12 text-primary mb-4" />
               <p className="text-muted-foreground mb-4">
-                "FlowCreate ATS transformed our hiring. We reduced time-to-hire by 60% and our team collaboration has never been better."
+                "MakeCV ATS transformed our hiring. We reduced time-to-hire by 60% and our team collaboration has never been better."
               </p>
               <div className="font-semibold">Sarah Johnson</div>
               <div className="text-sm text-muted-foreground">Head of HR, TechCorp</div>
@@ -220,7 +220,7 @@ const ATSLanding = () => {
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-4xl font-bold mb-4">Ready to Transform Your Hiring?</h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Join thousands of teams hiring smarter with FlowCreate ATS
+              Join thousands of teams hiring smarter with MakeCV ATS
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">

@@ -119,7 +119,7 @@ export function BlogManager() {
       title: editingPost.title, slug: editingPost.slug || slugify(editingPost.title),
       excerpt: editingPost.excerpt || '', description: editingPost.description || '',
       content, category: editingPost.category || 'Resume Tips', status,
-      keywords: editingPost.keywords || [], author: editingPost.author || 'FlowCreate Team',
+      keywords: editingPost.keywords || [], author: editingPost.author || 'MakeCV Team',
       read_time: editingPost.read_time || '5 min read', image_url: editingPost.image_url || '',
       published_at: status === 'published' ? new Date().toISOString() : editingPost.published_at,
       updated_at: new Date().toISOString(),
@@ -187,7 +187,7 @@ export function BlogManager() {
     if (!aiTopic.trim()) { setAiError('Enter or select a topic first'); return; }
     setAiLoading(true); setAiError('');
     try {
-      const prompt = `You are an expert SEO content writer for FlowCreate, a free online resume builder. Write a blog article titled "${aiTopic}".
+      const prompt = `You are an expert SEO content writer for MakeCV, a free online resume builder. Write a blog article titled "${aiTopic}".
 
 Your output renders through Tailwind prose — a professional typography system. To look beautiful, you MUST follow this EXACT structure:
 
@@ -269,7 +269,7 @@ ABSOLUTE REQUIREMENTS — VIOLATE ANY AND THE ARTICLE IS REJECTED:
       setEditingPost({
         id: '', slug: slugify(aiTopic), title: aiTopic, excerpt, description: metaDesc || excerpt,
         content: html, category: 'Resume Tips', status: 'draft', keywords: [],
-        author: 'FlowCreate Team', read_time: `${Math.ceil(wordCount / 200)} min read`,
+        author: 'MakeCV Team', read_time: `${Math.ceil(wordCount / 200)} min read`,
         image_url: '', created_at: '', updated_at: '', published_at: null,
       });
       setEditorTab('preview');
@@ -469,7 +469,7 @@ ${html.slice(0, 8000)}`, 4000);
                 <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
                   <li>SEO-optimized meta description</li>
                   <li>4-6 sections with H2/H3 headings</li>
-                  <li>Internal links to FlowCreate pages</li>
+                  <li>Internal links to MakeCV pages</li>
                   <li>FAQ section with 3-5 Q&A pairs</li>
                   <li>Call-to-action for the resume builder</li>
                   <li>800-1200 words, proper HTML formatting</li>

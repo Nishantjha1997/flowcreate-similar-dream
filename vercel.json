@@ -4,7 +4,16 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "trailingSlash": false,
+  "crons": [
+    { "path": "/api/blog-scheduler", "schedule": "*/5 * * * *" }
+  ],
   "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "flowcreate-similar-dream.vercel.app" }],
+      "destination": "https://makecv.site/$1",
+      "permanent": true
+    },
     { "source": "/resume-templates", "destination": "/templates", "permanent": true },
     { "source": "/cv-builder", "destination": "/resume-builder", "permanent": true },
     { "source": "/resume", "destination": "/resume-builder", "permanent": true },

@@ -305,7 +305,7 @@ export function WebsiteCustomization() {
       
       <CardContent>
         <Tabs defaultValue="design" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5">
             <TabsTrigger value="design">Design</TabsTrigger>
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="content">Content</TabsTrigger>

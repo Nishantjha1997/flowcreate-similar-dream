@@ -5,8 +5,8 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 
 const ShippingPolicy = () => {
   usePageMeta({
-    title: 'Shipping Policy - FlowCreate',
-    description: 'Information regarding the digital delivery of FlowCreate products and services.',
+    title: 'Shipping Policy - MakeCV',
+    description: 'Information regarding the digital delivery of MakeCV products and services.',
   });
 
   return (
@@ -20,7 +20,7 @@ const ShippingPolicy = () => {
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-8">
               <h2 className="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-2">Digital Service Notice</h2>
               <p className="text-blue-700 dark:text-blue-300">
-                FlowCreate is a digital resume building service. We do not ship physical products. All our services are delivered digitally through our online platform.
+                MakeCV is a digital resume building service. We do not ship physical products. All our services are delivered digitally through our online platform.
               </p>
             </div>
 
@@ -78,7 +78,7 @@ const ShippingPolicy = () => {
                 If you have any questions about our service delivery or access issues, please contact us at:
               </p>
               <p className="mt-2">
-                <strong>Email:</strong> support@flowcreate.com<br />
+                <strong>Email:</strong> support.makecv@gmail.com<br />
                 <strong>Response Time:</strong> Within 24 hours
               </p>
             </section>

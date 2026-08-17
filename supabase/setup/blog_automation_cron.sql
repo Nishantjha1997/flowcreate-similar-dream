@@ -1,6 +1,6 @@
--- FlowCreate blog automation dispatcher
+-- MakeCV blog automation dispatcher
 -- Run this AFTER creating these two Supabase Vault secrets:
---   flowcreate_project_url  = https://<project-ref>.supabase.co
+--   makecv_project_url      = https://<project-ref>.supabase.co
 --   blog_scheduler_secret   = same value as the BLOG_SCHEDULER_SECRET
 --                              Edge Function secret
 -- No secret value is stored in this file or in cron.job.
@@ -13,18 +13,18 @@ DECLARE
   existing_job_id bigint;
 BEGIN
   IF NOT EXISTS (
-    SELECT 1 FROM vault.decrypted_secrets WHERE name = 'flowcreate_project_url'
+    SELECT 1 FROM vault.decrypted_secrets WHERE name = 'makecv_project_url'
   ) OR NOT EXISTS (
     SELECT 1 FROM vault.decrypted_secrets WHERE name = 'blog_scheduler_secret'
   ) THEN
     RAISE EXCEPTION
-      'Create Vault secrets flowcreate_project_url and blog_scheduler_secret before installing this cron job.';
+      'Create Vault secrets makecv_project_url and blog_scheduler_secret before installing this cron job.';
   END IF;
 
   SELECT jobid
     INTO existing_job_id
     FROM cron.job
-   WHERE jobname = 'flowcreate-blog-scheduler'
+   WHERE jobname IN ('makecv-blog-scheduler', 'flowcreate-blog-scheduler')
    LIMIT 1;
 
   IF existing_job_id IS NOT NULL THEN
@@ -32,14 +32,14 @@ BEGIN
   END IF;
 
   PERFORM cron.schedule(
-    'flowcreate-blog-scheduler',
+    'makecv-blog-scheduler',
     '*/5 * * * *',
     $cron$
       SELECT net.http_post(
         url := (
           SELECT decrypted_secret
           FROM vault.decrypted_secrets
-          WHERE name = 'flowcreate_project_url'
+          WHERE name = 'makecv_project_url'
         ) || '/functions/v1/blog-scheduler',
         headers := jsonb_build_object(
           'Content-Type', 'application/json',
@@ -58,4 +58,4 @@ $setup$;
 
 -- Verify:
 -- SELECT jobid, jobname, schedule, active FROM cron.job
--- WHERE jobname = 'flowcreate-blog-scheduler';
+-- WHERE jobname = 'makecv-blog-scheduler';

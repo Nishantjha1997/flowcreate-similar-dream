@@ -87,7 +87,7 @@ function sharedNavigation() {
 }
 
 function sharedLinks() {
-  return `<aside aria-label="Explore FlowCreate">
+  return `<aside aria-label="Explore MakeCV">
     <h2>Build a Stronger Job Application</h2>
     <ul>
       <li><a href="/resume-builder">Create a free professional resume</a></li>
@@ -320,8 +320,8 @@ function blogStructuredData(post) {
         datePublished: post.published_at || post.created_at,
         dateModified: post.updated_at || post.published_at || post.created_at,
         author: {
-          '@type': post.author && post.author !== 'FlowCreate Team' ? 'Person' : 'Organization',
-          name: post.author || 'FlowCreate Team',
+          '@type': post.author && post.author !== 'MakeCV Team' ? 'Person' : 'Organization',
+          name: post.author || 'MakeCV Team',
         },
         publisher: {
           '@type': 'Organization',
@@ -409,7 +409,7 @@ function renderDocument({ path, title, description, body, schema, image, type = 
   if (publishedTime) html = upsertMeta(html, 'property', 'article:published_time', publishedTime);
   if (modifiedTime) html = upsertMeta(html, 'property', 'article:modified_time', modifiedTime);
   html = upsertLink(html, 'canonical', canonical);
-  html = upsertLink(html, 'alternate', `${siteUrl}/rss.xml`, ' type="application/rss+xml" title="FlowCreate Blog RSS"');
+  html = upsertLink(html, 'alternate', `${siteUrl}/rss.xml`, ' type="application/rss+xml" title="MakeCV Blog RSS"');
 
   const schemaJson = JSON.stringify(schema)
     .replace(/</g, '\\u003c')
@@ -422,7 +422,8 @@ function renderDocument({ path, title, description, body, schema, image, type = 
       '  </head>',
   );
 
-  const rootPattern = /<div\s+id=(["'])root\1\s*><\/div>/i;
+  // Vite may preserve a newline/indentation inside the root placeholder.
+  const rootPattern = /<div\s+id=(["'])root\1\s*>\s*<\/div>/i;
   if (!rootPattern.test(html)) {
     throw new Error(`Could not locate #root while generating ${path}`);
   }
@@ -461,7 +462,7 @@ for (const post of posts) {
     renderDocument({
       path,
       title: post.title,
-      description: post.description || post.excerpt || 'Resume tips and career advice from FlowCreate.',
+      description: post.description || post.excerpt || 'Resume tips and career advice from MakeCV.',
       body: blogPostShell(post),
       schema: blogStructuredData(post),
       image: post.image_url,
@@ -490,7 +491,7 @@ const notFoundHtml = renderDocument({
   path: '/404',
   title: 'Page Not Found',
   description: 'The requested page could not be found.',
-  body: `${sharedNavigation()}<main><h1>Page Not Found</h1><p>The requested page does not exist. <a href="/">Return to FlowCreate</a>.</p></main>`,
+  body: `${sharedNavigation()}<main><h1>Page Not Found</h1><p>The requested page does not exist. <a href="/">Return to MakeCV</a>.</p></main>`,
   schema: {
     '@context': 'https://schema.org',
     '@type': 'WebPage',

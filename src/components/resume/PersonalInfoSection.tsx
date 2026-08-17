@@ -33,8 +33,8 @@ const validateEmail = (email: string) => {
 
 const validatePhone = (phone: string) => {
   if (!phone) return { valid: false, message: 'Phone is required' };
-  const cleaned = phone.replace(/[\s\-\(\)]/g, '');
-  if (!/^[\+]?[\d]{7,15}$/.test(cleaned)) return { valid: false, message: 'Invalid phone number' };
+  const cleaned = phone.replace(/[\s()-]/g, '');
+  if (!/^[+]?[\d]{7,15}$/.test(cleaned)) return { valid: false, message: 'Invalid phone number' };
   return { valid: true, message: '' };
 };
 

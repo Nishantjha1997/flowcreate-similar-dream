@@ -233,7 +233,7 @@ export function UserRegistrations({ isAdmin }: UserRegistrationsProps) {
           <CardContent>
             {/* Enhanced Filters */}
             <div className="flex gap-4 mb-6 flex-wrap">
-              <div className="relative flex-1 min-w-[300px]">
+              <div className="relative min-w-0 w-full flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   placeholder="Search by email, name, or user ID..."

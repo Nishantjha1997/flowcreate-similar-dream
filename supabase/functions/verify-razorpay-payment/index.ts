@@ -10,13 +10,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// Server-side pricing constants (amounts in paise) - must match create-razorpay-order
-const PLAN_PRICES: Record<string, number> = {
-  monthly: 29900,
-  yearly: 249900,
-  lifetime: 499900,
-} as const;
-
 function timingSafeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false
   const ab = new TextEncoder().encode(a)
@@ -148,8 +141,9 @@ serve(async (req) => {
     const effectivePlanType = orderData?.notes?.plan_type || 'monthly'
 
     // Validate payment amount matches expected plan price
-    const expectedAmount = PLAN_PRICES[effectivePlanType]
-    if (!expectedAmount || paymentData.amount !== expectedAmount) {
+    const expectedAmount = Number(orderData?.notes?.expected_amount ?? 0)
+    const expectedCurrency = orderData?.notes?.currency || 'INR'
+    if (!expectedAmount || paymentData.amount !== expectedAmount || paymentData.currency !== expectedCurrency) {
       console.error(`Amount mismatch: paid ${paymentData.amount}, expected ${expectedAmount} for plan ${effectivePlanType}`)
       return new Response(
         JSON.stringify({ error: 'Payment amount does not match plan price' }),
@@ -236,7 +230,7 @@ serve(async (req) => {
       user_id: callerUserId,
       type: 'billing_payment_success',
       title: 'Payment successful',
-      body: `Your ${effectivePlanType} plan is now active. Welcome to FlowCreate Pro!`,
+      body: `Your ${effectivePlanType} plan is now active. Welcome to MakeCV Pro!`,
       action_url: '/account',
       send_email: true,
     })

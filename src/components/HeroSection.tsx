@@ -62,14 +62,13 @@ const HeroSection = () => {
           <div className="w-full lg:w-[55%] text-center lg:text-left">
             {/* Main headline */}
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-none text-white mb-6 animate-apple-fade-in-up-delay-1" style={{ letterSpacing: '-0.03em' }}>
-              Your resume.{' '}
-              <span className="text-white/40">Perfected.</span>
+              Build the resume<br />
+              <span className="text-white/40">that opens doors.</span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-lg md:text-xl text-white/50 font-normal leading-relaxed mb-12 max-w-[42rem] lg:mx-0 mx-auto animate-apple-fade-in-up-delay-2">
-              Create stunning, ATS-optimized resumes with intelligent AI suggestions. 
-              Stand out to employers and land your dream job.
+              Turn your experience into a clear, ATS-friendly story — then tailor it to the role you want with focused AI guidance.
             </p>
 
             {/* CTA Buttons */}
@@ -79,7 +78,7 @@ const HeroSection = () => {
                   size="lg" 
                   className="rounded-full px-8 h-12 text-base font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 shadow-lg w-full"
                 >
-                  Start Building
+                  Create my resume
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
@@ -89,7 +88,7 @@ const HeroSection = () => {
                   variant="outline" 
                   className="rounded-full px-8 h-12 text-base font-medium border-white/20 text-white hover:bg-white/10 transition-all duration-300 w-full"
                 >
-                  View Templates
+                  Explore templates
                 </Button>
               </Link>
             </div>
@@ -123,6 +122,14 @@ const HeroSection = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="mt-12 flex flex-wrap justify-center lg:justify-start gap-3 text-xs text-white/55 animate-apple-fade-in-up-delay-3">
+          {['ATS-aware layouts', 'Role-specific suggestions', 'PDF-ready in minutes'].map((label) => (
+            <span key={label} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 backdrop-blur-sm">
+              {label}
+            </span>
+          ))}
         </div>
 
         {/* Trust indicators on dark */}

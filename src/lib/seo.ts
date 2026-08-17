@@ -4,9 +4,10 @@
 // every canonical tag, og:url, sitemap entry, and JSON-LD url follows it.
 // Until then we fall back to the current origin at runtime, which keeps
 // preview deployments self-consistent.
+import { brand } from '@/config/brand';
+
 export const SITE_URL: string =
-  (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, '') ||
-  (typeof window !== 'undefined' ? window.location.origin : 'https://flowcreate-similar-dream.vercel.app');
+  (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, '') || brand.siteUrl;
 
 /** Absolute URL for a path on the canonical domain. */
 export function absoluteUrl(path: string): string {

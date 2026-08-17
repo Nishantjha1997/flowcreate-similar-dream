@@ -28,8 +28,8 @@ export const useProfileValidation = () => {
   };
 
   const validatePhone = (phone: string): boolean => {
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-    return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
+    const phoneRegex = /^[+]?[1-9][\d]{0,15}$/;
+    return phoneRegex.test(phone.replace(/[\s()-]/g, ''));
   };
 
   const validateUrl = (url: string): boolean => {

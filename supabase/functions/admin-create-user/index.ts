@@ -22,10 +22,10 @@ function validateCreateUserInput(body: unknown): { valid: true; data: { email: s
   if (typeof password !== 'string' || password.length < 8 || password.length > 100) {
     return { valid: false, error: 'Password must be 8-100 characters' };
   }
-  if (typeof firstName !== 'string' || firstName.length < 1 || firstName.length > 50 || !/^[a-zA-Z\s'\-]+$/.test(firstName)) {
+  if (typeof firstName !== 'string' || firstName.length < 1 || firstName.length > 50 || !/^[a-zA-Z\s'-]+$/.test(firstName)) {
     return { valid: false, error: 'Invalid first name (1-50 chars, letters only)' };
   }
-  if (typeof lastName !== 'string' || lastName.length < 1 || lastName.length > 50 || !/^[a-zA-Z\s'\-]+$/.test(lastName)) {
+  if (typeof lastName !== 'string' || lastName.length < 1 || lastName.length > 50 || !/^[a-zA-Z\s'-]+$/.test(lastName)) {
     return { valid: false, error: 'Invalid last name (1-50 chars, letters only)' };
   }
   if (typeof role !== 'string' || !VALID_ROLES.includes(role as typeof VALID_ROLES[number])) {

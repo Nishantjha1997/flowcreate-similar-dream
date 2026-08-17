@@ -73,9 +73,11 @@ function GatewayCard({
   const handleSave = () => {
     onSave({
       provider,
-      key_id: keyId || existing?.key_id || undefined,
-      key_secret: keySecret || existing?.key_secret || undefined,
-      webhook_secret: webhookSecret || existing?.webhook_secret || undefined,
+      key_id: keyId || undefined,
+      // Blank secrets intentionally mean "keep the server-side value". Never
+      // send the masked placeholder back to the Edge Function.
+      key_secret: keySecret || undefined,
+      webhook_secret: webhookSecret || undefined,
       is_live: isLive,
     });
     setKeySecret('');

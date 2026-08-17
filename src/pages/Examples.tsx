@@ -65,7 +65,7 @@ const categories = ["All", "Technology", "Marketing", "Design", "Finance", "Mana
 
 const Examples = () => {
   usePageMeta({
-    title: 'Resume Examples - FlowCreate',
+    title: 'Resume Examples - MakeCV',
     description: 'Browse professional resume examples across various industries to inspire your next application.',
   });
 
@@ -115,7 +115,7 @@ const Examples = () => {
               <Input
                 type="text"
                 placeholder="Search examples..."
-                className="pl-10 min-w-[250px]"
+                className="min-w-0 pl-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />

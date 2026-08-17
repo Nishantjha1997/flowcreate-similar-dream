@@ -15,6 +15,7 @@ import { Target, CheckCircle2, XCircle, Lightbulb, Crown, Wand2, History, Undo2 
 import { Spinner } from '@/components/ui/spinner';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { ResumeData } from '@/utils/types';
 import { captureError } from '@/lib/monitoring';
 import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
@@ -113,7 +114,7 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
           score_breakdown: normalized.breakdown,
           matched_keywords: normalized.matchedKeywords,
           missing_keywords: normalized.missingKeywords,
-          recommendations: normalized.recommendations,
+          recommendations: normalized.recommendations as unknown as Json,
         })
         .select('id')
         .maybeSingle();
@@ -310,7 +311,7 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
                       <p className="text-sm font-semibold flex items-center gap-1.5">
                         <Wand2 className="h-4 w-4 text-primary" /> Recommended fixes
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">Review each change. FlowCreate never changes your resume silently.</p>
+                      <p className="text-xs text-muted-foreground mt-1">Review each change. MakeCV never changes your resume silently.</p>
                     </div>
                     {onCreateTailoredVersion && resumeId && (
                       <Button

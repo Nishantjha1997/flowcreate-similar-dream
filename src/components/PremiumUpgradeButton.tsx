@@ -30,7 +30,7 @@ export const PremiumUpgradeButton: React.FC<PremiumUpgradeButtonProps> = ({
   const handleUpgrade = () => {
     initiatePayment({
       amount: amount * 100, // Convert to paise
-      description: `FlowCreate ${planType} subscription`,
+      description: `MakeCV ${planType} subscription`,
       planType
     });
   };

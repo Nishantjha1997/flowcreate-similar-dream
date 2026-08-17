@@ -107,7 +107,7 @@ serve(async (req) => {
           price_data: {
             currency: 'usd',
             unit_amount: plan.price_usd,
-            product_data: { name: `FlowCreate ${plan.name}` },
+            product_data: { name: `MakeCV ${plan.name}` },
             ...(isRecurring
               ? { recurring: { interval: RECURRING_INTERVALS[plan.billing_interval] } }
               : {}),

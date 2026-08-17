@@ -159,7 +159,7 @@ const ATSOnboarding = () => {
                   <div className="space-y-2">
                     <Label htmlFor="slug">Organization URL *</Label>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">flowcreate.app/</span>
+                      <span className="text-sm text-muted-foreground">makecv.site/</span>
                       <Input
                         id="slug"
                         placeholder="acme-corp"

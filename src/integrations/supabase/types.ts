@@ -284,6 +284,9 @@ export type Database = {
           error_message: string | null
           generated_title: string | null
           id: string
+          indexed_at: string | null
+          indexing_error: string | null
+          indexing_status: string
           provider: string | null
           schedule_id: string | null
           scheduled_for: string
@@ -301,6 +304,9 @@ export type Database = {
           error_message?: string | null
           generated_title?: string | null
           id?: string
+          indexed_at?: string | null
+          indexing_error?: string | null
+          indexing_status?: string
           provider?: string | null
           schedule_id?: string | null
           scheduled_for: string
@@ -318,6 +324,9 @@ export type Database = {
           error_message?: string | null
           generated_title?: string | null
           id?: string
+          indexed_at?: string | null
+          indexing_error?: string | null
+          indexing_status?: string
           provider?: string | null
           schedule_id?: string | null
           scheduled_for?: string
@@ -1398,6 +1407,7 @@ export type Database = {
           provider: string
           razorpay_order_id: string | null
           razorpay_payment_id: string | null
+          razorpay_subscription_id: string | null
           status: string
           stripe_checkout_session_id: string | null
           stripe_payment_intent_id: string | null
@@ -1413,6 +1423,7 @@ export type Database = {
           provider?: string
           razorpay_order_id?: string | null
           razorpay_payment_id?: string | null
+          razorpay_subscription_id?: string | null
           status: string
           stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
@@ -1428,6 +1439,7 @@ export type Database = {
           provider?: string
           razorpay_order_id?: string | null
           razorpay_payment_id?: string | null
+          razorpay_subscription_id?: string | null
           status?: string
           stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
@@ -1850,6 +1862,7 @@ export type Database = {
           price_usd: number
           product: string
           razorpay_plan_id: string | null
+          razorpay_plan_id_usd: string | null
           slug: string
           stripe_price_id: string | null
           trial_days: number
@@ -1870,6 +1883,7 @@ export type Database = {
           price_usd?: number
           product?: string
           razorpay_plan_id?: string | null
+          razorpay_plan_id_usd?: string | null
           slug: string
           stripe_price_id?: string | null
           trial_days?: number
@@ -1890,6 +1904,7 @@ export type Database = {
           price_usd?: number
           product?: string
           razorpay_plan_id?: string | null
+          razorpay_plan_id_usd?: string | null
           slug?: string
           stripe_price_id?: string | null
           trial_days?: number
@@ -1911,6 +1926,10 @@ export type Database = {
           provider: string | null
           razorpay_customer_id: string | null
           razorpay_payment_id: string | null
+          razorpay_plan_id: string | null
+          razorpay_subscription_id: string | null
+          cancellation_requested_at: string | null
+          provider_status: string | null
           status: string
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
@@ -1930,6 +1949,10 @@ export type Database = {
           provider?: string | null
           razorpay_customer_id?: string | null
           razorpay_payment_id?: string | null
+          razorpay_plan_id?: string | null
+          razorpay_subscription_id?: string | null
+          cancellation_requested_at?: string | null
+          provider_status?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -1949,6 +1972,10 @@ export type Database = {
           provider?: string | null
           razorpay_customer_id?: string | null
           razorpay_payment_id?: string | null
+          razorpay_plan_id?: string | null
+          razorpay_subscription_id?: string | null
+          cancellation_requested_at?: string | null
+          provider_status?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null

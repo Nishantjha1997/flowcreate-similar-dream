@@ -15,8 +15,6 @@ import {
   Plus, 
   Edit, 
   Trash2, 
-  Eye, 
-  EyeOff, 
   BarChart3, 
   CheckCircle, 
   AlertCircle,
@@ -24,7 +22,8 @@ import {
   Activity,
   DollarSign,
   TrendingUp,
-  RefreshCw
+  RefreshCw,
+  Shield
 } from 'lucide-react';
 
 const providerConfig = {
@@ -48,10 +47,11 @@ export function AIManagement() {
     isUpdating,
     isDeleting,
     isSettingPrimary,
-    isSettingFallback
+    isSettingFallback,
+    testAPIKey,
+    isTesting,
   } = useAIApiKeys();
 
-  const [showKey, setShowKey] = useState<{ [key: string]: boolean }>({});
   const [newKey, setNewKey] = useState({ provider: '', name: '', key: '' });
 
   const handleAddAPIKey = async () => {
@@ -60,15 +60,6 @@ export function AIManagement() {
     }
     addAPIKey(newKey);
     setNewKey({ provider: '', name: '', key: '' });
-  };
-
-  const toggleKeyVisibility = (keyId: string) => {
-    setShowKey(prev => ({ ...prev, [keyId]: !prev[keyId] }));
-  };
-
-  const maskKey = (key: string) => {
-    if (key.length <= 8) return '***';
-    return key.substring(0, 4) + '•'.repeat(key.length - 8) + key.substring(key.length - 4);
   };
 
   if (isLoading || isLoadingUsage) {
@@ -92,7 +83,7 @@ export function AIManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             AI API Management
@@ -104,7 +95,7 @@ export function AIManagement() {
             Keys added here power AI suggestions and PDF resume import. Scanned/image PDFs require a Gemini key.
           </p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline" className="text-sm flex items-center">
             <Activity className="w-3 h-3 mr-1" />
             {apiKeys.filter(k => k.is_active).length} Active Keys
@@ -248,14 +239,14 @@ export function AIManagement() {
                   'border-l-muted'
                 }`}>
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="flex min-w-0 items-start gap-4">
                       <div className={`w-12 h-12 rounded-lg ${providerConfig[key.provider as keyof typeof providerConfig]?.bgClass || 'bg-gray-100'} flex items-center justify-center text-2xl`}>
                         {providerConfig[key.provider as keyof typeof providerConfig]?.icon || '🤖'}
                       </div>
-                      <div>
-                        <div className="flex items-center space-x-2 mb-2">
-                          <h3 className="font-semibold text-lg">{key.name}</h3>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <h3 className="min-w-0 break-words font-semibold text-lg">{key.name}</h3>
                           {key.is_primary && (
                             <Badge variant="default" className="text-xs bg-green-500">
                               <Star className="w-3 h-3 mr-1" />Primary
@@ -279,18 +270,11 @@ export function AIManagement() {
                         <p className="text-sm text-muted-foreground mb-2">
                           {providerConfig[key.provider as keyof typeof providerConfig]?.name || key.provider} • Used {key.usage_count} times
                         </p>
-                        <div className="flex items-center space-x-2">
-                          <code className="text-xs bg-muted px-3 py-2 rounded-md font-mono">
-                            {showKey[key.id] ? key.key : maskKey(key.key)}
+                        <div className="flex min-w-0 flex-wrap items-center gap-2">
+                          <code className="max-w-full break-all rounded-md bg-muted px-3 py-2 text-xs font-mono">
+                            {key.key}
                           </code>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleKeyVisibility(key.id)}
-                            className="h-8 w-8 p-0"
-                          >
-                            {showKey[key.id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </Button>
+                          <Badge variant="outline" className="text-[10px]">Stored securely</Badge>
                         </div>
                         {key.last_used && (
                           <p className="text-xs text-muted-foreground mt-1">
@@ -299,7 +283,17 @@ export function AIManagement() {
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex w-full flex-wrap items-center gap-2 lg:w-auto lg:justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => testAPIKey(key.id)}
+                        disabled={!key.is_active || isTesting}
+                        className="flex items-center"
+                      >
+                        {isTesting ? <RefreshCw className="w-3 h-3 mr-1 animate-spin" /> : <Activity className="w-3 h-3 mr-1" />}
+                        Test connection
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"

@@ -58,7 +58,7 @@ export default function SharedResumeView() {
         <header className="border-b px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <FileText className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold tracking-tight">FlowCreate</span>
+            <span className="text-lg font-bold tracking-tight">MakeCV</span>
           </Link>
         </header>
         <main className="max-w-7xl mx-auto px-4 py-8">
@@ -82,7 +82,7 @@ export default function SharedResumeView() {
         <header className="border-b px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <FileText className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold tracking-tight">FlowCreate</span>
+            <span className="text-lg font-bold tracking-tight">MakeCV</span>
           </Link>
         </header>
         <main className="flex-1 flex items-center justify-center px-4">
@@ -113,7 +113,7 @@ export default function SharedResumeView() {
         <header className="border-b px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <FileText className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold tracking-tight">FlowCreate</span>
+            <span className="text-lg font-bold tracking-tight">MakeCV</span>
           </Link>
         </header>
         <main className="flex-1 flex items-center justify-center px-4">
@@ -144,7 +144,7 @@ export default function SharedResumeView() {
         <header className="border-b px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <FileText className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold tracking-tight">FlowCreate</span>
+            <span className="text-lg font-bold tracking-tight">MakeCV</span>
           </Link>
         </header>
         <main className="flex-1 flex items-center justify-center px-4">
@@ -177,7 +177,7 @@ export default function SharedResumeView() {
             <Link to="/" className="flex items-center gap-2 shrink-0">
               <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               <span className="text-base sm:text-lg font-bold tracking-tight hidden sm:block">
-                FlowCreate
+                MakeCV
               </span>
             </Link>
             <span className="text-muted-foreground hidden sm:block">/</span>
@@ -246,7 +246,7 @@ export default function SharedResumeView() {
           <span>
             Created with{' '}
             <Link to="/" className="text-primary hover:underline font-medium">
-              FlowCreate
+              MakeCV
             </Link>
           </span>
           <span>Share token: {token?.slice(0, 8)}...</span>

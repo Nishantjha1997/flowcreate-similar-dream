@@ -17,9 +17,9 @@ interface PageMetaProps {
   modifiedTime?: string;
 }
 
-const DEFAULT_TITLE = 'Free Online Resume Builder — Create Professional Resumes | FlowCreate';
+const DEFAULT_TITLE = 'Free Online Resume Builder — Create Professional Resumes | MakeCV';
 const DEFAULT_DESCRIPTION =
-  'Build a professional resume online free with FlowCreate. 30+ ATS-friendly templates, AI-powered suggestions, and instant PDF download. No credit card required.';
+  'Build a professional resume online free with MakeCV. 30+ ATS-friendly templates, AI-powered suggestions, and instant PDF download. No credit card required.';
 
 function upsertMeta(attr: 'name' | 'property', key: string, content: string): HTMLMetaElement {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
@@ -34,7 +34,7 @@ function upsertMeta(attr: 'name' | 'property', key: string, content: string): HT
 
 function completeTitle(title: string): string {
   const value = title.trim();
-  return /\bFlowCreate\b/i.test(value) ? value : `${value} | FlowCreate`;
+  return /\bMakeCV\b/i.test(value) ? value : `${value} | MakeCV`;
 }
 
 function absoluteAssetUrl(value: string): string {

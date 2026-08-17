@@ -1,4 +1,4 @@
--- FlowCreate AI blog automation
+-- MakeCV AI blog automation
 --
 -- The database owns scheduling through next_run_at. Workers atomically claim due
 -- schedules with FOR UPDATE SKIP LOCKED, so overlapping cron invocations cannot
@@ -18,7 +18,7 @@ CREATE TABLE public.blog_automation_schedules (
     CHECK (category IN ('Resume Tips', 'Career Advice', 'Job Search', 'Interview Tips', 'Industry Insights')),
   topic_prompt TEXT NOT NULL,
   keywords TEXT[] NOT NULL DEFAULT '{}',
-  author TEXT NOT NULL DEFAULT 'FlowCreate Team',
+  author TEXT NOT NULL DEFAULT 'MakeCV Team',
   time_zone TEXT NOT NULL DEFAULT 'UTC',
   next_run_at TIMESTAMPTZ NOT NULL,
   last_run_at TIMESTAMPTZ,

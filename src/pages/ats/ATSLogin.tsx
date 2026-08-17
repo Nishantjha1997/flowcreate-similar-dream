@@ -119,7 +119,7 @@ const ATSLogin = () => {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                New to FlowCreate ATS?{' '}
+                New to MakeCV ATS?{' '}
                 <Link to="/ats/signup" className="text-primary hover:underline font-medium">
                   Create an organization
                 </Link>

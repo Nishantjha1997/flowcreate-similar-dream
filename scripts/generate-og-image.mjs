@@ -1,4 +1,4 @@
-// Generates public/og-image.png (1200x630) — brand gradient + FlowCreate mark.
+// Generates public/og-image.png (1200x630) — brand gradient + MakeCV mark.
 // Pure Node (zlib only), no dependencies. 4x supersampling for smooth edges.
 // Re-run with: node scripts/generate-og-image.mjs
 // (Replace with a designed card featuring the wordmark whenever ready — this

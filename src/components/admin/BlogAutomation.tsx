@@ -54,14 +54,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 
 type Frequency = "daily" | "weekdays" | "weekly" | "biweekly" | "monthly";
-type PublishMode = "draft" | "published";
+type PublishMode = "published";
 
 type BlogSchedule = Omit<Tables<"blog_automation_schedules">, "frequency" | "publish_mode"> & {
   frequency: Frequency;
   publish_mode: PublishMode;
 };
 
-type AutomationRun = Tables<"blog_automation_runs">;
+type AutomationRun = Tables<"blog_automation_runs"> & {
+  indexing_status?: "not_requested" | "queued" | "submitted" | "not_configured" | "failed";
+  indexing_error?: string | null;
+  indexed_at?: string | null;
+};
 
 interface ScheduleForm {
   name: string;
@@ -168,7 +172,7 @@ function createEmptyForm(): ScheduleForm {
     name: "",
     is_enabled: true,
     frequency: "weekly",
-    publish_mode: "draft",
+    publish_mode: "published",
     category: "Resume Tips",
     topic_prompt: "",
     keywords: "",
@@ -257,7 +261,7 @@ export function BlogAutomation() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("blog_automation_runs")
-        .select("id,schedule_id,status,trigger_source,provider,generated_title,error_message,blog_post_id,scheduled_for,completed_at,created_at")
+        .select("id,schedule_id,status,trigger_source,provider,generated_title,error_message,blog_post_id,scheduled_for,completed_at,created_at,indexing_status,indexing_error,indexed_at")
         .order("scheduled_for", { ascending: false })
         .limit(25);
       if (error) throw new Error(error.message);
@@ -377,7 +381,7 @@ export function BlogAutomation() {
       name: schedule.name,
       is_enabled: schedule.is_enabled,
       frequency: schedule.frequency,
-      publish_mode: schedule.publish_mode,
+      publish_mode: "published",
       category: schedule.category,
       topic_prompt: schedule.topic_prompt,
       keywords: (schedule.keywords ?? []).join(", "),
@@ -556,7 +560,7 @@ export function BlogAutomation() {
                         </Badge>
                         <Badge variant="outline" className="text-[10px]">{frequencyLabel(schedule.frequency)}</Badge>
                         <Badge variant="outline" className="text-[10px]">
-                          {schedule.publish_mode === "published" ? "Auto-publish" : "Draft review"}
+                          Auto-publish
                         </Badge>
                       </div>
                       <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{schedule.topic_prompt}</p>
@@ -648,6 +652,7 @@ export function BlogAutomation() {
                       {run.provider && <Badge variant="secondary" className="text-[10px] capitalize">{run.provider}</Badge>}
                       <Badge variant="outline" className="text-[10px] capitalize">{run.trigger_source}</Badge>
                       {run.blog_post_id && <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400"><FileCheck2 className="h-3.5 w-3.5" /> Post saved</span>}
+                      {run.indexing_status && <Badge variant="outline" className="text-[10px]">Google: {run.indexing_status.replace("_", " ")}</Badge>}
                     </div>
                     {run.error_message && <p className="mt-2 line-clamp-2 text-xs text-red-600 dark:text-red-400" title={run.error_message}>{run.error_message}</p>}
                   </div>
@@ -680,7 +685,7 @@ export function BlogAutomation() {
                         <td className="truncate px-3 py-3 align-top text-xs capitalize text-muted-foreground">{run.provider || "Auto"} · {run.trigger_source}</td>
                         <td className="px-3 py-3 align-top text-xs text-muted-foreground">{formatDateTime(run.scheduled_for)}</td>
                         <td className="px-3 py-3 align-top text-xs">
-                          {run.blog_post_id ? <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400"><FileCheck2 className="h-3.5 w-3.5" /> Saved</span> : run.completed_at ? relativeTime(run.completed_at) : "—"}
+                          {run.blog_post_id ? <span className="flex flex-wrap items-center gap-1 text-emerald-600 dark:text-emerald-400"><FileCheck2 className="h-3.5 w-3.5" /> Saved {run.indexing_status && <span className="text-muted-foreground">· Google {run.indexing_status.replace("_", " ")}</span>}</span> : run.completed_at ? relativeTime(run.completed_at) : "—"}
                         </td>
                       </tr>
                     ))}
@@ -697,7 +702,7 @@ export function BlogAutomation() {
           <DialogHeader>
             <DialogTitle>{editingSchedule ? "Edit schedule" : "Create a publishing schedule"}</DialogTitle>
             <DialogDescription>
-              Choose a topic lane and cadence. Draft review is the safest mode for a new schedule.
+              Choose a topic lane and cadence. Articles publish after the server-side quality and safety gates pass.
             </DialogDescription>
           </DialogHeader>
 
@@ -731,13 +736,7 @@ export function BlogAutomation() {
 
               <div className="space-y-2">
                 <Label>Publishing mode</Label>
-                <Select value={form.publish_mode} onValueChange={(value: PublishMode) => setForm((current) => ({ ...current, publish_mode: value }))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Save as draft for review</SelectItem>
-                    <SelectItem value="published">Publish automatically</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex min-h-10 items-center rounded-md border bg-muted/40 px-3 text-sm">Automatic publishing after quality gates</div>
               </div>
 
               <div className="space-y-2">
@@ -812,13 +811,11 @@ export function BlogAutomation() {
               </div>
             </div>
 
-            {form.publish_mode === "published" && (
-              <Alert className="border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30">
-                <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                <AlertTitle>Automatic publishing is enabled</AlertTitle>
-                <AlertDescription>New articles can go live without review. Start with draft mode until the output is consistent.</AlertDescription>
-              </Alert>
-            )}
+            <Alert className="border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30">
+              <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <AlertTitle>Auto-publish and Search Console submission</AlertTitle>
+              <AlertDescription>Validated articles are published automatically, then sitemap.xml is regenerated and submitted to Google Search Console when the server credential is configured.</AlertDescription>
+            </Alert>
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>

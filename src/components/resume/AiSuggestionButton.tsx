@@ -205,7 +205,7 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
                 : quota.isUnlimited
                   ? "Unlimited AI uses"
                   : `${quota.used}/${quota.cap} AI uses / 30 days`
-              : "Premium Feature - ₹199/month"}
+              : "Premium Feature - ₹299/month"}
           </span>
         </span>
         
@@ -342,8 +342,8 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
             </div>
 
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">₹199/month</div>
-              <div className="text-sm text-muted-foreground">30-day money-back guarantee</div>
+              <div className="text-2xl font-bold text-primary">₹299/month</div>
+              <div className="text-sm text-muted-foreground">Payments are final after activation</div>
             </div>
           </div>
 
@@ -394,7 +394,7 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
               </div>
 
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">₹199/month</div>
+                <div className="text-2xl font-bold text-primary">₹299/month</div>
                 <div className="text-sm text-muted-foreground">Cancel anytime</div>
               </div>
             </DialogDescription>

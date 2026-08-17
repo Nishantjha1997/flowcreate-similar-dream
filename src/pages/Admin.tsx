@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { useAllMembers } from "@/hooks/useAllMembers";
 import { useUserProfiles } from "@/hooks/useUserProfiles";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { AdminOverview } from "@/components/admin/AdminOverview";
@@ -52,6 +52,7 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 // ─── Nav structure ─────────────────────────────────────────────────────────────
 const NAV_GROUPS = [
@@ -106,18 +107,33 @@ const NAV_GROUPS = [
 
 type TabValue = string;
 
+const TAB_VALUES = new Set<TabValue>(
+  NAV_GROUPS.flatMap((group) => group.items.map((item) => item.value)),
+);
+
 // ─── Component ─────────────────────────────────────────────────────────────────
 const Admin = () => {
   const { user, isLoading } = useAuth();
   const userId = user?.id;
   const navigate = useNavigate();
+  const { section } = useParams<{ section?: string }>();
 
   const { data: isAdmin, isLoading: loadingAdmin } = useAdminStatus(userId);
   const { data: members = [], isLoading: loadingMembers, refetch } = useAllMembers(!!isAdmin);
   const { data: userProfiles = [], isLoading: loadingProfiles } = useUserProfiles(!!isAdmin);
 
-  const [activeTab, setActiveTab] = useState<TabValue>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const activeTab: TabValue = section && TAB_VALUES.has(section) ? section : "overview";
+
+  const navigateToTab = (tab: TabValue) => {
+    navigate(tab === "overview" ? "/admin" : `/admin/${tab}`);
+  };
+
+  useEffect(() => {
+    if (section && !TAB_VALUES.has(section)) {
+      navigate("/admin", { replace: true });
+    }
+  }, [section, navigate]);
 
   useEffect(() => {
     if (!isLoading && !loadingAdmin) {
@@ -254,7 +270,7 @@ const Admin = () => {
                     return (
                       <li key={value}>
                         <button
-                          onClick={() => { setActiveTab(value); setSidebarOpen(false); }}
+                          onClick={() => { navigateToTab(value); setSidebarOpen(false); }}
                           className={cn(
                             "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all duration-150 text-left group",
                             isActive
@@ -314,7 +330,7 @@ const Admin = () => {
                 </div>
                 <div>
                   <h1 className="text-lg font-bold tracking-tight text-foreground">{currentItem?.label ?? "Dashboard"}</h1>
-                  <p className="text-xs text-muted-foreground">Admin · FlowCreate Console</p>
+                  <p className="text-xs text-muted-foreground">Admin · MakeCV Console</p>
                 </div>
               </div>
               <Badge variant="secondary" className="text-[10px] gap-1 hidden sm:flex">
@@ -326,33 +342,37 @@ const Admin = () => {
 
           {/* Tab Content Panel */}
           {activeTab === "overview" ? (
-            <AdminOverview onNavigate={setActiveTab} />
+            <ErrorBoundary>
+              <AdminOverview onNavigate={navigateToTab} />
+            </ErrorBoundary>
           ) : (
             <div className="rounded-xl border border-border/40 bg-card shadow-sm overflow-hidden">
               <div className="p-5">
-                {activeTab === "registrations" && <UserRegistrations isAdmin={!!isAdmin} />}
-                {activeTab === "users" && (
-                  <UserManagement
-                    members={members}
-                    userProfiles={userProfiles}
-                    isLoading={loadingMembers || loadingProfiles}
-                    refetch={() => { refetch(); }}
-                  />
-                )}
-                {activeTab === "helpcenter" && <HelpCenter isAdmin={!!isAdmin} />}
-                {activeTab === "blog" && <BlogManager />}
-                {activeTab === "blog-automation" && <BlogAutomation />}
-                {activeTab === "ats" && <ATSManagement isAdmin={!!isAdmin} />}
-                {activeTab === "templates" && <TemplateManagement />}
-                {activeTab === "website" && <WebsiteCustomization />}
-                {activeTab === "improvements" && <ImprovementPlans />}
-                {activeTab === "actions" && <QuickActions refetch={refetch} />}
-                {activeTab === "content" && <ContentManagement />}
-                {activeTab === "security" && <SecuritySettings />}
-                {activeTab === "ai" && <AIManagement />}
-                {activeTab === "payments" && <PaymentGatewayManagement />}
-                {activeTab === "analytics" && <AdminAnalytics isAdmin={!!isAdmin} />}
-                {activeTab === "audit" && <AuditLogs isAdmin={!!isAdmin} />}
+                <ErrorBoundary>
+                  {activeTab === "registrations" && <UserRegistrations isAdmin={!!isAdmin} />}
+                  {activeTab === "users" && (
+                    <UserManagement
+                      members={members}
+                      userProfiles={userProfiles}
+                      isLoading={loadingMembers || loadingProfiles}
+                      refetch={() => { refetch(); }}
+                    />
+                  )}
+                  {activeTab === "helpcenter" && <HelpCenter isAdmin={!!isAdmin} />}
+                  {activeTab === "blog" && <BlogManager />}
+                  {activeTab === "blog-automation" && <BlogAutomation />}
+                  {activeTab === "ats" && <ATSManagement isAdmin={!!isAdmin} />}
+                  {activeTab === "templates" && <TemplateManagement />}
+                  {activeTab === "website" && <WebsiteCustomization />}
+                  {activeTab === "improvements" && <ImprovementPlans />}
+                  {activeTab === "actions" && <QuickActions refetch={refetch} />}
+                  {activeTab === "content" && <ContentManagement />}
+                  {activeTab === "security" && <SecuritySettings />}
+                  {activeTab === "ai" && <AIManagement />}
+                  {activeTab === "payments" && <PaymentGatewayManagement />}
+                  {activeTab === "analytics" && <AdminAnalytics isAdmin={!!isAdmin} />}
+                  {activeTab === "audit" && <AuditLogs isAdmin={!!isAdmin} />}
+                </ErrorBoundary>
               </div>
             </div>
           )}

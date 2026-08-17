@@ -6,13 +6,13 @@ describe('parseExtractedJson', () => {
   it('normalizes model string fields into frontend-safe arrays', () => {
     const parsed = parseExtractedJson(JSON.stringify({
       skills: 'TypeScript, React; PostgreSQL',
-      projects: [{ name: 'FlowCreate', technologies: 'React, Supabase' }],
+      projects: [{ name: 'MakeCV', technologies: 'React, Supabase' }],
       languages: 'English, Hindi',
     }));
 
     expect(parsed.skills).toEqual(['TypeScript', 'React', 'PostgreSQL']);
     expect(parsed.projects).toEqual([{
-      name: 'FlowCreate',
+      name: 'MakeCV',
       technologies: ['React', 'Supabase'],
     }]);
     expect(parsed.languages).toEqual([

@@ -10,14 +10,14 @@ describe('mergeProfileImport', () => {
         mode: 'append',
         data: [
           { title: ' engineer ', company: 'ACME' },
-          { title: 'Lead', company: 'FlowCreate' },
+          { title: 'Lead', company: 'MakeCV' },
         ],
       }],
     );
 
     expect(result.work_experience).toEqual([
       { title: 'Engineer', company: 'Acme' },
-      { title: 'Lead', company: 'FlowCreate' },
+      { title: 'Lead', company: 'MakeCV' },
     ]);
   });
 

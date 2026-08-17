@@ -33,15 +33,15 @@ const SplashScreen = () => {
   const current = stages[stage];
 
   return (
-    <div className={`flow-splash${leaving ? ' is-leaving' : ''}`} role="status" aria-live="polite" aria-label="Loading FlowCreate">
+    <div className={`flow-splash${leaving ? ' is-leaving' : ''}`} role="status" aria-live="polite" aria-label="Loading MakeCV">
       <div className="flow-splash-grid" aria-hidden="true" />
       <div className="flow-splash-orb flow-splash-orb-one" aria-hidden="true" />
       <div className="flow-splash-orb flow-splash-orb-two" aria-hidden="true" />
-      <header className="flow-splash-topline"><span>FlowCreate / resume intelligence</span><strong>{current.code}</strong></header>
+      <header className="flow-splash-topline"><span>MakeCV / resume intelligence</span><strong>{current.code}</strong></header>
       <main className="flow-splash-center">
         <div className="flow-splash-documents" aria-hidden="true">
           <div className="flow-splash-document flow-splash-document-back"><i /><i /><i /></div>
-          <div className="flow-splash-document flow-splash-document-front"><b>FC</b><i /><i /><i /><span /></div>
+          <div className="flow-splash-document flow-splash-document-front"><b>CV</b><i /><i /><i /><span /></div>
           <div className="flow-splash-check">✓</div>
         </div>
         <p className="flow-splash-eyebrow">Your next chapter, in focus</p>

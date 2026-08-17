@@ -41,7 +41,7 @@ const Footer = () => {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t-2 border-foreground">
-            <p className="text-sm text-center font-bold uppercase tracking-wide text-foreground">&copy; {new Date().getFullYear()} FlowCreate. All rights reserved.</p>
+            <p className="text-sm text-center font-bold uppercase tracking-wide text-foreground">&copy; {new Date().getFullYear()} MakeCV. All rights reserved.</p>
           </div>
         </div>
       </footer>
@@ -60,7 +60,7 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
           <div className="col-span-2 lg:col-span-2 mb-4">
-            <Link to="/" className="mb-4" aria-label="FlowCreate home">
+            <Link to="/" className="mb-4" aria-label="MakeCV home">
               <BrandWordmark className="h-7" textClassName="text-lg font-semibold tracking-tight" />
             </Link>
             <p className="text-sm text-white/40 leading-relaxed max-w-xs">
@@ -104,7 +104,7 @@ const Footer = () => {
 
         <div className="mt-8 pt-6 border-t border-white/[0.06]">
           <p className="text-xs text-white/25 text-center">
-            Copyright &copy; {new Date().getFullYear()} FlowCreate. All rights reserved.
+            Copyright &copy; {new Date().getFullYear()} MakeCV. All rights reserved.
           </p>
         </div>
       </div>

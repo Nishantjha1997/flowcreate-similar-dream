@@ -1,5 +1,5 @@
-export const SITE_NAME = 'FlowCreate';
-export const DEFAULT_SITE_URL = 'https://flowcreate-similar-dream.vercel.app';
+export const SITE_NAME = 'MakeCV';
+export const DEFAULT_SITE_URL = 'https://makecv.site';
 export const DEFAULT_OG_IMAGE = '/og-image.png';
 
 export function getSiteUrl() {
@@ -13,7 +13,7 @@ export const PUBLIC_ROUTES = [
   {
     path: '/',
     title: 'Free Online Resume Builder — Create Professional Resumes',
-    description: 'Build a professional resume online free with FlowCreate. Choose from 30+ ATS-friendly templates, get AI writing suggestions, and download a polished PDF.',
+    description: 'Build a professional resume online free with MakeCV. Choose from 30+ ATS-friendly templates, get AI writing suggestions, and download a polished PDF.',
     heading: 'Build a Professional Resume Online for Free',
     changefreq: 'weekly',
     priority: '1.0',
@@ -48,7 +48,7 @@ export const PUBLIC_ROUTES = [
   {
     path: '/pricing',
     title: 'Resume Builder Pricing — Free and Premium Plans',
-    description: 'Start with FlowCreate for free. Compare resume builder plans with AI suggestions, unlimited resumes, version history, and cloud backup.',
+    description: 'Start with MakeCV for free. Compare resume builder plans with AI suggestions, unlimited resumes, version history, and cloud backup.',
     heading: 'Simple Resume Builder Pricing',
     changefreq: 'monthly',
     priority: '0.7',
@@ -56,7 +56,7 @@ export const PUBLIC_ROUTES = [
   {
     path: '/features',
     title: 'Resume Builder Features — ATS Templates and AI Tools',
-    description: 'Explore FlowCreate features including ATS-friendly templates, live preview, AI writing help, PDF export, cloud storage, and resume sharing.',
+    description: 'Explore MakeCV features including ATS-friendly templates, live preview, AI writing help, PDF export, cloud storage, and resume sharing.',
     heading: 'Everything You Need to Build a Better Resume',
     changefreq: 'monthly',
     priority: '0.8',
@@ -72,7 +72,7 @@ export const PUBLIC_ROUTES = [
   {
     path: '/blog',
     title: 'Resume Tips and Career Advice Blog',
-    description: 'Read practical resume writing tips, career advice, ATS guidance, and job search strategies from the FlowCreate team.',
+    description: 'Read practical resume writing tips, career advice, ATS guidance, and job search strategies from the MakeCV team.',
     heading: 'Resume Tips and Career Advice',
     changefreq: 'daily',
     priority: '0.8',
@@ -95,24 +95,24 @@ export const PUBLIC_ROUTES = [
   },
   {
     path: '/help',
-    title: 'FlowCreate Help Center and Support',
-    description: 'Find answers about FlowCreate resume tools, accounts, downloads, billing, and support.',
-    heading: 'FlowCreate Help Center',
+    title: 'MakeCV Help Center and Support',
+    description: 'Find answers about MakeCV resume tools, accounts, downloads, billing, and support.',
+    heading: 'MakeCV Help Center',
     changefreq: 'monthly',
     priority: '0.5',
   },
   {
     path: '/about',
-    title: 'About FlowCreate',
-    description: 'Learn about FlowCreate, the online resume and cover letter builder designed to help job seekers create professional applications.',
-    heading: 'About FlowCreate',
+    title: 'About MakeCV',
+    description: 'Learn about MakeCV, founded by Nishant Jha, the online resume and cover letter builder designed to help job seekers create professional applications.',
+    heading: 'About MakeCV',
     changefreq: 'yearly',
     priority: '0.5',
   },
   {
     path: '/ats',
     title: 'Applicant Tracking System for Collaborative Hiring',
-    description: 'Manage jobs, candidates, hiring pipelines, team feedback, and recruiting analytics with FlowCreate ATS.',
+    description: 'Manage jobs, candidates, hiring pipelines, team feedback, and recruiting analytics with MakeCV ATS.',
     heading: 'Hire Smarter, Faster, Together',
     changefreq: 'monthly',
     priority: '0.6',
@@ -121,7 +121,7 @@ export const PUBLIC_ROUTES = [
   {
     path: '/ats/jobs/browse',
     title: 'Browse Open Jobs',
-    description: 'Browse current job openings published by hiring teams using FlowCreate ATS.',
+    description: 'Browse current job openings published by hiring teams using MakeCV ATS.',
     heading: 'Browse Open Jobs',
     changefreq: 'daily',
     priority: '0.6',
@@ -129,7 +129,7 @@ export const PUBLIC_ROUTES = [
   {
     path: '/terms',
     title: 'Terms and Conditions',
-    description: 'Read the terms and conditions for using FlowCreate resume, cover letter, and career tools.',
+    description: 'Read the terms and conditions for using MakeCV resume, cover letter, and career tools.',
     heading: 'Terms and Conditions',
     changefreq: 'yearly',
     priority: '0.2',
@@ -137,7 +137,7 @@ export const PUBLIC_ROUTES = [
   {
     path: '/privacy',
     title: 'Privacy Policy',
-    description: 'Learn how FlowCreate collects, uses, and protects personal information and resume data.',
+    description: 'Learn how MakeCV collects, uses, and protects personal information and resume data.',
     heading: 'Privacy Policy',
     changefreq: 'yearly',
     priority: '0.2',
@@ -145,7 +145,7 @@ export const PUBLIC_ROUTES = [
   {
     path: '/refund-policy',
     title: 'Refund Policy',
-    description: 'Review FlowCreate cancellation and refund policies for subscriptions and services.',
+    description: 'Review MakeCV cancellation and refund policies for subscriptions and services.',
     heading: 'Refund Policy',
     changefreq: 'yearly',
     priority: '0.2',
@@ -153,7 +153,7 @@ export const PUBLIC_ROUTES = [
   {
     path: '/shipping-policy',
     title: 'Digital Delivery and Shipping Policy',
-    description: 'Information about the digital delivery of FlowCreate products and services.',
+    description: 'Information about the digital delivery of MakeCV products and services.',
     heading: 'Digital Delivery and Shipping Policy',
     changefreq: 'yearly',
     priority: '0.2',

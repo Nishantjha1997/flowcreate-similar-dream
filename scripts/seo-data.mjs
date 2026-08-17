@@ -50,11 +50,33 @@ export function getSupabaseCredentials() {
   };
 }
 
+function loadStaticBlogPosts() {
+  try {
+    const source = readFileSync(join(projectRoot, 'src', 'data', 'blogPosts.ts'), 'utf8');
+    const declaration = source.indexOf('export const blogPosts');
+    const start = source.indexOf('[', declaration);
+    const end = source.lastIndexOf('];');
+    if (start < 0 || end < start) return [];
+    const posts = Function(`"use strict"; return (${source.slice(start, end + 1)});`)();
+    return posts.map((post) => ({
+      ...post,
+      published_at: post.date,
+      created_at: post.date,
+      updated_at: post.date,
+      image_url: post.imageUrl,
+      read_time: post.readTime,
+    }));
+  } catch (error) {
+    console.warn(`seo: static blog data could not be read (${error.message})`);
+    return [];
+  }
+}
+
 export async function fetchPublishedBlogPosts({ full = false } = {}) {
   const { url, key } = getSupabaseCredentials();
   if (!url || !key) {
-    console.warn('seo: Supabase credentials unavailable; published blog posts were skipped');
-    return [];
+    console.warn('seo: Supabase credentials unavailable; using static blog posts');
+    return loadStaticBlogPosts();
   }
 
   const fields = full
@@ -76,8 +98,8 @@ export async function fetchPublishedBlogPosts({ full = false } = {}) {
     console.log(`seo: loaded ${posts.length} published blog posts`);
     return posts;
   } catch (error) {
-    console.warn(`seo: blog fetch failed (${error.message}); continuing without blog posts`);
-    return [];
+    console.warn(`seo: blog fetch failed (${error.message}); using bundled blog posts`);
+    return loadStaticBlogPosts();
   }
 }
 

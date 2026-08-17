@@ -23,7 +23,7 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 const Features = () => {
   usePageMeta({
     title: 'Resume Builder Features — ATS Optimization, AI Suggestions & More',
-    description: 'Discover FlowCreate features: 30+ ATS-optimized templates, real-time preview, AI writing suggestions, one-click PDF export, cloud storage & resume sharing. Free resume builder online.',
+    description: 'Discover MakeCV features: 30+ ATS-optimized templates, real-time preview, AI writing suggestions, one-click PDF export, cloud storage & resume sharing. Free resume builder online.',
   });
 
   const features = [
@@ -182,7 +182,7 @@ const Features = () => {
                 What Our Users Say
               </h2>
               <p className="mt-4 text-xl text-muted-foreground">
-                Don't just take our word for it - hear from people who have used FlowCreate
+                Don't just take our word for it - hear from people who have used MakeCV
               </p>
             </div>
 
@@ -194,7 +194,7 @@ const Features = () => {
                   ))}
                 </div>
                 <p className="mb-4 text-muted-foreground">
-                  "I landed my dream job using a resume I created with FlowCreate. The templates are professional and the interface is so intuitive. Highly recommend!"
+                  "I landed my dream job using a resume I created with MakeCV. The templates are professional and the interface is so intuitive. Highly recommend!"
                 </p>
                 <p className="font-semibold">Sarah T.</p>
                 <p className="text-sm text-muted-foreground">Marketing Manager</p>
@@ -207,7 +207,7 @@ const Features = () => {
                   ))}
                 </div>
                 <p className="mb-4 text-muted-foreground">
-                  "As a student with limited work experience, I was worried about my resume. FlowCreate helped me highlight my skills and education in a way that impressed employers."
+                  "As a student with limited work experience, I was worried about my resume. MakeCV helped me highlight my skills and education in a way that impressed employers."
                 </p>
                 <p className="font-semibold">Michael J.</p>
                 <p className="text-sm text-muted-foreground">Recent Graduate</p>
@@ -220,7 +220,7 @@ const Features = () => {
                   ))}
                 </div>
                 <p className="mb-4 text-muted-foreground">
-                  "I've tried many resume builders, and FlowCreate is by far the best. It's completely free but offers features that premium services charge for. Amazing tool!"
+                  "I've tried many resume builders, and MakeCV is by far the best. It's completely free but offers features that premium services charge for. Amazing tool!"
                 </p>
                 <p className="font-semibold">David L.</p>
                 <p className="text-sm text-muted-foreground">Software Engineer</p>
@@ -238,7 +238,7 @@ const Features = () => {
                   Ready to create a resume that gets results?
                 </h2>
                 <p className="mt-4 text-xl text-blue-100">
-                  Join thousands of job seekers who have found success with FlowCreate
+                  Join thousands of job seekers who have found success with MakeCV
                 </p>
                 <div className="mt-8">
                   <Link to="/resume-builder">

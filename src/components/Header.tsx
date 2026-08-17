@@ -179,9 +179,9 @@ const Header = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-12 items-center justify-between">
           <div className="flex items-center">
-            <Link to="/" className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded" aria-label="FlowCreate home">
+            <Link to="/" className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded" aria-label="MakeCV home">
               <BrandWordmark className="h-7" textClassName="text-xl font-semibold tracking-apple-tight" />
-              <span className="sr-only">FlowCreate - AI-powered resume builder</span>
+              <span className="sr-only">MakeCV - AI-powered resume builder</span>
             </Link>
           </div>
           
@@ -343,7 +343,7 @@ const Header = () => {
         <div className="fixed inset-0 z-50 md:hidden bg-background/95 backdrop-blur-xl">
           <div className="px-4 sm:px-6">
             <div className="flex h-12 items-center justify-between">
-              <Link to="/" className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded" onClick={() => setMobileMenuOpen(false)} aria-label="FlowCreate home">
+              <Link to="/" className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded" onClick={() => setMobileMenuOpen(false)} aria-label="MakeCV home">
                 <BrandWordmark className="h-7" textClassName="text-xl font-semibold tracking-apple-tight" />
               </Link>
               <button

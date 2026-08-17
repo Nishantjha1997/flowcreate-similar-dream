@@ -8,6 +8,8 @@ export interface PaymentGatewayKey {
   key_id: string | null;
   key_secret: string | null;
   webhook_secret: string | null;
+  has_secret: boolean;
+  has_webhook_secret: boolean;
   is_live: boolean;
   is_active: boolean;
   last_used: string | null;
@@ -15,98 +17,57 @@ export interface PaymentGatewayKey {
   updated_at: string;
 }
 
+async function invokeSecrets<T>(body: Record<string, unknown>): Promise<T> {
+  const { data, error } = await supabase.functions.invoke("admin-provider-secrets", { body });
+  if (error) throw error;
+  if (data?.error) throw new Error(String(data.error));
+  return data as T;
+}
+
+function normalizeGateway(row: Record<string, unknown>): PaymentGatewayKey {
+  return {
+    ...row,
+    key_secret: typeof row.key_secret_masked === "string" ? row.key_secret_masked : null,
+    webhook_secret: typeof row.webhook_secret_masked === "string" ? row.webhook_secret_masked : null,
+    has_secret: Boolean(row.has_secret),
+    has_webhook_secret: Boolean(row.has_webhook_secret),
+  } as PaymentGatewayKey;
+}
+
 export function usePaymentGatewayKeys() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["payment-gateway-keys"] });
+  const mutationOptions = (description: string) => ({
+    onSuccess: () => { void invalidate(); toast({ title: "Success", description }); },
+    onError: (mutationError: Error) => toast({ title: "Error", description: mutationError.message, variant: "destructive" as const }),
+  });
 
   const { data: gatewayKeys = [], isLoading, error } = useQuery({
     queryKey: ["payment-gateway-keys"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payment_gateway_keys")
-        .select("*")
-        .order("provider");
-
-      if (error) throw error;
-      return data as PaymentGatewayKey[];
+      const response = await invokeSecrets<{ data: Record<string, unknown>[] }>({ resource: "payment" });
+      return (response.data ?? []).map(normalizeGateway);
     },
   });
 
   const saveKeyMutation = useMutation({
-    mutationFn: async (input: {
-      provider: "razorpay" | "stripe";
-      key_id?: string;
-      key_secret?: string;
-      webhook_secret?: string;
-      is_live: boolean;
-    }) => {
-      const { data, error } = await supabase
-        .from("payment_gateway_keys")
-        .upsert(
-          {
-            provider: input.provider,
-            key_id: input.key_id || null,
-            key_secret: input.key_secret || null,
-            webhook_secret: input.webhook_secret || null,
-            is_live: input.is_live,
-            is_active: true,
-          },
-          { onConflict: "provider" }
-        )
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["payment-gateway-keys"] });
-      toast({ title: "Success", description: "Payment gateway keys saved" });
-    },
-    onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    },
+    mutationFn: (input: { provider: "razorpay" | "stripe"; key_id?: string; key_secret?: string; webhook_secret?: string; is_live: boolean }) =>
+      invokeSecrets({ resource: "payment", ...input }),
+    ...mutationOptions("Payment gateway keys saved"),
   });
-
   const toggleActiveMutation = useMutation({
-    mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
-      const { data, error } = await supabase
-        .from("payment_gateway_keys")
-        .update({ is_active })
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["payment-gateway-keys"] });
-      toast({ title: "Success", description: "Gateway status updated" });
-    },
-    onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    },
+    mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) =>
+      invokeSecrets({ resource: "payment", action: "toggle-active", id, is_active }),
+    ...mutationOptions("Gateway status updated"),
   });
-
   const deleteKeyMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("payment_gateway_keys").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["payment-gateway-keys"] });
-      toast({ title: "Success", description: "Gateway keys removed" });
-    },
-    onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    },
+    mutationFn: (id: string) => invokeSecrets({ resource: "payment", action: "delete", id }),
+    ...mutationOptions("Gateway keys removed"),
   });
 
   return {
-    gatewayKeys,
-    isLoading,
-    error,
+    gatewayKeys, isLoading, error,
     saveKey: saveKeyMutation.mutate,
     toggleActive: toggleActiveMutation.mutate,
     deleteKey: deleteKeyMutation.mutate,

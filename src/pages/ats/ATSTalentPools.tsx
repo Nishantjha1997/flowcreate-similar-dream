@@ -88,7 +88,7 @@ const ATSTalentPools = () => {
 
       // Get candidate counts
       const poolIds = (poolsData || []).map(p => p.id);
-      let counts: Record<string, number> = {};
+      const counts: Record<string, number> = {};
       if (poolIds.length > 0) {
         const { data: candidates } = await supabase
           .from('talent_pool_candidates')

@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { FileText, Globe, Save, Plus, Loader2, Trash2, Edit } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -26,12 +27,14 @@ interface SEOSettings {
   ogTitle: string; ogDescription: string; ogImage: string;
 }
 
+type SettingValue = LandingPageContent | SEOSettings | ContentSection[];
+
 const defaults = {
   landing: { heroTitle: "Build Your Perfect Resume", heroSubtitle: "Create professional, ATS-optimized resumes that get you noticed by employers", ctaButtonText: "Start Building", featuresTitle: "Why Choose Our Resume Builder?", testimonialsTitle: "Success Stories" } as LandingPageContent,
   seo: { metaTitle: "Professional Resume Builder | Create ATS-Optimized Resumes", metaDescription: "Build professional resumes with our easy-to-use resume builder. Choose from ATS-optimized templates and get hired faster.", keywords: "resume builder, CV maker, professional resume, ATS resume, job application", ogTitle: "Professional Resume Builder", ogDescription: "Create stunning resumes that get you hired", ogImage: "" } as SEOSettings,
   sections: [
     { id: "1", title: "Privacy Policy", content: "Your privacy is important to us. We do not sell or share your personal data.", isVisible: true, lastUpdated: new Date().toISOString().split('T')[0] },
-    { id: "2", title: "Terms of Service", content: "By using FlowCreate, you agree to our terms of service.", isVisible: true, lastUpdated: new Date().toISOString().split('T')[0] },
+    { id: "2", title: "Terms of Service", content: "By using MakeCV, you agree to our terms of service.", isVisible: true, lastUpdated: new Date().toISOString().split('T')[0] },
     { id: "3", title: "FAQ Section", content: "Find answers to common questions about our resume builder.", isVisible: true, lastUpdated: new Date().toISOString().split('T')[0] },
   ] as ContentSection[]
 };
@@ -63,18 +66,19 @@ export const ContentManagement = () => {
   useEffect(() => { if (savedSeo) setSeo({ ...defaults.seo, ...savedSeo }); }, [savedSeo]);
   useEffect(() => { if (savedSections) setSections(savedSections); }, [savedSections]);
 
-  const saveMutation = (key: string) => useMutation({
-    mutationFn: async (value: any) => {
+  const saveSetting = useMutation({
+    mutationFn: async ({ key, value }: { key: string; value: SettingValue }) => {
       const { data: ex } = await supabase.from('site_settings').select('id').eq('setting_key', key).single();
-      if (ex) await supabase.from('site_settings').update({ setting_value: value, updated_at: new Date().toISOString() }).eq('setting_key', key);
-      else await supabase.from('site_settings').insert({ setting_key: key, setting_value: value });
+      const jsonValue = value as unknown as Json;
+      if (ex) await supabase.from('site_settings').update({ setting_value: jsonValue, updated_at: new Date().toISOString() }).eq('setting_key', key);
+      else await supabase.from('site_settings').insert({ setting_key: key, setting_value: jsonValue });
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['site-settings', key] }); toast({ title: "Saved" }); },
-    onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
+    onSuccess: (_data, variables) => { queryClient.invalidateQueries({ queryKey: ['site-settings', variables.key] }); toast({ title: "Saved" }); },
+    onError: (e: Error) => toast({ title: "Error", description: e.message, variant: "destructive" }),
   });
-  const saveLanding = saveMutation('landing_page_content');
-  const saveSeo = saveMutation('seo_settings');
-  const saveSections = saveMutation('content_sections');
+  const saveLanding = { mutate: (value: LandingPageContent) => saveSetting.mutate({ key: 'landing_page_content', value }), isPending: saveSetting.isPending };
+  const saveSeo = { mutate: (value: SEOSettings) => saveSetting.mutate({ key: 'seo_settings', value }), isPending: saveSetting.isPending };
+  const saveSections = { mutate: (value: ContentSection[]) => saveSetting.mutate({ key: 'content_sections', value }), isPending: saveSetting.isPending };
 
   const toggleSection = (id: string) => {
     const updated = sections.map(s => s.id === id ? { ...s, isVisible: !s.isVisible, lastUpdated: new Date().toISOString().split('T')[0] } : s);

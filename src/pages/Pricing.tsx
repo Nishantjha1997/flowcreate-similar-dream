@@ -29,7 +29,7 @@ const FALLBACK_PLANS = [
     slug: 'monthly',
     description: 'Unlimited resumes with 100 AI actions every rolling 30 days.',
     price_inr: 29900,
-    price_usd: 499,
+    price_usd: 500,
     billing_interval: 'month',
     features: ['Everything in Free', 'Unlimited resumes', '100 AI actions / 30 days', 'Version history', 'Cloud backup', 'Premium support']
   },
@@ -39,7 +39,7 @@ const FALLBACK_PLANS = [
     slug: 'yearly',
     description: 'Best value with 150 AI actions every rolling 30 days.',
     price_inr: 249900,
-    price_usd: 3999,
+    price_usd: 3900,
     billing_interval: 'year',
     features: ['Everything in Monthly', '150 AI actions / 30 days', '2 months free', 'Priority support', 'Advanced features', 'Version history', 'Cloud backup']
   },
@@ -49,7 +49,7 @@ const FALLBACK_PLANS = [
     slug: 'lifetime',
     description: 'Lifetime access with 150 AI actions every rolling 30 days.',
     price_inr: 499900,
-    price_usd: 7999,
+    price_usd: 7900,
     billing_interval: 'lifetime',
     features: ['Everything in Yearly', '150 AI actions / 30 days', 'Lifetime updates', 'Future template updates', 'Advanced customization', 'Dedicated support', 'Fair-use access']
   }
@@ -137,8 +137,8 @@ const getIntervalText = (interval: string) => {
 
 const Pricing = () => {
   usePageMeta({
-    title: 'Pricing — Free Resume Builder Plans | FlowCreate',
-    description: 'FlowCreate is free forever. Upgrade for unlimited resumes and a generous AI allowance. Plans from ₹299/month. No hidden fees.',
+    title: 'Pricing — Free Resume Builder Plans | MakeCV',
+    description: 'MakeCV is free forever. Upgrade for unlimited resumes and a generous AI allowance. Plans from ₹299/month. No hidden fees.',
   });
 
   // FAQ structured data for Google rich snippets
@@ -151,10 +151,10 @@ const Pricing = () => {
       mainEntity: [
         {
           '@type': 'Question',
-          name: 'Is FlowCreate really free?',
+          name: 'Is MakeCV really free?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yes. FlowCreate has a permanently free plan that lets you create and download 1 resume with access to all templates. No credit card required.',
+            text: 'Yes. MakeCV has a permanently free plan that lets you create and download 1 resume with access to all templates. No credit card required.',
           },
         },
         {
@@ -178,7 +178,7 @@ const Pricing = () => {
           name: 'Do you offer a refund?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yes. We offer a full refund within 7 days of purchase if you are not satisfied with the premium features.',
+            text: 'Payments are final after activation. We investigate duplicate, fraudulent, technical capture, and legally required refund requests through support.',
           },
         },
         {
@@ -186,7 +186,7 @@ const Pricing = () => {
           name: 'Are the resume templates ATS-friendly?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yes. All FlowCreate templates are designed to pass through Applicant Tracking Systems (ATS) used by employers. They use clean formatting and standard fonts recognized by ATS software.',
+            text: 'Yes. All MakeCV templates are designed to pass through Applicant Tracking Systems (ATS) used by employers. They use clean formatting and standard fonts recognized by ATS software.',
           },
         },
       ],
@@ -270,7 +270,7 @@ const Pricing = () => {
               Simple, Transparent Pricing
             </h1>
             <p className="mt-6 text-xl text-muted-foreground">
-              FlowCreate is free for 1 resume, with Premium plans for unlimited resumes and generous AI allowances.
+              MakeCV is free for 1 resume, with Premium plans for unlimited resumes and generous AI allowances.
             </p>
           </div>
           </ScrollReveal>
@@ -407,7 +407,7 @@ const Pricing = () => {
               <div className="rounded-lg border p-6">
                 <h3 className="text-lg font-semibold mb-2">Is there a free trial?</h3>
                 <p className="text-muted-foreground">
-                  You can use FlowCreate for free with 1 resume save. This gives you a chance to 
+                  You can use MakeCV for free with 1 resume save. This gives you a chance to
                   explore all the basic features before deciding to upgrade.
                 </p>
               </div>

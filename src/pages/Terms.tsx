@@ -5,8 +5,8 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 
 const Terms = () => {
   usePageMeta({
-    title: 'Terms and Conditions - FlowCreate',
-    description: 'Read the terms and conditions for using the FlowCreate AI resume builder service.',
+    title: 'Terms and Conditions - MakeCV',
+    description: 'Read the terms and conditions for using the MakeCV AI resume builder service.',
   });
 
   return (
@@ -24,14 +24,14 @@ const Terms = () => {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">1. Acceptance of Terms</h2>
               <p className="mb-4">
-                By accessing and using FlowCreate ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+                By accessing and using MakeCV ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
               </p>
             </section>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">2. Service Description</h2>
               <p className="mb-4">
-                FlowCreate is an online resume building platform that provides:
+                MakeCV is an online resume building platform that provides:
               </p>
               <ul className="list-disc list-inside space-y-2">
                 <li>Professional resume templates</li>
@@ -61,8 +61,9 @@ const Terms = () => {
                 For Premium services:
               </p>
               <ul className="list-disc list-inside space-y-2">
-                <li>Monthly subscription: ₹199 per month</li>
-                <li>Annual subscription: ₹1999 per year</li>
+                <li>Monthly subscription: ₹299 per month or $5 per month, depending on checkout currency</li>
+                <li>Annual subscription: ₹2,499 per year or $39 per year, depending on checkout currency</li>
+                <li>Lifetime access: ₹4,999 or $79 as a one-time payment</li>
                 <li>All payments are processed securely through Razorpay</li>
                 <li>Subscriptions auto-renew unless cancelled</li>
                 <li><strong>No refunds are provided upon cancellation</strong></li>
@@ -73,7 +74,7 @@ const Terms = () => {
               <h2 className="text-2xl font-semibold mb-4">5. Refund and Cancellation Policy</h2>
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
                 <p className="text-red-800 dark:text-red-200 font-semibold">
-                  <strong>NO REFUNDS:</strong> All sales are final. We do not provide refunds for any subscription purchases, whether monthly or annual. Once payment is processed, no refund will be issued under any circumstances.
+                  <strong>NO VOLUNTARY REFUNDS:</strong> Payments are final after activation. We still investigate duplicate, fraudulent, failed-but-captured, and legally required refund requests.
                 </p>
               </div>
               <p className="mt-4">
@@ -84,7 +85,7 @@ const Terms = () => {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">6. Intellectual Property</h2>
               <p className="mb-4">
-                The Service and its original content, features, and functionality are owned by FlowCreate and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
+                The Service and its original content, features, and functionality are owned by MakeCV and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
               </p>
             </section>
 
@@ -119,7 +120,7 @@ const Terms = () => {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">10. Limitation of Liability</h2>
               <p className="mb-4">
-                In no event shall FlowCreate, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.
+                In no event shall MakeCV, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.
               </p>
             </section>
 
@@ -143,8 +144,8 @@ const Terms = () => {
                 If you have any questions about these Terms and Conditions, please contact us at:
               </p>
               <p className="mt-2">
-                <strong>Email:</strong> legal@flowcreate.com<br />
-                <strong>Support:</strong> support@flowcreate.com
+                <strong>Email:</strong> support.makecv@gmail.com<br />
+                <strong>Support:</strong> support.makecv@gmail.com
               </p>
             </section>
 

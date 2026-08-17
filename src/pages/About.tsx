@@ -6,11 +6,12 @@ import { Link } from 'react-router-dom';
 import { Heart, Sparkles, Shield, Zap, ArrowRight, User, Mail } from 'lucide-react';
 import { ScrollReveal } from '@/hooks/useScrollAnimation';
 import { usePageMeta } from '@/hooks/usePageMeta';
+import { brand, historicalBrandPhrase } from '@/config/brand';
 
 const About = () => {
   usePageMeta({
-    title: 'About Us - FlowCreate',
-    description: 'FlowCreate is a free online resume builder. Our premium plans with AI-powered features help cover API costs and keep the platform running for everyone.',
+    title: 'About Us - MakeCV',
+    description: 'MakeCV, founded by Nishant Jha, is a free online resume builder with AI-powered tools for professional applications.',
   });
 
   return (
@@ -21,7 +22,7 @@ const About = () => {
           <ScrollReveal>
           <div className="max-w-3xl mx-auto text-center mb-16">
             <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl mb-6">
-              About FlowCreate
+              About MakeCV
             </h1>
             <p className="text-xl text-muted-foreground">
               A free online resume builder with AI-powered features — built to help everyone create professional resumes that land interviews.
@@ -34,7 +35,7 @@ const About = () => {
               <ScrollReveal delay={50}>
               <h2 className="text-3xl font-bold mt-12 mb-6">Our Mission</h2>
               <p className="text-lg mb-6">
-                FlowCreate was born from a simple belief: creating a professional resume shouldn't require expensive software 
+                {historicalBrandPhrase} was born from a simple belief: creating a professional resume shouldn't require expensive software
                 or design skills. Our mission is to make high-quality resume building accessible to everyone — job seekers, 
                 career changers, and professionals at every stage.
               </p>
@@ -77,7 +78,7 @@ const About = () => {
               <ScrollReveal delay={100}>
               <h2 className="text-3xl font-bold mt-12 mb-6">Our Story</h2>
               <p className="text-lg mb-6">
-                FlowCreate began as a passion project by a solo developer who was frustrated with the state of online 
+                MakeCV began as a passion project by a solo developer who was frustrated with the state of online
                 resume builders. Most platforms were either expensive subscription services or offered severely limited 
                 free versions that produced unprofessional-looking results.
               </p>
@@ -90,7 +91,7 @@ const About = () => {
                 As we grew, we added AI-powered features — smart content suggestions, auto-formatting, and 
                 ATS optimization — to help users create even better resumes faster. These AI capabilities come 
                 with real API costs, which is why we introduced affordable premium plans. Every subscription helps 
-                us pay for the infrastructure, AI services, and ongoing improvements that keep FlowCreate running.
+                us pay for the infrastructure, AI services, and ongoing improvements that keep MakeCV running.
               </p>
               </ScrollReveal>
 
@@ -133,7 +134,7 @@ const About = () => {
                 more interviews.
               </p>
               <p className="text-lg mb-6">
-                Thank you for trusting FlowCreate with your career journey. Whether you're building your first resume 
+                Thank you for trusting MakeCV with your career journey. Whether you're building your first resume
                 or your fiftieth, we're honored to be part of your story.
               </p>
               </ScrollReveal>
@@ -146,19 +147,27 @@ const About = () => {
                 </h3>
                 <div className="text-center mb-2">
                   <span className="font-bold text-lg text-foreground">
-                    Nishant
+                    Nishant Jha
                   </span>
                 </div>
                 <div className="flex flex-col items-center space-y-1 mb-4">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Mail className="h-5 w-5" />
                     <a 
-                      href="mailto:hinishaant@gmail.com"
+                      href={`mailto:${brand.supportEmail}`}
                       className="text-primary underline hover:text-primary/80"
                     >
-                      hinishaant@gmail.com
+                      {brand.supportEmail}
                     </a>
                   </div>
+                  <a
+                    href={brand.linkedInUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary underline hover:text-primary/80"
+                  >
+                    Connect with Nishant on LinkedIn
+                  </a>
                 </div>
                 <p className="text-base text-muted-foreground text-center italic">
                   "My mission is to empower job seekers globally by providing a free, professional resume builder — with premium AI tools for those who want an extra edge."

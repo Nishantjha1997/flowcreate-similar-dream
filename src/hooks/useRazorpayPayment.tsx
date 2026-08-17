@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,11 +7,19 @@ import { captureError } from '@/lib/monitoring';
 import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 
 interface PaymentOptions {
-  amount: number; // in paise
-  currency?: string;
+  amount: number;
+  currency?: 'INR' | 'USD';
   description?: string;
-  planType?: string;
+  planType?: 'monthly' | 'yearly' | 'lifetime';
 }
+
+type CheckoutData = {
+  key_id: string;
+  amount: number;
+  currency: string;
+  order_id?: string;
+  subscription_id?: string;
+};
 
 export const useRazorpayPayment = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -21,130 +28,69 @@ export const useRazorpayPayment = () => {
 
   const initiatePayment = async (options: PaymentOptions) => {
     if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to purchase a subscription.",
-        variant: "destructive"
-      });
+      toast({ title: 'Authentication required', description: 'Please log in to purchase a subscription.', variant: 'destructive' });
       return;
     }
-
     if (!isLoaded) {
-      toast({
-        title: "Payment system loading",
-        description: "Please wait for the payment system to load.",
-        variant: "default"
-      });
+      toast({ title: 'Payment system loading', description: 'Please wait for the payment system to load.' });
       return;
     }
-
     setIsProcessing(true);
-
+    const planType = options.planType ?? 'monthly';
+    const isRecurring = planType === 'monthly' || planType === 'yearly';
     try {
-      console.log('Initiating payment with options:', options);
+      const { data, error } = await supabase.functions.invoke(
+        isRecurring ? 'create-razorpay-subscription' : 'create-razorpay-order',
+        { body: { planType, currency: options.currency ?? 'INR' } },
+      );
+      if (error) throw new Error(await getEdgeFunctionErrorMessage(error, 'Failed to create payment checkout'));
+      const checkout: CheckoutData = data;
+      if (!checkout.key_id || (!checkout.order_id && !checkout.subscription_id)) throw new Error('Payment checkout response was incomplete');
 
-      // Create order via Supabase edge function (amount is determined server-side)
-      const { data: orderData, error: orderError } = await supabase.functions.invoke('create-razorpay-order', {
-        body: {
-          planType: options.planType || 'monthly'
-        }
-      });
-
-      if (orderError) {
-        console.error('Order creation error:', orderError);
-        throw new Error(await getEdgeFunctionErrorMessage(orderError, 'Failed to create payment order'));
-      }
-
-      console.log('Order created successfully:', orderData);
-
-      const { order_id, amount, currency, key_id } = orderData;
-
-      // Configure Razorpay options
       const razorpayOptions = {
-        key: key_id,
-        amount: amount,
-        currency: currency,
-        name: 'FlowCreate',
-        description: options.description || 'Premium Subscription',
-        order_id: order_id,
-        prefill: {
-          email: user.email,
-          name: user.user_metadata?.full_name || user.email
-        },
-        theme: {
-          color: '#3B82F6'
-        },
-        handler: async (response: any) => {
+        key: checkout.key_id,
+        amount: checkout.amount,
+        currency: checkout.currency,
+        name: 'MakeCV',
+        description: options.description || `MakeCV ${planType} plan`,
+        ...(isRecurring ? { subscription_id: checkout.subscription_id } : { order_id: checkout.order_id }),
+        prefill: { email: user.email, name: user.user_metadata?.full_name || user.email },
+        theme: { color: '#3B82F6' },
+        handler: async (response: Record<string, string>) => {
           try {
-            console.log('Payment completed, verifying:', response);
-            
-            // Verify payment via Supabase edge function
-            const { data: verificationData, error: verificationError } = await supabase.functions.invoke('verify-razorpay-payment', {
-              body: {
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-                planType: options.planType || 'monthly'
-              }
-            });
-
-            if (verificationError) {
-              console.error('Payment verification error:', verificationError);
-              throw new Error(await getEdgeFunctionErrorMessage(verificationError, 'Payment verification failed'));
-            }
-
-            console.log('Payment verification successful:', verificationData);
-
-            toast({
-              title: "Payment Successful!",
-              description: "Your premium subscription has been activated.",
-              variant: "default"
-            });
-
-            // Refresh the page to update user status
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
+            const verifyFunction = isRecurring ? 'verify-razorpay-subscription' : 'verify-razorpay-payment';
+            const verifyBody = isRecurring
+              ? {
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_subscription_id: response.razorpay_subscription_id || checkout.subscription_id,
+                  razorpay_signature: response.razorpay_signature,
+                }
+              : {
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id || checkout.order_id,
+                  razorpay_signature: response.razorpay_signature,
+                  planType,
+                };
+            const { error: verificationError } = await supabase.functions.invoke(verifyFunction, { body: verifyBody });
+            if (verificationError) throw new Error(await getEdgeFunctionErrorMessage(verificationError, 'Payment verification failed'));
+            toast({ title: 'Payment Successful!', description: isRecurring ? 'Your subscription is active.' : 'Your premium access has been activated.' });
+            window.setTimeout(() => window.location.reload(), 1000);
           } catch (error) {
-            console.error('Payment verification failed:', error);
             captureError(error, { context: 'payment_verification' });
-            toast({
-              title: "Payment verification failed",
-              description: "Please contact support if your payment was deducted. Error: " + (error instanceof Error ? error.message : 'Unknown error'),
-              variant: "destructive"
-            });
+            toast({ title: 'Payment verification failed', description: `Please contact support if your payment was deducted. ${error instanceof Error ? error.message : ''}`, variant: 'destructive' });
           }
         },
-        modal: {
-          ondismiss: () => {
-            toast({
-              title: "Payment cancelled",
-              description: "You can try again anytime.",
-              variant: "default"
-            });
-          }
-        }
+        modal: { ondismiss: () => toast({ title: 'Payment cancelled', description: 'You can try again anytime.' }) },
       };
-
-      // Open Razorpay checkout
       const rzp = new window.Razorpay(razorpayOptions);
       rzp.open();
-
     } catch (error) {
-      console.error('Payment initiation failed:', error);
       captureError(error, { context: 'payment_initiation' });
-      toast({
-        title: "Payment failed",
-        description: "Unable to initiate payment. Please try again. Error: " + (error instanceof Error ? error.message : 'Unknown error'),
-        variant: "destructive"
-      });
+      toast({ title: 'Payment failed', description: `Unable to initiate payment. ${error instanceof Error ? error.message : ''}`, variant: 'destructive' });
     } finally {
       setIsProcessing(false);
     }
   };
 
-  return {
-    initiatePayment,
-    isProcessing
-  };
+  return { initiatePayment, isProcessing };
 };

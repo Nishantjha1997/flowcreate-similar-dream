@@ -2647,7 +2647,7 @@ export const templateMockData: Record<string, ResumeData> = {
     customization: { primaryColor: '#059669', fontSize: 'medium', spacing: 'normal' },
   },
 
-  // ─── FlowCreate Studio collection mock data ───────────────────
+  // ─── MakeCV Studio collection mock data ───────────────────
 
   'atlantic-blue': {
     personal: {

@@ -10,7 +10,6 @@ import { RazorpayProvider } from "./components/RazorpayProvider";
 import { LoadingFallback } from "./components/ui/loading-fallback";
 import { ErrorBoundary } from "./components/ui/error-boundary";
 import { DesignModeProvider } from "./hooks/useDesignMode";
-import SplashScreen from "./components/SplashScreen";
 import ScrollProgress from "./components/ScrollProgress";
 // Lazy load pages for better initial bundle size
 const Index = lazy(() => import("./pages/Index"));
@@ -69,7 +68,6 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <>
-    <SplashScreen />
     <ScrollProgress />
     <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="light">
@@ -96,7 +94,7 @@ const App = () => (
                       <Route path="/forgot-password" element={<ForgotPassword />} />
                       <Route path="/account" element={<Account />} />
                       <Route path="/account/settings" element={<AccountSettings />} />
-                      <Route path="/admin" element={<Admin />} />
+                      <Route path="/admin/:section?" element={<Admin />} />
                       <Route path="/terms" element={<Terms />} />
                       <Route path="/privacy" element={<Privacy />} />
                       <Route path="/refund-policy" element={<RefundPolicy />} />

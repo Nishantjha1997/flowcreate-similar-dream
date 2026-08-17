@@ -22,6 +22,7 @@ interface SuggestionRequest {
 export async function fetchGeminiSuggestions(request: SuggestionRequest): Promise<string[]> {
   const prompts = generateContextualPrompts(request);
   const suggestions: string[] = [];
+  const failures: string[] = [];
 
   // Fetch multiple suggestions in parallel using supabase.functions.invoke (handles auth + CORS automatically)
   const suggestionPromises = prompts.map(async (prompt) => {
@@ -40,6 +41,7 @@ export async function fetchGeminiSuggestions(request: SuggestionRequest): Promis
       throw new Error(data?.error || "No suggestion returned from AI");
     } catch (error) {
       console.error("[Gemini] Individual suggestion error:", error);
+      if (error instanceof Error && error.message) failures.push(error.message);
       return null;
     }
   });
@@ -53,7 +55,7 @@ export async function fetchGeminiSuggestions(request: SuggestionRequest): Promis
   });
 
   if (suggestions.length === 0) {
-    throw new Error("Failed to generate any suggestions. Please try again.");
+    throw new Error(failures[0] || "Failed to generate any suggestions. Please try again.");
   }
 
   return suggestions;

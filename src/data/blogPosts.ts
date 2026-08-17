@@ -20,7 +20,7 @@ export const blogPosts: BlogPost[] = [
     description: 'Learn how to write an ATS-friendly resume that passes automated screening. Tips on formatting, keywords, and structure to get your resume seen by recruiters.',
     category: 'Resume Tips',
     date: '2025-07-10',
-    author: 'FlowCreate Team',
+    author: 'MakeCV Team',
     imageUrl: '',
     readTime: '6 min read',
     keywords: ['ATS resume tips', 'applicant tracking system', 'resume optimization', 'ATS friendly resume', 'resume keywords'],
@@ -36,16 +36,16 @@ export const blogPosts: BlogPost[] = [
 <p>Stick to conventional headings: "Work Experience," "Education," "Skills," "Certifications." Creative headings like "Where I've Been" or "My Toolbox" confuse ATS parsers.</p>
 
 <h3>2. Avoid Tables, Columns, and Graphics</h3>
-<p>ATS software struggles with multi-column layouts, embedded images, and text boxes. A single-column layout with clear section breaks is safest. FlowCreate templates are built with this in mind — every template passes ATS parsing tests.</p>
+<p>ATS software struggles with multi-column layouts, embedded images, and text boxes. A single-column layout with clear section breaks is safest. MakeCV templates are built with this in mind — every template passes ATS parsing tests.</p>
 
 <h3>3. Include Keywords from the Job Description</h3>
 <p>The ATS compares your resume against the job posting. If the job asks for "project management" and you wrote "managed projects," you might not match. Mirror the exact language from the job description where possible — but do it naturally.</p>
 
 <h3>4. Use Standard Fonts</h3>
-<p>Stick to Arial, Helvetica, Calibri, Georgia, or Times New Roman. Decorative fonts may not render correctly in ATS parsers. All FlowCreate templates use web-safe font stacks with proper fallbacks.</p>
+<p>Stick to Arial, Helvetica, Calibri, Georgia, or Times New Roman. Decorative fonts may not render correctly in ATS parsers. All MakeCV templates use web-safe font stacks with proper fallbacks.</p>
 
 <h3>5. Submit as PDF or DOCX (Check the Posting)</h3>
-<p>Most modern ATS systems handle PDFs well, but some older systems prefer .docx. If the job posting specifies a format, follow it. FlowCreate exports clean, machine-readable PDFs optimized for ATS parsing.</p>
+<p>Most modern ATS systems handle PDFs well, but some older systems prefer .docx. If the job posting specifies a format, follow it. MakeCV exports clean, machine-readable PDFs optimized for ATS parsing.</p>
 
 <h3>6. Don't Put Critical Info in Headers or Footers</h3>
 <p>Many ATS systems ignore content in headers and footers. Keep your contact information in the body of the resume, not in the header.</p>
@@ -53,8 +53,8 @@ export const blogPosts: BlogPost[] = [
 <h3>7. Spell Out Acronyms on First Use</h3>
 <p>Write "Search Engine Optimization (SEO)" the first time, then "SEO" after that. This ensures both the full term and the acronym are captured by the ATS.</p>
 
-<h2>How FlowCreate Helps</h2>
-<p>All FlowCreate templates are tested for ATS compatibility. We avoid multi-column layouts that confuse parsers, use standard section headings, and generate clean PDFs that pass through ATS systems smoothly. <a href="/resume-builder">Try building your ATS-friendly resume now</a> — it's free.</p>`,
+<h2>How MakeCV Helps</h2>
+<p>All MakeCV templates are tested for ATS compatibility. We avoid multi-column layouts that confuse parsers, use standard section headings, and generate clean PDFs that pass through ATS systems smoothly. <a href="/resume-builder">Try building your ATS-friendly resume now</a> — it's free.</p>`,
   },
   {
     slug: 'resume-mistakes-to-avoid',
@@ -63,7 +63,7 @@ export const blogPosts: BlogPost[] = [
     description: 'Avoid these 10 common resume mistakes that cause instant rejection. Learn what recruiters hate and how to fix your resume for better results.',
     category: 'Resume Tips',
     date: '2025-07-08',
-    author: 'FlowCreate Team',
+    author: 'MakeCV Team',
     imageUrl: '',
     readTime: '7 min read',
     keywords: ['resume mistakes', 'common resume errors', 'resume tips', 'job application tips', 'resume advice'],
@@ -91,13 +91,13 @@ export const blogPosts: BlogPost[] = [
 <p>"Seeking a challenging position at a growth-oriented company" says nothing. Either skip the objective entirely or write a targeted professional summary that speaks to the specific role.</p>
 
 <h2>8. Inconsistent Formatting</h2>
-<p>Mixed fonts, inconsistent spacing, dates that switch formats — these make your resume look sloppy. Using a template (like FlowCreate's) ensures consistency throughout.</p>
+<p>Mixed fonts, inconsistent spacing, dates that switch formats — these make your resume look sloppy. Using a template (like MakeCV's) ensures consistency throughout.</p>
 
 <h2>9. Including Irrelevant Information</h2>
 <p>Your high school job from 15 years ago probably doesn't belong on your senior-level resume. Every line should earn its place. If it doesn't support the job you're targeting, cut it.</p>
 
 <h2>10. Not Tailoring Your Resume</h2>
-<p>Sending the same resume to every job is the biggest missed opportunity. Adjust your skills section, reorder bullet points, and tweak your summary to match each job description. <a href="/resume-builder">FlowCreate makes it easy to create and customize multiple versions</a> of your resume.</p>`,
+<p>Sending the same resume to every job is the biggest missed opportunity. Adjust your skills section, reorder bullet points, and tweak your summary to match each job description. <a href="/resume-builder">MakeCV makes it easy to create and customize multiple versions</a> of your resume.</p>`,
   },
   {
     slug: 'resume-keywords-by-industry',
@@ -106,7 +106,7 @@ export const blogPosts: BlogPost[] = [
     description: 'Industry-specific resume keywords that help you pass ATS screening and get noticed by recruiters. Covers tech, finance, healthcare, marketing, and engineering.',
     category: 'Career Advice',
     date: '2025-07-05',
-    author: 'FlowCreate Team',
+    author: 'MakeCV Team',
     imageUrl: '',
     readTime: '8 min read',
     keywords: ['resume keywords', 'ATS keywords', 'industry resume tips', 'resume optimization', 'job search keywords'],
@@ -148,7 +148,7 @@ export const blogPosts: BlogPost[] = [
 <li><strong>Metrics:</strong> "led team of X," "$Y budget," "Z% efficiency improvement"</li>
 <li><strong>Soft skills:</strong> cross-functional leadership, stakeholder management, executive presentations</li></ul>
 
-<p><strong>Pro tip:</strong> Don't just list keywords — weave them into achievement-based bullet points. Instead of "Python, AWS" write "Built a Python-based data pipeline on AWS Lambda, processing 10M events/day." Use <a href="/resume-builder">FlowCreate's AI suggestions</a> to automatically optimize your resume for your target industry.</p>`,
+<p><strong>Pro tip:</strong> Don't just list keywords — weave them into achievement-based bullet points. Instead of "Python, AWS" write "Built a Python-based data pipeline on AWS Lambda, processing 10M events/day." Use <a href="/resume-builder">MakeCV's AI suggestions</a> to automatically optimize your resume for your target industry.</p>`,
   },
   {
     slug: 'free-vs-paid-resume-builders',
@@ -157,7 +157,7 @@ export const blogPosts: BlogPost[] = [
     description: 'Honest comparison of free vs paid resume builders. Learn when free is enough and when upgrading to premium features actually helps you land more interviews.',
     category: 'Career Advice',
     date: '2025-07-02',
-    author: 'FlowCreate Team',
+    author: 'MakeCV Team',
     imageUrl: '',
     readTime: '5 min read',
     keywords: ['best free resume builder', 'paid resume builder', 'resume builder comparison', 'free resume maker', 'premium resume features'],
@@ -169,7 +169,7 @@ export const blogPosts: BlogPost[] = [
 <li><strong>PDF export</strong> — the essential format for job applications</li>
 <li><strong>Basic editing</strong> — fill-in-the-blank sections for experience, education, skills</li>
 <li><strong>1 saved resume</strong> — enough if you're targeting one type of role</li></ul>
-<p>FlowCreate's free plan includes all of this, plus access to every template in our library. You can create a professional, ATS-friendly resume without spending anything.</p>
+<p>MakeCV's free plan includes all of this, plus access to every template in our library. You can create a professional, ATS-friendly resume without spending anything.</p>
 
 <h2>When to Consider a Premium Plan</h2>
 <p>Premium features become valuable when:</p>
@@ -180,9 +180,9 @@ export const blogPosts: BlogPost[] = [
 <li><strong>You're in a competitive industry</strong> (consulting, tech, finance) — premium templates give you a design edge</li></ul>
 
 <h2>The Verdict</h2>
-<p>For most job seekers, a free resume builder is <strong>completely sufficient</strong>. You can create a polished, ATS-friendly resume in under 30 minutes without paying a dime. FlowCreate's free plan gives you everything you need to build and download a professional resume.</p>
-<p>Premium plans are worth it if you're job searching aggressively, targeting multiple industries, or want AI assistance to optimize your content. At ₹299/month, FlowCreate Premium pays for itself the moment it helps you land one better interview.</p>
-<p><a href="/pricing">Compare FlowCreate plans</a> or <a href="/resume-builder">start building for free</a>.</p>`,
+<p>For most job seekers, a free resume builder is <strong>completely sufficient</strong>. You can create a polished, ATS-friendly resume in under 30 minutes without paying a dime. MakeCV's free plan gives you everything you need to build and download a professional resume.</p>
+<p>Premium plans are worth it if you're job searching aggressively, targeting multiple industries, or want AI assistance to optimize your content. At ₹299/month, MakeCV Premium pays for itself the moment it helps you land one better interview.</p>
+<p><a href="/pricing">Compare MakeCV plans</a> or <a href="/resume-builder">start building for free</a>.</p>`,
   },
   {
     slug: 'career-change-resume-guide',
@@ -191,7 +191,7 @@ export const blogPosts: BlogPost[] = [
     description: 'Complete guide to writing a career change resume. Learn how to reframe your experience, identify transferable skills, and convince employers to take a chance on you.',
     category: 'Career Advice',
     date: '2025-06-28',
-    author: 'FlowCreate Team',
+    author: 'MakeCV Team',
     imageUrl: '',
     readTime: '7 min read',
     keywords: ['career change resume', 'career pivot', 'transferable skills', 'changing industries', 'resume for career changers'],
@@ -214,11 +214,11 @@ export const blogPosts: BlogPost[] = [
 <p>Fill gaps with certifications (Coursera, LinkedIn Learning, industry credentials) and side projects. A marketer pivoting to UX could add: "Completed Google UX Design Certificate; redesigned local nonprofit's donation flow, increasing conversion by 40%."</p>
 
 <h2>5. Use a Skills-Based or Hybrid Resume Format</h2>
-<p>If your work history doesn't directly relate to your target role, consider a hybrid format that leads with a "Relevant Skills" section before your chronological work history. FlowCreate templates support custom section ordering so you can put your strongest content first.</p>
+<p>If your work history doesn't directly relate to your target role, consider a hybrid format that leads with a "Relevant Skills" section before your chronological work history. MakeCV templates support custom section ordering so you can put your strongest content first.</p>
 
 <h2>6. Address the Career Change Directly in Your Cover Letter</h2>
 <p>Your resume shows what you've done; your cover letter explains why you're changing. Be honest, enthusiastic, and specific about why this new path excites you and why your unique background is an asset, not a liability.</p>
 
-<p>Ready to make the leap? <a href="/resume-builder">Build your career-change resume for free on FlowCreate</a> — choose from 30+ templates and customize every section to tell your story.</p>`,
+<p>Ready to make the leap? <a href="/resume-builder">Build your career-change resume for free on MakeCV</a> — choose from 30+ templates and customize every section to tell your story.</p>`,
   },
 ];

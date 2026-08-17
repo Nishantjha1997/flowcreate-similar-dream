@@ -1,6 +1,6 @@
 {
-  "name": "FlowCreate - Resume Builder",
-  "short_name": "FlowCreate",
+  "name": "MakeCV - Resume Builder",
+  "short_name": "MakeCV",
   "description": "Build a professional, ATS-friendly resume online for free.",
   "start_url": "/",
   "display": "standalone",
@@ -12,6 +12,12 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ]
 }

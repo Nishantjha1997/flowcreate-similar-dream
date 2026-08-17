@@ -63,7 +63,7 @@ const StatsSection = () => {
               <div className="col-span-1 md:col-span-1 flex flex-col justify-center">
                 <h3 className="text-2xl font-bold text-foreground mb-4">Our Users Work At</h3>
                 <p className="text-muted-foreground">
-                  FlowCreate resumes are recognized and preferred by hiring managers at top companies worldwide
+                  MakeCV resumes are recognized and preferred by hiring managers at top companies worldwide
                 </p>
               </div>
               <div className="col-span-1 md:col-span-2">

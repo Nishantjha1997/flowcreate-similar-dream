@@ -33,6 +33,7 @@ interface Organization {
   id: string;
   name: string;
   slug: string;
+  description: string | null;
 }
 
 const ATSPublicJobs = () => {
@@ -50,7 +51,7 @@ const ATSPublicJobs = () => {
     title: organization ? `Open Jobs at ${organization.name}` : 'Browse Open Jobs',
     description: organization
       ? `Browse current job openings at ${organization.name} and apply online.`
-      : 'Browse current job openings published by hiring teams using FlowCreate ATS.',
+      : 'Browse current job openings published by hiring teams using MakeCV ATS.',
     canonicalPath: '/ats/jobs/browse',
   });
 

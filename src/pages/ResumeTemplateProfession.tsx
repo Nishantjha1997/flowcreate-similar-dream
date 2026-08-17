@@ -16,7 +16,7 @@ const ResumeTemplateProfession = () => {
   const data = professions.find((p) => p.slug === profession);
 
   usePageMeta({
-    title: data ? `${data.title} | FlowCreate` : 'Resume Templates by Profession',
+    title: data ? `${data.title} | MakeCV` : 'Resume Templates by Profession',
     description: data?.description || 'Browse free resume templates tailored for your profession. ATS-optimized, professional designs with instant PDF download.',
     noindex: !data,
   });
@@ -43,7 +43,7 @@ const ResumeTemplateProfession = () => {
           name: data.title,
           description: data.description,
           category: data.category,
-          brand: { '@type': 'Brand', name: 'FlowCreate' },
+          brand: { '@type': 'Brand', name: 'MakeCV' },
           offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', availability: 'https://schema.org/InStock' },
         },
       ],
@@ -237,7 +237,7 @@ const ResumeTemplateProfession = () => {
           <div className="max-w-4xl mx-auto bg-[hsl(var(--surface-dark))] rounded-3xl p-10 md:p-16 text-center text-white">
             <h2 className="text-3xl font-bold mb-4">Ready to Build Your Resume?</h2>
             <p className="text-lg text-white/70 mb-8 max-w-xl mx-auto">
-              Join thousands of job seekers who landed interviews with a FlowCreate resume. Free, fast, and professional.
+              Join thousands of job seekers who landed interviews with a MakeCV resume. Free, fast, and professional.
             </p>
             <Link to={`/resume-builder?template=${data.templateKey}`}>
               <Button size="lg" variant="secondary" className="rounded-full px-8 h-12 text-base">

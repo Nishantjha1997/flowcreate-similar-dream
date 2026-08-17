@@ -37,7 +37,7 @@ const Blog = () => {
 
   usePageMeta({
     title: 'Resume Tips & Career Advice Blog',
-    description: 'Expert resume writing tips, career advice, and job search strategies. Learn how to build better resumes and land more interviews with FlowCreate.',
+    description: 'Expert resume writing tips, career advice, and job search strategies. Learn how to build better resumes and land more interviews with MakeCV.',
   });
 
   const filtered = blogPosts.filter((post) => {

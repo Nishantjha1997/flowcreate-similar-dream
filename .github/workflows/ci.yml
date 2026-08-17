@@ -27,9 +27,21 @@ jobs:
         
       - name: Type check
         run: npx tsc --noEmit -p tsconfig.app.json
-        
+
+      - name: Lint
+        run: npm run lint -- --quiet
+
       - name: Run tests
         run: npm run test
-        
+
+      - name: Blog automation smoke test
+        run: npm run test:blog
+
+      - name: Edge function syntax check
+        run: npm run test:edge
+
       - name: Build
         run: npm run build
+
+      - name: Validate generated SEO artifacts
+        run: npm run seo:validate

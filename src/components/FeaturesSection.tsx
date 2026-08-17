@@ -2,14 +2,14 @@ import { CheckCircle, Edit3, FileText, Layout, Shield, Zap, Award, Bot } from 'l
 import { useDesignMode } from '@/hooks/useDesignMode';
 
 const features = [
-  { title: "ATS-Optimized", description: "Templates designed to pass Applicant Tracking Systems and reach hiring managers.", icon: Layout, nbColor: "bg-[#3B82F6]" },
-  { title: "AI Assistant", description: "Smart suggestions to improve your content and highlight achievements effectively.", icon: Bot, nbColor: "bg-[#A855F7]" },
-  { title: "Easy Customization", description: "Personalize your resume with intuitive drag-and-drop. No design skills needed.", icon: Edit3, nbColor: "bg-[#22C55E]" },
-  { title: "Expert Content", description: "Industry-specific suggestions written and approved by hiring managers.", icon: CheckCircle, nbColor: "bg-[#14B8A6]" },
-  { title: "Multiple Formats", description: "Download as PDF, DOCX, or TXT to use with any application system.", icon: FileText, nbColor: "bg-[#F97316]" },
-  { title: "Privacy Protected", description: "Your personal data is fully encrypted and never shared with third parties.", icon: Shield, nbColor: "bg-[#EF4444]" },
-  { title: "Quick & Easy", description: "Build and download your professional resume in less than 15 minutes.", icon: Zap, nbColor: "bg-[#F59E0B]" },
-  { title: "Achievement Focused", description: "Tools to help you quantify and showcase accomplishments that stand out.", icon: Award, nbColor: "bg-[#6366F1]" },
+  { title: "ATS-readable", description: "Clean hierarchy and proven layouts help your experience stay readable from upload to recruiter screen.", icon: Layout, nbColor: "bg-[#3B82F6]" },
+  { title: "Role-aware AI", description: "Get focused rewrites that bring out impact, keywords, and evidence without inventing your story.", icon: Bot, nbColor: "bg-[#A855F7]" },
+  { title: "Easy to shape", description: "Edit your story in a calm, guided builder with templates that do the visual heavy lifting.", icon: Edit3, nbColor: "bg-[#22C55E]" },
+  { title: "Match guidance", description: "Compare your resume with a job description and see what to strengthen before you apply.", icon: CheckCircle, nbColor: "bg-[#14B8A6]" },
+  { title: "One-click export", description: "Download PDF, DOCX, or TXT versions ready for the application system in front of you.", icon: FileText, nbColor: "bg-[#F97316]" },
+  { title: "Private by design", description: "Your career story stays in your account and is never used as public content without your action.", icon: Shield, nbColor: "bg-[#EF4444]" },
+  { title: "Fast first draft", description: "Go from blank page to a polished foundation in minutes, not a weekend of formatting.", icon: Zap, nbColor: "bg-[#F59E0B]" },
+  { title: "Impact first", description: "Turn responsibilities into clear accomplishments with stronger verbs and meaningful outcomes.", icon: Award, nbColor: "bg-[#6366F1]" },
 ];
 
 const FeaturesSection = () => {
@@ -50,7 +50,7 @@ const FeaturesSection = () => {
             Built for <span className="text-muted-foreground">impact.</span>
           </h2>
           <p className="apple-subheadline mx-auto">
-            Everything you need to create a resume that gets you noticed.
+            Everything you need to make the next application count.
           </p>
         </div>
         

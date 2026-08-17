@@ -25,8 +25,8 @@ const Templates = () => {
   const [activeTab, setActiveTab] = useState("all");
 
   const pageTitle = selectedCategory === "All" 
-    ? "Resume Templates - FlowCreate" 
-    : `${selectedCategory} Resume Templates - FlowCreate`;
+    ? "Resume Templates - MakeCV"
+    : `${selectedCategory} Resume Templates - MakeCV`;
 
   usePageMeta({
     title: pageTitle,

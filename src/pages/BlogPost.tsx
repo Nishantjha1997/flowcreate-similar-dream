@@ -58,8 +58,8 @@ const BlogPost = () => {
   });
 
   usePageMeta({
-    title: post ? `${post.title} | FlowCreate Blog` : 'Blog Post',
-    description: post?.description || 'Resume tips and career advice from FlowCreate.',
+    title: post ? `${post.title} | MakeCV Blog` : 'Blog Post',
+    description: post?.description || 'Resume tips and career advice from MakeCV.',
     noindex: !isLoading && (isError || !post),
     type: 'article',
     image: post?.image_url || '/og-image.png',
@@ -103,10 +103,10 @@ const BlogPost = () => {
           description: post.description,
           datePublished: post.published_at || post.created_at,
           dateModified: post.published_at || post.created_at,
-          author: { '@type': 'Person', name: post.author || 'FlowCreate Team' },
+          author: { '@type': 'Person', name: post.author || 'MakeCV Team' },
           publisher: {
             '@type': 'Organization',
-            name: 'FlowCreate',
+            name: 'MakeCV',
             url: SITE_URL,
           },
           mainEntityOfPage: { '@type': 'WebPage', '@id': absoluteUrl(`/blog/${post.slug}`) },

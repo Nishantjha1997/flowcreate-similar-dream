@@ -77,7 +77,7 @@ export async function notifyUser(admin: SupabaseClient, params: NotifyParams): P
     const { data: userResp } = await admin.auth.admin.getUserById(user_id)
     const email = userResp?.user?.email
     if (email) {
-      const from = Deno.env.get('NOTIFY_FROM_EMAIL') ?? 'FlowCreate <onboarding@resend.dev>'
+      const from = Deno.env.get('NOTIFY_FROM_EMAIL') ?? 'MakeCV <onboarding@resend.dev>'
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -94,7 +94,7 @@ export async function notifyUser(admin: SupabaseClient, params: NotifyParams): P
               <p style="color: #444; line-height: 1.6;">${body ?? ''}</p>
               ${action_url ? `<p><a href="${action_url}" style="background:#6366f1;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;">View details</a></p>` : ''}
               <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
-              <p style="color:#999;font-size:12px;">You can change your notification preferences in your FlowCreate account settings.</p>
+              <p style="color:#999;font-size:12px;">You can change your notification preferences in your MakeCV account settings.</p>
             </div>`,
         }),
       })

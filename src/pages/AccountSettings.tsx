@@ -209,7 +209,7 @@ const AccountSettings = () => {
 
           <div className="lg:col-span-3">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8">
                 <TabsTrigger value="personal">
                   <User className="w-4 h-4 mr-1" />
                   Personal

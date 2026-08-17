@@ -37,7 +37,7 @@ export function useFieldValidation() {
 
   const validatePhone = (phone: string): string | undefined => {
     if (!phone) return 'Phone number is required';
-    if (!/^[\+]?[1-9][\d]{0,15}$/.test(phone.replace(/[\s\-\(\)]/g, ''))) {
+    if (!/^[+]?[1-9][\d]{0,15}$/.test(phone.replace(/[\s()-]/g, ''))) {
       return 'Please enter a valid phone number';
     }
     return undefined;

@@ -202,7 +202,7 @@ serve(async (req) => {
         await notify(
           admin, userId, 'billing_payment_success',
           'Payment successful',
-          `Your ${planSlug} plan is now active. Welcome to FlowCreate Pro!`
+          `Your ${planSlug} plan is now active. Welcome to MakeCV Pro!`
         )
         break
       }

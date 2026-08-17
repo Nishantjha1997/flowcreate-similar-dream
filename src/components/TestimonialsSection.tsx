@@ -2,10 +2,10 @@ import { Star } from 'lucide-react';
 import { useDesignMode } from '@/hooks/useDesignMode';
 
 const testimonials = [
-  { quote: "FlowCreate helped me land my dream job. The ATS-friendly templates made my resume stand out from the competition.", author: "Sarah Johnson", role: "Product Manager", company: "Google", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887" },
+  { quote: "MakeCV helped me land my dream job. The ATS-friendly templates made my resume stand out from the competition.", author: "Sarah Johnson", role: "Product Manager", company: "Google", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887" },
   { quote: "I created a professional resume in just 30 minutes. The AI suggestions were incredibly helpful and spot-on.", author: "Michael Chen", role: "Software Engineer", company: "Microsoft", image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1887" },
   { quote: "The AI writer helped me highlight achievements I never could on my own. Highly recommended to everyone.", author: "Jessica Miller", role: "Marketing Director", company: "Adobe", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964" },
-  { quote: "As a career coach, I recommend FlowCreate to all my clients. Professional, modern, and ATS-optimized.", author: "David Wilson", role: "Career Coach", company: "CareerBoost", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1887" },
+  { quote: "As a career coach, I recommend MakeCV to all my clients. Professional, modern, and ATS-optimized.", author: "David Wilson", role: "Career Coach", company: "CareerBoost", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1887" },
 ];
 
 const TestimonialsSection = () => {
@@ -45,7 +45,7 @@ const TestimonialsSection = () => {
             Loved by <span className="text-white/40">professionals.</span>
           </h2>
           <p className="text-lg md:text-xl text-white/50 font-normal leading-relaxed max-w-[42rem] mx-auto">
-            Join thousands who've advanced their careers with FlowCreate.
+            Join thousands who've advanced their careers with MakeCV.
           </p>
         </div>
         

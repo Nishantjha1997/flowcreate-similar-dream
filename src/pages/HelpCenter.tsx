@@ -56,7 +56,7 @@ const HelpCenter = () => {
 
   usePageMeta({
     title: 'Help Center & Support',
-    description: 'Get help with FlowCreate. Submit a support ticket, find answers to common questions, or contact our team.',
+    description: 'Get help with MakeCV. Submit a support ticket, find answers to common questions, or contact our team.',
   });
 
   const { data: tickets, isLoading, isError, error: ticketsError } = useQuery({
@@ -258,7 +258,7 @@ const HelpCenter = () => {
                             <div className="flex items-center gap-2 mb-1">
                               {msg.is_staff ? (
                                 <Badge variant="outline" className="text-xs bg-primary/10 text-primary flex items-center gap-1">
-                                  <Shield className="h-3 w-3" /> FlowCreate Support
+                                  <Shield className="h-3 w-3" /> MakeCV Support
                                 </Badge>
                               ) : (
                                 <Badge variant="outline" className="text-xs flex items-center gap-1">

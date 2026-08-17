@@ -26,9 +26,9 @@ const CallToAction = () => {
 
   const plans = [
     { name: "Free", price: isIndianUser ? "₹0" : "$0", description: "Perfect for getting started", features: ["1 resume template", "Basic customization", "PDF download", "Email support"], popular: false },
-    { name: "Pro", price: isIndianUser ? "₹199" : "$2.99", period: "/mo", description: "Everything for job hunting", features: ["All premium templates", "AI-powered suggestions", "Multiple formats", "Priority support", "Cover letter builder", "ATS optimization"], popular: true },
-    { name: "Annual", price: isIndianUser ? "₹1,999" : "$19.99", period: "/yr", description: "Best value — save 44%", features: ["Everything in Pro", "2 months free", "Priority support", "Advanced features", "Version history"], popular: false },
-    { name: "Lifetime", price: isIndianUser ? "₹2,500" : "$29.99", description: "One-time payment", features: ["Everything in Pro", "Future template updates", "Advanced customization", "Portfolio builder", "Interview prep", "Lifetime updates"], popular: false }
+    { name: "Pro", price: isIndianUser ? "₹299" : "$5", period: "/mo", description: "Everything for job hunting", features: ["All premium templates", "AI-powered suggestions", "Multiple formats", "Priority support", "Cover letter builder", "ATS optimization"], popular: true },
+    { name: "Annual", price: isIndianUser ? "₹2,499" : "$39", period: "/yr", description: "Best value — save 44%", features: ["Everything in Pro", "2 months free", "Priority support", "Advanced features", "Version history"], popular: false },
+    { name: "Lifetime", price: isIndianUser ? "₹4,999" : "$79", description: "One-time payment", features: ["Everything in Pro", "Future template updates", "Advanced customization", "Portfolio builder", "Interview prep", "Lifetime updates"], popular: false }
   ];
 
   if (loading) {
@@ -77,9 +77,9 @@ const CallToAction = () => {
         {/* Stats row — dark inset cards */}
         <div className="max-w-3xl mx-auto grid grid-cols-3 gap-4 mb-20 md:mb-24">
           {[
-            { value: '2M+', label: 'Resumes Created' },
-            { value: '95%', label: 'Success Rate' },
-            { value: '24/7', label: 'Expert Support' }
+            { value: '15 min', label: 'to a strong first draft' },
+            { value: '30+', label: 'ATS-friendly templates' },
+            { value: '3 ways', label: 'to export and apply' }
           ].map(({ value, label }) => (
             <div key={label} className="text-center rounded-2xl bg-[hsl(var(--surface-dark))] py-8 px-4">
               <div className="text-3xl md:text-4xl font-semibold text-white tracking-tight mb-1">{value}</div>
@@ -91,7 +91,7 @@ const CallToAction = () => {
         {/* Pricing */}
         <div className="max-w-2xl mx-auto text-center mb-14">
           <h2 className="apple-headline mb-5">
-            Find the plan <span className="text-muted-foreground">that's right for you.</span>
+            Start free. <span className="text-muted-foreground">Upgrade when the next application matters.</span>
           </h2>
         </div>
 
@@ -150,10 +150,10 @@ const CallToAction = () => {
         {/* Final CTA — dark band */}
         <div className="mt-20 md:mt-24 rounded-3xl bg-[hsl(var(--surface-dark))] p-12 md:p-16 text-center">
           <h3 className="text-2xl md:text-3xl font-semibold text-white tracking-tight mb-4">
-            Ready to build your perfect resume?
+            Ready to make your experience impossible to miss?
           </h3>
           <p className="text-white/50 mb-8 max-w-md mx-auto">
-            Join millions of professionals who've landed their dream jobs.
+            Build a clear foundation, tailor it to the role, and move to the next application with confidence.
           </p>
           <Link to="/resume-builder">
             <Button 

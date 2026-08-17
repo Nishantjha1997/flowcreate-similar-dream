@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { debounce } from 'lodash-es';
 
 // Hook for debounced form updates
@@ -32,11 +32,11 @@ export function useOptimizedHandlers<T extends Record<string, (...args: any[]) =
     const optimizedHandlers = {} as T;
     
     for (const [key, handler] of Object.entries(handlers)) {
-      optimizedHandlers[key as keyof T] = useCallback(handler, dependencies) as T[keyof T];
+      optimizedHandlers[key as keyof T] = ((...args: Parameters<typeof handler>) => handler(...args)) as T[keyof T];
     }
     
     return optimizedHandlers;
-  }, dependencies);
+  }, [handlers, ...dependencies]);
 }
 
 // Hook for performance monitoring

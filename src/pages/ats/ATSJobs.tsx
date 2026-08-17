@@ -74,7 +74,7 @@ const ATSJobs = () => {
 
       // Fetch application counts per job
       const jobIds = (jobsData || []).map(j => j.id);
-      let appCounts: Record<string, number> = {};
+      const appCounts: Record<string, number> = {};
       if (jobIds.length > 0) {
         const { data: apps } = await supabase
           .from('job_applications')
