@@ -57,6 +57,10 @@ export function useAIApiKeys() {
   const [testStatuses, setTestStatuses] = useState<Record<string, TestStatus>>({});
   const [testingId, setTestingId] = useState<string | null>(null);
 
+  // Draft key test state
+  const [draftTestStatus, setDraftTestStatus] = useState<TestStatus>('idle');
+  const [isTestingDraft, setIsTestingDraft] = useState(false);
+
   const { data: apiKeys = [], isLoading, error } = useQuery({
     queryKey: ["ai-api-keys"],
     queryFn: async () => {
@@ -108,19 +112,44 @@ export function useAIApiKeys() {
       setTestStatuses(prev => ({ ...prev, [id]: 'success' }));
       toast({ title: "✅ Connection successful", description: `Provider responded: "${String(data.message ?? "OK").slice(0, 80)}"` });
 
-      // Auto-reset status after 8 seconds
       setTimeout(() => setTestStatuses(prev => ({ ...prev, [id]: 'idle' })), 8000);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Connection test failed";
       setTestStatuses(prev => ({ ...prev, [id]: 'error' }));
       toast({ title: "❌ Connection failed", description: message, variant: "destructive" });
 
-      // Auto-reset status after 8 seconds
       setTimeout(() => setTestStatuses(prev => ({ ...prev, [id]: 'idle' })), 8000);
     } finally {
       setTestingId(null);
     }
   }, [testingId, toast]);
+
+  const testDraftKey = useCallback(async (provider: string, key: string) => {
+    if (!provider || !key.trim() || isTestingDraft) return;
+    setIsTestingDraft(true);
+    setDraftTestStatus('testing');
+
+    try {
+      const { data, error } = await supabase.functions.invoke("test-ai-provider", {
+        body: { provider, key: key.trim() }
+      });
+      if (error) throw error;
+      if (data?.error || data?.ok === false) throw new Error(String(data?.error ?? "Provider test failed"));
+
+      setDraftTestStatus('success');
+      toast({ title: "✅ Connection successful", description: `Valid API key! Provider responded: "${String(data.message ?? "OK").slice(0, 80)}"` });
+
+      setTimeout(() => setDraftTestStatus('idle'), 8000);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Connection test failed";
+      setDraftTestStatus('error');
+      toast({ title: "❌ Connection failed", description: message, variant: "destructive" });
+
+      setTimeout(() => setDraftTestStatus('idle'), 8000);
+    } finally {
+      setIsTestingDraft(false);
+    }
+  }, [isTestingDraft, toast]);
 
   return {
     apiKeys, tokenUsage, isLoading, isLoadingUsage, error,
@@ -130,8 +159,11 @@ export function useAIApiKeys() {
     isUpdating: updateAPIKeyMutation.isPending, isDeleting: deleteAPIKeyMutation.isPending,
     isSettingPrimary: setPrimaryMutation.isPending, isSettingFallback: setFallbackMutation.isPending,
     testAPIKey,
+    testDraftKey,
     testingId,
     testStatuses,
-    isTesting: testingId !== null,
+    draftTestStatus,
+    isTestingDraft,
+    isTesting: testingId !== null || isTestingDraft,
   };
 }

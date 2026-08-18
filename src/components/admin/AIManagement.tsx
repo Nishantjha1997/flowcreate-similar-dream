@@ -50,8 +50,11 @@ export function AIManagement() {
     isSettingPrimary,
     isSettingFallback,
     testAPIKey,
+    testDraftKey,
     testingId,
     testStatuses,
+    draftTestStatus,
+    isTestingDraft,
   } = useAIApiKeys();
 
   const [newKey, setNewKey] = useState({ provider: '', name: '', key: '' });
@@ -60,6 +63,11 @@ export function AIManagement() {
     if (!newKey.provider || !newKey.name || !newKey.key) return;
     addAPIKey(newKey);
     setNewKey({ provider: '', name: '', key: '' });
+  };
+
+  const handleTestDraft = () => {
+    if (!newKey.provider || !newKey.key) return;
+    testDraftKey(newKey.provider, newKey.key);
   };
 
   if (isLoading || isLoadingUsage) {
@@ -161,9 +169,21 @@ export function AIManagement() {
           {/* Add New Key */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Plus className="w-5 h-5 mr-2" />
-                Add New API Key
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Plus className="w-5 h-5 mr-2" />
+                  Add New API Key
+                </div>
+                {draftTestStatus === 'success' && (
+                  <Badge variant="outline" className="text-xs text-green-600 border-green-400 bg-green-50 dark:bg-green-950/30">
+                    <Wifi className="w-3 h-3 mr-1" />Verified Connection OK
+                  </Badge>
+                )}
+                {draftTestStatus === 'error' && (
+                  <Badge variant="outline" className="text-xs text-red-600 border-red-400 bg-red-50 dark:bg-red-950/30">
+                    <WifiOff className="w-3 h-3 mr-1" />Verification Failed
+                  </Badge>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -184,7 +204,7 @@ export function AIManagement() {
                 <div>
                   <Label>Name</Label>
                   <Input
-                    placeholder="e.g., Primary OpenAI Key"
+                    placeholder="e.g., Primary DeepSeek Key"
                     value={newKey.name}
                     onChange={(e) => setNewKey({ ...newKey, name: e.target.value })}
                   />
@@ -199,13 +219,45 @@ export function AIManagement() {
                   />
                 </div>
               </div>
-              <Button onClick={handleAddAPIKey} disabled={isAdding || !newKey.provider || !newKey.name || !newKey.key} className="w-full">
-                {isAdding ? (
-                  <><RefreshCw className="w-4 h-4 mr-2 animate-spin" />Adding...</>
-                ) : (
-                  <><Plus className="w-4 h-4 mr-2" />Add API Key</>
-                )}
-              </Button>
+
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleTestDraft}
+                  disabled={isTestingDraft || !newKey.provider || !newKey.key}
+                  className={`flex-1 sm:flex-initial flex items-center justify-center transition-colors ${
+                    draftTestStatus === 'success'
+                      ? 'border-green-500 text-green-600 bg-green-50 dark:bg-green-950/30 hover:bg-green-100'
+                      : draftTestStatus === 'error'
+                      ? 'border-red-400 text-red-600 bg-red-50 dark:bg-red-950/30 hover:bg-red-100'
+                      : ''
+                  }`}
+                >
+                  {isTestingDraft ? (
+                    <><RefreshCw className="w-4 h-4 mr-2 animate-spin" />Verifying Connection...</>
+                  ) : draftTestStatus === 'success' ? (
+                    <><Wifi className="w-4 h-4 mr-2 text-green-500" />Connection Verified ✓</>
+                  ) : draftTestStatus === 'error' ? (
+                    <><WifiOff className="w-4 h-4 mr-2 text-red-500" />Retry Test ✗</>
+                  ) : (
+                    <><Activity className="w-4 h-4 mr-2" />Test Connection (Connector)</>
+                  )}
+                </Button>
+
+                <Button
+                  type="button"
+                  onClick={handleAddAPIKey}
+                  disabled={isAdding || !newKey.provider || !newKey.name || !newKey.key}
+                  className="flex-1"
+                >
+                  {isAdding ? (
+                    <><RefreshCw className="w-4 h-4 mr-2 animate-spin" />Adding Key...</>
+                  ) : (
+                    <><Plus className="w-4 h-4 mr-2" />Save & Add API Key</>
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -292,7 +344,7 @@ export function AIManagement() {
 
                         {/* Action Buttons */}
                         <div className="flex w-full flex-wrap items-center gap-2 lg:w-auto lg:justify-end">
-                          {/* Test Connection */}
+                          {/* Test Connection / Connector */}
                           <Button
                             variant="outline"
                             size="sm"
