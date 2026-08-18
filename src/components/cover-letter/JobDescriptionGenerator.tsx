@@ -11,6 +11,8 @@ import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 import { JobDescriptionInput } from '@/components/JobDescriptionInput';
 import { Spinner } from '@/components/ui/spinner';
 import { toastActionFailed, toastActionDone } from '@/utils/toastMessages';
+import { generateAIContent } from '@/utils/ai/universalAIGenerator';
+
 
 interface JobDescriptionGeneratorOptions {
   tone: string;
@@ -53,25 +55,67 @@ export const JobDescriptionGenerator = ({ resumeId, currentContent, onGenerated,
     const previousContent = currentContent;
     setGenerating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('gemini-suggest', {
-        body: {
-          context: 'cover_letter_from_jd',
-          resumeId,
-          jobDescription: jobDescription.trim(),
-          company: company.trim(),
-          role: role.trim(),
-          tone,
-          length,
-          instructions: instructions.trim(),
-          maxTokens: 1200,
-        },
-      });
+      let generatedText = '';
 
-      if (error) throw new Error(await getEdgeFunctionErrorMessage(error, 'Failed to generate cover letter'));
-      if (data?.error) throw new Error(data.error as string);
-      if (!data?.suggestion) throw new Error('No response from AI');
+      // 1. Try Edge function first
+      try {
+        const { data, error } = await supabase.functions.invoke('gemini-suggest', {
+          body: {
+            context: 'cover_letter_from_jd',
+            resumeId,
+            jobDescription: jobDescription.trim(),
+            company: company.trim(),
+            role: role.trim(),
+            tone,
+            length,
+            instructions: instructions.trim(),
+            maxTokens: 1200,
+          },
+        });
 
-      onGenerated(data.suggestion as string);
+        if (!error && data?.suggestion) {
+          generatedText = data.suggestion as string;
+        }
+      } catch (efErr) {
+        console.warn('[JobDescriptionGenerator] Edge function failed, trying direct AI generator:', efErr);
+      }
+
+      // 2. Direct Universal AI Generator Fallback
+      if (!generatedText) {
+        const { data: resumeRow } = await supabase
+          .from('resumes')
+          .select('resume_data')
+          .eq('id', resumeId)
+          .maybeSingle();
+
+        const rd = (resumeRow?.resume_data ?? {}) as Record<string, any>;
+        const candidateName = rd?.personal?.name || 'the applicant';
+        const prompt = `Write an ATS-friendly, professional cover letter for ${candidateName} tailored to this job description:
+${jobDescription.trim()}
+
+Candidate Resume Summary:
+${rd?.personal?.summary || 'Not provided'}
+Skills: ${Array.isArray(rd?.skills) ? rd.skills.join(', ') : 'Not provided'}
+Tone: ${tone}. Length: ${length}. ${instructions ? `Special instructions: ${instructions}` : ''}
+Company: ${company || 'the hiring company'}. Role: ${role || 'the target role'}.
+Return ONLY the completed cover letter text.`;
+
+        const directResult = await generateAIContent({
+          prompt,
+          maxTokens: 1500,
+          timeoutMs: 60000,
+        });
+
+        if (directResult.text) {
+          generatedText = directResult.text;
+        }
+      }
+
+      if (!generatedText) {
+        throw new Error('No response from AI. Please verify your active API key in Admin > AI Providers.');
+      }
+
+      onGenerated(generatedText);
 
       // A generation overwrites whatever the user had already written - never
       // let that be silently unrecoverable.

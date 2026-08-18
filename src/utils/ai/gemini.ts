@@ -1,10 +1,10 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
+import { generateAIContent } from '@/utils/ai/universalAIGenerator';
 
 /**
- * Enhanced utility to request resume enhancements from Gemini API via Supabase Edge Function.
- * Provides contextual, varied suggestions based on resume section type.
+ * Enhanced utility to request resume enhancements from Gemini / DeepSeek / OpenAI.
+ * Uses Edge Function first with automatic fallback to direct Universal AI Generator.
  */
 
 export type SuggestionType = 'bullet' | 'paragraph' | 'concise';
@@ -24,30 +24,43 @@ export async function fetchGeminiSuggestions(request: SuggestionRequest): Promis
   const suggestions: string[] = [];
   const failures: string[] = [];
 
-  // Fetch multiple suggestions in parallel using supabase.functions.invoke (handles auth + CORS automatically)
+  // Fetch suggestions in parallel with Edge Function + Direct Provider fallback
   const suggestionPromises = prompts.map(async (prompt) => {
+    // 1. Try Edge Function first
     try {
       const { data, error } = await supabase.functions.invoke('gemini-suggest', {
         body: { prompt },
       });
 
-      if (error) {
-        throw new Error(await getEdgeFunctionErrorMessage(error, 'AI suggestion failed'));
-      }
-
-      if (data?.suggestion) {
+      if (!error && data?.suggestion) {
         return (data.suggestion as string).trim();
       }
-      throw new Error(data?.error || "No suggestion returned from AI");
-    } catch (error) {
-      console.error("[Gemini] Individual suggestion error:", error);
-      if (error instanceof Error && error.message) failures.push(error.message);
-      return null;
+    } catch (efError) {
+      console.warn("[Gemini] Edge function unavailable, trying direct AI generator:", efError);
     }
+
+    // 2. Direct Universal Generator Fallback
+    try {
+      const directResult = await generateAIContent({
+        prompt,
+        maxTokens: 1000,
+        temperature: 0.7,
+        timeoutMs: 30000,
+      });
+
+      if (directResult.text) {
+        return directResult.text.trim();
+      }
+    } catch (directError) {
+      console.error("[Gemini] Direct AI generator error:", directError);
+      if (directError instanceof Error) failures.push(directError.message);
+    }
+
+    return null;
   });
 
   const results = await Promise.allSettled(suggestionPromises);
-  
+
   results.forEach((result) => {
     if (result.status === 'fulfilled' && result.value) {
       suggestions.push(result.value);
@@ -55,7 +68,7 @@ export async function fetchGeminiSuggestions(request: SuggestionRequest): Promis
   });
 
   if (suggestions.length === 0) {
-    throw new Error(failures[0] || "Failed to generate any suggestions. Please try again.");
+    throw new Error(failures[0] || "Failed to generate AI suggestions. Please check your API key in Admin > AI Providers.");
   }
 
   return suggestions;
@@ -63,7 +76,7 @@ export async function fetchGeminiSuggestions(request: SuggestionRequest): Promis
 
 function generateContextualPrompts(request: SuggestionRequest): string[] {
   const { content, section, suggestionType, jobTitle, company, additionalContext } = request;
-  
+
   const contextInfo = [
     jobTitle && `Job Title: ${jobTitle}`,
     company && `Company: ${company}`,
@@ -90,7 +103,7 @@ function generateContextualPrompts(request: SuggestionRequest): string[] {
 
 function generateSummaryPrompts(content: string, type: SuggestionType, context: string): string[] {
   const prompts = [];
-  
+
   if (type === 'bullet') {
     prompts.push(`${context}Transform this professional summary into 3-4 compelling bullet points that highlight key achievements and skills. Make each bullet start with a strong action verb and include quantifiable results where possible:\n\n"${content}"`);
   } else if (type === 'paragraph') {
@@ -108,7 +121,7 @@ function generateSummaryPrompts(content: string, type: SuggestionType, context: 
 
 function generateExperiencePrompts(content: string, type: SuggestionType, context: string): string[] {
   const prompts = [];
-  
+
   if (type === 'bullet') {
     prompts.push(`${context}Transform this job description into 3-5 powerful bullet points using the STAR method (Situation, Task, Action, Result). Start each bullet with a strong action verb and include quantifiable achievements:\n\n"${content}"`);
     prompts.push(`${context}Create achievement-focused bullet points that demonstrate impact and results. Use metrics, percentages, and numbers wherever possible:\n\n"${content}"`);
@@ -125,7 +138,7 @@ function generateExperiencePrompts(content: string, type: SuggestionType, contex
 
 function generateEducationPrompts(content: string, type: SuggestionType, context: string): string[] {
   const prompts = [];
-  
+
   if (type === 'bullet') {
     prompts.push(`${context}Transform this education description into 2-3 bullet points highlighting academic achievements, relevant coursework, honors, or projects:\n\n"${content}"`);
   } else if (type === 'paragraph') {
@@ -142,7 +155,7 @@ function generateEducationPrompts(content: string, type: SuggestionType, context
 
 function generateSkillsPrompts(content: string, type: SuggestionType, context: string): string[] {
   const prompts = [];
-  
+
   prompts.push(`${context}Organize and enhance this skills list by grouping related skills into categories (Technical, Leadership, Soft Skills, etc.) and using industry-standard terminology:\n\n"${content}"`);
   prompts.push(`${context}Refine this skills list to include more specific, in-demand skills relevant to the target role. Remove generic skills and add technical proficiencies:\n\n"${content}"`);
   prompts.push(`${context}Transform this skills list into a more strategic presentation that showcases both hard and soft skills with brief proficiency indicators:\n\n"${content}"`);
@@ -152,7 +165,7 @@ function generateSkillsPrompts(content: string, type: SuggestionType, context: s
 
 function generateProjectPrompts(content: string, type: SuggestionType, context: string): string[] {
   const prompts = [];
-  
+
   if (type === 'bullet') {
     prompts.push(`${context}Transform this project description into 3-4 bullet points that clearly outline the challenge, your approach, technologies used, and measurable outcomes:\n\n"${content}"`);
   } else if (type === 'paragraph') {
@@ -175,7 +188,7 @@ function createGenericPrompt(content: string, type: SuggestionType, context: str
 export async function fetchGeminiSuggestion(description: string): Promise<string> {
   const suggestions = await fetchGeminiSuggestions({
     content: description,
-    section: 'experience', // Default to experience for backward compatibility
+    section: 'experience',
     suggestionType: 'bullet'
   });
   return suggestions[0] || description;

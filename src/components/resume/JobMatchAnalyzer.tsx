@@ -22,6 +22,7 @@ import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
 import { JobDescriptionInput } from '@/components/JobDescriptionInput';
 import { useAuth } from '@/hooks/useAuth';
 import { useAIQuota } from '@/hooks/useAIQuota';
+import { generateAIContent } from '@/utils/ai/universalAIGenerator';
 import {
   applyJobRecommendation,
   buildAddSkillRecommendation,
@@ -83,20 +84,61 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
     setResult(null);
 
     try {
-      const { data, error: fnError } = await supabase.functions.invoke('gemini-suggest', {
-        body: {
-          context: 'job_match',
-          resume,
-          jobDescription: jobDescription.trim(),
-          maxTokens: 1800,
-        },
-      });
+      let parsed: any = null;
 
-      if (fnError) throw new Error(await getEdgeFunctionErrorMessage(fnError, 'AI request failed'));
-      if (data?.error) throw new Error(data.error as string);
-      if (!data?.suggestion) throw new Error('No response from AI');
+      // 1. Try Edge function first
+      try {
+        const { data, error: fnError } = await supabase.functions.invoke('gemini-suggest', {
+          body: {
+            context: 'job_match',
+            resume,
+            jobDescription: jobDescription.trim(),
+            maxTokens: 1800,
+          },
+        });
 
-      const parsed = data.jobMatch ?? JSON.parse(data.suggestion as string);
+        if (!fnError && (data?.jobMatch || data?.suggestion)) {
+          parsed = data.jobMatch ?? JSON.parse(data.suggestion as string);
+        }
+      } catch (efErr) {
+        console.warn('[JobMatchAnalyzer] Edge function failed, trying direct AI generator:', efErr);
+      }
+
+      // 2. Direct Universal AI Generator Fallback
+      if (!parsed) {
+        const rd = resume as Record<string, any>;
+        const experience = Array.isArray(rd.experience)
+          ? rd.experience.map((e: any, i: number) => `[${i}] ${e.title || ''} at ${e.company || ''}: ${e.description || ''}`).join('\n')
+          : 'Not specified';
+
+        const prompt = `You are an ATS resume-matching expert. Compare the resume to the job description. Return ONLY valid JSON with no markdown wrapping.
+RESUME:
+Summary: ${rd.personal?.summary || 'Not specified'}
+Skills: ${Array.isArray(rd.skills) ? rd.skills.join(', ') : 'Not specified'}
+Experience:\n${experience}
+Education:\n${Array.isArray(rd.education) ? rd.education.map((e: any) => `- ${e.degree || ''}, ${e.school || ''}`).join('\n') : 'Not specified'}
+
+JOB DESCRIPTION:\n${jobDescription.trim()}
+
+Return this exact JSON shape:
+{"score":75,"breakdown":{"skills":80,"experience":75,"keywords":70,"education":75},"matchedKeywords":[],"missingKeywords":[],"suggestions":[],"recommendations":[],"company":"","role":""}`;
+
+        const directResult = await generateAIContent({
+          prompt,
+          maxTokens: 2000,
+          timeoutMs: 60000,
+        });
+
+        if (directResult.text) {
+          const cleanJson = directResult.text.replace(/```json|```/g, '').trim();
+          parsed = JSON.parse(cleanJson);
+        }
+      }
+
+      if (!parsed) {
+        throw new Error('AI analysis failed. Please verify your active API key in Admin > AI Providers.');
+      }
+
       const normalized = normalizeJobMatchResult(parsed);
       setResult(normalized);
       setAppliedIds([]);
@@ -123,8 +165,6 @@ export function JobMatchAnalyzer({ resume, resumeId, onResumeChange, onCreateTai
       void quota.refresh();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Analysis failed. Please try again.';
-      // Server-side entitlement gating (free plan) surfaces as a plain error
-      // message here - show it as-is rather than a generic failure.
       setError(message);
       captureError(err, { context: 'job_match_analyzer' });
     } finally {

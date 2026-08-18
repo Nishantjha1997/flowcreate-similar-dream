@@ -21,6 +21,8 @@ import { toastActionFailed, toastActionDone } from '@/utils/toastMessages';
 import { JobDescriptionGenerator } from './JobDescriptionGenerator';
 import { useAuth } from '@/hooks/useAuth';
 import { useAIQuota } from '@/hooks/useAIQuota';
+import { generateAIContent } from '@/utils/ai/universalAIGenerator';
+
 
 const TEMPLATE_OPTIONS = Object.entries(coverLetterTemplateNames).map(([value, label]) => ({ value, label }));
 
@@ -56,23 +58,62 @@ export const CoverLetterEditor = ({
 
     setAiLoading(true);
     try {
-      const { data: funcData, error: funcError } = await supabase.functions.invoke(
-        'gemini-suggest',
-        {
-          body: {
-            context: 'cover_letter',
-            resumeId: formData.resume_id,
-            currentContent: formData.content,
-          },
-        }
-      );
+      let suggestion = '';
 
-      if (funcError) throw new Error(await getEdgeFunctionErrorMessage(funcError, 'AI suggestion failed'));
-      if (funcData?.error) throw new Error(funcData.error as string);
-      if (funcData?.suggestion) {
-        setFormData((prev) => ({ ...prev, content: funcData.suggestion }));
+      // 1. Try Edge Function first
+      try {
+        const { data: funcData, error: funcError } = await supabase.functions.invoke(
+          'gemini-suggest',
+          {
+            body: {
+              context: 'cover_letter',
+              resumeId: formData.resume_id,
+              currentContent: formData.content,
+            },
+          }
+        );
+
+        if (!funcError && funcData?.suggestion) {
+          suggestion = funcData.suggestion;
+        }
+      } catch (efErr) {
+        console.warn('[CoverLetterEditor] Edge function failed, trying direct generator:', efErr);
+      }
+
+      // 2. Direct Universal Generator Fallback
+      if (!suggestion) {
+        const { data: resumeRow } = await supabase
+          .from('resumes')
+          .select('resume_data')
+          .eq('id', formData.resume_id)
+          .maybeSingle();
+
+        const rd = (resumeRow?.resume_data ?? {}) as Record<string, any>;
+        const candidateName = rd?.personal?.name || 'the applicant';
+        const jobTitle = rd?.experience?.[0]?.title || 'Professional';
+        const prompt = `Write a compelling, professional cover letter for ${candidateName} applying for a ${jobTitle} position.
+Candidate summary: ${rd?.personal?.summary || 'Not specified'}
+Skills: ${Array.isArray(rd?.skills) ? rd.skills.join(', ') : 'Not specified'}
+${formData.content ? `User drafted draft: ${formData.content}` : ''}
+Return ONLY the completed cover letter text.`;
+
+        const directResult = await generateAIContent({
+          prompt,
+          maxTokens: 1200,
+          timeoutMs: 60000,
+        });
+
+        if (directResult.text) {
+          suggestion = directResult.text;
+        }
+      }
+
+      if (suggestion) {
+        setFormData((prev) => ({ ...prev, content: suggestion }));
         void quota.refresh();
         toastActionDone('AI suggestion generated.');
+      } else {
+        throw new Error('No suggestion generated. Please check your API key in Admin > AI Providers.');
       }
     } catch (error: any) {
       toastActionFailed('generate an AI suggestion', error?.message, 'Try again in a moment.');

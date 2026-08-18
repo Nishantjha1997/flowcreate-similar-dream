@@ -15,6 +15,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Json } from '@/integrations/supabase/types';
 import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
+import { generateAIContent } from '@/utils/ai/universalAIGenerator';
+
 import {
   Sparkles,
   Loader2,
@@ -113,16 +115,37 @@ export function TranslationPanel({ resumeData, profileId, onTranslated }: Transl
 
       const prompt = `Translate the following resume content to ${langLabel}. Preserve the field labels exactly (e.g., "Name:", "Summary:", "Job Title:") - only translate the values after the colon. Keep the "---" separators between sections. Do not add any extra text or commentary.\n\n${sourceText}`;
 
-      // Call the gemini-suggest edge function for translation (uses invoke for CORS-safe call)
-      const { data: funcData, error: funcError } = await supabase.functions.invoke('gemini-suggest', {
-        body: { prompt },
-      });
+      // Call the gemini-suggest edge function with direct Universal AI fallback
+      let translationResult = '';
 
-      if (funcError) {
-        throw new Error(await getEdgeFunctionErrorMessage(funcError, 'Translation service unavailable'));
+      try {
+        const { data: funcData, error: funcError } = await supabase.functions.invoke('gemini-suggest', {
+          body: { prompt },
+        });
+        if (!funcError && funcData?.suggestion) {
+          translationResult = funcData.suggestion;
+        }
+      } catch (efErr) {
+        console.warn('[TranslationPanel] Edge function failed, trying direct AI generator:', efErr);
       }
 
-      setTranslatedText(funcData?.suggestion || '');
+      if (!translationResult) {
+        const directResult = await generateAIContent({
+          prompt,
+          maxTokens: 3000,
+          timeoutMs: 60000,
+        });
+        if (directResult.text) {
+          translationResult = directResult.text;
+        }
+      }
+
+      if (!translationResult) {
+        throw new Error('Translation failed. Please verify your active API key in Admin > AI Providers.');
+      }
+
+      setTranslatedText(translationResult);
+      const funcData = { suggestion: translationResult };
 
       // Save translated data back to master profile
       if (funcData?.suggestion && onTranslated) {

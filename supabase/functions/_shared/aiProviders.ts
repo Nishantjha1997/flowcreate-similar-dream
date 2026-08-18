@@ -21,7 +21,7 @@ export async function callTextModel(
 ): Promise<TextModelResult> {
   const temperature = opts?.temperature ?? 0.7;
   const maxTokens = opts?.maxTokens ?? 2048;
-  const timeoutMs = opts?.timeoutMs ?? 20000;
+  const timeoutMs = opts?.timeoutMs ?? 90000;
 
   try {
     // ── Google Gemini ─────────────────────────────────────────────────────────

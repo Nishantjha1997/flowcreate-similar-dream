@@ -43,7 +43,22 @@ function cleanHTML(html: string): string {
     .trim();
 }
 
+import { generateAIContent } from '@/utils/ai/universalAIGenerator';
+
 async function callGemini(prompt: string, maxTokens?: number): Promise<string> {
+  // 1. Try Universal Direct Engine first (avoids Edge Function timeout & works with DeepSeek / OpenAI / Gemini)
+  try {
+    const result = await generateAIContent({
+      prompt,
+      maxTokens: maxTokens || 4000,
+      timeoutMs: 90000,
+    });
+    if (result.text) return result.text;
+  } catch (err) {
+    console.warn('[BlogManager] Direct AI generator failed, trying edge function:', err);
+  }
+
+  // 2. Fallback to Edge function
   const body: Record<string, unknown> = { prompt };
   if (maxTokens) body.maxTokens = maxTokens;
   const { data, error } = await supabase.functions.invoke('blog-ai', { body });
