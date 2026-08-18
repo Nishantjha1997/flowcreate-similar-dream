@@ -183,7 +183,7 @@ const ATSCandidateDiscovery = () => {
                 />
               </div>
               <Select value={expFilter} onValueChange={setExpFilter}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-full sm:w-[180px]">
                   <SelectValue placeholder="Experience" />
                 </SelectTrigger>
                 <SelectContent>
@@ -195,7 +195,7 @@ const ATSCandidateDiscovery = () => {
                 </SelectContent>
               </Select>
               <Select value={selectedJobId} onValueChange={setSelectedJobId}>
-                <SelectTrigger className="w-[240px]">
+                <SelectTrigger className="w-full sm:w-[240px]">
                   <SelectValue placeholder="Match against job..." />
                 </SelectTrigger>
                 <SelectContent>

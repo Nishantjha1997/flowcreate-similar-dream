@@ -300,7 +300,7 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Search organizations..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-9 w-64" />
+                  <Input placeholder="Search organizations..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-9 sm:w-64" />
                 </div>
                 <Button onClick={() => setIsCreateDialogOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" /> Add Organization
@@ -374,10 +374,10 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Search jobs..." value={jobSearch} onChange={(e) => setJobSearch(e.target.value)} className="pl-9 w-64" />
+                  <Input placeholder="Search jobs..." value={jobSearch} onChange={(e) => setJobSearch(e.target.value)} className="w-full pl-9 sm:w-64" />
                 </div>
                 <Select value={jobStatusFilter} onValueChange={setJobStatusFilter}>
-                  <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="w-full sm:w-[140px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Status</SelectItem>
                     <SelectItem value="draft">Draft</SelectItem>
@@ -450,10 +450,10 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Search candidates..." value={appSearch} onChange={(e) => setAppSearch(e.target.value)} className="pl-9 w-64" />
+                  <Input placeholder="Search candidates..." value={appSearch} onChange={(e) => setAppSearch(e.target.value)} className="w-full pl-9 sm:w-64" />
                 </div>
                 <Select value={appStatusFilter} onValueChange={setAppStatusFilter}>
-                  <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="w-full sm:w-[140px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Status</SelectItem>
                     <SelectItem value="new">New</SelectItem>
@@ -605,7 +605,7 @@ export const ATSManagement = ({ isAdmin }: ATSManagementProps) => {
                     <Input placeholder="user@email.com" type="email" value={addMemberEmail} onChange={(e) => setAddMemberEmail(e.target.value)} />
                   </div>
                   <Select value={addMemberRole} onValueChange={setAddMemberRole}>
-                    <SelectTrigger className="w-[120px]"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="w-full sm:w-[120px]"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="owner">Owner</SelectItem>
                       <SelectItem value="admin">Admin</SelectItem>

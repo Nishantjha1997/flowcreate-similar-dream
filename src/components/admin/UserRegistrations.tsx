@@ -244,7 +244,7 @@ export function UserRegistrations({ isAdmin }: UserRegistrationsProps) {
               </div>
               
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-full sm:w-[140px]">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -256,7 +256,7 @@ export function UserRegistrations({ isAdmin }: UserRegistrationsProps) {
               </Select>
               
               <Select value={dateFilter} onValueChange={setDateFilter}>
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-full sm:w-[140px]">
                   <SelectValue placeholder="Date" />
                 </SelectTrigger>
                 <SelectContent>

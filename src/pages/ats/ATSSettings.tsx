@@ -306,7 +306,7 @@ const ATSSettings = () => {
                         />
                       </div>
                       <Select value={newMemberRole} onValueChange={setNewMemberRole}>
-                        <SelectTrigger className="w-[160px]">
+                        <SelectTrigger className="w-full sm:w-[160px]">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -357,7 +357,7 @@ const ATSSettings = () => {
                               value={member.role}
                               onValueChange={(newRole) => updateMemberRole(member.id, newRole)}
                             >
-                              <SelectTrigger className="w-[140px]">
+                              <SelectTrigger className="w-full sm:w-[140px]">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>

@@ -113,7 +113,7 @@ export const AuditLogs = ({ isAdmin }: AuditLogsProps) => {
           />
         </div>
         <Select value={entityFilter} onValueChange={setEntityFilter}>
-          <SelectTrigger className="w-[160px]">
+          <SelectTrigger className="w-full sm:w-[160px]">
             <SelectValue placeholder="Entity type" />
           </SelectTrigger>
           <SelectContent>

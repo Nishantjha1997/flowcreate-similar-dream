@@ -248,7 +248,7 @@ export function UserManagement({ userProfiles, isLoading, refetch }: UserManagem
           />
         </div>
         <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger className="w-[140px]"><SelectValue placeholder="Role" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[140px]"><SelectValue placeholder="Role" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Roles</SelectItem>
             <SelectItem value="admin">Admin</SelectItem>
@@ -257,7 +257,7 @@ export function UserManagement({ userProfiles, isLoading, refetch }: UserManagem
           </SelectContent>
         </Select>
         <Select value={premiumFilter} onValueChange={setPremiumFilter}>
-          <SelectTrigger className="w-[140px]"><SelectValue placeholder="Premium" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[140px]"><SelectValue placeholder="Premium" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Users</SelectItem>
             <SelectItem value="premium">Premium</SelectItem>
