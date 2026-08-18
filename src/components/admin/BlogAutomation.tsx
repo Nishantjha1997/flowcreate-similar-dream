@@ -476,7 +476,7 @@ export function BlogAutomation() {
             <h2 className="text-xl font-semibold tracking-tight">AI blog automation</h2>
           </div>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Generate SEO articles on a safe schedule. Keep them as drafts for review or publish automatically.
+            Generate SEO articles on a safe schedule. Articles publish automatically only after the server-side quality gates pass.
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
