@@ -67,84 +67,91 @@ serve(async (req) => {
   if (!auth) return json({ error: 'Admin authorization required' }, 403);
 
   try {
+    // supabase.functions.invoke() always sends POST regardless of semantic intent.
+    // We parse the body for all requests and derive the operation from body fields.
     const body = req.method === 'GET' ? {} : await req.json().catch(() => ({}));
+
+    // Resource can come from body or query string.
     const resource = resourceFrom(body.resource ?? new URL(req.url).searchParams.get('resource'));
     if (!resource) return json({ error: 'resource must be ai or payment' }, 400);
     const table = resource === 'ai' ? 'ai_api_keys' : 'payment_gateway_keys';
 
-    if (req.method === 'GET') {
+    // ── LIST (no action, no id, no provider = fetch all rows) ────────────────
+    // Also handles GET method from non-JS clients.
+    if (req.method === 'GET' || (!body.action && !body.id && !body.provider)) {
       const { data, error } = await auth.client.from(table).select('*').order(resource === 'ai' ? 'created_at' : 'provider');
       if (error) throw error;
       return json({ data: (data ?? []).map((row) => resource === 'ai' ? safeAi(row) : safePayment(row)) });
     }
 
-    if (req.method === 'DELETE') {
+    // ── DELETE ───────────────────────────────────────────────────────────────
+    if (req.method === 'DELETE' || body.action === 'delete') {
       if (typeof body.id !== 'string') return json({ error: 'id is required' }, 400);
       const { error } = await auth.client.from(table).delete().eq('id', body.id);
       if (error) throw error;
       return json({ ok: true });
     }
 
+    // ── PATCH (activate / deactivate) ────────────────────────────────────────
     if (req.method === 'PATCH') {
       if (typeof body.id !== 'string' || !body.updates || typeof body.updates !== 'object') {
         return json({ error: 'id and updates are required' }, 400);
       }
-      const updates = resource === 'ai'
-        ? { is_active: Boolean(body.updates.is_active) }
-        : { is_active: Boolean(body.updates.is_active) };
+      const updates = { is_active: Boolean((body.updates as Record<string, unknown>).is_active) };
       const { data, error } = await auth.client.from(table).update(updates).eq('id', body.id).select('*').single();
       if (error) throw error;
       return json({ data: resource === 'ai' ? safeAi(data) : safePayment(data) });
     }
 
-    if (req.method === 'POST') {
-      if (body.action === 'delete') {
-        if (typeof body.id !== 'string') return json({ error: 'id is required' }, 400);
-        const { error } = await auth.client.from(table).delete().eq('id', body.id);
-        if (error) throw error;
-        return json({ ok: true });
-      }
-      if (body.action === 'toggle-active') {
-        if (typeof body.id !== 'string') return json({ error: 'id is required' }, 400);
-        const { data, error } = await auth.client.from(table).update({ is_active: Boolean(body.is_active) }).eq('id', body.id).select('*').single();
-        if (error) throw error;
-        return json({ data: resource === 'ai' ? safeAi(data) : safePayment(data) });
-      }
-      if (body.action === 'set-primary' || body.action === 'set-fallback') {
-        if (resource !== 'ai' || typeof body.id !== 'string') return json({ error: 'Invalid AI provider action' }, 400);
-        const field = body.action === 'set-primary' ? 'is_primary' : 'is_fallback';
-        const { error: clearError } = await auth.client.from(table).update({ [field]: false }).neq('id', '00000000-0000-0000-0000-000000000000');
-        if (clearError) throw clearError;
-        const { data, error } = await auth.client.from(table).update({ [field]: true, is_active: true }).eq('id', body.id).select('*').single();
-        if (error) throw error;
-        return json({ data: safeAi(data) });
-      }
-
-      if (typeof body.provider !== 'string' || !providers.has(body.provider)) return json({ error: 'Unsupported provider' }, 400);
-      if (resource === 'ai') {
-        if (typeof body.name !== 'string' || !body.name.trim() || typeof body.key !== 'string' || !body.key.trim()) {
-          return json({ error: 'name and key are required' }, 400);
-        }
-        const { data, error } = await auth.client.from(table).insert({
-          name: body.name.trim().slice(0, 120), provider: body.provider, key: body.key.trim(),
-          is_active: true, is_primary: false, is_fallback: false, usage_count: 0,
-        }).select('*').single();
-        if (error) throw error;
-        return json({ data: safeAi(data) }, 201);
-      }
-      if (body.key_secret !== undefined && typeof body.key_secret !== 'string') return json({ error: 'key_secret must be a string' }, 400);
-      const payload: Record<string, unknown> = {
-        provider: body.provider, is_live: Boolean(body.is_live), is_active: true,
-      };
-      if (typeof body.key_id === 'string' && body.key_id.trim()) payload.key_id = body.key_id.trim();
-      if (typeof body.key_secret === 'string' && body.key_secret.trim()) payload.key_secret = body.key_secret.trim();
-      if (typeof body.webhook_secret === 'string' && body.webhook_secret.trim()) payload.webhook_secret = body.webhook_secret.trim();
-      const { data, error } = await auth.client.from(table).upsert(payload, { onConflict: 'provider' }).select('*').single();
+    // ── POST actions ─────────────────────────────────────────────────────────
+    if (body.action === 'toggle-active') {
+      if (typeof body.id !== 'string') return json({ error: 'id is required' }, 400);
+      const { data, error } = await auth.client.from(table).update({ is_active: Boolean(body.is_active) }).eq('id', body.id).select('*').single();
       if (error) throw error;
-      return json({ data: safePayment(data) }, 201);
+      return json({ data: resource === 'ai' ? safeAi(data) : safePayment(data) });
     }
 
-    return json({ error: 'Method not allowed' }, 405);
+    if (body.action === 'set-primary' || body.action === 'set-fallback') {
+      if (resource !== 'ai' || typeof body.id !== 'string') return json({ error: 'Invalid AI provider action' }, 400);
+      const field = body.action === 'set-primary' ? 'is_primary' : 'is_fallback';
+      const { error: clearError } = await auth.client.from(table).update({ [field]: false }).neq('id', '00000000-0000-0000-0000-000000000000');
+      if (clearError) throw clearError;
+      const { data, error } = await auth.client.from(table).update({ [field]: true, is_active: true }).eq('id', body.id).select('*').single();
+      if (error) throw error;
+      return json({ data: safeAi(data) });
+    }
+
+    // ── INSERT new key ───────────────────────────────────────────────────────
+    if (typeof body.provider !== 'string' || !providers.has(body.provider)) {
+      return json({ error: 'Unsupported provider' }, 400);
+    }
+
+    if (resource === 'ai') {
+      if (typeof body.name !== 'string' || !body.name.trim() || typeof body.key !== 'string' || !body.key.trim()) {
+        return json({ error: 'name and key are required' }, 400);
+      }
+      const { data, error } = await auth.client.from(table).insert({
+        name: body.name.trim().slice(0, 120), provider: body.provider, key: body.key.trim(),
+        is_active: true, is_primary: false, is_fallback: false, usage_count: 0,
+      }).select('*').single();
+      if (error) throw error;
+      return json({ data: safeAi(data) }, 201);
+    }
+
+    // Payment gateway upsert
+    if (body.key_secret !== undefined && typeof body.key_secret !== 'string') {
+      return json({ error: 'key_secret must be a string' }, 400);
+    }
+    const payload: Record<string, unknown> = {
+      provider: body.provider, is_live: Boolean(body.is_live), is_active: true,
+    };
+    if (typeof body.key_id === 'string' && body.key_id.trim()) payload.key_id = body.key_id.trim();
+    if (typeof body.key_secret === 'string' && body.key_secret.trim()) payload.key_secret = body.key_secret.trim();
+    if (typeof body.webhook_secret === 'string' && body.webhook_secret.trim()) payload.webhook_secret = body.webhook_secret.trim();
+    const { data, error } = await auth.client.from(table).upsert(payload, { onConflict: 'provider' }).select('*').single();
+    if (error) throw error;
+    return json({ data: safePayment(data) }, 201);
+
   } catch (error) {
     console.error('admin-provider-secrets failed', error);
     return json({ error: error instanceof Error ? error.message : 'Request failed' }, 500);

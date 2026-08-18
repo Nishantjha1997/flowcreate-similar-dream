@@ -3,8 +3,8 @@ import { AIKeyManager } from './aiKeyManager.ts';
 // Keep the model configurable so a provider can be rotated without another
 // frontend release. The previous default (gemini-1.5-flash) is no longer a
 // safe production default and can return a 404 for otherwise valid keys.
-const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.5-flash';
-const GEMINI_FALLBACK_MODEL = 'gemini-2.5-flash';
+const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash';
+const GEMINI_FALLBACK_MODEL = 'gemini-2.0-flash';
 
 export type AIProvider = 'gemini' | 'deepseek' | 'openai';
 
@@ -24,6 +24,7 @@ export async function callTextModel(
   const timeoutMs = opts?.timeoutMs ?? 20000;
 
   try {
+    // ── Google Gemini ─────────────────────────────────────────────────────────
     if (provider === 'gemini') {
       const models = GEMINI_MODEL === GEMINI_FALLBACK_MODEL
         ? [GEMINI_MODEL]
@@ -59,9 +60,9 @@ export async function callTextModel(
           return { text: null, error: lastError };
         }
 
-        const json = await response.json();
-        const text = Array.isArray(json?.candidates?.[0]?.content?.parts)
-          ? json.candidates[0].content.parts
+        const data = await response.json();
+        const text = Array.isArray(data?.candidates?.[0]?.content?.parts)
+          ? data.candidates[0].content.parts
             .map((part: { text?: unknown }) => typeof part.text === 'string' ? part.text : '')
             .join('')
             .trim()
@@ -73,6 +74,9 @@ export async function callTextModel(
       return { text: null, error: lastError };
     }
 
+    // ── DeepSeek ──────────────────────────────────────────────────────────────
+    // Valid model IDs: deepseek-chat (V3), deepseek-reasoner (R1).
+    // deepseek-v4-flash is NOT a valid model and will return a 404.
     if (provider === 'deepseek') {
       const response = await fetch('https://api.deepseek.com/chat/completions', {
         method: 'POST',
@@ -82,7 +86,7 @@ export async function callTextModel(
         },
         signal: AbortSignal.timeout(timeoutMs),
         body: JSON.stringify({
-          model: 'deepseek-v4-flash',
+          model: 'deepseek-chat',
           messages: [{ role: 'user', content: prompt }],
           temperature,
           max_tokens: maxTokens,
@@ -92,11 +96,12 @@ export async function callTextModel(
         const errText = await response.text().catch(() => response.statusText);
         return { text: null, error: `DeepSeek API error ${response.status}: ${errText}` };
       }
-      const json = await response.json();
-      const text: string | null = json?.choices?.[0]?.message?.content ?? null;
+      const data = await response.json();
+      const text: string | null = data?.choices?.[0]?.message?.content ?? null;
       return { text };
     }
 
+    // ── OpenAI ────────────────────────────────────────────────────────────────
     if (provider === 'openai') {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -116,8 +121,8 @@ export async function callTextModel(
         const errText = await response.text().catch(() => response.statusText);
         return { text: null, error: `OpenAI API error ${response.status}: ${errText}` };
       }
-      const json = await response.json();
-      const text: string | null = json?.choices?.[0]?.message?.content ?? null;
+      const data = await response.json();
+      const text: string | null = data?.choices?.[0]?.message?.content ?? null;
       return { text };
     }
 

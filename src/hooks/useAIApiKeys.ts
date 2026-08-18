@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -26,6 +27,8 @@ export interface AITokenUsage {
   cost_estimate: number;
 }
 
+export type TestStatus = 'idle' | 'testing' | 'success' | 'error';
+
 async function invokeSecrets<T>(body: Record<string, unknown>): Promise<T> {
   const { data, error } = await supabase.functions.invoke("admin-provider-secrets", { body });
   if (error) throw error;
@@ -49,6 +52,10 @@ export function useAIApiKeys() {
     onSuccess: () => { void invalidate(); toast({ title: "Success", description }); },
     onError: (mutationError: Error) => toast({ title: "Error", description: mutationError.message, variant: "destructive" as const }),
   });
+
+  // Per-key test status tracking
+  const [testStatuses, setTestStatuses] = useState<Record<string, TestStatus>>({});
+  const [testingId, setTestingId] = useState<string | null>(null);
 
   const { data: apiKeys = [], isLoading, error } = useQuery({
     queryKey: ["ai-api-keys"],
@@ -87,15 +94,33 @@ export function useAIApiKeys() {
     mutationFn: (id: string) => invokeSecrets({ resource: "ai", action: "set-fallback", id }),
     ...mutationOptions("Fallback API key updated successfully"),
   });
-  const testAPIKeyMutation = useMutation({
-    mutationFn: async (id: string) => {
+
+  const testAPIKey = useCallback(async (id: string) => {
+    if (testingId) return; // prevent concurrent tests
+    setTestingId(id);
+    setTestStatuses(prev => ({ ...prev, [id]: 'testing' }));
+
+    try {
       const { data, error } = await supabase.functions.invoke("test-ai-provider", { body: { id } });
       if (error) throw error;
       if (data?.error || data?.ok === false) throw new Error(String(data?.error ?? "Provider test failed"));
-      return data;
-    },
-    ...mutationOptions("Provider connection succeeded"),
-  });
+
+      setTestStatuses(prev => ({ ...prev, [id]: 'success' }));
+      toast({ title: "✅ Connection successful", description: `Provider responded: "${String(data.message ?? "OK").slice(0, 80)}"` });
+
+      // Auto-reset status after 8 seconds
+      setTimeout(() => setTestStatuses(prev => ({ ...prev, [id]: 'idle' })), 8000);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Connection test failed";
+      setTestStatuses(prev => ({ ...prev, [id]: 'error' }));
+      toast({ title: "❌ Connection failed", description: message, variant: "destructive" });
+
+      // Auto-reset status after 8 seconds
+      setTimeout(() => setTestStatuses(prev => ({ ...prev, [id]: 'idle' })), 8000);
+    } finally {
+      setTestingId(null);
+    }
+  }, [testingId, toast]);
 
   return {
     apiKeys, tokenUsage, isLoading, isLoadingUsage, error,
@@ -104,7 +129,9 @@ export function useAIApiKeys() {
     setFallback: setFallbackMutation.mutate, isAdding: addAPIKeyMutation.isPending,
     isUpdating: updateAPIKeyMutation.isPending, isDeleting: deleteAPIKeyMutation.isPending,
     isSettingPrimary: setPrimaryMutation.isPending, isSettingFallback: setFallbackMutation.isPending,
-    testAPIKey: testAPIKeyMutation.mutate,
-    isTesting: testAPIKeyMutation.isPending,
+    testAPIKey,
+    testingId,
+    testStatuses,
+    isTesting: testingId !== null,
   };
 }
