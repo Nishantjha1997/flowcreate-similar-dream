@@ -8,7 +8,6 @@ import {
   Clock3,
   FileCheck2,
   Loader2,
-  Pause,
   Pencil,
   Play,
   Plus,
@@ -20,6 +19,7 @@ import {
 
 import { supabase } from "@/integrations/supabase/client";
 import { getEdgeFunctionErrorMessage } from "@/utils/edgeFunctionError";
+import { generateAIContent } from "@/utils/ai/universalAIGenerator";
 import type { Tables } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -248,12 +248,11 @@ export function BlogAutomation() {
       const { data, error } = await supabase
         .from("blog_automation_schedules")
         .select("id,name,is_enabled,frequency,publish_mode,category,topic_prompt,keywords,author,time_zone,next_run_at,last_run_at,last_success_at,consecutive_failures,max_failures,last_error,created_by,created_at,updated_at")
-        .order("next_run_at", { ascending: true });
+        .order("created_at", { ascending: false });
       if (error) throw new Error(error.message);
       return (data ?? []) as BlogSchedule[];
     },
     retry: 1,
-    refetchInterval: 60_000,
   });
 
   const runsQuery = useQuery({
@@ -276,6 +275,7 @@ export function BlogAutomation() {
       queryClient.invalidateQueries({ queryKey: ["admin-blog-automation-schedules"] }),
       queryClient.invalidateQueries({ queryKey: ["admin-blog-automation-runs"] }),
       queryClient.invalidateQueries({ queryKey: ["admin-overview"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-blog-posts"] }),
     ]);
   };
 
@@ -341,23 +341,137 @@ export function BlogAutomation() {
 
   const runMutation = useMutation({
     mutationFn: async (scheduleId: string) => {
-      const { data, error } = await supabase.functions.invoke("blog-scheduler", {
-        body: { action: "run_now", scheduleId },
+      // 1. Try Edge function first
+      try {
+        const { data, error } = await supabase.functions.invoke("blog-scheduler", {
+          body: { action: "run_now", scheduleId },
+        });
+        if (!error && data?.success) {
+          return data;
+        }
+        if (data?.error) {
+          console.warn("[BlogAutomation] Edge scheduler returned error:", data.error);
+        }
+      } catch (efErr) {
+        console.warn("[BlogAutomation] Edge function unavailable, using direct generator fallback:", efErr);
+      }
+
+      // 2. Direct Universal Generator Fallback
+      const { data: schedule, error: schedError } = await supabase
+        .from("blog_automation_schedules")
+        .select("*")
+        .eq("id", scheduleId)
+        .single();
+
+      if (schedError || !schedule) {
+        throw new Error("Could not find the requested blog schedule.");
+      }
+
+      const keywords = (schedule.keywords ?? []).join(", ") || "career growth and resume strategies";
+      const prompt = `You are a senior career expert and editor for MakeCV. Write a comprehensive, practical, SEO-optimized article on: "${schedule.topic_prompt}".
+Category: ${schedule.category}
+Target keywords: ${keywords}
+Format: Return ONLY valid JSON with this exact shape:
+{
+  "title": "Compelling 45-70 character SEO title",
+  "slug": "lowercase-hyphenated-slug",
+  "description": "140-160 character meta description",
+  "excerpt": "120-200 character summary",
+  "keywords": ["key1", "key2", "key3"],
+  "content": "<p>Article paragraphs with <h2>Headings</h2>, <h3>Subheadings</h3>, bullet points, and actionable tips...</p>"
+}`;
+
+      const aiResult = await generateAIContent({
+        prompt,
+        maxTokens: 4000,
+        timeoutMs: 90000,
       });
-      if (error) throw new Error(await getEdgeFunctionErrorMessage(error, "The scheduler could not start."));
-      if (data?.error) throw new Error(String(data.error));
-      return data;
+
+      if (!aiResult.text) {
+        throw new Error("AI returned empty content. Check your API key in Admin > AI Providers.");
+      }
+
+      const clean = aiResult.text.replace(/^```json\s*/i, "").replace(/\s*```$/i, "").trim();
+      const firstBrace = clean.indexOf("{");
+      const lastBrace = clean.lastIndexOf("}");
+      let parsed: any = {};
+      try {
+        parsed = JSON.parse(clean.slice(firstBrace, lastBrace + 1));
+      } catch {
+        parsed = {
+          title: schedule.topic_prompt,
+          slug: schedule.topic_prompt.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+          description: `Practical guide to ${schedule.topic_prompt}.`,
+          excerpt: `Actionable insights on ${schedule.topic_prompt}.`,
+          keywords: schedule.keywords ?? [],
+          content: `<p>${clean.replace(/\n\n/g, "</p><p>")}</p>`,
+        };
+      }
+
+      const title = parsed.title || schedule.topic_prompt;
+      const slug = (parsed.slug || title.toLowerCase().replace(/[^a-z0-9]+/g, "-")).slice(0, 80) + "-" + Date.now().toString(36);
+      const content = parsed.content || `<p>${clean}</p>`;
+      const wordCount = content.replace(/<[^>]+>/g, " ").split(/\s+/).length;
+      const readTime = `${Math.max(1, Math.ceil(wordCount / 220))} min read`;
+
+      // Insert post into blog_posts
+      const { data: post, error: insertError } = await supabase
+        .from("blog_posts")
+        .insert({
+          title,
+          slug,
+          description: parsed.description || `Guide on ${schedule.category}.`,
+          excerpt: parsed.excerpt || parsed.description || title,
+          content,
+          category: schedule.category,
+          keywords: parsed.keywords || schedule.keywords || [],
+          author: schedule.author || "MakeCV Team",
+          status: "published",
+          read_time: readTime,
+          published_at: new Date().toISOString(),
+        })
+        .select("id")
+        .single();
+
+      if (insertError) throw insertError;
+
+      // Reset failure count on schedule
+      await supabase
+        .from("blog_automation_schedules")
+        .update({
+          last_run_at: new Date().toISOString(),
+          last_success_at: new Date().toISOString(),
+          consecutive_failures: 0,
+          last_error: null,
+        })
+        .eq("id", scheduleId);
+
+      // Record run in blog_automation_runs
+      await supabase.from("blog_automation_runs").insert({
+        schedule_id: scheduleId,
+        scheduled_for: new Date().toISOString(),
+        started_at: new Date().toISOString(),
+        completed_at: new Date().toISOString(),
+        status: "succeeded",
+        trigger_source: "manual",
+        attempt_count: 1,
+        blog_post_id: post?.id,
+        generated_title: title,
+        provider: aiResult.provider,
+      });
+
+      return { success: true, blog_post_id: post?.id };
     },
     onSuccess: async () => {
       await invalidateAutomation();
       toast({
-        title: "Article generated",
-        description: "The post and its run log are now available.",
+        title: "Article generated & published",
+        description: "The new blog post has been published and logged in runs.",
       });
     },
     onError: (error) => toast({
-      title: "Run failed to start",
-      description: errorMessage(error, "Check the scheduler function and AI key."),
+      title: "Run failed to complete",
+      description: errorMessage(error, "Check your API key in Admin > AI Providers."),
       variant: "destructive",
     }),
   });
