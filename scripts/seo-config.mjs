@@ -8,16 +8,26 @@ export function getSiteUrl() {
 
 // These are the public, canonical routes we intentionally want search engines
 // to index. Authenticated, account, admin, and user-specific routes are kept out
-// of the sitemap and receive X-Robots-Tag headers in vercel.json.
+// of the sitemap and receive X-Robots-Tag headers in vercel.json. The public
+// login landing page is intentionally included so returning users can find it
+// from Search; account and admin surfaces remain private.
 export const PUBLIC_ROUTES = [
   {
     path: '/',
     title: 'Free Online Resume Builder — Create Professional Resumes',
-    description: 'Build a professional resume online free with MakeCV. Choose from 30+ ATS-friendly templates, get AI writing suggestions, and download a polished PDF.',
+    description: 'MakeCV helps you build ATS-friendly resumes, write cover letters, explore templates, and get career advice with free online tools and AI assistance.',
     heading: 'Build a Professional Resume Online for Free',
     changefreq: 'weekly',
     priority: '1.0',
     type: 'WebApplication',
+  },
+  {
+    path: '/login',
+    title: 'Log In to MakeCV',
+    description: 'Log in to MakeCV to build resumes, create cover letters, manage your templates, and continue your job search workspace.',
+    heading: 'Log In to MakeCV',
+    changefreq: 'yearly',
+    priority: '0.4',
   },
   {
     path: '/resume-builder',

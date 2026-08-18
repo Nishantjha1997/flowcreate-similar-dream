@@ -26,7 +26,6 @@ assert(locations.length > 0, 'sitemap contains no URLs');
 assert(new Set(locations).size === locations.length, 'sitemap contains duplicate URLs');
 
 const forbiddenPaths = [
-  '/login',
   '/register',
   '/forgot-password',
   '/account',

@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { NotificationBell } from './NotificationBell';
-import { BrandMark, BrandWordmark } from './BrandLogo';
+import { BrandWordmark } from './BrandLogo';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -61,9 +61,7 @@ const Header = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
-              <BrandMark className="h-8 w-8" />
-              <span className="text-2xl font-bold uppercase tracking-wider text-primary">Flow</span>
-              <span className="text-2xl font-bold uppercase tracking-wider text-foreground">Create</span>
+              <BrandWordmark className="h-8" textClassName="text-2xl font-bold uppercase tracking-wider" />
             </Link>
             <nav className="hidden md:flex md:items-center md:space-x-6">
               <DropdownMenu>
@@ -136,7 +134,7 @@ const Header = () => {
         {mobileMenuOpen && (
           <div className="fixed inset-0 z-50 bg-background px-4">
             <div className="flex h-16 items-center justify-between">
-              <Link to="/" className="flex items-center gap-2"><BrandMark className="h-8 w-8" /><span className="text-2xl font-bold uppercase tracking-wider text-primary">Flow</span><span className="text-2xl font-bold uppercase tracking-wider text-foreground">Create</span></Link>
+              <Link to="/" className="flex items-center gap-2"><BrandWordmark className="h-8" textClassName="text-2xl font-bold uppercase tracking-wider" /></Link>
               <button onClick={() => setMobileMenuOpen(false)} className="border-2 border-foreground p-2"><X className="h-5 w-5" /></button>
             </div>
             <div className="mt-6 space-y-6 py-6">

@@ -6,7 +6,7 @@ import { componentTagger } from "lovable-tagger";
 
 // Canonical origin baked into index.html's static OG tags at build time.
 // Set VITE_SITE_URL in Vercel when the custom domain goes live.
-const SITE_URL = (process.env.VITE_SITE_URL ?? "https://flowcreate-similar-dream.vercel.app").replace(/\/$/, "");
+const SITE_URL = (process.env.VITE_SITE_URL ?? "https://makecv.site").replace(/\/$/, "");
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({

@@ -19,7 +19,7 @@ interface PageMetaProps {
 
 const DEFAULT_TITLE = 'Free Online Resume Builder — Create Professional Resumes | MakeCV';
 const DEFAULT_DESCRIPTION =
-  'Build a professional resume online free with MakeCV. 30+ ATS-friendly templates, AI-powered suggestions, and instant PDF download. No credit card required.';
+  'MakeCV helps you build ATS-friendly resumes, write cover letters, explore templates, and get career advice with free online tools and AI assistance.';
 
 function upsertMeta(attr: 'name' | 'property', key: string, content: string): HTMLMetaElement {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useDesignMode } from '@/hooks/useDesignMode';
 import { professions } from '@/data/professions';
-import { BrandMark, BrandWordmark } from './BrandLogo';
+import { BrandWordmark } from './BrandLogo';
 
 // A stable subset of profession pages, cross-linked from every page via the
 // footer so crawlers can discover them without depending solely on the sitemap.
@@ -16,7 +16,7 @@ const Footer = () => {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
             <div className="col-span-1 sm:col-span-2 lg:col-span-2">
-              <Link to="/" className="inline-flex items-center gap-2"><BrandMark className="h-8 w-8" /><span className="text-2xl font-bold uppercase tracking-wider text-primary">Flow</span><span className="text-2xl font-bold uppercase tracking-wider text-foreground">Create</span></Link>
+              <Link to="/" className="inline-flex items-center gap-2"><BrandWordmark className="h-8" textClassName="text-2xl font-bold uppercase tracking-wider" /></Link>
               <p className="mt-4 text-sm text-foreground font-medium">Create professional resumes and cover letters online in minutes.</p>
             </div>
             {[

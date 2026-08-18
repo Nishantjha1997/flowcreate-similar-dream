@@ -33,6 +33,21 @@ const posts = (await fetchPublishedBlogPosts({ full: true })).map((post) => ({
   content: normalizeBrandText(post.content),
   author: normalizeBrandText(post.author),
 }));
+const SITE_NAV_LINKS = [
+  { path: '/resume-builder', label: 'Build a Resume' },
+  { path: '/cover-letter-builder', label: 'Build a Cover Letter' },
+  { path: '/templates', label: 'Resume Templates' },
+  { path: '/examples', label: 'Resume Examples' },
+  { path: '/pricing', label: 'Pricing' },
+  { path: '/features', label: 'Features' },
+  { path: '/career-advice', label: 'Career Advice' },
+  { path: '/blog', label: 'Blog' },
+  { path: '/resources', label: 'Resources' },
+  { path: '/ats', label: 'For Companies' },
+  { path: '/help', label: 'Help Center' },
+  { path: '/about', label: 'About MakeCV' },
+  { path: '/login', label: 'Log In' },
+];
 const professions = loadProfessions();
 
 const escapeHtml = (value = '') =>
@@ -86,11 +101,7 @@ function sharedNavigation() {
   return `<header data-seo-header>
     <a href="/" aria-label="${SITE_NAME} home">${SITE_NAME}</a>
     <nav aria-label="Primary navigation">
-      <a href="/resume-builder">Resume Builder</a>
-      <a href="/templates">Resume Templates</a>
-      <a href="/examples">Resume Examples</a>
-      <a href="/cover-letter-builder">Cover Letter Builder</a>
-      <a href="/blog">Career Blog</a>
+      ${SITE_NAV_LINKS.map(({ path, label }) => `<a href="${path}">${label}</a>`).join('\n      ')}
     </nav>
   </header>`;
 }
@@ -100,10 +111,12 @@ function sharedLinks() {
     <h2>Build a Stronger Job Application</h2>
     <ul>
       <li><a href="/resume-builder">Create a free professional resume</a></li>
+      <li><a href="/cover-letter-builder">Build a tailored cover letter</a></li>
       <li><a href="/templates">Browse ATS-friendly resume templates</a></li>
       <li><a href="/examples">Review professional resume examples</a></li>
       <li><a href="/career-advice">Read career and job search advice</a></li>
       <li><a href="/blog">Explore resume writing guides</a></li>
+      <li><a href="/login">Log in to your MakeCV workspace</a></li>
     </ul>
   </aside>`;
 }
@@ -284,6 +297,17 @@ function routeStructuredData(route) {
         url: siteUrl,
         publisher: { '@id': `${siteUrl}/#organization` },
         inLanguage: 'en',
+      },
+      {
+        '@type': 'ItemList',
+        '@id': `${siteUrl}/#navigation`,
+        name: 'MakeCV navigation',
+        itemListElement: SITE_NAV_LINKS.map((item, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: item.label,
+          url: `${siteUrl}${item.path}`,
+        })),
       },
       {
         '@type': 'SoftwareApplication',
