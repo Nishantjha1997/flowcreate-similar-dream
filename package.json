@@ -15,7 +15,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:admin": "node scripts/test-admin-routes.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

@@ -37,6 +37,9 @@ jobs:
       - name: Blog automation smoke test
         run: npm run test:blog
 
+      - name: Admin route smoke test
+        run: npm run test:admin
+
       - name: Edge function syntax check
         run: npm run test:edge
 
