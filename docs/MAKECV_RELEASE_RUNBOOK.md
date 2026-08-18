@@ -98,8 +98,13 @@ BLOG_SCHEDULER_SECRET=<same scheduler secret used by the API route>
 
 Deploy with the repository's normal Vercel integration. The build command is
 `npm run build`, output is `dist`, and `vercel.json` schedules
-`/api/blog-scheduler` every five minutes. The API route refuses to run when
-the Supabase URL or scheduler secret is missing.
+`/api/blog-scheduler` once daily as a Hobby-plan-compatible fallback. The API
+route refuses to run when the Supabase URL or scheduler secret is missing.
+For the intended five-minute automation cadence, install
+`supabase/setup/blog_automation_cron.sql` after deploying the
+`blog-scheduler` function; Supabase `pg_cron` is the authoritative scheduler
+and avoids Vercel Hobby's once-per-day cron limit. On Vercel Pro, the fallback
+cron can be changed back to `*/5 * * * *` if Supabase cron is not used.
 
 After deployment, verify:
 
