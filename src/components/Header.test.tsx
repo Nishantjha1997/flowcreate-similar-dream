@@ -16,9 +16,9 @@ vi.mock('@/hooks/useDesignMode', () => ({
   useDesignMode: () => ({ isNeoBrutalism: false }),
 }));
 
-// Radix's DropdownMenu relies on pointer-capture and scroll APIs jsdom
-// doesn't implement; polyfill the no-ops so opening the "Build" menu in a
-// test doesn't throw. This is standard practice for testing Radix in jsdom.
+// Radix's DropdownMenu and Dialog rely on pointer-capture and scroll APIs jsdom
+// doesn't implement; polyfill the no-ops so opening the "Build" menu or Sheet
+// in a test doesn't throw.
 beforeAll(() => {
   if (!Element.prototype.hasPointerCapture) {
     Element.prototype.hasPointerCapture = () => false;
@@ -46,19 +46,33 @@ describe('Header navigation', () => {
     expect(screen.getAllByRole('link', { name: 'Templates' })[0].getAttribute('href')).toBe('/templates');
     expect(screen.getAllByRole('link', { name: 'Pricing' })[0].getAttribute('href')).toBe('/pricing');
 
-    // The document builders had zero header entry points before this fix -
-    // they live behind the "Build" dropdown, which Radix only mounts into
-    // the DOM once opened. Radix's trigger opens on pointerdown (not click,
-    // to avoid double-firing on touch), so fireEvent.click alone is a no-op.
     const buildTrigger = screen.getByRole('button', { name: /build/i });
     fireEvent.pointerDown(buildTrigger, { button: 0, pointerId: 1, pointerType: 'mouse' });
     fireEvent.pointerUp(buildTrigger, { button: 0, pointerId: 1, pointerType: 'mouse' });
     fireEvent.click(buildTrigger);
 
-    // Radix's DropdownMenuItem sets role="menuitem" on its child even when
-    // that child is an <a> (asChild composition overrides the implicit role).
     expect((await screen.findByRole('menuitem', { name: 'Resume Builder' })).getAttribute('href')).toBe('/resume-builder');
     expect(screen.getByRole('menuitem', { name: 'Cover Letters' }).getAttribute('href')).toBe('/cover-letter-builder');
     expect(screen.getByRole('menuitem', { name: 'Master Profiles' }).getAttribute('href')).toBe('/master-profiles');
+  });
+
+  it('opens and displays the mobile navigation drawer when hamburger menu is clicked', async () => {
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <Header />
+      </MemoryRouter>
+    );
+
+    const mobileMenuTrigger = screen.getByLabelText(/open main menu/i);
+    expect(mobileMenuTrigger).toBeTruthy();
+
+    fireEvent.click(mobileMenuTrigger);
+
+    // Should mount mobile drawer with links
+    const resumeBuilderLinks = await screen.findAllByText('Resume Builder');
+    expect(resumeBuilderLinks.length).toBeGreaterThanOrEqual(1);
+
+    const getStartedLink = screen.getByRole('link', { name: /get started free/i });
+    expect(getStartedLink.getAttribute('href')).toBe('/register');
   });
 });

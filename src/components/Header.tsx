@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation } from 'react-router-dom';
-import { MenuIcon, X, User, Settings, LogOut, Shield, ChevronDown } from 'lucide-react';
+import { Menu, X, User, Settings, LogOut, Shield, ChevronDown, FileText, Sparkles, LayoutTemplate, HelpCircle, Briefcase, DollarSign, BookOpen } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { NotificationBell } from './NotificationBell';
 import { BrandWordmark } from './BrandLogo';
@@ -26,6 +27,7 @@ const Header = () => {
   const location = useLocation();
 
   const handleSignOut = async () => {
+    setMobileMenuOpen(false);
     await signOut();
   };
 
@@ -36,17 +38,18 @@ const Header = () => {
 
   // "Build" groups the actual document builders
   const toolsItems = [
-    { to: '/resume-builder', label: 'Resume Builder' },
-    { to: '/cover-letter-builder', label: 'Cover Letters' },
-    { to: '/master-profiles', label: 'Master Profiles' },
+    { to: '/resume-builder', label: 'Resume Builder', icon: FileText },
+    { to: '/cover-letter-builder', label: 'Cover Letters', icon: Sparkles },
+    { to: '/master-profiles', label: 'Master Profiles', icon: User },
   ];
 
   const navItems = [
-    { to: '/templates', label: 'Templates' },
-    { to: '/blog', label: 'Blog' },
-    { to: '/pricing', label: 'Pricing' },
-    { to: '/ats', label: 'For Companies' },
-    { to: '/help', label: 'Help' },
+    { to: '/templates', label: 'Templates', icon: LayoutTemplate },
+    { to: '/examples', label: 'Examples', icon: FileText },
+    { to: '/blog', label: 'Blog', icon: BookOpen },
+    { to: '/pricing', label: 'Pricing', icon: DollarSign },
+    { to: '/ats', label: 'For Companies', icon: Briefcase },
+    { to: '/help', label: 'Help', icon: HelpCircle },
   ];
 
   const isRouteActive = (to: string) =>
@@ -55,12 +58,14 @@ const Header = () => {
 
   if (isNeoBrutalism) {
     return (
-      <header className="sticky top-0 z-50 bg-background border-b-4 border-foreground">
+      <header className="sticky top-0 z-40 bg-background border-b-4 border-foreground">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
               <BrandWordmark className="h-8" textClassName="text-2xl font-bold uppercase tracking-wider" />
             </Link>
+
+            {/* Desktop Navigation */}
             <nav className="hidden md:flex md:items-center md:space-x-6">
               <DropdownMenu>
                 <DropdownMenuTrigger
@@ -88,6 +93,8 @@ const Header = () => {
                 </Link>
               ))}
             </nav>
+
+            {/* Desktop Right Controls */}
             <div className="hidden md:flex md:items-center md:space-x-3">
               <ThemeToggle />
               {user && <NotificationBell />}
@@ -122,130 +129,122 @@ const Header = () => {
                 </>
               )}
             </div>
+
+            {/* Mobile Controls */}
             <div className="flex md:hidden items-center gap-2">
               <ThemeToggle />
               {user && <NotificationBell />}
-              {user && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-full border-2 border-foreground h-8 w-8">
-                      <Avatar className="h-7 w-7 border border-foreground">
-                        <AvatarFallback className="bg-primary text-primary-foreground font-bold text-xs">{getUserInitials()}</AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 border-3 border-foreground rounded-none shadow-[4px_4px_0px_0px_hsl(var(--foreground))]">
-                    <div className="p-2"><p className="text-xs font-bold truncate">{user.email}</p></div>
-                    <DropdownMenuItem asChild><Link to="/account" className="flex cursor-pointer items-center"><User className="mr-2 h-4 w-4" /><span>My Account</span></Link></DropdownMenuItem>
-                    <DropdownMenuItem asChild><Link to="/account/settings" className="flex cursor-pointer items-center"><Settings className="mr-2 h-4 w-4" /><span>Settings</span></Link></DropdownMenuItem>
-                    {isAdmin && (<><DropdownMenuSeparator className="bg-foreground h-0.5" /><DropdownMenuItem asChild><Link to="/admin" className="flex cursor-pointer items-center"><Shield className="mr-2 h-4 w-4" /><span>Admin Dashboard</span></Link></DropdownMenuItem></>)}
-                    <DropdownMenuSeparator className="bg-foreground h-0.5" />
-                    <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer"><LogOut className="mr-2 h-4 w-4" /><span>Sign out</span></DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-              <button 
-                onClick={() => setMobileMenuOpen(true)} 
-                className="border-2 border-foreground p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                aria-label="Open menu"
-              >
-                <MenuIcon className="h-5 w-5" />
-              </button>
+              
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <button 
+                    className="border-2 border-foreground p-2 min-h-[44px] min-w-[44px] flex items-center justify-center bg-background focus:outline-none"
+                    aria-label="Open mobile menu"
+                    data-testid="mobile-menu-trigger"
+                  >
+                    <Menu className="h-6 w-6" />
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-full sm:max-w-md p-6 overflow-y-auto bg-background border-l-4 border-foreground rounded-none shadow-2xl z-[100]">
+                  <SheetTitle className="sr-only">Mobile Navigation Menu</SheetTitle>
+                  <SheetDescription className="sr-only">Navigate site pages, builder tools, and account settings</SheetDescription>
+                  
+                  <div className="flex items-center justify-between pb-4 border-b-2 border-foreground">
+                    <Link to="/" onClick={() => setMobileMenuOpen(false)}>
+                      <BrandWordmark className="h-8" textClassName="text-2xl font-bold uppercase tracking-wider" />
+                    </Link>
+                  </div>
+
+                  {user && (
+                    <div className="mt-4 p-3 border-2 border-foreground bg-muted flex items-center justify-between">
+                      <div className="min-w-0 pr-2">
+                        <p className="text-xs font-bold truncate">{user.email}</p>
+                        {isAdmin && <span className="text-[10px] text-destructive font-black uppercase">Admin</span>}
+                      </div>
+                      <Link to="/account" onClick={() => setMobileMenuOpen(false)}>
+                        <Button size="sm" variant="outline" className="text-xs rounded-none border-2 border-foreground font-bold uppercase">Account</Button>
+                      </Link>
+                    </div>
+                  )}
+
+                  <div className="mt-6 space-y-6 py-2">
+                    <div className="space-y-2">
+                      <p className="text-xs uppercase tracking-widest text-muted-foreground font-black">Build</p>
+                      {toolsItems.map(({ to, label, icon: Icon }) => (
+                        <Link
+                          key={to}
+                          to={to}
+                          className={`flex items-center gap-2 uppercase tracking-wide font-bold text-base py-1.5 ${isRouteActive(to) ? 'text-primary' : 'text-foreground hover:text-primary'}`}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Icon className="h-4 w-4" />
+                          {label}
+                        </Link>
+                      ))}
+                    </div>
+
+                    <div className="space-y-2 border-t-2 border-foreground pt-4">
+                      <p className="text-xs uppercase tracking-widest text-muted-foreground font-black">Explore</p>
+                      {navItems.map(({ to, label, icon: Icon }) => (
+                        <Link
+                          key={to}
+                          to={to}
+                          className={`flex items-center gap-2 uppercase tracking-wide font-bold text-base py-1.5 ${isRouteActive(to) ? 'text-primary' : 'text-foreground hover:text-primary'}`}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Icon className="h-4 w-4" />
+                          {label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-6 space-y-2 border-t-2 border-foreground pt-4 pb-8">
+                    {user ? (
+                      <>
+                        <Link to="/account/settings" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
+                          <Button variant="outline" className="w-full rounded-none border-2 border-foreground font-bold uppercase justify-start">
+                            <Settings className="mr-2 h-4 w-4" /> Settings
+                          </Button>
+                        </Link>
+                        {isAdmin && (
+                          <Link to="/admin" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
+                            <Button variant="outline" className="w-full rounded-none border-2 border-foreground font-bold uppercase text-destructive justify-start">
+                              <Shield className="mr-2 h-4 w-4" /> Admin Dashboard
+                            </Button>
+                          </Link>
+                        )}
+                        <Button 
+                          variant="ghost" 
+                          className="w-full rounded-none border-2 border-foreground font-bold uppercase justify-start text-destructive"
+                          onClick={handleSignOut}
+                        >
+                          <LogOut className="mr-2 h-4 w-4" /> Sign out
+                        </Button>
+                      </>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2 pt-2">
+                        <Link to="/login" className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                          <Button variant="outline" className="w-full rounded-none border-2 border-foreground font-bold uppercase">Sign in</Button>
+                        </Link>
+                        <Link to="/register" className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                          <Button className="w-full rounded-none border-2 border-foreground font-bold uppercase">Sign up</Button>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </div>
-        {mobileMenuOpen && (
-          <div className="fixed inset-0 z-50 bg-background px-4 overflow-y-auto">
-            <div className="flex h-16 items-center justify-between">
-              <Link to="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                <BrandWordmark className="h-8" textClassName="text-2xl font-bold uppercase tracking-wider" />
-              </Link>
-              <button 
-                onClick={() => setMobileMenuOpen(false)} 
-                className="border-2 border-foreground p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                aria-label="Close menu"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            {user && (
-              <div className="mt-4 p-3 border-2 border-foreground bg-muted flex items-center justify-between">
-                <div className="min-w-0 pr-2">
-                  <p className="text-xs font-bold truncate">{user.email}</p>
-                  {isAdmin && <span className="text-[10px] text-destructive font-black uppercase">Admin</span>}
-                </div>
-                <Link to="/account" onClick={() => setMobileMenuOpen(false)}>
-                  <Button size="sm" variant="outline" className="text-xs rounded-none border-2 border-foreground font-bold uppercase">Account</Button>
-                </Link>
-              </div>
-            )}
-            <div className="mt-6 space-y-6 py-4">
-              <div className="space-y-3">
-                <p className="text-xs uppercase tracking-widest text-muted-foreground font-black">Build</p>
-                {toolsItems.map(({ to, label }) => (
-                  <Link
-                    key={to}
-                    to={to}
-                    className={`block uppercase tracking-wide font-bold text-lg ${isRouteActive(to) ? 'text-primary' : 'text-foreground hover:text-primary'}`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {label}
-                  </Link>
-                ))}
-              </div>
-              <div className="space-y-3">
-                <p className="text-xs uppercase tracking-widest text-muted-foreground font-black">Explore</p>
-                {navItems.map(({ to, label }) => (
-                  <Link
-                    key={to}
-                    to={to}
-                    className={`block uppercase tracking-wide font-bold text-lg ${isRouteActive(to) ? 'text-primary' : 'text-foreground hover:text-primary'}`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-            <div className="mt-4 space-y-2 pb-8">
-              {user ? (
-                <>
-                  <Link to="/account/settings" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full rounded-none border-2 border-foreground font-bold uppercase">Settings</Button>
-                  </Link>
-                  {isAdmin && (
-                    <Link to="/admin" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full rounded-none border-2 border-foreground font-bold uppercase text-destructive">Admin Dashboard</Button>
-                    </Link>
-                  )}
-                  <Button 
-                    variant="ghost" 
-                    className="w-full rounded-none border-2 border-foreground font-bold uppercase"
-                    onClick={() => { setMobileMenuOpen(false); handleSignOut(); }}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" /> Sign out
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Link to="/login" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full rounded-none border-2 border-foreground font-bold uppercase">Sign in</Button>
-                  </Link>
-                  <Link to="/register" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full rounded-none border-2 border-foreground font-bold uppercase">Sign up</Button>
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        )}
       </header>
     );
   }
 
   // Apple-inspired default design
   return (
-    <header className="sticky top-0 z-50 apple-nav">
+    <header className="sticky top-0 z-40 apple-nav">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-12 items-center justify-between">
           <div className="flex items-center">
@@ -255,6 +254,7 @@ const Header = () => {
             </Link>
           </div>
           
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex md:items-center md:space-x-7" role="navigation" aria-label="Main navigation">
             <DropdownMenu>
               <DropdownMenuTrigger
@@ -284,6 +284,7 @@ const Header = () => {
             ))}
           </nav>
 
+          {/* Desktop User / Auth Actions */}
           <div className="hidden md:flex md:items-center md:space-x-3">
             <ThemeToggle />
             {user && <NotificationBell />}
@@ -298,7 +299,7 @@ const Header = () => {
                     aria-label={`User menu for ${user.email}`}
                   >
                     <Avatar className="h-7 w-7">
-                      <AvatarFallback className="text-xs bg-muted text-muted-foreground">
+                      <AvatarFallback className="text-xs bg-muted text-muted-foreground font-medium">
                         {getUserInitials()}
                       </AvatarFallback>
                     </Avatar>
@@ -373,134 +374,124 @@ const Header = () => {
             )}
           </div>
 
-          <div className="flex md:hidden items-center gap-2">
+          {/* Mobile Right Controls */}
+          <div className="flex md:hidden items-center gap-1.5">
             <ThemeToggle />
             {user && <NotificationBell />}
-            {user && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full h-8 w-8" aria-label={`User menu for ${user.email}`}>
-                    <Avatar className="h-7 w-7">
-                      <AvatarFallback className="text-xs">{getUserInitials()}</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 rounded-xl border border-border/50 shadow-lg bg-background/95 backdrop-blur-xl">
-                  <div className="p-2"><p className="text-sm font-medium truncate">{user.email}</p></div>
-                  <DropdownMenuItem asChild><Link to="/account" className="flex cursor-pointer items-center" onClick={() => setMobileMenuOpen(false)}><User className="mr-2 h-4 w-4" /><span>My Account</span></Link></DropdownMenuItem>
-                  <DropdownMenuItem asChild><Link to="/account/settings" className="flex cursor-pointer items-center" onClick={() => setMobileMenuOpen(false)}><Settings className="mr-2 h-4 w-4" /><span>Settings</span></Link></DropdownMenuItem>
-                  {isAdmin && (<><DropdownMenuSeparator /><DropdownMenuItem asChild><Link to="/admin" className="flex cursor-pointer items-center" onClick={() => setMobileMenuOpen(false)}><Shield className="mr-2 h-4 w-4" /><span>Admin Dashboard</span></Link></DropdownMenuItem></>)}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer"><LogOut className="mr-2 h-4 w-4" /><span>Sign out</span></DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-            <button
-              type="button"
-              className="inline-flex items-center justify-center rounded-md p-2 text-foreground/80 hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary min-h-[44px] min-w-[44px]"
-              onClick={() => setMobileMenuOpen(true)}
-              aria-label="Open main menu"
-            >
-              <MenuIcon className="h-5 w-5" aria-hidden="true" />
-            </button>
+            
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center rounded-lg p-2 text-foreground/80 hover:text-foreground hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary min-h-[44px] min-w-[44px]"
+                  aria-label="Open main menu"
+                  data-testid="mobile-menu-trigger"
+                >
+                  <Menu className="h-6 w-6" aria-hidden="true" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-full sm:max-w-md p-6 overflow-y-auto bg-background/98 backdrop-blur-2xl border-l border-border/50 shadow-2xl z-[100]">
+                <SheetTitle className="sr-only">Mobile Navigation Menu</SheetTitle>
+                <SheetDescription className="sr-only">Main site navigation, builders, and account</SheetDescription>
+                
+                <div className="flex items-center justify-between pb-4 border-b border-border/40">
+                  <Link to="/" onClick={() => setMobileMenuOpen(false)} aria-label="MakeCV home">
+                    <BrandWordmark className="h-7" textClassName="text-xl font-semibold tracking-apple-tight" />
+                  </Link>
+                </div>
+
+                <div className="mt-4 flow-root">
+                  {user && (
+                    <div className="mb-5 p-3 rounded-2xl bg-muted/60 border border-border/50 flex items-center justify-between">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Avatar className="h-9 w-9 shrink-0">
+                          <AvatarFallback className="text-xs font-semibold bg-primary text-primary-foreground">
+                            {getUserInitials()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold truncate text-foreground">{user.email}</p>
+                          {isAdmin && <span className="text-[10px] text-destructive font-medium uppercase tracking-wider">Admin</span>}
+                        </div>
+                      </div>
+                      <Link to="/account" onClick={() => setMobileMenuOpen(false)}>
+                        <Button variant="outline" size="sm" className="text-xs h-8 rounded-full">Account</Button>
+                      </Link>
+                    </div>
+                  )}
+
+                  <div className="space-y-1">
+                    <p className="pt-2 pb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Document Builders</p>
+                    {toolsItems.map(({ to, label, icon: Icon }) => (
+                      <Link
+                        key={to}
+                        to={to}
+                        className={`flex items-center gap-3 py-3 text-lg font-medium tracking-tight transition-colors border-b border-border/20 ${isRouteActive(to) ? 'text-primary font-semibold' : 'text-foreground hover:text-primary'}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <span>{label}</span>
+                      </Link>
+                    ))}
+                    
+                    <p className="pt-5 pb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Explore</p>
+                    {navItems.map(({ to, label, icon: Icon }) => (
+                      <Link
+                        key={to}
+                        to={to}
+                        className={`flex items-center gap-3 py-3 text-lg font-medium tracking-tight transition-colors border-b border-border/20 ${isRouteActive(to) ? 'text-primary font-semibold' : 'text-foreground hover:text-primary'}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground shrink-0">
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <span>{label}</span>
+                      </Link>
+                    ))}
+                  </div>
+
+                  <div className="mt-8 space-y-3 pb-8">
+                    {user ? (
+                      <div className="space-y-2">
+                        <Link to="/account/settings" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
+                          <Button variant="outline" className="w-full h-11 rounded-xl text-sm font-medium justify-start">
+                            <Settings className="mr-2 h-4 w-4" /> Settings
+                          </Button>
+                        </Link>
+                        {isAdmin && (
+                          <Link to="/admin" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
+                            <Button variant="outline" className="w-full h-11 rounded-xl text-sm font-medium text-destructive justify-start">
+                              <Shield className="mr-2 h-4 w-4" /> Admin Dashboard
+                            </Button>
+                          </Link>
+                        )}
+                        <Button
+                          variant="ghost"
+                          className="w-full h-11 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 justify-start"
+                          onClick={handleSignOut}
+                        >
+                          <LogOut className="mr-2 h-4 w-4" /> Sign out
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-2 pt-2">
+                        <Link to="/register" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
+                          <Button className="w-full h-11 rounded-full text-sm font-medium">Get Started Free</Button>
+                        </Link>
+                        <Link to="/login" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
+                          <Button variant="outline" className="w-full h-11 rounded-full text-sm font-medium">Sign in</Button>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
-
-      {/* Mobile menu - Apple style */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden bg-background/95 backdrop-blur-xl overflow-y-auto">
-          <div className="px-4 sm:px-6 py-4">
-            <div className="flex h-12 items-center justify-between">
-              <Link to="/" className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded" onClick={() => setMobileMenuOpen(false)} aria-label="MakeCV home">
-                <BrandWordmark className="h-7" textClassName="text-xl font-semibold tracking-apple-tight" />
-              </Link>
-              <button
-                type="button"
-                className="rounded-md p-2 text-foreground/80 hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"
-                onClick={() => setMobileMenuOpen(false)}
-                aria-label="Close menu"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="mt-6 flow-root">
-              {user && (
-                <div className="mb-6 p-3 rounded-xl bg-muted/50 border border-border/40 flex items-center justify-between">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <Avatar className="h-9 w-9 shrink-0">
-                      <AvatarFallback className="text-xs font-semibold bg-primary text-primary-foreground">
-                        {getUserInitials()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold truncate text-foreground">{user.email}</p>
-                      {isAdmin && <span className="text-[10px] text-destructive font-medium uppercase tracking-wider">Admin</span>}
-                    </div>
-                  </div>
-                  <Link to="/account" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="ghost" size="sm" className="text-xs h-8">Account</Button>
-                  </Link>
-                </div>
-              )}
-              <div className="space-y-1">
-                <p className="pt-1 pb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Build</p>
-                {toolsItems.map(({ to, label }) => (
-                  <Link
-                    key={to}
-                    to={to}
-                    className={`block py-3 text-xl font-semibold tracking-apple-tight transition-colors border-b border-border/30 ${isRouteActive(to) ? 'text-primary' : 'text-foreground hover:text-primary'}`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {label}
-                  </Link>
-                ))}
-                <p className="pt-4 pb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Explore</p>
-                {navItems.map(({ to, label }) => (
-                  <Link
-                    key={to}
-                    to={to}
-                    className={`block py-3 text-xl font-semibold tracking-apple-tight transition-colors border-b border-border/30 ${isRouteActive(to) ? 'text-primary' : 'text-foreground hover:text-primary'}`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {label}
-                  </Link>
-                ))}
-              </div>
-              <div className="mt-8 space-y-3 pb-8">
-                {user ? (
-                  <div className="space-y-2">
-                    <Link to="/account/settings" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full h-11 rounded-xl text-sm font-medium">Settings</Button>
-                    </Link>
-                    {isAdmin && (
-                      <Link to="/admin" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
-                        <Button variant="outline" className="w-full h-11 rounded-xl text-sm font-medium text-destructive">Admin Dashboard</Button>
-                      </Link>
-                    )}
-                    <Button
-                      variant="ghost"
-                      className="w-full h-11 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground"
-                      onClick={() => { setMobileMenuOpen(false); handleSignOut(); }}
-                    >
-                      <LogOut className="mr-2 h-4 w-4" /> Sign out
-                    </Button>
-                  </div>
-                ) : (
-                  <>
-                    <Link to="/login" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full h-12 rounded-xl text-base">Sign in</Button>
-                    </Link>
-                    <Link to="/register" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full h-12 rounded-xl text-base">Get Started</Button>
-                    </Link>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   );
 };
