@@ -11,6 +11,7 @@ import { LoadingFallback } from "./components/ui/loading-fallback";
 import { ErrorBoundary } from "./components/ui/error-boundary";
 import { DesignModeProvider } from "./hooks/useDesignMode";
 import ScrollProgress from "./components/ScrollProgress";
+
 // Lazy load pages for better initial bundle size
 const Index = lazy(() => import("./pages/Index"));
 const Templates = lazy(() => import("./pages/Templates"));
@@ -70,82 +71,83 @@ const App = () => (
   <>
     <ScrollProgress />
     <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light">
-      <DesignModeProvider>
-        <ErrorBoundary>
-          <AuthProvider>
-            <RazorpayProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                  <Suspense fallback={<LoadingFallback />}>
-                    <Routes>
-                      <Route path="/" element={<Index />} />
-                      <Route path="/templates" element={<Templates />} />
-                      <Route path="/resume-builder" element={<ResumeBuilder />} />
-                      <Route path="/cover-letter-builder" element={<CoverLetterBuilder />} />
-                      <Route path="/examples" element={<Examples />} />
-                      <Route path="/features" element={<Features />} />
-                      <Route path="/pricing" element={<Pricing />} />
-                      <Route path="/about" element={<About />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/register" element={<Register />} />
-                      <Route path="/forgot-password" element={<ForgotPassword />} />
-                      <Route path="/account" element={<Account />} />
-                      <Route path="/account/settings" element={<AccountSettings />} />
-                      <Route path="/admin/:section?" element={<Admin />} />
-                      <Route path="/terms" element={<Terms />} />
-                      <Route path="/privacy" element={<Privacy />} />
-                      <Route path="/refund-policy" element={<RefundPolicy />} />
-                      <Route path="/shipping-policy" element={<ShippingPolicy />} />
-                      
-                      {/* ATS Routes */}
-                      <Route path="/ats" element={<ATSLanding />} />
-                      <Route path="/ats/login" element={<ATSLogin />} />
-                      <Route path="/ats/signup" element={<ATSSignup />} />
-                      <Route path="/ats/onboarding" element={<ATSOnboarding />} />
-                      <Route path="/ats/dashboard" element={<ATSDashboard />} />
-                      <Route path="/ats/jobs" element={<ATSJobs />} />
-                      <Route path="/ats/jobs/new" element={<ATSJobCreate />} />
-                      <Route path="/ats/jobs/:jobId" element={<ATSJobDetail />} />
-                      <Route path="/ats/applications/:applicationId" element={<ATSApplicationDetail />} />
-                      <Route path="/ats/settings" element={<ATSSettings />} />
-                      <Route path="/ats/jobs/browse" element={<ATSPublicJobs />} />
-                      <Route path="/ats/apply/:jobId" element={<ATSApply />} />
-                      <Route path="/ats/talent-pools" element={<ATSTalentPools />} />
-                      <Route path="/ats/candidates" element={<ATSCandidateDiscovery />} />
-                      
-                      {/* Shared Resume View */}
-                      <Route path="/r/:token" element={<SharedResumeView />} />
-                      
-                      {/* Master Profiles */}
-                      <Route path="/master-profiles" element={<MasterProfile />} />
-                      
-                      {/* Programmatic SEO — Resume Template by Profession */}
-                      <Route path="/resume-template/:profession" element={<ResumeTemplateProfession />} />
-                      
-                      {/* Blog */}
-                      <Route path="/blog" element={<Blog />} />
-                      <Route path="/blog/:slug" element={<BlogPost />} />
-                      
-                      {/* Resources & Career Advice */}
-                      <Route path="/resources" element={<Resources />} />
-                      <Route path="/career-advice" element={<CareerAdvice />} />
-                      
-                      {/* Help Center */}
-                      <Route path="/help" element={<HelpCenter />} />
-                      
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </Suspense>
-                </BrowserRouter>
-              </TooltipProvider>
-            </RazorpayProvider>
-          </AuthProvider>
-        </ErrorBoundary>
-      </DesignModeProvider>
-    </ThemeProvider>
+      <ThemeProvider defaultTheme="light">
+        <DesignModeProvider>
+          <ErrorBoundary>
+            <AuthProvider>
+              <RazorpayProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter>
+                    <Suspense fallback={<LoadingFallback />}>
+                      <Routes>
+                        <Route path="/" element={<Index />} />
+                        <Route path="/templates" element={<Templates />} />
+                        <Route path="/resume-builder" element={<ResumeBuilder />} />
+                        <Route path="/cover-letter-builder" element={<CoverLetterBuilder />} />
+                        <Route path="/examples" element={<Examples />} />
+                        <Route path="/features" element={<Features />} />
+                        <Route path="/pricing" element={<Pricing />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/account" element={<Account />} />
+                        <Route path="/account/settings" element={<AccountSettings />} />
+                        <Route path="/admin/:section?" element={<Admin />} />
+                        <Route path="/terms" element={<Terms />} />
+                        <Route path="/privacy" element={<Privacy />} />
+                        <Route path="/refund-policy" element={<RefundPolicy />} />
+                        <Route path="/shipping-policy" element={<ShippingPolicy />} />
+                        
+                        {/* ATS Routes */}
+                        <Route path="/ats" element={<ATSLanding />} />
+                        <Route path="/ats/login" element={<ATSLogin />} />
+                        <Route path="/ats/signup" element={<ATSSignup />} />
+                        <Route path="/ats/onboarding" element={<ATSOnboarding />} />
+                        <Route path="/ats/dashboard" element={<ATSDashboard />} />
+                        <Route path="/ats/jobs" element={<ATSJobs />} />
+                        <Route path="/ats/jobs/new" element={<ATSJobCreate />} />
+                        <Route path="/ats/jobs/:jobId/edit" element={<ATSJobCreate />} />
+                        <Route path="/ats/jobs/:jobId" element={<ATSJobDetail />} />
+                        <Route path="/ats/applications/:applicationId" element={<ATSApplicationDetail />} />
+                        <Route path="/ats/settings" element={<ATSSettings />} />
+                        <Route path="/ats/jobs/browse" element={<ATSPublicJobs />} />
+                        <Route path="/ats/apply/:jobId" element={<ATSApply />} />
+                        <Route path="/ats/talent-pools" element={<ATSTalentPools />} />
+                        <Route path="/ats/candidates" element={<ATSCandidateDiscovery />} />
+                        
+                        {/* Shared Resume View */}
+                        <Route path="/r/:token" element={<SharedResumeView />} />
+                        
+                        {/* Master Profiles */}
+                        <Route path="/master-profiles" element={<MasterProfile />} />
+                        
+                        {/* Programmatic SEO — Resume Template by Profession */}
+                        <Route path="/resume-template/:profession" element={<ResumeTemplateProfession />} />
+                        
+                        {/* Blog */}
+                        <Route path="/blog" element={<Blog />} />
+                        <Route path="/blog/:slug" element={<BlogPost />} />
+                        
+                        {/* Resources & Career Advice */}
+                        <Route path="/resources" element={<Resources />} />
+                        <Route path="/career-advice" element={<CareerAdvice />} />
+                        
+                        {/* Help Center */}
+                        <Route path="/help" element={<HelpCenter />} />
+                        
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </Suspense>
+                  </BrowserRouter>
+                </TooltipProvider>
+              </RazorpayProvider>
+            </AuthProvider>
+          </ErrorBoundary>
+        </DesignModeProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   </>
 );

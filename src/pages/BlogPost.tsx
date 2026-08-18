@@ -8,9 +8,9 @@ import { ScrollReveal } from '@/hooks/useScrollAnimation';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-
 import { SITE_URL, absoluteUrl } from '@/lib/seo';
 import { normalizeBrandText } from '@/config/brand';
+import { toast } from 'sonner';
 
 interface BlogPost {
   id: string; slug: string; title: string; excerpt: string;
@@ -226,7 +226,14 @@ const BlogPost = () => {
               <span className="text-sm text-muted-foreground flex items-center gap-1">
                 <Share2 className="h-4 w-4" /> Share this article:
               </span>
-              <Button variant="outline" size="sm" onClick={() => navigator.clipboard?.writeText(window.location.href)}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => {
+                  navigator.clipboard?.writeText(window.location.href);
+                  toast.success('Article link copied to clipboard!');
+                }}
+              >
                 Copy Link
               </Button>
             </div>

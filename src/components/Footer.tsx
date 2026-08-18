@@ -22,7 +22,7 @@ const Footer = () => {
             {[
               { title: 'Product', links: [{ to: '/resume-builder', label: 'Resume Builder' }, { to: '/cover-letter-builder', label: 'Cover Letter Builder' }, { to: '/master-profiles', label: 'Master Profiles' }, { to: '/templates', label: 'Templates' }, { to: '/examples', label: 'Examples' }, { to: '/features', label: 'Features' }, { to: '/pricing', label: 'Pricing' }] },
               { title: 'Resources', links: [{ to: '/blog', label: 'Blog' }, { to: '/resources', label: 'Resources' }, { to: '/help', label: 'Help Center' }, { to: '/career-advice', label: 'Career Advice' }] },
-              { title: 'Company', links: [{ to: '/about', label: 'About' }, { to: '/privacy', label: 'Privacy' }, { to: '/terms', label: 'Terms' }, { to: '/shipping-policy', label: 'Shipping Policy' }] },
+              { title: 'Company', links: [{ to: '/about', label: 'About' }, { to: '/privacy', label: 'Privacy' }, { to: '/terms', label: 'Terms' }, { to: '/refund-policy', label: 'Refund Policy' }, { to: '/shipping-policy', label: 'Shipping Policy' }] },
             ].map((section) => (
               <div key={section.title}>
                 <h3 className="text-sm font-black uppercase tracking-widest text-foreground border-b-2 border-foreground pb-2 mb-4">{section.title}</h3>
@@ -52,7 +52,7 @@ const Footer = () => {
   const footerSections = [
     { title: 'Product', links: [{ to: '/resume-builder', label: 'Resume Builder' }, { to: '/cover-letter-builder', label: 'Cover Letter Builder' }, { to: '/master-profiles', label: 'Master Profiles' }, { to: '/templates', label: 'Templates' }, { to: '/examples', label: 'Example Resumes' }, { to: '/features', label: 'Features' }, { to: '/pricing', label: 'Pricing' }] },
     { title: 'Resources', links: [{ to: '/blog', label: 'Blog' }, { to: '/resources', label: 'Resources' }, { to: '/help', label: 'Help Center' }, { to: '/career-advice', label: 'Career Advice' }] },
-    { title: 'Company', links: [{ to: '/about', label: 'About' }, { to: '/privacy', label: 'Privacy Policy' }, { to: '/terms', label: 'Terms of Use' }, { to: '/shipping-policy', label: 'Shipping Policy' }] }
+    { title: 'Company', links: [{ to: '/about', label: 'About' }, { to: '/privacy', label: 'Privacy Policy' }, { to: '/terms', label: 'Terms of Use' }, { to: '/refund-policy', label: 'Refund Policy' }, { to: '/shipping-policy', label: 'Shipping Policy' }] }
   ];
 
   return (

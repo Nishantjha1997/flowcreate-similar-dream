@@ -190,8 +190,8 @@ const ATSTalentPools = () => {
     try {
       const { error } = await supabase.from('talent_pool_candidates').delete().eq('id', candidateId);
       if (error) throw error;
-      setPoolCandidates(prev => prev.filter(c => c.id !== candidateId));
       toast({ title: "Candidate removed" });
+      if (selectedPool) viewPoolDetail(selectedPool);
       loadData();
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -221,12 +221,12 @@ const ATSTalentPools = () => {
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
         </Button>
 
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Talent Pools</h1>
-            <p className="text-muted-foreground">Organize and nurture candidates for future positions</p>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Talent Pools</h1>
+            <p className="text-muted-foreground text-sm">Organize and nurture candidates for future positions</p>
           </div>
-          <Button onClick={() => setIsCreateOpen(true)}>
+          <Button onClick={() => setIsCreateOpen(true)} className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" /> Create Pool
           </Button>
         </div>

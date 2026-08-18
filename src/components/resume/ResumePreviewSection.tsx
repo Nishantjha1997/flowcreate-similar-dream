@@ -36,13 +36,18 @@ export const ResumePreviewSection = ({
   hiddenSections,
   onDownload
 }: ResumePreviewSectionProps) => {
-  const [zoom, setZoom] = useState(70);
+  const [zoom, setZoom] = useState(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 640) {
+      return 45;
+    }
+    return 70;
+  });
   const [isFullscreen, setIsFullscreen] = useState(false);
   const { isNeoBrutalism } = useDesignMode();
   
   const zoomIn = useCallback(() => setZoom(prev => Math.min(prev + 10, 150)), []);
   const zoomOut = useCallback(() => setZoom(prev => Math.max(prev - 10, 30)), []);
-  const resetZoom = useCallback(() => setZoom(70), []);
+  const resetZoom = useCallback(() => setZoom(typeof window !== 'undefined' && window.innerWidth < 640 ? 45 : 70), []);
   const toggleFullscreen = useCallback(() => setIsFullscreen(prev => !prev), []);
 
   useEffect(() => {
@@ -63,10 +68,10 @@ export const ResumePreviewSection = ({
     )}>
       {/* Toolbar */}
       <div className={cn(
-        "flex-shrink-0 px-4 py-2 border-b border-border/30 bg-muted/10 flex items-center justify-between",
+        "flex-shrink-0 px-3 sm:px-4 py-2 border-b border-border/30 bg-muted/10 flex items-center justify-between gap-2 overflow-x-auto",
         isNeoBrutalism && "border-b-2 border-foreground bg-accent/20"
       )}>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <div className="flex gap-1">
             <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
             <span className="h-2.5 w-2.5 rounded-full bg-yellow-400/80" />
@@ -76,8 +81,8 @@ export const ResumePreviewSection = ({
         </div>
         
         {/* Zoom Controls */}
-        <div className="flex items-center gap-0.5">
-          <div className="flex items-center gap-0.5 mr-2 bg-muted/40 p-0.5 rounded-lg border border-border/10">
+        <div className="flex items-center gap-0.5 shrink-0">
+          <div className="hidden sm:flex items-center gap-0.5 mr-2 bg-muted/40 p-0.5 rounded-lg border border-border/10">
             {[50, 75, 100, 125].map((z) => (
               <Button
                 key={z}
@@ -93,14 +98,14 @@ export const ResumePreviewSection = ({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button aria-label="Zoom out" size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={zoomOut} disabled={zoom <= 30}>
+              <Button aria-label="Zoom out" size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground min-h-[32px] min-w-[32px]" onClick={zoomOut} disabled={zoom <= 30}>
                 <ZoomOut className="h-3.5 w-3.5" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="bottom">Zoom Out</TooltipContent>
           </Tooltip>
           
-          <div className="w-20 mx-1">
+          <div className="hidden md:block w-20 mx-1">
             <Slider value={[zoom]} onValueChange={([value]) => setZoom(value)} min={30} max={150} step={5} className="h-1" />
           </div>
           
@@ -108,7 +113,7 @@ export const ResumePreviewSection = ({
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button aria-label="Zoom in" size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={zoomIn} disabled={zoom >= 150}>
+              <Button aria-label="Zoom in" size="icon" variant="ghost" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground min-h-[32px] min-w-[32px]" onClick={zoomIn} disabled={zoom >= 150}>
                 <ZoomIn className="h-3.5 w-3.5" />
               </Button>
             </TooltipTrigger>

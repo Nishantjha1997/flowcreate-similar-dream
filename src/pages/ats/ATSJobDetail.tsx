@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ArrowLeft, MoreVertical, Plus, Mail, Phone, Linkedin, Star } from 'lucide-react';
+import { ArrowLeft, MoreVertical, Plus, Mail, Phone, Linkedin, Star, Edit } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import Header from '@/components/Header';
 
@@ -198,31 +198,35 @@ const ATSJobDetail = () => {
         </Button>
 
         <div className="mb-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold mb-2">{job.title}</h1>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">{job.title}</h1>
+              <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
                 {job.location && <span>{job.location}</span>}
                 {job.job_type && <span>• {job.job_type}</span>}
                 <span>• {applications.length} applicants</span>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Badge variant={job.status === 'published' ? 'default' : 'secondary'}>
                 {job.status}
               </Badge>
+              <Button variant="outline" size="sm" onClick={() => navigate(`/ats/jobs/${job.id}/edit`)}>
+                <Edit className="mr-1.5 h-3.5 w-3.5" />
+                Edit Job
+              </Button>
               {job.status === 'draft' && (
-                <Button variant="default" onClick={() => updateJobStatus('published')}>
+                <Button size="sm" variant="default" onClick={() => updateJobStatus('published')}>
                   Publish Job
                 </Button>
               )}
               {job.status === 'published' && (
-                <Button variant="outline" onClick={() => updateJobStatus('closed')}>
+                <Button size="sm" variant="outline" onClick={() => updateJobStatus('closed')}>
                   Close Job
                 </Button>
               )}
               {job.status === 'closed' && (
-                <Button variant="outline" onClick={() => updateJobStatus('published')}>
+                <Button size="sm" variant="outline" onClick={() => updateJobStatus('published')}>
                   Reopen Job
                 </Button>
               )}

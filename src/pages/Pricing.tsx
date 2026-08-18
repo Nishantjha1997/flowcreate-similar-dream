@@ -365,8 +365,10 @@ const Pricing = () => {
               );
             })}
           </div>
+          </ScrollReveal>
 
           {/* FAQs */}
+          <ScrollReveal delay={150}>
           <div className="max-w-3xl mx-auto mt-20">
             <h2 className="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
             
@@ -425,9 +427,11 @@ const Pricing = () => {
               <p className="text-muted-foreground mb-6">
                 Can't find the answer you're looking for? Please reach out to our support team.
               </p>
-              <Button variant="outline">
-                Contact Support
-              </Button>
+              <Link to="/help">
+                <Button variant="outline">
+                  Contact Support
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

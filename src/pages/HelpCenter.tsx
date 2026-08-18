@@ -37,9 +37,9 @@ interface TicketMessage {
 }
 
 const statusConfig: Record<string, { icon: typeof AlertCircle; color: string; label: string }> = {
-  open: { icon: AlertCircle, color: 'text-orange-500 bg-orange-50', label: 'Open' },
-  in_progress: { icon: Clock, color: 'text-blue-500 bg-blue-50', label: 'In Progress' },
-  resolved: { icon: CheckCircle, color: 'text-green-500 bg-green-50', label: 'Resolved' },
+  open: { icon: AlertCircle, color: 'text-orange-600 bg-orange-50 dark:bg-orange-950/40 dark:text-orange-300 dark:border dark:border-orange-800/40', label: 'Open' },
+  in_progress: { icon: Clock, color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/40 dark:text-blue-300 dark:border dark:border-blue-800/40', label: 'In Progress' },
+  resolved: { icon: CheckCircle, color: 'text-green-600 bg-green-50 dark:bg-green-950/40 dark:text-green-300 dark:border dark:border-green-800/40', label: 'Resolved' },
 };
 
 const HelpCenter = () => {

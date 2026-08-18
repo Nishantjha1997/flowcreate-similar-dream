@@ -90,16 +90,16 @@ const ATSLanding = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/ats/login">
-                <Button size="lg" className="text-lg px-8">
+              <Link to="/ats/signup">
+                <Button size="lg" className="text-lg px-8 w-full sm:w-auto">
                   Get Started Free
                 </Button>
               </Link>
-              <Link to="/ats/demo">
-                <Button size="lg" variant="outline" className="text-lg px-8">
-                  Watch Demo
+              <a href="#features">
+                <Button size="lg" variant="outline" className="text-lg px-8 w-full sm:w-auto">
+                  Explore Features
                 </Button>
-              </Link>
+              </a>
             </div>
             
             <div className="mt-12 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
@@ -224,14 +224,14 @@ const ATSLanding = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Link to="/ats/login">
-                <Button size="lg" className="text-lg px-8">
+              <Link to="/ats/signup">
+                <Button size="lg" className="text-lg px-8 w-full sm:w-auto">
                   Start Free Trial
                 </Button>
               </Link>
-              <Link to="/ats/contact">
-                <Button size="lg" variant="outline" className="text-lg px-8">
-                  Talk to Sales
+              <Link to="/help">
+                <Button size="lg" variant="outline" className="text-lg px-8 w-full sm:w-auto">
+                  Contact Support
                 </Button>
               </Link>
             </div>

@@ -277,8 +277,10 @@ const Account = () => {
                   </AvatarFallback>
                 </Avatar>
                 <button 
-                  onClick={() => setActiveTab('personal')}
+                  onClick={() => setActiveTab('profile')}
                   className={`absolute inset-0 flex items-center justify-center bg-foreground/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${isNeoBrutalism ? 'border-4 border-foreground' : ''}`}
+                  title="Edit profile & avatar"
+                  aria-label="Edit profile & avatar"
                 >
                   <Upload className="h-6 w-6 text-background" />
                 </button>
@@ -475,15 +477,15 @@ const Account = () => {
                         <TabsTrigger 
                           key={tab.id}
                           value={tab.id}
-                          className={`flex items-center gap-2 px-3 sm:px-4 py-2.5 text-sm font-medium transition-all duration-200 relative ${isNeoBrutalism ? 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground uppercase data-[state=active]:scale-105' : 'data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md data-[state=active]:scale-[1.02]'}`}
+                          className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium transition-all duration-200 relative whitespace-nowrap min-h-[40px] ${isNeoBrutalism ? 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-foreground uppercase data-[state=active]:scale-105' : 'data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md data-[state=active]:scale-[1.02]'}`}
                         >
                           <div className="relative">
-                            <IconComponent className="w-4 h-4 transition-transform duration-200 group-data-[state=active]:scale-110" />
+                            <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-200 group-data-[state=active]:scale-110" />
                             {tab.isComplete && (
                               <div className={`absolute -top-1 -right-1 w-2 h-2 rounded-full animate-pulse ${isNeoBrutalism ? 'bg-green-500 border border-foreground' : 'bg-green-500'}`} />
                             )}
                           </div>
-                          <span className="hidden sm:inline">{tab.label}</span>
+                          <span className="inline">{tab.label}</span>
                         </TabsTrigger>
                       );
                     })}

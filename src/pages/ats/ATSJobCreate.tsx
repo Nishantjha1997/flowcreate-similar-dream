@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -13,10 +13,13 @@ import { ArrowLeft } from 'lucide-react';
 import Header from '@/components/Header';
 
 const ATSJobCreate = () => {
+  const { jobId } = useParams<{ jobId?: string }>();
+  const isEditing = Boolean(jobId);
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingJob, setIsFetchingJob] = useState(isEditing);
   const [organizationId, setOrganizationId] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
@@ -40,6 +43,12 @@ const ATSJobCreate = () => {
     }
     loadOrganization();
   }, [user, navigate]);
+
+  useEffect(() => {
+    if (jobId && user) {
+      loadJob(jobId);
+    }
+  }, [jobId, user]);
 
   const loadOrganization = async () => {
     if (!user) return;
@@ -68,6 +77,43 @@ const ATSJobCreate = () => {
     }
   };
 
+  const loadJob = async (id: string) => {
+    setIsFetchingJob(true);
+    try {
+      const { data: job, error } = await supabase
+        .from('jobs')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      if (job) {
+        setFormData({
+          title: job.title || '',
+          description: job.description || '',
+          requirements: job.requirements || '',
+          responsibilities: job.responsibilities || '',
+          location: job.location || '',
+          job_type: job.job_type || '',
+          experience_level: job.experience_level || '',
+          salary_min: job.salary_min ? String(job.salary_min) : '',
+          salary_max: job.salary_max ? String(job.salary_max) : '',
+          salary_currency: job.salary_currency || 'USD',
+          status: job.status || 'draft',
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error loading job details",
+        description: error.message,
+        variant: "destructive",
+      });
+      navigate('/ats/jobs');
+    } finally {
+      setIsFetchingJob(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -76,59 +122,90 @@ const ATSJobCreate = () => {
     setIsLoading(true);
 
     try {
-      const { data: job, error } = await supabase
-        .from('jobs')
-        .insert({
-          organization_id: organizationId,
-          created_by: user.id,
-          title: formData.title,
-          description: formData.description,
-          requirements: formData.requirements || null,
-          responsibilities: formData.responsibilities || null,
-          location: formData.location || null,
-          job_type: formData.job_type || null,
-          experience_level: formData.experience_level || null,
-          salary_min: formData.salary_min ? parseInt(formData.salary_min) : null,
-          salary_max: formData.salary_max ? parseInt(formData.salary_max) : null,
-          salary_currency: formData.salary_currency,
-          status: formData.status,
-        })
-        .select()
-        .single();
+      if (isEditing && jobId) {
+        const { error } = await supabase
+          .from('jobs')
+          .update({
+            title: formData.title,
+            description: formData.description,
+            requirements: formData.requirements || null,
+            responsibilities: formData.responsibilities || null,
+            location: formData.location || null,
+            job_type: formData.job_type || null,
+            experience_level: formData.experience_level || null,
+            salary_min: formData.salary_min ? parseInt(formData.salary_min) : null,
+            salary_max: formData.salary_max ? parseInt(formData.salary_max) : null,
+            salary_currency: formData.salary_currency,
+            status: formData.status,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', jobId);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      // Create default pipeline stages
-      const defaultStages = [
-        { name: 'Applied', stage_order: 1, color: '#6366f1' },
-        { name: 'Phone Screen', stage_order: 2, color: '#8b5cf6' },
-        { name: 'Interview', stage_order: 3, color: '#ec4899' },
-        { name: 'Offer', stage_order: 4, color: '#10b981' },
-        { name: 'Hired', stage_order: 5, color: '#22c55e' },
-      ];
+        toast({
+          title: "Job updated successfully!",
+          description: formData.status === 'published' 
+            ? "Your changes are now live"
+            : "Your draft has been updated",
+        });
 
-      const stages = defaultStages.map(stage => ({
-        job_id: job.id,
-        ...stage,
-      }));
+        navigate(`/ats/jobs/${jobId}`);
+      } else {
+        const { data: job, error } = await supabase
+          .from('jobs')
+          .insert({
+            organization_id: organizationId,
+            created_by: user.id,
+            title: formData.title,
+            description: formData.description,
+            requirements: formData.requirements || null,
+            responsibilities: formData.responsibilities || null,
+            location: formData.location || null,
+            job_type: formData.job_type || null,
+            experience_level: formData.experience_level || null,
+            salary_min: formData.salary_min ? parseInt(formData.salary_min) : null,
+            salary_max: formData.salary_max ? parseInt(formData.salary_max) : null,
+            salary_currency: formData.salary_currency,
+            status: formData.status,
+          })
+          .select()
+          .single();
 
-      const { error: stagesError } = await supabase
-        .from('pipeline_stages')
-        .insert(stages);
+        if (error) throw error;
 
-      if (stagesError) throw stagesError;
+        // Create default pipeline stages
+        const defaultStages = [
+          { name: 'Applied', stage_order: 1, color: '#6366f1' },
+          { name: 'Phone Screen', stage_order: 2, color: '#8b5cf6' },
+          { name: 'Interview', stage_order: 3, color: '#ec4899' },
+          { name: 'Offer', stage_order: 4, color: '#10b981' },
+          { name: 'Hired', stage_order: 5, color: '#22c55e' },
+        ];
 
-      toast({
-        title: "Job created successfully!",
-        description: formData.status === 'published' 
-          ? "Your job is now live and accepting applications"
-          : "Your job has been saved as a draft",
-      });
+        const stages = defaultStages.map(stage => ({
+          job_id: job.id,
+          ...stage,
+        }));
 
-      navigate(`/ats/jobs/${job.id}`);
+        const { error: stagesError } = await supabase
+          .from('pipeline_stages')
+          .insert(stages);
+
+        if (stagesError) throw stagesError;
+
+        toast({
+          title: "Job created successfully!",
+          description: formData.status === 'published' 
+            ? "Your job is now live and accepting applications"
+            : "Your job has been saved as a draft",
+        });
+
+        navigate(`/ats/jobs/${job.id}`);
+      }
     } catch (error: any) {
       toast({
-        title: "Error creating job",
+        title: isEditing ? "Error updating job" : "Error creating job",
         description: error.message,
         variant: "destructive",
       });
@@ -137,6 +214,17 @@ const ATSJobCreate = () => {
     }
   };
 
+  if (isFetchingJob) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -144,18 +232,20 @@ const ATSJobCreate = () => {
       <div className="container mx-auto px-4 py-8">
         <Button
           variant="ghost"
-          onClick={() => navigate('/ats/jobs')}
+          onClick={() => navigate(isEditing && jobId ? `/ats/jobs/${jobId}` : '/ats/jobs')}
           className="mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Jobs
+          {isEditing ? 'Back to Job Details' : 'Back to Jobs'}
         </Button>
 
         <div className="max-w-4xl mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle>Create New Job Posting</CardTitle>
-              <CardDescription>Fill in the details for your new position</CardDescription>
+              <CardTitle>{isEditing ? 'Edit Job Posting' : 'Create New Job Posting'}</CardTitle>
+              <CardDescription>
+                {isEditing ? 'Update the details and requirements for this role' : 'Fill in the details for your new position'}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -301,21 +391,23 @@ const ATSJobCreate = () => {
                   />
                 </div>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
                   <Button
                     type="submit"
                     variant="outline"
                     disabled={isLoading}
                     onClick={() => setFormData({ ...formData, status: 'draft' })}
+                    className="w-full sm:w-auto"
                   >
-                    Save as Draft
+                    {isEditing ? 'Save as Draft' : 'Save as Draft'}
                   </Button>
                   <Button
                     type="submit"
                     disabled={isLoading}
                     onClick={() => setFormData({ ...formData, status: 'published' })}
+                    className="w-full sm:w-auto"
                   >
-                    {isLoading ? 'Publishing...' : 'Publish Job'}
+                    {isLoading ? (isEditing ? 'Updating...' : 'Publishing...') : (isEditing ? 'Update & Publish' : 'Publish Job')}
                   </Button>
                 </div>
               </form>

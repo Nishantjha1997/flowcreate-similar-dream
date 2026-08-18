@@ -113,18 +113,11 @@ const ATSDashboard = () => {
       const activeJobs = jobs.filter(j => j.status === 'published' || j.status === 'active').length;
       const newApps = applications.filter((a: any) => a.status === 'new').length;
 
-      // Filter interviews that belong to this org's jobs
-      const orgJobIds = new Set(jobs.map(j => j.id));
-      const orgInterviews = (interviewsRes.data || []).filter((i: any) => {
-        // We'd need to cross-reference, but for now count all scheduled
-        return true;
-      });
-
       setStats({
         activeJobs,
         totalApplications: applications.length,
         newApplications: newApps,
-        scheduledInterviews: orgInterviews.length,
+        scheduledInterviews: interviewsRes.data?.length || 0,
       });
 
       setRecentJobs(jobs.slice(0, 10).map(j => ({
@@ -209,48 +202,38 @@ const ATSDashboard = () => {
       
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">{primaryOrg.name}</h1>
-            <p className="text-muted-foreground">ATS Dashboard • {primaryOrg.role}</p>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">{primaryOrg.name}</h1>
+            <p className="text-muted-foreground text-sm">ATS Dashboard • {primaryOrg.role}</p>
           </div>
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <Link to="/">
-              <Button variant="ghost" size="sm">
-                <Home className="mr-2 h-4 w-4" />
+              <Button variant="ghost" size="sm" className="text-xs">
+                <Home className="mr-1.5 h-3.5 w-3.5" />
                 Main Site
               </Button>
             </Link>
-            <Link to="/resume-builder">
-              <Button variant="ghost" size="sm">
-                <FileText className="mr-2 h-4 w-4" />
-                Resume Builder
-              </Button>
-            </Link>
-            <Button variant="outline" onClick={() => navigate('/ats/settings')}>
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/ats/talent-pools')}>
-              <FolderOpen className="mr-2 h-4 w-4" />
+            <Button variant="outline" size="sm" className="text-xs" onClick={() => navigate('/ats/talent-pools')}>
+              <FolderOpen className="mr-1.5 h-3.5 w-3.5" />
               Talent Pools
             </Button>
-            <Button variant="outline" onClick={() => navigate('/ats/candidates')}>
-              <Sparkles className="mr-2 h-4 w-4" />
-              Discover Candidates
+            <Button variant="outline" size="sm" className="text-xs" onClick={() => navigate('/ats/candidates')}>
+              <Sparkles className="mr-1.5 h-3.5 w-3.5 text-primary" />
+              Discover
             </Button>
-            <Button variant="outline" onClick={() => navigate('/ats/jobs')}>
-              View All Jobs
+            <Button variant="outline" size="sm" className="text-xs" onClick={() => navigate('/ats/settings')}>
+              <Settings className="mr-1.5 h-3.5 w-3.5" />
+              Settings
             </Button>
-            <Button onClick={() => navigate('/ats/jobs/new')}>
-              <Plus className="mr-2 h-4 w-4" />
-              Post New Job
+            <Button size="sm" className="text-xs" onClick={() => navigate('/ats/jobs/new')}>
+              <Plus className="mr-1.5 h-3.5 w-3.5" /> New Job
             </Button>
           </div>
         </div>
 
         {/* Stats Cards - Real Data */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Jobs</CardTitle>
@@ -301,7 +284,7 @@ const ATSDashboard = () => {
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <CardTitle>Active Job Openings</CardTitle>
                     <CardDescription>Manage your open positions</CardDescription>
