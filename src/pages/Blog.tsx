@@ -9,6 +9,7 @@ import { ScrollReveal } from '@/hooks/useScrollAnimation';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { normalizeBrandText } from '@/config/brand';
 
 interface BlogPost {
   id: string; slug: string; title: string; excerpt: string;
@@ -28,7 +29,11 @@ const Blog = () => {
         .eq('status', 'published')
         .order('published_at', { ascending: false });
       if (error) throw error;
-      return data as BlogPost[];
+      return (data as BlogPost[]).map((post) => ({
+        ...post,
+        title: normalizeBrandText(post.title),
+        excerpt: normalizeBrandText(post.excerpt),
+      }));
     },
     retry: false,
   });

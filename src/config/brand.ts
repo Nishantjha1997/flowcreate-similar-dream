@@ -10,3 +10,7 @@ export const brand = {
 } as const;
 
 export const historicalBrandPhrase = `${brand.name} (formerly ${brand.formerName})`;
+
+/** Prevent legacy CMS rows from leaking the old name before migration. */
+export const normalizeBrandText = (value: string | null | undefined): string =>
+  String(value ?? '').replace(/\bFlowCreate\b/gi, brand.name);

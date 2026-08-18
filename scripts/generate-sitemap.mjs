@@ -29,6 +29,9 @@ const escapeXml = (value = '') =>
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&apos;');
 
+const normalizeBrandText = (value = '') =>
+  String(value).replace(/\bFlowCreate\b/gi, SITE_NAME);
+
 const formatDate = (value) => {
   if (!value) return undefined;
   const date = new Date(value);
@@ -88,12 +91,12 @@ const rssItems = posts
     const url = `${siteUrl}/blog/${post.slug}`;
     const published = post.published_at || post.created_at;
     return `    <item>
-      <title>${escapeXml(post.title)}</title>
+      <title>${escapeXml(normalizeBrandText(post.title))}</title>
       <link>${escapeXml(url)}</link>
       <guid isPermaLink="true">${escapeXml(url)}</guid>
-      <description>${escapeXml(post.description || post.excerpt || '')}</description>
+      <description>${escapeXml(normalizeBrandText(post.description || post.excerpt || ''))}</description>
       ${published ? `<pubDate>${new Date(published).toUTCString()}</pubDate>` : ''}
-      ${post.author ? `<dc:creator>${escapeXml(post.author)}</dc:creator>` : ''}
+      ${post.author ? `<dc:creator>${escapeXml(normalizeBrandText(post.author))}</dc:creator>` : ''}
     </item>`;
   })
   .join('\n');

@@ -23,7 +23,16 @@ const siteUrl = getSiteUrl();
 const distDirectory = join(projectRoot, 'dist');
 const templatePath = join(distDirectory, 'index.html');
 const baseHtml = readFileSync(templatePath, 'utf8');
-const posts = await fetchPublishedBlogPosts({ full: true });
+const normalizeBrandText = (value = '') =>
+  String(value).replace(/\bFlowCreate\b/gi, SITE_NAME);
+const posts = (await fetchPublishedBlogPosts({ full: true })).map((post) => ({
+  ...post,
+  title: normalizeBrandText(post.title),
+  excerpt: normalizeBrandText(post.excerpt),
+  description: normalizeBrandText(post.description),
+  content: normalizeBrandText(post.content),
+  author: normalizeBrandText(post.author),
+}));
 const professions = loadProfessions();
 
 const escapeHtml = (value = '') =>

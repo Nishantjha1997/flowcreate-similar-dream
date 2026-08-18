@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
 import { SITE_URL, absoluteUrl } from '@/lib/seo';
+import { normalizeBrandText } from '@/config/brand';
 
 interface BlogPost {
   id: string; slug: string; title: string; excerpt: string;
@@ -32,7 +33,15 @@ const BlogPost = () => {
         .eq('status', 'published')
         .single();
       if (error) throw error;
-      return data as BlogPost;
+      const raw = data as BlogPost;
+      return {
+        ...raw,
+        title: normalizeBrandText(raw.title),
+        excerpt: normalizeBrandText(raw.excerpt),
+        description: normalizeBrandText(raw.description),
+        content: normalizeBrandText(raw.content),
+        author: normalizeBrandText(raw.author || 'MakeCV Team'),
+      };
     },
     enabled: !!slug,
     retry: false,
