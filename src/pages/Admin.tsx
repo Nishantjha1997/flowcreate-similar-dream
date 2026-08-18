@@ -111,6 +111,22 @@ const TAB_VALUES = new Set<TabValue>(
   NAV_GROUPS.flatMap((group) => group.items.map((item) => item.value)),
 );
 
+// Keep the descriptive URLs used by older bookmarks and release documentation
+// working while the sidebar continues to use short canonical section names.
+const TAB_ALIASES: Record<string, TabValue> = {
+  "ai-management": "ai",
+  "ai-providers": "ai",
+  "payment-gateways": "payments",
+  "payment-management": "payments",
+  "content-management": "content",
+  "blog-manager": "blog",
+};
+
+function canonicalTab(value?: string): TabValue {
+  if (!value) return "overview";
+  return TAB_ALIASES[value] ?? (TAB_VALUES.has(value) ? value : "overview");
+}
+
 // ─── Component ─────────────────────────────────────────────────────────────────
 const Admin = () => {
   const { user, isLoading } = useAuth();
@@ -123,7 +139,7 @@ const Admin = () => {
   const { data: userProfiles = [], isLoading: loadingProfiles } = useUserProfiles(!!isAdmin);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const activeTab: TabValue = section && TAB_VALUES.has(section) ? section : "overview";
+  const activeTab = canonicalTab(section);
 
   const navigateToTab = (tab: TabValue) => {
     navigate(tab === "overview" ? "/admin" : `/admin/${tab}`);
@@ -131,6 +147,11 @@ const Admin = () => {
 
   useEffect(() => {
     if (section && !TAB_VALUES.has(section)) {
+      const alias = TAB_ALIASES[section];
+      if (alias) {
+        navigate(`/admin/${alias}`, { replace: true });
+        return;
+      }
       navigate("/admin", { replace: true });
     }
   }, [section, navigate]);
