@@ -3,9 +3,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Header from './Header';
 
-// Header only needs these hooks to resolve to a logged-out, default-design
-// state - the nav links under test render identically regardless of auth,
-// and mocking avoids hitting the real Supabase client from a unit test.
 vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({ user: null, signOut: vi.fn() }),
 }));
@@ -16,9 +13,7 @@ vi.mock('@/hooks/useDesignMode', () => ({
   useDesignMode: () => ({ isNeoBrutalism: false }),
 }));
 
-// Radix's DropdownMenu and Dialog rely on pointer-capture and scroll APIs jsdom
-// doesn't implement; polyfill the no-ops so opening the "Build" menu or Sheet
-// in a test doesn't throw.
+// Polyfill Radix pointer-capture APIs that jsdom doesn't ship with.
 beforeAll(() => {
   if (!Element.prototype.hasPointerCapture) {
     Element.prototype.hasPointerCapture = () => false;
@@ -42,7 +37,6 @@ describe('Header navigation', () => {
       </MemoryRouter>
     );
 
-    // Templates and Pricing are always in the DOM (top-level nav items).
     expect(screen.getAllByRole('link', { name: 'Templates' })[0].getAttribute('href')).toBe('/templates');
     expect(screen.getAllByRole('link', { name: 'Pricing' })[0].getAttribute('href')).toBe('/pricing');
 
@@ -56,23 +50,35 @@ describe('Header navigation', () => {
     expect(screen.getByRole('menuitem', { name: 'Master Profiles' }).getAttribute('href')).toBe('/master-profiles');
   });
 
-  it('opens and displays the mobile navigation drawer when hamburger menu is clicked', async () => {
+  it('opens mobile navigation drawer and shows all nav links when hamburger is clicked', async () => {
     render(
       <MemoryRouter initialEntries={['/']}>
         <Header />
       </MemoryRouter>
     );
 
-    const mobileMenuTrigger = screen.getByLabelText(/open main menu/i);
+    // The mobile menu trigger is a plain <button> — no Radix events needed.
+    const mobileMenuTrigger = screen.getByTestId('mobile-menu-trigger');
     expect(mobileMenuTrigger).toBeTruthy();
 
     fireEvent.click(mobileMenuTrigger);
 
-    // Should mount mobile drawer with links
-    const resumeBuilderLinks = await screen.findAllByText('Resume Builder');
-    expect(resumeBuilderLinks.length).toBeGreaterThanOrEqual(1);
+    // Menu should now be open — portal renders into document.body
+    expect(screen.getByRole('dialog', { name: /mobile navigation menu/i })).toBeTruthy();
 
-    const getStartedLink = screen.getByRole('link', { name: /get started free/i });
-    expect(getStartedLink.getAttribute('href')).toBe('/register');
+    // "Get Started Free" sign-up link should be visible for guests
+    const signupLink = screen.getByRole('link', { name: /get started free/i });
+    expect(signupLink.getAttribute('href')).toBe('/register');
+
+    // Resume Builder should be in the menu
+    expect(screen.getAllByRole('link', { name: 'Resume Builder' }).length).toBeGreaterThanOrEqual(1);
+
+    // Close button should be present inside the drawer
+    const closeBtn = screen.getByLabelText(/close menu/i);
+    expect(closeBtn).toBeTruthy();
+    fireEvent.click(closeBtn);
+
+    // Dialog should be gone after closing
+    expect(screen.queryByRole('dialog', { name: /mobile navigation menu/i })).toBeNull();
   });
 });
