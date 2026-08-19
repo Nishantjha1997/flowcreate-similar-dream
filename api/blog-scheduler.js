@@ -12,13 +12,17 @@ export default async function handler(req, res) {
   }
 
   const schedulerSecret = process.env.BLOG_SCHEDULER_SECRET || process.env.CRON_SECRET;
+  const cronSecret = process.env.CRON_SECRET;
+  const backendSecret = process.env.BLOG_SCHEDULER_SECRET || cronSecret;
   const cronAuthorization = req.headers.authorization || '';
-  const expectedAuthorization = schedulerSecret ? `Bearer ${schedulerSecret}` : '';
+  const acceptedAuthorizations = [schedulerSecret, cronSecret]
+    .filter(Boolean)
+    .map((secret) => `Bearer ${secret}`);
 
-  // Vercel sends CRON_SECRET as a bearer token for cron invocations. Requiring
-  // the same secret here also keeps the dispatcher from becoming a public
-  // trigger when someone discovers the endpoint.
-  if (!schedulerSecret || cronAuthorization !== expectedAuthorization) {
+  // Vercel sends CRON_SECRET as a bearer token for cron invocations. Accepting
+  // either configured secret keeps the dispatcher private while allowing the
+  // backend worker secret to remain independent from Vercel's cron secret.
+  if (!acceptedAuthorizations.includes(cronAuthorization)) {
     return json(res, { error: 'Unauthorized' }, 401);
   }
   if (!PROJECT_URL) {
@@ -30,7 +34,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-blog-scheduler-secret': schedulerSecret,
+        'x-blog-scheduler-secret': backendSecret,
       },
       body: JSON.stringify({ action: 'tick' }),
     });

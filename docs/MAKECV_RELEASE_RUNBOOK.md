@@ -16,6 +16,7 @@ npm test
 npm run test:blog
 npm run test:payments
 npm run test:ai-boundary
+npm run test:scheduler-route
 npm run test:edge
 npm run build
 npm run seo:validate
@@ -113,6 +114,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=<anon-key>
 VITE_SUPABASE_PROJECT_ID=<project-ref>
 SUPABASE_URL=https://ufzxrojekrrvlweadnkq.supabase.co
 BLOG_SCHEDULER_SECRET=<same scheduler secret used by the API route>
+CRON_SECRET=<Vercel cron bearer secret; it may equal BLOG_SCHEDULER_SECRET>
 ```
 
 Deploy with the repository's normal Vercel integration. The build command is
