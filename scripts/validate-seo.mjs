@@ -106,6 +106,15 @@ for (const location of locations) {
   }
 }
 
+const rootHtmlPath = join(dist, 'index.html');
+if (existsSync(rootHtmlPath)) {
+  const rootHtml = readFileSync(rootHtmlPath, 'utf8');
+  assert(rootHtml.includes('nishant-jha-059828104'), 'homepage Organization JSON-LD is missing Nishant Jha LinkedIn sameAs');
+  for (const path of ['/login', '/resume-builder', '/cover-letter-builder', '/templates', '/blog']) {
+    assert(rootHtml.includes(`href="${path}"`), `homepage crawlable navigation is missing ${path}`);
+  }
+}
+
 const robotsPath = join(dist, 'robots.txt');
 assert(existsSync(robotsPath), 'dist/robots.txt is missing');
 if (existsSync(robotsPath)) {
