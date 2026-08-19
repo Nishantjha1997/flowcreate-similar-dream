@@ -14,6 +14,7 @@
     "test:payments": "node scripts/test-payment-flows.mjs",
     "test:ai-boundary": "node scripts/test-ai-boundary.mjs",
     "test:scheduler-route": "node scripts/test-scheduler-route.mjs",
+    "test:razorpay-loader": "node scripts/test-razorpay-loader.mjs",
     "test:edge": "node scripts/check-edge-syntax.mjs",
     "build:dev": "vite build --mode development",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",

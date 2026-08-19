@@ -17,6 +17,7 @@ npm run test:blog
 npm run test:payments
 npm run test:ai-boundary
 npm run test:scheduler-route
+npm run test:razorpay-loader
 npm run test:edge
 npm run build
 npm run seo:validate
