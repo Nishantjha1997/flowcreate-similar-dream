@@ -43,6 +43,7 @@ jobs:
             verify-razorpay-subscription \
             cancel-razorpay-subscription \
             razorpay-webhook \
+            stripe-webhook \
             blog-scheduler; do
             supabase functions deploy "$function" --project-ref "$SUPABASE_PROJECT_REF" --no-verify-jwt
           done

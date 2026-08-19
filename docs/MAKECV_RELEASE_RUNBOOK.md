@@ -55,12 +55,15 @@ Deploy every changed function:
 ```bash
 supabase functions deploy admin-provider-secrets
 supabase functions deploy test-ai-provider
+supabase functions deploy gemini-suggest
+supabase functions deploy blog-ai
 supabase functions deploy create-razorpay-order
 supabase functions deploy verify-razorpay-payment
 supabase functions deploy create-razorpay-subscription
 supabase functions deploy verify-razorpay-subscription
 supabase functions deploy cancel-razorpay-subscription
 supabase functions deploy razorpay-webhook
+supabase functions deploy stripe-webhook
 supabase functions deploy blog-scheduler
 ```
 
