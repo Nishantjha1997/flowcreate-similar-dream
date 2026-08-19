@@ -10,7 +10,8 @@ const corsHeaders = {
 };
 
 type Resource = 'ai' | 'payment';
-const providers = new Set(['openai', 'gemini', 'deepseek', 'razorpay', 'stripe']);
+const aiProviders = new Set(['openai', 'gemini', 'deepseek']);
+const paymentProviders = new Set(['razorpay', 'stripe']);
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -122,7 +123,8 @@ serve(async (req) => {
     }
 
     // ── INSERT new key ───────────────────────────────────────────────────────
-    if (typeof body.provider !== 'string' || !providers.has(body.provider)) {
+    const allowedProviders = resource === 'ai' ? aiProviders : paymentProviders;
+    if (typeof body.provider !== 'string' || !allowedProviders.has(body.provider)) {
       return json({ error: 'Unsupported provider' }, 400);
     }
 

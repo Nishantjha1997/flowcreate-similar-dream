@@ -43,7 +43,7 @@ export function usePaymentGatewayKeys() {
     onError: (mutationError: Error) => toast({ title: "Error", description: mutationError.message, variant: "destructive" as const }),
   });
 
-  const { data: gatewayKeys = [], isLoading, error } = useQuery({
+  const { data: gatewayKeys = [], isLoading, error, refetch } = useQuery({
     queryKey: ["payment-gateway-keys"],
     queryFn: async () => {
       const response = await invokeSecrets<{ data: Record<string, unknown>[] }>({ resource: "payment" });
@@ -67,7 +67,7 @@ export function usePaymentGatewayKeys() {
   });
 
   return {
-    gatewayKeys, isLoading, error,
+    gatewayKeys, isLoading, error, refetch,
     saveKey: saveKeyMutation.mutate,
     toggleActive: toggleActiveMutation.mutate,
     deleteKey: deleteKeyMutation.mutate,

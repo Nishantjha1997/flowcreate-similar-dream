@@ -65,7 +65,12 @@ async function invokeSecretsOrFallback<T>(
 
   // 2. Fallback to direct Supabase database operations
   if (action === 'list') {
-    const { data, error } = await supabase.from('ai_api_keys').select('*').order('created_at', { ascending: true });
+    // Only request non-secret metadata. The browser must never receive raw
+    // provider credentials, even when the secure Edge Function is unavailable.
+    const { data, error } = await supabase
+      .from('ai_api_keys')
+      .select('id,name,provider,is_active,is_primary,is_fallback,usage_count,last_used,created_at,updated_at')
+      .order('created_at', { ascending: true });
     if (error) throw error;
     return { data: (data ?? []).map(r => normalizeKey(r as Record<string, unknown>)) } as T;
   }
@@ -128,7 +133,7 @@ export function useAIApiKeys() {
   const [draftTestStatus, setDraftTestStatus] = useState<TestStatus>('idle');
   const [isTestingDraft, setIsTestingDraft] = useState(false);
 
-  const { data: apiKeys = [], isLoading, error } = useQuery({
+  const { data: apiKeys = [], isLoading, error, refetch } = useQuery({
     queryKey: ["ai-api-keys"],
     queryFn: async () => {
       const response = await invokeSecretsOrFallback<{ data: Record<string, unknown>[] }>('list');
@@ -189,20 +194,14 @@ export function useAIApiKeys() {
           throw new Error(data.error);
         }
       } catch (efErr) {
-        console.warn("[testAPIKey] Edge function failed, trying direct DB key fetch:", efErr);
+        console.warn("[testAPIKey] Secure test-ai-provider function failed:", efErr);
       }
 
-      // 2. Direct fallback: query key secret from DB & test directly
+      // Saved secrets are intentionally never fetched into the browser. If the
+      // secure tester is unavailable, surface an actionable deployment error
+      // instead of weakening the secret boundary with a direct DB fallback.
       if (!testedOk) {
-        const { data: row, error: dbErr } = await supabase.from('ai_api_keys').select('provider,key').eq('id', id).maybeSingle();
-        if (dbErr || !row?.key) {
-          throw new Error("Unable to test key — neither edge function nor direct query responded.");
-        }
-        const directResult = await testProviderDirectly(row.provider, row.key);
-        if (!directResult.ok) {
-          throw new Error(directResult.error ?? "Provider connection failed");
-        }
-        replyMessage = directResult.message ?? "OK";
+        throw new Error("Saved-key testing is temporarily unavailable. Deploy the test-ai-provider Edge Function and try again.");
       }
 
       setTestStatuses(prev => ({ ...prev, [id]: 'success' }));
@@ -261,7 +260,7 @@ export function useAIApiKeys() {
   }, [isTestingDraft, toast]);
 
   return {
-    apiKeys, tokenUsage, isLoading, isLoadingUsage, error,
+    apiKeys, tokenUsage, isLoading, isLoadingUsage, error, refetch,
     addAPIKey: addAPIKeyMutation.mutate, updateAPIKey: updateAPIKeyMutation.mutate,
     deleteAPIKey: deleteAPIKeyMutation.mutate, setPrimary: setPrimaryMutation.mutate,
     setFallback: setFallbackMutation.mutate, isAdding: addAPIKeyMutation.isPending,

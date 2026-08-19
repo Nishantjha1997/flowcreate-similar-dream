@@ -152,7 +152,7 @@ duplicate, and cancellation updates the local lifecycle fields.
 
 The browser receives only masked metadata. Raw provider keys are read and
 written by `admin-provider-secrets` with `service_role`, and AI calls use the
-server-side key manager. The current DeepSeek model is `deepseek-v4-flash`.
+server-side key manager. The current DeepSeek model is `deepseek-chat`.
 
 ## 6. Configure automated blogs and indexing
 

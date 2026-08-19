@@ -5,6 +5,7 @@
 import { readFileSync } from 'node:fs';
 
 const scheduler = readFileSync(new URL('../supabase/functions/blog-scheduler/index.ts', import.meta.url), 'utf8');
+const adminAutomation = readFileSync(new URL('../src/components/admin/BlogAutomation.tsx', import.meta.url), 'utf8');
 const migration = readFileSync(new URL('../supabase/migrations/20260817000000_release_hardening.sql', import.meta.url), 'utf8');
 const automationMigration = readFileSync(new URL('../supabase/migrations/20260730000000_blog_automation.sql', import.meta.url), 'utf8');
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
@@ -43,6 +44,8 @@ for (const required of ['claim_due_blog_automation_runs', 'complete_blog_automat
   assert(scheduler.includes(required), `scheduler is missing ${required}`);
 }
 assert(automationMigration.includes('blog_automation_run_once'), 'automation migration is missing its idempotency constraint');
+assert(!adminAutomation.includes('generateAIContent'), 'admin blog publishing must not bypass server quality gates');
+assert(adminAutomation.includes('Deploy the blog-scheduler Edge Function'), 'admin blog publishing needs an actionable scheduler error');
 for (const required of ['blog_automation_schedules_publish_mode_check', 'indexing_status']) {
   assert(migration.includes(required), `release migration is missing ${required}`);
 }

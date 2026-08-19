@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { usePaymentGatewayKeys, type PaymentGatewayKey } from '@/hooks/usePaymentGatewayKeys';
 import {
   CreditCard,
@@ -69,6 +70,12 @@ function GatewayCard({
   const [webhookSecret, setWebhookSecret] = useState('');
   const [isLive, setIsLive] = useState(existing?.is_live ?? false);
   const [showSecret, setShowSecret] = useState(false);
+
+  // The card mounts before the async gateway query resolves. Keep the toggle
+  // in sync when the existing record arrives or changes after a save.
+  useEffect(() => {
+    setIsLive(existing?.is_live ?? false);
+  }, [existing?.id, existing?.is_live]);
 
   const handleSave = () => {
     onSave({
@@ -192,7 +199,7 @@ function GatewayCard({
 }
 
 export function PaymentGatewayManagement() {
-  const { gatewayKeys, isLoading, saveKey, toggleActive, deleteKey, isSaving, isDeleting } = usePaymentGatewayKeys();
+  const { gatewayKeys, isLoading, error, refetch, saveKey, toggleActive, deleteKey, isSaving, isDeleting } = usePaymentGatewayKeys();
 
   const razorpay = gatewayKeys.find((k) => k.provider === 'razorpay');
   const stripe = gatewayKeys.find((k) => k.provider === 'stripe');
@@ -211,6 +218,18 @@ export function PaymentGatewayManagement() {
 
   return (
     <div className="space-y-6">
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Payment settings could not be loaded</AlertTitle>
+          <AlertDescription className="flex flex-wrap items-center gap-3">
+            <span>{error instanceof Error ? error.message : 'The secure payment settings service is unavailable.'}</span>
+            <Button type="button" variant="outline" size="sm" onClick={() => void refetch()}>
+              <RefreshCw className="mr-2 h-3.5 w-3.5" /> Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
       <div>
         <h2 className="text-2xl font-bold flex items-center gap-2">
           <CreditCard className="w-6 h-6" />

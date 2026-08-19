@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useAIApiKeys } from '@/hooks/useAIApiKeys';
 import {
   Key,
@@ -39,6 +40,8 @@ export function AIManagement() {
     tokenUsage,
     isLoading,
     isLoadingUsage,
+    error,
+    refetch,
     addAPIKey,
     updateAPIKey,
     deleteAPIKey,
@@ -89,6 +92,18 @@ export function AIManagement() {
 
   return (
     <div className="space-y-6">
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>AI provider settings could not be loaded</AlertTitle>
+          <AlertDescription className="flex flex-wrap items-center gap-3">
+            <span>{error instanceof Error ? error.message : 'The secure provider service is unavailable.'}</span>
+            <Button type="button" variant="outline" size="sm" onClick={() => void refetch()}>
+              <RefreshCw className="mr-2 h-3.5 w-3.5" /> Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">

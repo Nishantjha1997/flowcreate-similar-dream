@@ -139,6 +139,18 @@ serve(async (req) => {
 
     // Derive plan type from order notes (server-side truth)
     const effectivePlanType = orderData?.notes?.plan_type || 'monthly'
+    if (!['monthly', 'yearly', 'lifetime'].includes(effectivePlanType)) {
+      return new Response(JSON.stringify({ error: 'Invalid subscription plan' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 })
+    }
+
+    const notedPlanId = typeof orderData?.notes?.plan_id === 'string' ? orderData.notes.plan_id : null
+    const planQuery = notedPlanId
+      ? supabase.from('subscription_plans').select('id,slug').eq('id', notedPlanId).eq('slug', effectivePlanType).maybeSingle()
+      : supabase.from('subscription_plans').select('id,slug').eq('slug', effectivePlanType).maybeSingle()
+    const { data: plan, error: planError } = await planQuery
+    if (planError || !plan) {
+      return new Response(JSON.stringify({ error: 'Selected plan is not configured' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 503 })
+    }
 
     // Validate payment amount matches expected plan price
     const expectedAmount = Number(orderData?.notes?.expected_amount ?? 0)
@@ -186,7 +198,10 @@ serve(async (req) => {
         user_id: callerUserId,
         is_premium: true,
         plan_type: effectivePlanType,
+        plan_id: plan.id,
+        provider: 'razorpay',
         razorpay_customer_id: paymentData.customer_id,
+        razorpay_payment_id: razorpay_payment_id,
         status: 'active',
         current_period_start: currentDate.toISOString(),
         current_period_end: endDate.toISOString(),

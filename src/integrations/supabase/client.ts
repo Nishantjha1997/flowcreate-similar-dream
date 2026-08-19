@@ -1,13 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-// Reads from Vercel/local env first; falls back to the legacy hardcoded
-// project so existing local setups keep working until VITE_SUPABASE_* is set.
+// Production and local deployments must point at the same Supabase project.
+// Keep only the public project URL as a harmless build-time fallback; never
+// ship a stale or mismatched anonymous token in source control.
 const SUPABASE_URL =
-  import.meta.env.VITE_SUPABASE_URL ?? "https://tkhnxiqvghvejdulvmmx.supabase.co";
+  import.meta.env.VITE_SUPABASE_URL ?? "https://ufzxrojekrrvlweadnkq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRraG54aXF2Z2h2ZWpkdWx2bW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM1NzUyODksImV4cCI6MjA1OTE1MTI4OX0.sbAp0cYt7vCPTEzUvI5_IND_hsbG2vtKLsbAGR4rOJA";
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "makecv-local-config-missing";
+
+if (!import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY) {
+  console.warn(
+    "[MakeCV] VITE_SUPABASE_PUBLISHABLE_KEY is not configured. Add it to .env.local for local auth/data access.",
+  );
+}
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";

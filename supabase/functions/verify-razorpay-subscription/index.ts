@@ -82,29 +82,35 @@ serve(async (req) => {
       : new Date(now.getTime() + (planType === 'yearly' ? 365 : 30) * 86400000);
     const allowedStatuses = new Set(['active', 'trialing', 'past_due', 'canceled', 'expired']);
     const localStatus = allowedStatuses.has(remoteSubscription.status) ? remoteSubscription.status : 'active';
+    const isPremium = !['canceled', 'expired'].includes(localStatus);
     const { data: localSubscription, error: subscriptionError } = await admin.from('subscriptions').upsert({
-      user_id: user.id, is_premium: true, plan_type: planType, plan_id: checkout.plan_id,
+      user_id: user.id, is_premium: isPremium, plan_type: planType, plan_id: checkout.plan_id,
       provider: 'razorpay', razorpay_customer_id: remoteSubscription.customer_id ?? null,
-      razorpay_subscription_id: subscriptionId, razorpay_plan_id: remoteSubscription.plan_id ?? null,
+      razorpay_payment_id: paymentId, razorpay_subscription_id: subscriptionId, razorpay_plan_id: remoteSubscription.plan_id ?? null,
       status: localStatus,
       provider_status: remoteSubscription.status, current_period_start: start.toISOString(),
       current_period_end: end.toISOString(), updated_at: now.toISOString(),
     }, { onConflict: 'user_id' }).select('id').single();
     if (subscriptionError || !localSubscription) throw subscriptionError ?? new Error('Subscription update failed');
 
-    await admin.from('payments').upsert({
+    const { error: paymentError } = await admin.from('payments').upsert({
       user_id: user.id, subscription_id: localSubscription.id, provider: 'razorpay',
       razorpay_payment_id: paymentId, razorpay_subscription_id: subscriptionId,
       amount: payment.amount ?? checkout.amount, currency: payment.currency ?? checkout.currency,
       status: payment.status, payment_method: payment.method ?? null,
     }, { onConflict: 'razorpay_payment_id' });
-    await admin.from('razorpay_subscription_checkouts').update({ status: 'active' }).eq('id', checkout.id);
-    const notification = await notifyUser(admin, {
-      user_id: user.id, type: 'billing_payment_success', title: 'Subscription activated',
-      body: `Your MakeCV ${planType} subscription is active.`, action_url: '/account', send_email: true,
-    });
-    if (!notification.success) console.error('subscription notification failed', notification.error);
-    return json({ success: true, subscription_id: subscriptionId });
+    if (paymentError) throw paymentError;
+    await admin.from('razorpay_subscription_checkouts')
+      .update({ status: isPremium ? 'active' : 'cancelled' })
+      .eq('id', checkout.id);
+    if (isPremium) {
+      const notification = await notifyUser(admin, {
+        user_id: user.id, type: 'billing_payment_success', title: 'Subscription activated',
+        body: `Your MakeCV ${planType} subscription is active.`, action_url: '/account', send_email: true,
+      });
+      if (!notification.success) console.error('subscription notification failed', notification.error);
+    }
+    return json({ success: true, subscription_id: subscriptionId, status: localStatus, is_premium: isPremium });
   } catch (error) {
     console.error('verify-razorpay-subscription failed', error);
     return json({ error: 'Internal server error' }, 500);

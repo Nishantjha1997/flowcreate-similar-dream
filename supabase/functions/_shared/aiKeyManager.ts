@@ -27,6 +27,8 @@ export class AIKeyManager {
         .eq('provider', provider)
         .eq('is_active', true)
         .eq('is_primary', true)
+        .order('updated_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (primaryKey && !primaryError) {
@@ -41,6 +43,8 @@ export class AIKeyManager {
         .eq('provider', provider)
         .eq('is_active', true)
         .eq('is_fallback', true)
+        .order('updated_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (fallbackKey && !fallbackError) {
@@ -107,6 +111,8 @@ export class AIKeyManager {
         .eq('provider', provider)
         .eq('is_active', true)
         .eq('is_fallback', true)
+        .order('updated_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (data && !error) {
@@ -133,6 +139,8 @@ export class AIKeyManager {
         .select('*')
         .eq('is_active', true)
         .eq('is_primary', true)
+        .order('updated_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (data && !error) {
@@ -153,6 +161,8 @@ export class AIKeyManager {
         .select('*')
         .eq('is_active', true)
         .eq('is_fallback', true)
+        .order('updated_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (data && !error) {
