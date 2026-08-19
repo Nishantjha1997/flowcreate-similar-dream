@@ -371,7 +371,8 @@ export function BlogAutomation() {
         if (!error && data?.success) {
           return data;
         }
-        throw new Error(await getEdgeFunctionErrorMessage(error ?? data?.error, "The blog scheduler could not publish this article."));
+        const schedulerError = error ?? (data?.error ? new Error(String(data.error)) : null);
+        throw new Error(await getEdgeFunctionErrorMessage(schedulerError, "The blog scheduler could not publish this article."));
       } catch (efErr) {
         throw new Error(
           `${errorMessage(efErr, "The blog scheduler is unavailable.")} Deploy the blog-scheduler Edge Function and run the database cron setup before publishing.`,
