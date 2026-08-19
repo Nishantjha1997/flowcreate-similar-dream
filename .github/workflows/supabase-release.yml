@@ -2,18 +2,12 @@ name: Supabase release
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "supabase/**"
-      - ".github/workflows/supabase-release.yml"
 
 jobs:
   deploy:
-    # Pushes stay harmless until the repository owner adds the two required
-    # GitHub secrets. A manual run always attempts the deployment and exposes
-    # a clear missing-secret error instead of silently skipping production.
-    if: github.event_name == 'workflow_dispatch' || secrets.SUPABASE_ACCESS_TOKEN != ''
+    # This is deliberately manual: applying production migrations is a
+    # controlled release step and requires the owner to configure the two
+    # database credentials first.
     runs-on: ubuntu-latest
     permissions:
       contents: read

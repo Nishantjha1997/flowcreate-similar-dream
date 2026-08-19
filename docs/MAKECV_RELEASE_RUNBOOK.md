@@ -55,6 +55,12 @@ supabase functions deploy razorpay-webhook
 supabase functions deploy blog-scheduler
 ```
 
+The repository also contains a manual GitHub Actions workflow at
+`.github/workflows/supabase-release.yml`. Add `SUPABASE_ACCESS_TOKEN` and
+`SUPABASE_DB_PASSWORD` as repository secrets, then run **Supabase release**
+from the Actions tab to apply the migration and deploy the functions without
+installing the CLI locally.
+
 Set server-only secrets in Supabase (never prefix these with `VITE_`):
 
 ```bash
