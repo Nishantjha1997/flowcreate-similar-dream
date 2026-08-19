@@ -257,11 +257,32 @@ export function BlogAutomation() {
   const runsQuery = useQuery({
     queryKey: ["admin-blog-automation-runs"],
     queryFn: async () => {
+      const baseSelection = "id,schedule_id,status,trigger_source,provider,generated_title,error_message,blog_post_id,scheduled_for,completed_at,created_at";
+      const indexedSelection = `${baseSelection},indexing_status,indexing_error,indexed_at`;
       const { data, error } = await supabase
         .from("blog_automation_runs")
-        .select("id,schedule_id,status,trigger_source,provider,generated_title,error_message,blog_post_id,scheduled_for,completed_at,created_at,indexing_status,indexing_error,indexed_at")
+        .select(indexedSelection)
         .order("scheduled_for", { ascending: false })
         .limit(25);
+
+      // Older production databases may not yet have the additive Search
+      // Console columns from the release migration. Keep run history usable
+      // while the migration is being applied instead of making the whole
+      // Blog Automation tab appear broken.
+      if (error && (error.code === "42703" || /indexing_status|indexing_error|indexed_at/i.test(error.message))) {
+        const legacy = await supabase
+          .from("blog_automation_runs")
+          .select(baseSelection)
+          .order("scheduled_for", { ascending: false })
+          .limit(25);
+        if (legacy.error) throw new Error(legacy.error.message);
+        return (legacy.data ?? []).map((run) => ({
+          ...run,
+          indexing_status: "not_requested" as const,
+          indexing_error: null,
+          indexed_at: null,
+        })) as AutomationRun[];
+      }
       if (error) throw new Error(error.message);
       return (data ?? []) as AutomationRun[];
     },

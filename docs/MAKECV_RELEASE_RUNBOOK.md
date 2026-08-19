@@ -33,10 +33,11 @@ Acceptance criteria:
 
 ## 2. Configure Supabase
 
-Create a database backup before changing production. From the repository root:
+Create a database backup before changing production. This repository is linked
+to Supabase project `ufzxrojekrrvlweadnkq`. From the repository root:
 
 ```bash
-supabase link --project-ref <project-ref>
+supabase link --project-ref ufzxrojekrrvlweadnkq
 supabase db push
 ```
 
@@ -89,10 +90,10 @@ Set these project environment variables for Production and Preview as
 appropriate:
 
 ```text
-VITE_SUPABASE_URL=https://<project-ref>.supabase.co
+VITE_SUPABASE_URL=https://ufzxrojekrrvlweadnkq.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=<anon-key>
 VITE_SUPABASE_PROJECT_ID=<project-ref>
-SUPABASE_URL=https://<project-ref>.supabase.co
+SUPABASE_URL=https://ufzxrojekrrvlweadnkq.supabase.co
 BLOG_SCHEDULER_SECRET=<same scheduler secret used by the API route>
 ```
 
@@ -130,7 +131,7 @@ Set the returned `plan_...` IDs in the server secrets above. Configure a
 Razorpay webhook pointing to:
 
 ```text
-https://<project-ref>.supabase.co/functions/v1/razorpay-webhook
+https://ufzxrojekrrvlweadnkq.supabase.co/functions/v1/razorpay-webhook
 ```
 
 Use the same `RAZORPAY_WEBHOOK_SECRET` and enable subscription events:
@@ -162,7 +163,7 @@ server-side key manager. The current DeepSeek model is `deepseek-chat`.
 3. Run the local wiring smoke test:
 
    ```bash
-   BLOG_SCHEDULER_URL=https://<project-ref>.supabase.co/functions/v1/blog-scheduler \
+   BLOG_SCHEDULER_URL=https://ufzxrojekrrvlweadnkq.supabase.co/functions/v1/blog-scheduler \
    BLOG_SCHEDULER_SECRET=<secret> \
    npm run test:blog
    ```

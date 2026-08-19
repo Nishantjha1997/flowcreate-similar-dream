@@ -1,0 +1,52 @@
+name: Supabase release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/**"
+      - ".github/workflows/supabase-release.yml"
+
+jobs:
+  deploy:
+    # Pushes stay harmless until the repository owner adds the two required
+    # GitHub secrets. A manual run always attempts the deployment and exposes
+    # a clear missing-secret error instead of silently skipping production.
+    if: github.event_name == 'workflow_dispatch' || secrets.SUPABASE_ACCESS_TOKEN != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_REF: ufzxrojekrrvlweadnkq
+
+    steps:
+      - name: Check out release
+        uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Apply database migrations
+        run: supabase db push --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Deploy changed Edge Functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          for function in \
+            admin-provider-secrets \
+            test-ai-provider \
+            create-razorpay-order \
+            verify-razorpay-payment \
+            create-razorpay-subscription \
+            verify-razorpay-subscription \
+            cancel-razorpay-subscription \
+            razorpay-webhook \
+            blog-scheduler; do
+            supabase functions deploy "$function" --project-ref "$SUPABASE_PROJECT_REF" --no-verify-jwt
+          done
