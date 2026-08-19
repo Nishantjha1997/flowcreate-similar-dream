@@ -46,74 +46,18 @@ function normalizeKey(row: Record<string, unknown>): AIApiKey {
   } as AIApiKey;
 }
 
-// Invoke Edge Function with automatic fallback to direct DB operations if function is not deployed
-async function invokeSecretsOrFallback<T>(
+// Provider secrets are service-role-only. The browser always goes through the
+// protected Edge Function; there is deliberately no direct-table fallback.
+async function invokeSecrets<T>(
   action: 'list' | 'add' | 'update' | 'delete' | 'set-primary' | 'set-fallback',
   payload: Record<string, unknown> = {}
 ): Promise<T> {
-  // 1. Try Edge Function first
-  try {
-    const { data, error } = await supabase.functions.invoke("admin-provider-secrets", {
-      body: { resource: "ai", ...payload, action: action === 'list' ? undefined : action }
-    });
-    if (!error && data && !data.error) {
-      return data as T;
-    }
-  } catch (efError) {
-    console.warn("[AIApiKeys] Edge function unreachable, falling back to direct DB queries:", efError);
-  }
-
-  // 2. Fallback to direct Supabase database operations
-  if (action === 'list') {
-    // Only request non-secret metadata. The browser must never receive raw
-    // provider credentials, even when the secure Edge Function is unavailable.
-    const { data, error } = await supabase
-      .from('ai_api_keys')
-      .select('id,name,provider,is_active,is_primary,is_fallback,usage_count,last_used,created_at,updated_at')
-      .order('created_at', { ascending: true });
-    if (error) throw error;
-    return { data: (data ?? []).map(r => normalizeKey(r as Record<string, unknown>)) } as T;
-  }
-
-  if (action === 'add') {
-    const { data, error } = await supabase.from('ai_api_keys').insert({
-      name: String(payload.name).trim().slice(0, 120),
-      provider: String(payload.provider),
-      key: String(payload.key).trim(),
-      is_active: true,
-      is_primary: false,
-      is_fallback: false,
-      usage_count: 0,
-    }).select('*').single();
-    if (error) throw error;
-    return { data: normalizeKey(data as Record<string, unknown>) } as T;
-  }
-
-  if (action === 'update') {
-    const id = String(payload.id);
-    const updates = payload.updates as { is_active?: boolean; name?: string };
-    const { data, error } = await supabase.from('ai_api_keys').update(updates as any).eq('id', id).select('*').single();
-    if (error) throw error;
-    return { data: normalizeKey(data as Record<string, unknown>) } as T;
-  }
-
-  if (action === 'delete') {
-    const id = String(payload.id);
-    const { error } = await supabase.from('ai_api_keys').delete().eq('id', id);
-    if (error) throw error;
-    return { ok: true } as T;
-  }
-
-  if (action === 'set-primary' || action === 'set-fallback') {
-    const id = String(payload.id);
-    const field = action === 'set-primary' ? 'is_primary' : 'is_fallback';
-    await (supabase.from('ai_api_keys') as any).update({ [field]: false }).neq('id', '00000000-0000-0000-0000-000000000000');
-    const { data, error } = await (supabase.from('ai_api_keys') as any).update({ [field]: true, is_active: true }).eq('id', id).select('*').single();
-    if (error) throw error;
-    return { data: normalizeKey(data as Record<string, unknown>) } as T;
-  }
-
-  throw new Error(`Unsupported action: ${action}`);
+  const { data, error } = await supabase.functions.invoke("admin-provider-secrets", {
+    body: { resource: "ai", ...payload, action: action === 'list' ? undefined : action },
+  });
+  if (error) throw error;
+  if (!data || data.error) throw new Error(String(data?.error ?? "Secure provider settings are unavailable."));
+  return data as T;
 }
 
 export function useAIApiKeys() {
@@ -136,7 +80,7 @@ export function useAIApiKeys() {
   const { data: apiKeys = [], isLoading, error, refetch } = useQuery({
     queryKey: ["ai-api-keys"],
     queryFn: async () => {
-      const response = await invokeSecretsOrFallback<{ data: Record<string, unknown>[] }>('list');
+      const response = await invokeSecrets<{ data: Record<string, unknown>[] }>('list');
       return (response.data ?? []).map(normalizeKey);
     },
   });
@@ -154,23 +98,23 @@ export function useAIApiKeys() {
   });
 
   const addAPIKeyMutation = useMutation({
-    mutationFn: (newKey: { name: string; provider: string; key: string }) => invokeSecretsOrFallback('add', newKey),
+    mutationFn: (newKey: { name: string; provider: string; key: string }) => invokeSecrets('add', newKey),
     ...mutationOptions("API key added successfully"),
   });
   const updateAPIKeyMutation = useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<Pick<AIApiKey, "is_active">> }) => invokeSecretsOrFallback('update', { id, updates }),
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Pick<AIApiKey, "is_active">> }) => invokeSecrets('update', { id, updates }),
     ...mutationOptions("API key updated successfully"),
   });
   const deleteAPIKeyMutation = useMutation({
-    mutationFn: (id: string) => invokeSecretsOrFallback('delete', { id }),
+    mutationFn: (id: string) => invokeSecrets('delete', { id }),
     ...mutationOptions("API key deleted successfully"),
   });
   const setPrimaryMutation = useMutation({
-    mutationFn: (id: string) => invokeSecretsOrFallback('set-primary', { id }),
+    mutationFn: (id: string) => invokeSecrets('set-primary', { id }),
     ...mutationOptions("Primary API key updated successfully"),
   });
   const setFallbackMutation = useMutation({
-    mutationFn: (id: string) => invokeSecretsOrFallback('set-fallback', { id }),
+    mutationFn: (id: string) => invokeSecrets('set-fallback', { id }),
     ...mutationOptions("Fallback API key updated successfully"),
   });
 
@@ -199,7 +143,7 @@ export function useAIApiKeys() {
 
       // Saved secrets are intentionally never fetched into the browser. If the
       // secure tester is unavailable, surface an actionable deployment error
-      // instead of weakening the secret boundary with a direct DB fallback.
+      // instead of weakening the secret boundary with a direct DB request.
       if (!testedOk) {
         throw new Error("Saved-key testing is temporarily unavailable. Deploy the test-ai-provider Edge Function and try again.");
       }
