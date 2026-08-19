@@ -80,8 +80,12 @@ serve(async (req) => {
     const end = remoteSubscription.current_end
       ? new Date(remoteSubscription.current_end * 1000)
       : new Date(now.getTime() + (planType === 'yearly' ? 365 : 30) * 86400000);
-    const allowedStatuses = new Set(['active', 'trialing', 'past_due', 'canceled', 'expired']);
-    const localStatus = allowedStatuses.has(remoteSubscription.status) ? remoteSubscription.status : 'active';
+    // Razorpay spells this lifecycle state `cancelled`; keep the local
+    // provider-neutral status as `canceled` for compatibility with Stripe and
+    // the existing subscriptions table values.
+    const allowedStatuses = new Set(['active', 'trialing', 'past_due', 'canceled', 'cancelled', 'expired']);
+    const normalizedProviderStatus = remoteSubscription.status === 'cancelled' ? 'canceled' : remoteSubscription.status;
+    const localStatus = allowedStatuses.has(remoteSubscription.status) ? normalizedProviderStatus : 'active';
     const isPremium = !['canceled', 'expired'].includes(localStatus);
     const { data: localSubscription, error: subscriptionError } = await admin.from('subscriptions').upsert({
       user_id: user.id, is_premium: isPremium, plan_type: planType, plan_id: checkout.plan_id,

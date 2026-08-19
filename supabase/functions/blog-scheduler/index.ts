@@ -163,6 +163,10 @@ function cleanPlainText(value: unknown, maxLength: number): string {
     .slice(0, maxLength);
 }
 
+function normalizeBrandText(value: string): string {
+  return value.replace(/\bFlowCreate\b/gi, "MakeCV");
+}
+
 function escapeAttribute(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
 }
@@ -252,17 +256,17 @@ function parseArticle(rawText: string, schedule: BlogSchedule): ArticlePayload {
     throw new SchedulerError("invalid_ai_output", "AI returned an invalid article format");
   }
 
-  let title = cleanPlainText(parsed.title, 180);
-  let description = cleanPlainText(parsed.description, 200);
-  let excerpt = cleanPlainText(parsed.excerpt, 280);
+  let title = normalizeBrandText(cleanPlainText(parsed.title, 180));
+  let description = normalizeBrandText(cleanPlainText(parsed.description, 200));
+  let excerpt = normalizeBrandText(cleanPlainText(parsed.excerpt, 280));
   const rawContent = typeof parsed.content === "string" ? parsed.content : "";
-  let content = sanitizeHtml(rawContent);
+  let content = normalizeBrandText(sanitizeHtml(rawContent));
 
   if (!title) {
     title = cleanPlainText(schedule.topic_prompt, 180) || "Career Guide";
   }
   if (!description) {
-    description = `Comprehensive career and resume guide covering ${schedule.category.toLowerCase()} and practical strategies for job seekers.`;
+    description = `Comprehensive career and resume guide covering ${schedule.category.toLowerCase()}, with practical strategies and examples for today's job seekers.`;
   }
   if (!excerpt) {
     excerpt = description.slice(0, 180);
@@ -274,8 +278,20 @@ function parseArticle(rawText: string, schedule: BlogSchedule): ArticlePayload {
   }
 
   const wordCount = countWords(content);
-  if (wordCount < 100) {
-    throw new SchedulerError("article_validation_failed", "Generated article content was too short");
+  if (wordCount < 700) {
+    throw new SchedulerError("article_validation_failed", "Generated article must contain at least 700 words");
+  }
+  if ((content.match(/<h[23]>/gi) ?? []).length < 2) {
+    throw new SchedulerError("article_validation_failed", "Generated article needs at least two semantic section headings");
+  }
+  if (!/<a\s+href=["']\/(?:resume-builder|templates|cover-letter-builder)(?:[/?#"'])/i.test(content)) {
+    throw new SchedulerError("article_validation_failed", "Generated article needs an approved internal MakeCV link");
+  }
+  if (title.length < 30 || title.length > 80) {
+    throw new SchedulerError("article_validation_failed", "Generated article title is outside the 30–80 character range");
+  }
+  if (description.length < 120 || description.length > 180) {
+    throw new SchedulerError("article_validation_failed", "Generated article description is outside the 120–180 character range");
   }
 
   const generatedKeywords = Array.isArray(parsed.keywords)
@@ -512,7 +528,7 @@ async function processRun(
     }
 
     const existingTitles = (existingPosts ?? [])
-      .map((post: { title?: string }) => cleanPlainText(post.title, 180))
+      .map((post: { title?: string }) => normalizeBrandText(cleanPlainText(post.title, 180)))
       .filter(Boolean);
     const { article, provider } = await generateArticle(schedule, keyManager, existingTitles);
     const slug = await findUniqueSlug(adminClient, article.slug, run.run_id);
@@ -529,9 +545,9 @@ async function processRun(
         description: article.description,
         content: article.content,
         category: schedule.category,
-        status: "published",
+        status: schedule.publish_mode,
         keywords: article.keywords,
-        author: cleanPlainText(schedule.author, 120) || "MakeCV Team",
+        author: normalizeBrandText(cleanPlainText(schedule.author, 120)) || "MakeCV Team",
         read_time: readTime,
         image_url: "",
         published_at: publishedAt,
@@ -550,9 +566,9 @@ async function processRun(
           description: article.description,
           content: article.content,
           category: schedule.category,
-          status: "published",
+          status: schedule.publish_mode,
           keywords: article.keywords,
-          author: cleanPlainText(schedule.author, 120) || "MakeCV Team",
+          author: normalizeBrandText(cleanPlainText(schedule.author, 120)) || "MakeCV Team",
           read_time: readTime,
           image_url: "",
           published_at: publishedAt,
@@ -582,12 +598,16 @@ async function processRun(
       throw new SchedulerError("run_finalize_failed", "Generated article could not be finalized");
     }
 
-    await publishAndSubmitSitemap(adminClient, run.run_id);
+    if (schedule.publish_mode === "published") {
+      await publishAndSubmitSitemap(adminClient, run.run_id);
+    } else {
+      await recordIndexingStatus(adminClient, run.run_id, "not_configured", "Draft mode does not enter the public sitemap");
+    }
     return {
       success: true,
       runId: run.run_id,
       blogPostId: post.id,
-      postStatus: "published",
+      postStatus: schedule.publish_mode,
     };
   } catch (error) {
     console.error(`[blog-scheduler] Run ${run.run_id} failed`, error);

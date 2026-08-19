@@ -19,12 +19,20 @@ assert(
   'one-time Razorpay verification must be idempotent by payment ID',
 );
 assert(
+  verifyPayment.includes(".eq('product', 'resume')"),
+  'one-time Razorpay verification must correlate the payment to the resume plan catalog',
+);
+assert(
   verifySubscription.includes("onConflict: 'razorpay_payment_id'"),
   'recurring Razorpay verification must be idempotent by payment ID',
 );
 assert(
   verifySubscription.includes('razorpay_subscription_checkouts'),
   'recurring Razorpay verification must correlate to the server checkout ledger',
+);
+assert(
+  verifySubscription.includes("remoteSubscription.status === 'cancelled'") && verifySubscription.includes("normalizedProviderStatus"),
+  'recurring Razorpay verification must normalize Razorpay\'s cancelled lifecycle spelling',
 );
 assert(
   (stripeWebhook.match(/if \(payError\) throw payError/g) || []).length >= 2,

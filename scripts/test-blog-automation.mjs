@@ -39,6 +39,10 @@ assert(!safe.includes('<script'), 'unsafe script tag survived sanitization');
 assert(safe.includes('<h2>') && safe.includes('<p>'), 'semantic article tags were lost');
 assert(countWords(safe) >= 700, 'quality gate should reject short articles');
 assert(slugify('How to Write an ATS-Friendly Resume in 2026') === 'how-to-write-an-ats-friendly-resume-in-2026', 'slug normalization changed');
+assert(scheduler.includes('wordCount < 700'), 'scheduler must enforce the documented 700-word minimum');
+assert(scheduler.includes('status: schedule.publish_mode'), 'scheduler must honor draft versus published mode');
+assert(scheduler.includes('publish_mode === "published"'), 'scheduler must only submit published articles for indexing');
+assert(scheduler.includes('normalizeBrandText'), 'scheduler must prevent legacy FlowCreate text from entering new articles');
 
 for (const required of ['claim_due_blog_automation_runs', 'complete_blog_automation_run', 'fail_blog_automation_run', 'publishAndSubmitSitemap', 'submitSitemapToSearchConsole']) {
   assert(scheduler.includes(required), `scheduler is missing ${required}`);

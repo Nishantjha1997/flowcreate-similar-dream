@@ -104,6 +104,19 @@ serve(async (req) => {
       return json({ data: resource === 'ai' ? safeAi(data) : safePayment(data) });
     }
 
+    // The browser client uses POST for all function invocations. Keep the
+    // semantic update action equivalent to PATCH so the AI Providers page can
+    // activate/deactivate a saved key without falling through to INSERT.
+    if (body.action === 'update') {
+      if (typeof body.id !== 'string' || !body.updates || typeof body.updates !== 'object') {
+        return json({ error: 'id and updates are required' }, 400);
+      }
+      const updates = { is_active: Boolean((body.updates as Record<string, unknown>).is_active) };
+      const { data, error } = await auth.client.from(table).update(updates).eq('id', body.id).select('*').single();
+      if (error) throw error;
+      return json({ data: resource === 'ai' ? safeAi(data) : safePayment(data) });
+    }
+
     // ── POST actions ─────────────────────────────────────────────────────────
     if (body.action === 'toggle-active') {
       if (typeof body.id !== 'string') return json({ error: 'id is required' }, 400);

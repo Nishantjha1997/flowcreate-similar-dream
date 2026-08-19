@@ -94,12 +94,12 @@ function GatewayCard({
   return (
     <Card className={`border-l-4 ${existing?.is_active ? 'border-l-green-500' : 'border-l-muted'}`}>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <CardTitle className="flex items-center gap-2">
             <span className="text-2xl">{config.icon}</span>
             {config.name}
           </CardTitle>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {existing?.is_live ? (
               <Badge variant="destructive" className="text-xs">Live mode</Badge>
             ) : (
@@ -174,8 +174,8 @@ function GatewayCard({
             className="rounded scale-125"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Button onClick={handleSave} disabled={isSaving} className="flex-1">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <Button onClick={handleSave} disabled={isSaving} className="w-full sm:flex-1">
             {isSaving ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
             Save {config.name} Keys
           </Button>
@@ -184,10 +184,11 @@ function GatewayCard({
               <Button
                 variant="outline"
                 onClick={() => onToggleActive({ id: existing.id, is_active: !existing.is_active })}
+                className="w-full sm:w-auto"
               >
                 {existing.is_active ? 'Disable' : 'Enable'}
               </Button>
-              <Button variant="destructive" size="sm" disabled={isDeleting} onClick={() => onDelete(existing.id)}>
+              <Button variant="destructive" size="sm" disabled={isDeleting} onClick={() => onDelete(existing.id)} className="w-full sm:w-auto">
                 {isDeleting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
               </Button>
             </>

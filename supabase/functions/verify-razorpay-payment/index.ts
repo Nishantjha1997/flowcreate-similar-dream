@@ -145,8 +145,8 @@ serve(async (req) => {
 
     const notedPlanId = typeof orderData?.notes?.plan_id === 'string' ? orderData.notes.plan_id : null
     const planQuery = notedPlanId
-      ? supabase.from('subscription_plans').select('id,slug').eq('id', notedPlanId).eq('slug', effectivePlanType).maybeSingle()
-      : supabase.from('subscription_plans').select('id,slug').eq('slug', effectivePlanType).maybeSingle()
+      ? supabase.from('subscription_plans').select('id,slug').eq('product', 'resume').eq('id', notedPlanId).eq('slug', effectivePlanType).maybeSingle()
+      : supabase.from('subscription_plans').select('id,slug').eq('product', 'resume').eq('slug', effectivePlanType).maybeSingle()
     const { data: plan, error: planError } = await planQuery
     if (planError || !plan) {
       return new Response(JSON.stringify({ error: 'Selected plan is not configured' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 503 })
