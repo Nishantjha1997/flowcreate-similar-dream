@@ -285,6 +285,7 @@ function routeStructuredData(route) {
         '@id': `${siteUrl}/#organization`,
         name: SITE_NAME,
         url: siteUrl,
+        sameAs: ['https://www.linkedin.com/in/nishant-jha-059828104/'],
         logo: {
           '@type': 'ImageObject',
           url: `${siteUrl}/logo.svg`,

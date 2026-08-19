@@ -42,6 +42,7 @@ const Index = () => {
           '@type': 'Organization',
           name: 'MakeCV',
           url: SITE_URL,
+          sameAs: ['https://www.linkedin.com/in/nishant-jha-059828104/'],
           logo: `${SITE_URL}/logo.svg`,
         },
         {

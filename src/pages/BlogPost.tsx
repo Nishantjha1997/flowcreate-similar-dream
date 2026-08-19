@@ -117,6 +117,7 @@ const BlogPost = () => {
             '@type': 'Organization',
             name: 'MakeCV',
             url: SITE_URL,
+            sameAs: ['https://www.linkedin.com/in/nishant-jha-059828104/'],
           },
           mainEntityOfPage: { '@type': 'WebPage', '@id': absoluteUrl(`/blog/${post.slug}`) },
         },

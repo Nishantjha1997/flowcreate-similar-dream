@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useDesignMode } from '@/hooks/useDesignMode';
 import { professions } from '@/data/professions';
 import { BrandWordmark } from './BrandLogo';
+import { brand } from '@/config/brand';
 
 // A stable subset of profession pages, cross-linked from every page via the
 // footer so crawlers can discover them without depending solely on the sitemap.
@@ -18,6 +19,7 @@ const Footer = () => {
             <div className="col-span-1 sm:col-span-2 lg:col-span-2">
               <Link to="/" className="inline-flex items-center gap-2"><BrandWordmark className="h-8" textClassName="text-2xl font-bold uppercase tracking-wider" /></Link>
               <p className="mt-4 text-sm text-foreground font-medium">Create professional resumes and cover letters online in minutes.</p>
+              <a href={brand.linkedInUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex text-sm font-bold text-foreground underline decoration-2 underline-offset-4 hover:text-primary" aria-label="Connect with Nishant Jha on LinkedIn">Connect with Nishant Jha on LinkedIn</a>
             </div>
             {[
               { title: 'Product', links: [{ to: '/resume-builder', label: 'Resume Builder' }, { to: '/cover-letter-builder', label: 'Cover Letter Builder' }, { to: '/master-profiles', label: 'Master Profiles' }, { to: '/templates', label: 'Templates' }, { to: '/examples', label: 'Examples' }, { to: '/features', label: 'Features' }, { to: '/pricing', label: 'Pricing' }] },
@@ -66,6 +68,7 @@ const Footer = () => {
             <p className="text-sm text-white/40 leading-relaxed max-w-xs">
               Create professional resumes and cover letters online in minutes with AI-powered tools.
             </p>
+            <a href={brand.linkedInUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex text-xs text-white/55 underline underline-offset-4 hover:text-white transition-colors" aria-label="Connect with Nishant Jha on LinkedIn">Connect with Nishant Jha on LinkedIn</a>
           </div>
 
           {footerSections.map((section) => (
