@@ -166,7 +166,9 @@ serve(async (req) => {
     const instructions = typeof body?.instructions === 'string' ? body.instructions.slice(0, 1000) : '';
     const companyOverride = typeof body?.company === 'string' ? body.company.trim().slice(0, 200) : '';
     const roleOverride = typeof body?.role === 'string' ? body.role.trim().slice(0, 200) : '';
-    const maxTokensParam = typeof body?.maxTokens === 'number' ? body.maxTokens : undefined;
+    const maxTokensParam = typeof body?.maxTokens === 'number'
+      ? Math.max(64, Math.min(4_000, Math.floor(body.maxTokens)))
+      : undefined;
     const preferredProvider = ['gemini', 'deepseek', 'openai'].includes(body?.preferredProvider)
       ? body.preferredProvider as 'gemini' | 'deepseek' | 'openai'
       : null;
@@ -388,15 +390,31 @@ Keep the tone professional yet warm. Do NOT include placeholder brackets — wri
       temperature: 0.7,
     });
 
-    // If first provider errored, try gemini fallback key as second attempt
+    // If the selected provider errors, try the explicitly designated global
+    // fallback first, then any other active provider. This keeps adding
+    // DeepSeek useful even when it is configured as primary and temporarily
+    // unavailable.
     if (result.text === null) {
-      console.log(`[AI Suggest] ${resolved.provider} failed, trying gemini fallback`);
-      const fallbackKey = await keyManager.getFallbackKey('gemini');
-      if (fallbackKey) {
-        result = await callTextModel('gemini', fallbackKey, trimmedPrompt, {
+      console.log(`[AI Suggest] ${resolved.provider} failed, trying configured fallback providers`);
+      const candidates: Array<{ provider: 'gemini' | 'deepseek' | 'openai'; key: string }> = [];
+      const globalFallback = await keyManager.getGlobalFallbackKey();
+      if (globalFallback && globalFallback.provider !== resolved.provider) {
+        candidates.push({ provider: globalFallback.provider as 'gemini' | 'deepseek' | 'openai', key: globalFallback.key });
+      }
+      for (const provider of ['gemini', 'deepseek', 'openai'] as const) {
+        if (provider === resolved.provider || candidates.some((candidate) => candidate.provider === provider)) continue;
+        const key = await keyManager.getActiveKey(provider);
+        if (key) candidates.push({ provider, key });
+      }
+      for (const candidate of candidates) {
+        result = await callTextModel(candidate.provider, candidate.key, trimmedPrompt, {
           maxTokens: maxTokensParam || 1000,
           temperature: 0.7,
         });
+        if (result.text) {
+          resolved = candidate;
+          break;
+        }
       }
     }
 

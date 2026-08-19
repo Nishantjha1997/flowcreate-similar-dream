@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const universal = readFileSync(new URL('../src/utils/ai/universalAIGenerator.ts', import.meta.url), 'utf8');
 const apiKeysHook = readFileSync(new URL('../src/hooks/useAIApiKeys.ts', import.meta.url), 'utf8');
+const suggest = readFileSync(new URL('../supabase/functions/gemini-suggest/index.ts', import.meta.url), 'utf8');
 
 const assert = (condition, message) => {
   if (!condition) throw new Error(message);
@@ -12,5 +13,7 @@ assert(universal.includes("functions.invoke('gemini-suggest'"), 'universal AI ge
 assert(!/https:\/\/(api\.deepseek|api\.openai|generativelanguage\.googleapis)/.test(universal), 'universal AI generation must not call providers from the browser');
 assert(!universal.includes("from('ai_api_keys'"), 'universal AI generation must not read provider secrets from Supabase in the browser');
 assert(!apiKeysHook.includes('testProviderDirectly'), 'draft provider tests must not send keys directly from the browser');
+assert(suggest.includes('configured fallback providers'), 'AI generation must try configured fallback providers when the preferred provider fails');
+assert(suggest.includes('Math.min(4_000'), 'AI generation must cap caller-provided token budgets');
 
 console.log('AI secret-boundary smoke checks passed');
