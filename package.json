@@ -12,6 +12,7 @@
     "verify:live": "node scripts/verify-live-release.mjs",
     "test:blog": "node scripts/test-blog-automation.mjs",
     "test:payments": "node scripts/test-payment-flows.mjs",
+    "test:ai-boundary": "node scripts/test-ai-boundary.mjs",
     "test:edge": "node scripts/check-edge-syntax.mjs",
     "build:dev": "vite build --mode development",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",

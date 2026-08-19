@@ -15,6 +15,12 @@ const FALLBACK_GEMINI_KEY = Deno.env.get("GEMINI_API_KEY");
 // which easily exceeds a few thousand characters - keep this generous.
 const MAX_PROMPT_LENGTH = 24000;
 
+function modelName(provider: string): string {
+  if (provider === 'deepseek') return 'deepseek-chat';
+  if (provider === 'openai') return 'gpt-4o-mini';
+  return Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash';
+}
+
 type JobMatchRecommendation = {
   id: string;
   type: 'rewrite_bullet' | 'improve_summary' | 'add_skill' | 'grammar' | 'remove_repetition';
@@ -161,6 +167,9 @@ serve(async (req) => {
     const companyOverride = typeof body?.company === 'string' ? body.company.trim().slice(0, 200) : '';
     const roleOverride = typeof body?.role === 'string' ? body.role.trim().slice(0, 200) : '';
     const maxTokensParam = typeof body?.maxTokens === 'number' ? body.maxTokens : undefined;
+    const preferredProvider = ['gemini', 'deepseek', 'openai'].includes(body?.preferredProvider)
+      ? body.preferredProvider as 'gemini' | 'deepseek' | 'openai'
+      : null;
 
     let finalPrompt: string;
 
@@ -354,7 +363,12 @@ Keep the tone professional yet warm. Do NOT include placeholder brackets — wri
 
     // Resolve key: try any active provider from DB, then fall back to env GEMINI_API_KEY
     const keyManager = new AIKeyManager(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    let resolved = await getAnyActiveKey(keyManager);
+    let resolved = null as { provider: 'gemini' | 'deepseek' | 'openai'; key: string } | null;
+    if (preferredProvider) {
+      const preferredKey = await keyManager.getActiveKey(preferredProvider);
+      if (preferredKey) resolved = { provider: preferredProvider, key: preferredKey };
+    }
+    resolved ??= await getAnyActiveKey(keyManager);
 
     if (!resolved && FALLBACK_GEMINI_KEY) {
       console.log('[AI Suggest] No DB key found, using environment GEMINI_API_KEY');
@@ -425,7 +439,9 @@ Keep the tone professional yet warm. Do NOT include placeholder brackets — wri
 
       const jobMatch = context === 'job_match' ? normalizeJobMatch(extractJsonObject(result.text)) : null;
       return new Response(
-        JSON.stringify(jobMatch ? { suggestion: JSON.stringify(jobMatch), jobMatch } : { suggestion: result.text }),
+        JSON.stringify(jobMatch
+          ? { suggestion: JSON.stringify(jobMatch), jobMatch, provider: resolved.provider, modelUsed: modelName(resolved.provider) }
+          : { suggestion: result.text, provider: resolved.provider, modelUsed: modelName(resolved.provider) }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     } else {

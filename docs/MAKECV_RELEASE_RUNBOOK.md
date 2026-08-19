@@ -15,6 +15,7 @@ npm run lint -- --quiet
 npm test
 npm run test:blog
 npm run test:payments
+npm run test:ai-boundary
 npm run test:edge
 npm run build
 npm run seo:validate
@@ -30,6 +31,9 @@ Acceptance criteria:
 - TypeScript, lint, and all tests pass.
 - `test:blog` reports the sanitizer, article-quality gates, slug handling, and
   scheduler wiring checks as passed.
+- `test:ai-boundary` confirms browser bundles never read or transmit provider
+  secrets directly; all AI generation goes through the authenticated Edge
+  Function.
 - SEO validation reports no duplicate canonicals/titles and confirms the
   sitemap, RSS, robots, JSON-LD, prerendered routes, and 404 page.
 - `verify:live` confirms that the additive billing/indexing columns exist in

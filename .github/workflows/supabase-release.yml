@@ -35,6 +35,8 @@ jobs:
           for function in \
             admin-provider-secrets \
             test-ai-provider \
+            gemini-suggest \
+            blog-ai \
             create-razorpay-order \
             verify-razorpay-payment \
             create-razorpay-subscription \

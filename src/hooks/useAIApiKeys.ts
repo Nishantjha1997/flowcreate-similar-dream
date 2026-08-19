@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { testProviderDirectly } from "@/utils/ai/directTester";
 
 export interface AIApiKey {
   id: string;
@@ -168,31 +167,19 @@ export function useAIApiKeys() {
     setDraftTestStatus('testing');
 
     try {
-      // 1. Try direct test first (fastest, most reliable in client admin console)
-      const directResult = await testProviderDirectly(provider, key);
-      if (directResult.ok) {
+      // Draft secrets are tested only by the Edge Function. Never send an API
+      // key directly from the browser to an AI provider or expose it to CORS.
+      const { data, error } = await supabase.functions.invoke("test-ai-provider", {
+        body: { provider, key: key.trim() }
+      });
+      if (!error && data?.ok) {
         setDraftTestStatus('success');
-        toast({ title: "✅ Connection successful", description: `Valid ${provider} key! Response: "${(directResult.message ?? "OK").slice(0, 80)}"` });
+        toast({ title: "✅ Connection successful", description: `Valid ${provider} key! Response: "${String(data.message ?? "OK").slice(0, 80)}"` });
         setTimeout(() => setDraftTestStatus('idle'), 8000);
         return;
       }
 
-      // 2. If direct test threw CORS/network error, try edge function as backup
-      try {
-        const { data, error } = await supabase.functions.invoke("test-ai-provider", {
-          body: { provider, key: key.trim() }
-        });
-        if (!error && data?.ok) {
-          setDraftTestStatus('success');
-          toast({ title: "✅ Connection successful", description: `Valid key! Response: "${String(data.message ?? "OK").slice(0, 80)}"` });
-          setTimeout(() => setDraftTestStatus('idle'), 8000);
-          return;
-        }
-      } catch {
-        // use directResult error
-      }
-
-      throw new Error(directResult.error ?? "Provider connection failed");
+      throw new Error(String(data?.error ?? error?.message ?? "Provider connection failed"));
     } catch (err) {
       const message = err instanceof Error ? err.message : "Connection test failed";
       setDraftTestStatus('error');
