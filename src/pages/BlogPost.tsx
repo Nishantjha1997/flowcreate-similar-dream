@@ -60,7 +60,10 @@ const BlogPost = () => {
         .order('published_at', { ascending: false })
         .limit(3);
       if (error) throw error;
-      return data;
+      return (data as Array<{ id: string; slug: string; title: string; category: string; read_time: string }>).map((relatedPost) => ({
+        ...relatedPost,
+        title: normalizeBrandText(relatedPost.title),
+      }));
     },
     enabled: !!post,
     retry: false,
