@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 
 const verifyPayment = readFileSync(new URL('../supabase/functions/verify-razorpay-payment/index.ts', import.meta.url), 'utf8');
 const verifySubscription = readFileSync(new URL('../supabase/functions/verify-razorpay-subscription/index.ts', import.meta.url), 'utf8');
+const stripeWebhook = readFileSync(new URL('../supabase/functions/stripe-webhook/index.ts', import.meta.url), 'utf8');
 
 const assert = (condition, message) => {
   if (!condition) throw new Error(message);
@@ -24,6 +25,10 @@ assert(
 assert(
   verifySubscription.includes('razorpay_subscription_checkouts'),
   'recurring Razorpay verification must correlate to the server checkout ledger',
+);
+assert(
+  (stripeWebhook.match(/if \(payError\) throw payError/g) || []).length >= 2,
+  'Stripe webhook payment writes must fail the event so the provider retries safely',
 );
 
 console.log('payment flow smoke checks passed');

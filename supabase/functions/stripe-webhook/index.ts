@@ -196,7 +196,7 @@ serve(async (req) => {
             },
             { onConflict: 'stripe_payment_intent_id', ignoreDuplicates: true }
           )
-          if (payError) console.error('payment record failed:', payError.message)
+          if (payError) throw payError
         }
 
         await notify(
@@ -298,7 +298,7 @@ serve(async (req) => {
           },
           { onConflict: 'stripe_payment_intent_id', ignoreDuplicates: true }
         )
-        if (payError) console.error('payment record failed:', payError.message)
+        if (payError) throw payError
 
         const { error: invError } = await admin.from('invoices').insert({
           user_id: userId,
