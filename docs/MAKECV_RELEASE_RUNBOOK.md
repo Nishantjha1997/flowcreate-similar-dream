@@ -14,6 +14,7 @@ npm run typecheck
 npm run lint -- --quiet
 npm test
 npm run test:blog
+npm run test:payments
 npm run test:edge
 npm run build
 npm run seo:validate

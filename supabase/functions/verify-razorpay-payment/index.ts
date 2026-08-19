@@ -236,6 +236,10 @@ serve(async (req) => {
 
     if (paymentError) {
       console.error('Payment record error:', paymentError)
+      return new Response(
+        JSON.stringify({ error: 'Payment was verified but could not be recorded. Please retry verification.' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
     }
 
     // Best-effort: an email/notification failure should never fail a payment
