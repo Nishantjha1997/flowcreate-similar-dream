@@ -17,6 +17,7 @@ npm run test:blog
 npm run test:edge
 npm run build
 npm run seo:validate
+npm run verify:live
 ```
 
 `npm run build` runs the sitemap generator and static SEO prerender. The blog
@@ -30,6 +31,9 @@ Acceptance criteria:
   scheduler wiring checks as passed.
 - SEO validation reports no duplicate canonicals/titles and confirms the
   sitemap, RSS, robots, JSON-LD, prerendered routes, and 404 page.
+- `verify:live` confirms that the additive billing/indexing columns exist in
+  Supabase and that provider-secret tables reject anonymous reads. Run it after
+  the Supabase release workflow succeeds.
 
 ## 2. Configure Supabase
 

@@ -9,6 +9,7 @@
     "build": "vite build",
     "postbuild": "node scripts/generate-static-seo-pages.mjs",
     "seo:validate": "node scripts/validate-seo.mjs",
+    "verify:live": "node scripts/verify-live-release.mjs",
     "test:blog": "node scripts/test-blog-automation.mjs",
     "test:edge": "node scripts/check-edge-syntax.mjs",
     "build:dev": "vite build --mode development",
