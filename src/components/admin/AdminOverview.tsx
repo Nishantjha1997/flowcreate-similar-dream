@@ -85,6 +85,21 @@ function safeRows<T>(result: QueryResult): T[] {
   return result.error || !Array.isArray(result.data) ? [] : result.data as T[];
 }
 
+async function loadActiveAiKeyCount(): Promise<QueryResult> {
+  const { data, error } = await supabase.functions.invoke("admin-provider-secrets", {
+    body: { resource: "ai" },
+  });
+  if (error || data?.error) {
+    return {
+      data: null,
+      error: { message: error instanceof Error ? error.message : String(data?.error ?? "AI provider settings unavailable") },
+      count: null,
+    };
+  }
+  const rows = Array.isArray(data?.data) ? data.data : [];
+  return { data: rows, error: null, count: rows.filter((row) => row?.is_active).length };
+}
+
 function relativeTime(value: string | null): string {
   if (!value) return "Not completed";
   const date = new Date(value);
@@ -165,7 +180,7 @@ export function AdminOverview({ onNavigate }: AdminOverviewProps) {
           .limit(8),
         supabase.from("help_tickets").select("status"),
         supabase.from("webhook_events").select("id", { count: "exact", head: true }).eq("status", "failed"),
-        supabase.from("ai_api_keys").select("id", { count: "exact", head: true }).eq("is_active", true),
+        loadActiveAiKeyCount(),
       ]);
 
       const unavailable: string[] = [];
