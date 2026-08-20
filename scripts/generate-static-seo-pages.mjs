@@ -172,12 +172,47 @@ function staticRouteShell(route) {
   } else if (route.path === '/blog') {
     supplemental = `<section aria-labelledby="latest-articles">
       <h2 id="latest-articles">Latest Resume and Career Guides</h2>
+      <p>Looking for structured advice on salary negotiation, interviews, and career transitions? Visit the <a href="/career-advice">MakeCV Career Advice Hub</a>.</p>
       <ul>
         ${posts
           .map(
             (post) =>
               `<li><a href="/blog/${escapeHtml(post.slug)}">${escapeHtml(post.title)}</a>` +
               `${post.excerpt ? `<p>${escapeHtml(post.excerpt)}</p>` : ''}</li>`,
+          )
+          .join('\n')}
+      </ul>
+      <h2>Resume Templates by Profession</h2>
+      <ul>
+        ${professions
+          .slice(0, 10)
+          .map(
+            (profession) =>
+              `<li><a href="/resume-template/${escapeHtml(profession.slug)}">${escapeHtml(profession.title)}</a></li>`,
+          )
+          .join('\n')}
+      </ul>
+    </section>`;
+  } else if (route.path === '/career-advice') {
+    supplemental = `<section aria-labelledby="career-advice-topics">
+      <h2 id="career-advice-topics">Career Advice Guides & Strategies</h2>
+      <p>Actionable career advice written by recruiters and career coaches. Read our in-depth guides in the <a href="/blog">MakeCV Blog</a> or choose a role-tailored layout from our <a href="/templates">30+ Resume Templates</a>.</p>
+      <h2>Featured Career & Job Search Articles</h2>
+      <ul>
+        ${posts
+          .map(
+            (post) =>
+              `<li><a href="/blog/${escapeHtml(post.slug)}">${escapeHtml(post.title)}</a></li>`,
+          )
+          .join('\n')}
+      </ul>
+      <h2>Popular Career Resume Templates</h2>
+      <ul>
+        ${professions
+          .slice(0, 12)
+          .map(
+            (profession) =>
+              `<li><a href="/resume-template/${escapeHtml(profession.slug)}">${escapeHtml(profession.title)}</a></li>`,
           )
           .join('\n')}
       </ul>
@@ -215,7 +250,7 @@ function blogPostShell(post) {
   return `${sharedNavigation()}
     <main>
       <article>
-        <nav aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/blog">Blog</a></nav>
+        <nav aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/blog">Blog</a> / <a href="/career-advice">Career Advice</a></nav>
         <h1>${escapeHtml(post.title)}</h1>
         ${post.excerpt ? `<p>${escapeHtml(post.excerpt)}</p>` : ''}
         <p>
@@ -226,6 +261,10 @@ function blogPostShell(post) {
         ${post.image_url ? `<img src="${escapeHtml(post.image_url)}" alt="${escapeHtml(post.title)}" />` : ''}
         <div>${sanitizeArticleHtml(post.content)}</div>
       </article>
+      <section aria-label="Career and Template Links">
+        <h2>Career Tools and Advice</h2>
+        <p>Explore more guides in our <a href="/career-advice">Career Advice Hub</a> or build an ATS-friendly resume using our <a href="/templates">Resume Templates</a>.</p>
+      </section>
       ${
         relatedPosts.length
           ? `<aside aria-labelledby="related-articles">
