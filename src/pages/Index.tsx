@@ -2,6 +2,8 @@ import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import HowItWorksSection from '@/components/HowItWorksSection';
 import TemplatesCarousel from '@/components/TemplatesCarousel';
+import ResumeBuilderShowcase from '@/components/ResumeBuilderShowcase';
+import StatsSection from '@/components/StatsSection';
 import FeaturesSection from '@/components/FeaturesSection';
 import TestimonialsSection from '@/components/TestimonialsSection';
 import SeoContentSection, { FAQ_ITEMS, HOW_TO_STEPS } from '@/components/SeoContentSection';
@@ -103,6 +105,12 @@ const Index = () => {
         </ScrollReveal>
         <ScrollReveal>
           <TemplatesCarousel />
+        </ScrollReveal>
+        <ScrollReveal delay={100}>
+          <ResumeBuilderShowcase />
+        </ScrollReveal>
+        <ScrollReveal delay={100}>
+          <StatsSection />
         </ScrollReveal>
         <ScrollReveal delay={100}>
           <FeaturesSection />
