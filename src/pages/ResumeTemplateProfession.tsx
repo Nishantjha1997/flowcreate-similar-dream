@@ -114,47 +114,48 @@ const ResumeTemplateProfession = () => {
           </ScrollReveal>
 
           {/* Template Preview + Why This Template */}
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16">
+          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center mb-16">
             <ScrollReveal delay={50}>
             <div className="flex justify-center">
-              <div className="w-full max-w-[320px]">
-                <ResumeTemplatePreview templateKey={data.templateKey} scale={0.48} />
+              <div className="w-full max-w-[340px] rounded-2xl overflow-hidden shadow-2xl border border-border/70 bg-card p-2.5 transition-transform duration-300 hover:scale-[1.02]">
+                <ResumeTemplatePreview templateKey={data.templateKey} scale={0.48} className="rounded-xl overflow-hidden shadow-inner" />
               </div>
             </div>
             </ScrollReveal>
             <ScrollReveal delay={100}>
             <div className="flex flex-col justify-center">
-              <h2 className="text-2xl font-bold mb-4">Why This Template Works</h2>
-              <p className="text-muted-foreground mb-6">{data.summary}</p>
-              <div className="space-y-3">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider mb-3 w-fit">
+                <Star className="h-3.5 w-3.5 fill-primary" /> Recruiter-Approved Format
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-foreground">Why This Template Works</h2>
+              <p className="text-muted-foreground mb-6 leading-relaxed text-sm sm:text-base">{data.summary}</p>
+              <div className="space-y-3 mb-6">
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm">ATS-optimized layout that passes applicant tracking systems</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-foreground/90">ATS-optimized layout guaranteed to parse cleanly into employer applicant tracking systems</span>
                 </div>
                 {template?.atsOptimized !== false && (
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Structured sections for skills, experience, and education</span>
+                    <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-foreground/90">Pre-structured sections for hard technical skills, quantified achievements, and education</span>
                   </div>
                 )}
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm">Instant PDF download — ready to send to employers</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-foreground/90">Instant PDF download formatted for A4 & US Letter standard dimensions</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm">Completely free — no credit card required</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-foreground/90">100% Free with optional AI bullet points and live phrasing suggestions</span>
                 </div>
               </div>
               {template && (
-                <p className="text-sm text-muted-foreground mt-4">
-                  Template: <span className="font-medium text-foreground">{template.name}</span>
-                  {template.premium && (
-                    <span className="ml-2 inline-flex items-center gap-1 text-yellow-600 text-xs font-medium">
-                      <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" /> Premium
-                    </span>
-                  )}
-                </p>
+                <div className="p-3 rounded-xl bg-muted/40 border border-border/50 text-xs text-muted-foreground flex items-center justify-between">
+                  <span>Layout Style: <strong className="text-foreground">{template.name}</strong> ({template.category})</span>
+                  <Link to={`/resume-builder?template=${data.templateKey}`} className="text-primary font-semibold hover:underline">
+                    Customize Layout →
+                  </Link>
+                </div>
               )}
             </div>
             </ScrollReveal>

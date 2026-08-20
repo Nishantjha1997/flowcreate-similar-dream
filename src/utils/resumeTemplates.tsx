@@ -60,14 +60,33 @@ export const applyCustomization = (
       }
     }
   }
+
+  const activeAccent = customization.accentColor || customization.primaryColor;
+  if (activeAccent) {
+    if (styles.container) {
+      if (styles.container.borderTop) styles.container.borderTopColor = activeAccent;
+      if (styles.container.borderLeft) styles.container.borderLeftColor = activeAccent;
+    }
+    if (styles.header && styles.header.borderBottom) {
+      styles.header.borderBottomColor = activeAccent;
+    }
+    if (styles.item && styles.item.borderLeft) {
+      styles.item.borderLeftColor = activeAccent;
+    }
+    if (styles.sectionTitle) {
+      if (styles.sectionTitle.borderBottom || styles.sectionTitle.borderBottomColor) {
+        styles.sectionTitle.borderBottomColor = activeAccent;
+      }
+    }
+    if (styles.sidebarSectionTitle) {
+      if (styles.sidebarSectionTitle.borderBottom || styles.sidebarSectionTitle.borderBottomColor) {
+        styles.sidebarSectionTitle.borderBottomColor = activeAccent;
+      }
+    }
+  }
   
   if (customization.secondaryColor) {
     if (styles.itemSubtitle) styles.itemSubtitle.color = customization.secondaryColor;
-  }
-  
-  if (customization.accentColor) {
-    if (styles.sectionTitle) styles.sectionTitle.borderBottomColor = customization.accentColor;
-    if (styles.sidebarSectionTitle) styles.sidebarSectionTitle.borderBottomColor = customization.accentColor;
   }
   
   if (customization.textColor) {
@@ -3025,6 +3044,27 @@ const ResumeTemplate = ({
     </>
   );
 
+	  const renderFormattedDescription = (text?: string, descStyle?: CSSProperties) => {
+	    if (!text) return null;
+	    const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+	    if (lines.length > 1 && lines.some((l) => l.startsWith('•') || l.startsWith('-') || l.startsWith('*'))) {
+	      return (
+	        <ul style={{ margin: '4px 0 0 0', paddingLeft: '16px', listStyleType: 'disc', ...(descStyle || {}) }}>
+	          {lines.map((line, idx) => (
+	            <li key={idx} style={{ marginBottom: '2px', lineHeight: '1.45' }}>
+	              {line.replace(/^[•\-\*]\s*/, '')}
+	            </li>
+	          ))}
+	        </ul>
+	      );
+	    }
+	    return (
+	      <div style={{ ...descStyle, whiteSpace: 'pre-line', lineHeight: '1.45', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+	        {text}
+	      </div>
+	    );
+	  };
+
 	  const renderSection = (key: string, titleStyle?: CSSProperties) => {
 	    if (hiddenSections && hiddenSections.includes(key)) return null;
 	    const secTitle = titleStyle ?? styles.sectionTitle;
@@ -3036,7 +3076,7 @@ const ResumeTemplate = ({
           return (
             <div style={styles.section} key="summary">
               <div style={secTitle}>{title('Summary')}</div>
-              <div style={{ ...styles.itemDescription, wordBreak: 'break-word' as const, overflowWrap: 'break-word' as const }}>{resumeData.personal.summary}</div>
+              {renderFormattedDescription(resumeData.personal.summary, styles.itemDescription)}
             </div>
           );
         }
@@ -3052,7 +3092,7 @@ const ResumeTemplate = ({
                     <div style={styles.itemTitle}>{exp.title}</div>
                     <div style={styles.itemSubtitle}>{exp.company}{exp.location ? ` | ${exp.location}` : ''}</div>
                     <div style={styles.itemDate}>{exp.startDate} - {exp.current ? 'Present' : exp.endDate}</div>
-                    <div style={{ ...styles.itemDescription, wordBreak: 'break-word' as const, overflowWrap: 'break-word' as const }}>{exp.description}</div>
+                    {renderFormattedDescription(exp.description, styles.itemDescription)}
                   </div>
                 ))}
               </div>
@@ -3071,7 +3111,7 @@ const ResumeTemplate = ({
                     <div style={styles.itemTitle}>{edu.degree} {edu.field ? `in ${edu.field}` : ''}</div>
                     <div style={styles.itemSubtitle}>{edu.school}</div>
                     <div style={styles.itemDate}>{edu.startDate} - {edu.endDate}</div>
-                    {edu.description && <div style={{ ...styles.itemDescription, wordBreak: 'break-word' as const, overflowWrap: 'break-word' as const }}>{edu.description}</div>}
+                    {edu.description && renderFormattedDescription(edu.description, styles.itemDescription)}
                   </div>
                 ))}
               </div>
@@ -3107,7 +3147,7 @@ const ResumeTemplate = ({
                         <a href={project.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: '8px', fontSize: '14px' }}>↗</a>
                       )}
                     </div>
-                    <div style={{ ...styles.itemDescription, wordBreak: 'break-word' as const, overflowWrap: 'break-word' as const }}>{project.description}</div>
+                    {renderFormattedDescription(project.description, styles.itemDescription)}
                     {project.technologies && project.technologies.length > 0 && (
                       <div style={{ ...styles.skillsList, marginTop: '5px' }}>
                         {project.technologies.map((tech, i) => (
@@ -3190,7 +3230,7 @@ const ResumeTemplate = ({
                     <div style={styles.itemTitle}>{vol.role}</div>
                     <div style={styles.itemSubtitle}>{vol.organization}</div>
                     <div style={styles.itemDate}>{vol.startDate} - {vol.endDate}</div>
-                    {vol.description && <div style={{ ...styles.itemDescription, wordBreak: 'break-word' as const, overflowWrap: 'break-word' as const }}>{vol.description}</div>}
+                    {vol.description && renderFormattedDescription(vol.description, styles.itemDescription)}
                   </div>
                 ))}
               </div>

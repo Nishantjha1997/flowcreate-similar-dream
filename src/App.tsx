@@ -11,6 +11,7 @@ import { LoadingFallback } from "./components/ui/loading-fallback";
 import { ErrorBoundary } from "./components/ui/error-boundary";
 import { DesignModeProvider } from "./hooks/useDesignMode";
 import ScrollProgress from "./components/ScrollProgress";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Lazy load pages for better initial bundle size
 const Index = lazy(() => import("./pages/Index"));
@@ -81,6 +82,7 @@ const App = () => (
                   <Toaster />
                   <Sonner />
                   <BrowserRouter>
+                    <ScrollToTop />
                     <Suspense fallback={<LoadingFallback />}>
                       <Routes>
                         <Route path="/" element={<Index />} />
