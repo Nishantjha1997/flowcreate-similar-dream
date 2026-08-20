@@ -9,18 +9,16 @@ import { toast } from 'sonner';
 
 const HeroSection = () => {
   const { isNeoBrutalism } = useDesignMode();
-  const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const processFile = (file: File) => {
     if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
       toast.error('Please upload a PDF resume file.');
       return;
@@ -28,10 +26,38 @@ const HeroSection = () => {
 
     setIsUploading(true);
     toast.info('Loading resume builder with your file...');
-    // Navigate to resume builder to process the file
     setTimeout(() => {
       navigate('/resume-builder');
     }, 600);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processFile(file);
+    }
   };
 
   if (isNeoBrutalism) {
@@ -165,7 +191,22 @@ const HeroSection = () => {
           </div>
 
           {/* Right Showcase Column (Stack of interactive template previews with floating chips) */}
-          <div className="w-full lg:w-[46%] flex justify-center items-center h-[360px] sm:h-[460px] relative overflow-visible mt-6 lg:mt-0">
+          <div 
+            className="w-full lg:w-[46%] flex justify-center items-center h-[360px] sm:h-[460px] relative overflow-visible mt-6 lg:mt-0 cursor-pointer"
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={handleUploadClick}
+            title="Drop your PDF resume here to import"
+          >
+            {isDragging && (
+              <div className="absolute inset-0 z-30 bg-primary/20 backdrop-blur-sm border-2 border-dashed border-primary rounded-3xl flex flex-col items-center justify-center text-white p-6 shadow-2xl transition-all">
+                <Upload className="h-12 w-12 text-primary animate-bounce mb-3" />
+                <p className="text-base font-bold text-white">Drop your PDF resume here</p>
+                <p className="text-xs text-white/70 mt-1">We will import your content automatically</p>
+              </div>
+            )}
+
             <div className="relative w-[300px] h-[340px] sm:w-[390px] sm:h-[440px] overflow-visible">
               {/* Left Card */}
               <div className="absolute left-0 top-12 w-[170px] sm:w-[230px] transform -rotate-12 transition-all duration-500 hover:rotate-0 hover:z-20 hover:scale-105">

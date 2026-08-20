@@ -157,6 +157,7 @@ const Pricing = () => {
 
   const { user } = useAuth();
   const [isIndianUser, setIsIndianUser] = useState(false);
+  const [billingCycle, setBillingCycle] = useState<'annual' | 'monthly'>('annual');
   const [loading, setLoading] = useState(true);
 
   const { data: dbPlans, isLoading: loadingPlans } = useQuery({
@@ -215,16 +216,47 @@ const Pricing = () => {
         <div className="container mx-auto px-4 max-w-7xl">
           {/* Header */}
           <ScrollReveal>
-            <div className="max-w-3xl mx-auto text-center mb-16">
+            <div className="max-w-3xl mx-auto text-center mb-12">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
                 <Zap className="h-3.5 w-3.5" /> Simple, Transparent Pricing
               </div>
               <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground mb-5">
                 Invest in Your Career with Confidence
               </h1>
-              <p className="text-lg text-muted-foreground leading-relaxed">
+              <p className="text-lg text-muted-foreground leading-relaxed mb-8">
                 Start for free with zero credit card required. Upgrade when you need unlimited resumes and advanced AI tools.
               </p>
+
+              {/* Billing Cycle Switcher */}
+              <div className="inline-flex items-center p-1.5 rounded-full bg-muted/60 border border-border/80 shadow-inner">
+                <button
+                  type="button"
+                  onClick={() => setBillingCycle('annual')}
+                  className={cn(
+                    'px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-1.5',
+                    billingCycle === 'annual'
+                      ? 'bg-foreground text-background shadow-md'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  <span>Annual Billing</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+                    Save 35%
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBillingCycle('monthly')}
+                  className={cn(
+                    'px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200',
+                    billingCycle === 'monthly'
+                      ? 'bg-foreground text-background shadow-md'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  Monthly Billing
+                </button>
+              </div>
             </div>
           </ScrollReveal>
 
@@ -232,7 +264,7 @@ const Pricing = () => {
           <ScrollReveal delay={100}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-20 items-stretch">
               {plans.map((plan) => {
-                const isPopular = plan.slug === 'yearly';
+                const isPopular = billingCycle === 'annual' ? plan.slug === 'yearly' : plan.slug === 'monthly';
                 const isFree = plan.slug === 'free';
                 const priceText = formatPrice(isIndianUser ? plan.price_inr : plan.price_usd, isIndianUser);
                 const intervalText = getIntervalText(plan.billing_interval);
@@ -249,8 +281,9 @@ const Pricing = () => {
                     )}
                   >
                     {isPopular && (
-                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider shadow-md flex items-center gap-1.5">
-                        <Sparkles className="h-3.5 w-3.5" /> Most Popular (Save 35%)
+                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider shadow-md flex items-center gap-1.5 whitespace-nowrap">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        {plan.slug === 'yearly' ? 'Most Popular (Save 35%)' : 'Most Flexible'}
                       </div>
                     )}
 
