@@ -207,7 +207,7 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
                 : quota.isUnlimited
                   ? "Unlimited AI uses"
                   : `${quota.used}/${quota.cap} AI uses / 30 days`
-              : "Premium Feature - ₹299/month"}
+              : "Pro Feature · Instant AI Bullet Polishing"}
           </span>
         </span>
         

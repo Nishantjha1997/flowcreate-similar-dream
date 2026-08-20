@@ -38,9 +38,21 @@ export const ProjectsSection = ({
 
   const addTech = (index: number, tech: string) => {
     if (!tech.trim()) return;
+    const incoming = tech
+      .split(/[,;\n]/)
+      .map(t => t.trim())
+      .filter(t => t.length > 0);
+    if (incoming.length === 0) return;
+
     const currentTechs = projects[index].technologies || [];
-    if (currentTechs.includes(tech.trim())) return;
-    const newTechs = [...currentTechs, tech.trim()];
+    const existingLower = new Set(currentTechs.map((t: string) => t.toLowerCase()));
+    const newItems = incoming.filter(t => !existingLower.has(t.toLowerCase()));
+    if (newItems.length === 0) {
+      setTechInput(prev => ({ ...prev, [index]: '' }));
+      return;
+    }
+
+    const newTechs = [...currentTechs, ...newItems];
     onChange('technologies', JSON.stringify(newTechs), index);
     setTechInput(prev => ({ ...prev, [index]: '' }));
   };

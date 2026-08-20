@@ -27,10 +27,24 @@ export const SkillsSection = ({ skills, onChange, onAIFeatureUpsell, isPremium }
   const getSkillsString = () => skills.join(', ');
 
   const addSkill = (skill: string) => {
-    if (!skill.trim() || skills.includes(skill.trim())) return;
-    const newSkills = [...skills, skill.trim()];
+    if (!skill.trim()) return;
+    const incoming = skill
+      .split(/[,;\n]/)
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+    if (incoming.length === 0) return;
+    
+    // Add only skills that are not already present (case-insensitive deduplication)
+    const existingLower = new Set(skills.map(s => s.toLowerCase()));
+    const newItems = incoming.filter(s => !existingLower.has(s.toLowerCase()));
+    if (newItems.length === 0) {
+      setNewSkill('');
+      return;
+    }
+    
+    const merged = [...skills, ...newItems];
     onChange({
-      target: { value: newSkills.join(', ') },
+      target: { value: merged.join(', ') },
     } as React.ChangeEvent<HTMLTextAreaElement>);
     setNewSkill('');
   };

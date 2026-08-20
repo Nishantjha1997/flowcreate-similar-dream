@@ -130,8 +130,16 @@ Return this exact JSON shape:
         });
 
         if (directResult.text) {
-          const cleanJson = directResult.text.replace(/```json|```/g, '').trim();
-          parsed = JSON.parse(cleanJson);
+          const raw = directResult.text.trim();
+          const firstBrace = raw.indexOf('{');
+          const lastBrace = raw.lastIndexOf('}');
+          if (firstBrace !== -1 && lastBrace !== -1) {
+            const jsonStr = raw.substring(firstBrace, lastBrace + 1);
+            parsed = JSON.parse(jsonStr);
+          } else {
+            const cleanJson = raw.replace(/```json|```/g, '').trim();
+            parsed = JSON.parse(cleanJson);
+          }
         }
       }
 

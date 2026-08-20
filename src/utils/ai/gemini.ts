@@ -66,11 +66,23 @@ export async function fetchGeminiSuggestions(request: SuggestionRequest): Promis
     return null;
   });
 
+  const cleanSuggestion = (text: string): string => {
+    let cleaned = text.trim();
+    if ((cleaned.startsWith('"') && cleaned.endsWith('"')) || (cleaned.startsWith('“') && cleaned.endsWith('”'))) {
+      cleaned = cleaned.slice(1, -1).trim();
+    }
+    cleaned = cleaned.replace(/^(Here (is|are) (a|the|some) (revised|improved|suggested|updated|enhanced)?.*?:?\n+)/i, '');
+    cleaned = cleaned.replace(/^(Sure! Here (is|are).*?:?\n+)/i, '');
+    cleaned = cleaned.replace(/^(Certainly!.*?:?\n+)/i, '');
+    return cleaned.trim();
+  };
+
   const results = await Promise.allSettled(suggestionPromises);
 
   results.forEach((result) => {
     if (result.status === 'fulfilled' && result.value) {
-      suggestions.push(result.value);
+      const cleaned = cleanSuggestion(result.value);
+      if (cleaned) suggestions.push(cleaned);
     }
   });
 
