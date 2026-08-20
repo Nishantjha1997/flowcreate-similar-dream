@@ -1,77 +1,92 @@
-
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { ScrollReveal } from '@/hooks/useScrollAnimation';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { 
-  FileText, 
-  Download, 
-  Share2, 
-  Clock, 
-  Layout, 
-  PenTool, 
-  CheckCircle,
+import {
+  FileText,
+  Download,
+  Share2,
+  Clock,
+  Layout,
+  PenTool,
+  CheckCircle2,
   Star,
   ArrowRight,
   Layers,
   Globe,
-  Zap
+  Zap,
+  ShieldCheck,
+  Target,
+  Sparkles,
+  Award,
 } from 'lucide-react';
 import { usePageMeta } from '@/hooks/usePageMeta';
 
 const Features = () => {
   usePageMeta({
-    title: 'Resume Builder Features — ATS Optimization, AI Suggestions & More',
-    description: 'Discover MakeCV features: 30+ ATS-optimized templates, real-time preview, AI writing suggestions, one-click PDF export, cloud storage & resume sharing. Free resume builder online.',
+    title: 'MakeCV Features — AI Resume Builder, ATS Checker & Templates',
+    description: 'Explore MakeCV features: 30+ ATS-optimized templates, real-time live preview, AI bullet suggestions, job description keyword matching, and instant PDF download.',
   });
 
-  const features = [
+  const featurePillars = [
     {
-      icon: <Layout className="h-8 w-8 text-primary" />,
-      title: "Professional Templates",
-      description: "Choose from dozens of expertly-designed templates suitable for all industries and career levels."
+      category: 'ATS & Formatting Engine',
+      icon: ShieldCheck,
+      description: 'Engineered from the ground up to guarantee flawless parsing across all applicant tracking systems.',
+      items: [
+        {
+          title: '30+ ATS-Certified Templates',
+          description: 'Single-column and dual-column layouts tested against Workday, Taleo, Greenhouse, and Lever.',
+        },
+        {
+          title: 'Zero Canvas / Image Traps',
+          description: 'Standard semantic text hierarchy ensuring your text, skills, and dates are never dropped by parsers.',
+        },
+        {
+          title: 'Real-Time Layout Engine',
+          description: 'Auto-adjusts typography and margins dynamically to eliminate accidental 2nd page overflow.',
+        },
+      ],
     },
     {
-      icon: <PenTool className="h-8 w-8 text-primary" />,
-      title: "Easy Customization",
-      description: "Easily customize colors, fonts, and layouts to create a unique resume that reflects your personal brand."
+      category: 'AI Writing & Job Match Assistant',
+      icon: Sparkles,
+      description: 'Turn uninspired bullet points into metric-heavy accomplishment statements that demand interviews.',
+      items: [
+        {
+          title: 'AI Bullet Point Polish',
+          description: 'Converts passive duties into action-verb statements with quantifiable metrics and impact.',
+        },
+        {
+          title: 'Job Description Matcher',
+          description: 'Paste any job posting to calculate match percentage, find missing skills, and optimize keywords.',
+        },
+        {
+          title: 'Professional Summary Generator',
+          description: 'Generate compelling 2-sentence executive summaries tailored to your exact career target.',
+        },
+      ],
     },
     {
-      icon: <Clock className="h-8 w-8 text-primary" />,
-      title: "Real-time Preview",
-      description: "See changes instantly as you edit, ensuring your resume looks exactly how you want it."
+      category: 'Export, Cloud & Application Suite',
+      icon: Layers,
+      description: 'Everything you need to manage multiple career tracks and apply with confidence.',
+      items: [
+        {
+          title: 'Instant PDF & Docx Export',
+          description: 'High-resolution vector PDF generation with zero paywall traps or unwanted watermarks.',
+        },
+        {
+          title: 'Matching Cover Letter Suite',
+          description: 'Generate cover letters that match your resume template typography, colors, and header style.',
+        },
+        {
+          title: 'Multi-Language Translation',
+          description: 'One-click resume translation into Spanish, French, German, and 10+ global languages.',
+        },
+      ],
     },
-    {
-      icon: <Layers className="h-8 w-8 text-primary" />,
-      title: "Content Suggestions",
-      description: "Get expert suggestions for each section of your resume based on your industry and role."
-    },
-    {
-      icon: <CheckCircle className="h-8 w-8 text-primary" />,
-      title: "ATS-Friendly",
-      description: "All our templates are optimized to pass through Applicant Tracking Systems used by employers."
-    },
-    {
-      icon: <Download className="h-8 w-8 text-primary" />,
-      title: "Multiple Export Options",
-      description: "Download your resume as PDF, DOCX, or TXT formats to suit different application requirements."
-    },
-    {
-      icon: <Globe className="h-8 w-8 text-primary" />,
-      title: "Cloud Storage",
-      description: "Save your resumes in the cloud and access them anywhere, anytime from any device."
-    },
-    {
-      icon: <Share2 className="h-8 w-8 text-primary" />,
-      title: "Easy Sharing",
-      description: "Generate a shareable link to your resume that you can send to potential employers."
-    },
-    {
-      icon: <Zap className="h-8 w-8 text-primary" />,
-      title: "Version History",
-      description: "Keep track of different versions of your resume and revert to previous versions if needed."
-    }
   ];
 
   return (
@@ -79,176 +94,151 @@ const Features = () => {
       <Header />
       <main>
         {/* Hero Section */}
-        <section className="py-20 bg-muted">
-          <div className="container mx-auto px-4">
+        <section className="py-20 md:py-28 bg-[hsl(var(--surface-dark))] text-white relative overflow-hidden">
+          <div className="absolute inset-0">
+            <div className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]" />
+          </div>
+
+          <div className="container mx-auto px-4 max-w-5xl text-center relative z-10">
             <ScrollReveal>
-            <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-                Powerful Features to Create Standout Resumes
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-primary text-xs font-semibold uppercase tracking-wider mb-6">
+                <Zap className="h-3.5 w-3.5" /> Complete Resume Suite
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-6 leading-tight">
+                Everything You Need to Build Resumes That Get Hired
               </h1>
-              <p className="mt-6 text-xl text-muted-foreground">
-                Everything you need to build professional resumes that get noticed by recruiters and hiring managers.
+              <p className="text-lg text-white/70 max-w-3xl mx-auto mb-10 leading-relaxed">
+                Combining recruiter-tested design principles with cutting-edge AI assistance to help you land more interviews in less time.
               </p>
-              <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/resume-builder">
-                  <Button size="lg">
-                    Start Building Your Resume
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                  <Button size="lg" className="rounded-full px-8 h-12 text-base font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl">
+                    Try All Features Free <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
                 <Link to="/templates">
-                  <Button variant="outline" size="lg">
-                    Browse Templates
+                  <Button size="lg" variant="outline" className="rounded-full px-8 h-12 text-base font-medium border-white/20 text-white hover:bg-white/10">
+                    Explore Templates
                   </Button>
                 </Link>
               </div>
-            </div>
             </ScrollReveal>
           </div>
         </section>
 
-        {/* Features Grid */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {features.map((feature, index) => (
-                <ScrollReveal key={index} delay={index * 50} direction="up">
-                <div className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow">
-                  <div className="mb-4">
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </div>
-                </ScrollReveal>
-              ))}
+        {/* 3 Core Pillars */}
+        <section className="py-20 md:py-28 bg-background">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <div className="grid lg:grid-cols-3 gap-8">
+              {featurePillars.map((pillar, idx) => {
+                const IconComponent = pillar.icon;
+                return (
+                  <ScrollReveal key={idx} delay={idx * 100}>
+                    <div className="rounded-3xl border border-border/80 p-8 bg-card shadow-sm h-full flex flex-col justify-between hover:border-primary/40 transition-all">
+                      <div>
+                        <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6">
+                          <IconComponent className="h-6 w-6" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-foreground mb-3">{pillar.category}</h2>
+                        <p className="text-sm text-muted-foreground leading-relaxed mb-8">
+                          {pillar.description}
+                        </p>
+
+                        <div className="space-y-6">
+                          {pillar.items.map((item, itemIdx) => (
+                            <div key={itemIdx} className="space-y-1">
+                              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                                <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+                                {item.title}
+                              </h3>
+                              <p className="text-xs text-muted-foreground leading-relaxed pl-6">
+                                {item.description}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollReveal>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        {/* How It Works */}
-        <section className="py-20 bg-muted">
-          <div className="container mx-auto px-4">
-            <ScrollReveal>
-            <div className="max-w-3xl mx-auto text-center mb-16">
-              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                How It Works
+        {/* Competitor Comparison Matrix */}
+        <section className="py-20 bg-muted/30 border-y border-border/40">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <div className="text-center mb-14">
+              <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">
+                Why Job Seekers Choose MakeCV
               </h2>
-              <p className="mt-4 text-xl text-muted-foreground">
-                Create a professional resume in just a few simple steps
-              </p>
-            </div>
-            </ScrollReveal>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-6">
-                  <FileText className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Choose a Template</h3>
-                <p className="text-muted-foreground">
-                  Browse our collection of professionally designed templates and select one that suits your style.
-                </p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-6">
-                  <PenTool className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Fill in Your Details</h3>
-                <p className="text-muted-foreground">
-                  Add your experience, education, skills, and other details using our easy-to-use interface.
-                </p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-6">
-                  <Download className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Download & Share</h3>
-                <p className="text-muted-foreground">
-                  Download your completed resume in your preferred format or share it directly with employers.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Testimonials */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center mb-16">
-              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                What Our Users Say
-              </h2>
-              <p className="mt-4 text-xl text-muted-foreground">
-                Don't just take our word for it - hear from people who have used MakeCV
+              <p className="text-base text-muted-foreground max-w-xl mx-auto">
+                Compare MakeCV with traditional word processors and generic design platforms.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="p-6 rounded-lg border bg-card">
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-amber-400 fill-amber-400" />
-                  ))}
-                </div>
-                <p className="mb-4 text-muted-foreground">
-                  "I landed my dream job using a resume I created with MakeCV. The templates are professional and the interface is so intuitive. Highly recommend!"
-                </p>
-                <p className="font-semibold">Sarah T.</p>
-                <p className="text-sm text-muted-foreground">Marketing Manager</p>
-              </div>
-
-              <div className="p-6 rounded-lg border bg-card">
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-amber-400 fill-amber-400" />
-                  ))}
-                </div>
-                <p className="mb-4 text-muted-foreground">
-                  "As a student with limited work experience, I was worried about my resume. MakeCV helped me highlight my skills and education in a way that impressed employers."
-                </p>
-                <p className="font-semibold">Michael J.</p>
-                <p className="text-sm text-muted-foreground">Recent Graduate</p>
-              </div>
-
-              <div className="p-6 rounded-lg border bg-card">
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-amber-400 fill-amber-400" />
-                  ))}
-                </div>
-                <p className="mb-4 text-muted-foreground">
-                  "I've tried many resume builders, and MakeCV is by far the best. It's completely free but offers features that premium services charge for. Amazing tool!"
-                </p>
-                <p className="font-semibold">David L.</p>
-                <p className="text-sm text-muted-foreground">Software Engineer</p>
-              </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse bg-background rounded-2xl border border-border/70 overflow-hidden shadow-sm">
+                <thead>
+                  <tr className="border-b border-border bg-muted/50 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    <th className="p-4 sm:p-5">Feature</th>
+                    <th className="p-4 sm:p-5 text-primary">MakeCV</th>
+                    <th className="p-4 sm:p-5">Microsoft Word</th>
+                    <th className="p-4 sm:p-5">Canva</th>
+                  </tr>
+                </thead>
+                <tbody className="text-xs sm:text-sm divide-y divide-border/50">
+                  <tr>
+                    <td className="p-4 sm:p-5 font-semibold">100% ATS Compliant</td>
+                    <td className="p-4 sm:p-5 text-emerald-600 font-bold">✅ Yes (Guaranteed)</td>
+                    <td className="p-4 sm:p-5 text-muted-foreground">⚠️ Manual formatting required</td>
+                    <td className="p-4 sm:p-5 text-destructive">❌ No (Graphics break parsers)</td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 sm:p-5 font-semibold">AI Job Match Keyword Scanner</td>
+                    <td className="p-4 sm:p-5 text-emerald-600 font-bold">✅ Built-in (1-Click)</td>
+                    <td className="p-4 sm:p-5 text-destructive">❌ No</td>
+                    <td className="p-4 sm:p-5 text-destructive">❌ No</td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 sm:p-5 font-semibold">Free Watermark-Free PDF Export</td>
+                    <td className="p-4 sm:p-5 text-emerald-600 font-bold">✅ Yes</td>
+                    <td className="p-4 sm:p-5 text-emerald-600">✅ Yes</td>
+                    <td className="p-4 sm:p-5 text-muted-foreground">⚠️ Free with limitations</td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 sm:p-5 font-semibold">One-Click Template Switching</td>
+                    <td className="p-4 sm:p-5 text-emerald-600 font-bold">✅ Instant (Preserves text)</td>
+                    <td className="p-4 sm:p-5 text-destructive">❌ Must re-type layout</td>
+                    <td className="p-4 sm:p-5 text-destructive">❌ Must redesign layout</td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 sm:p-5 font-semibold">Matching Cover Letter Suite</td>
+                    <td className="p-4 sm:p-5 text-emerald-600 font-bold">✅ Included</td>
+                    <td className="p-4 sm:p-5 text-destructive">❌ Separate file</td>
+                    <td className="p-4 sm:p-5 text-destructive">❌ Separate file</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="py-16 md:py-24">
-          <div className="container mx-auto px-4">
-            <div className="rounded-2xl hero-gradient p-8 md:p-12 lg:p-16">
-              <div className="max-w-3xl mx-auto text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                  Ready to create a resume that gets results?
-                </h2>
-                <p className="mt-4 text-xl text-blue-100">
-                  Join thousands of job seekers who have found success with MakeCV
-                </p>
-                <div className="mt-8">
-                  <Link to="/resume-builder">
-                    <Button size="lg" className="bg-white text-primary hover:bg-blue-50">
-                      Build My Resume <ArrowRight className="ml-2 h-5 w-5" />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
+        {/* CTA Banner */}
+        <section className="py-20 bg-[hsl(var(--surface-dark))] text-white text-center">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              Experience the MakeCV Advantage Today
+            </h2>
+            <p className="text-base text-white/70 mb-8 max-w-xl mx-auto">
+              Join thousands of job seekers who build interview-winning resumes with MakeCV. Free, fast, and 100% ATS-friendly.
+            </p>
+            <Link to="/resume-builder">
+              <Button size="lg" className="rounded-full px-8 h-12 text-base font-semibold bg-primary text-primary-foreground hover:bg-primary/90">
+                Start Building Free <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
           </div>
         </section>
       </main>
