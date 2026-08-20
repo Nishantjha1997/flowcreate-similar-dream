@@ -184,6 +184,7 @@ export default function TemplatesCarousel() {
                         <div className="h-full w-full rounded-lg overflow-hidden shadow-sm bg-white transition-transform duration-500 group-hover:scale-[1.03]">
                           <ResumeTemplatePreview
                             templateKey={template.key}
+                            primaryColor={selectedAccent}
                             className="w-full h-full"
                           />
                         </div>

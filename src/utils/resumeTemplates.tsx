@@ -37,8 +37,19 @@ export const applyCustomization = (
   
   if (customization.primaryColor) {
     if (styles.name) styles.name.color = customization.primaryColor;
-    if (styles.sectionTitle) styles.sectionTitle.color = customization.primaryColor;
+    if (styles.sectionTitle) {
+      styles.sectionTitle.color = customization.primaryColor;
+      if (styles.sectionTitle.borderBottomColor || styles.sectionTitle.borderBottom) {
+        styles.sectionTitle.borderBottomColor = customization.primaryColor;
+      }
+    }
     if (styles.sidebarSectionTitle) styles.sidebarSectionTitle.color = customization.primaryColor;
+    if (styles.header && styles.header.backgroundColor && styles.header.backgroundColor !== '#ffffff' && styles.header.backgroundColor !== 'transparent' && styles.header.backgroundColor !== '#111827') {
+      styles.header.backgroundColor = customization.primaryColor;
+    }
+    if (styles.sidebar && styles.sidebar.backgroundColor && styles.sidebar.backgroundColor !== '#ffffff' && styles.sidebar.backgroundColor !== 'transparent' && styles.sidebar.backgroundColor !== '#111827') {
+      styles.sidebar.backgroundColor = customization.primaryColor;
+    }
     if (styles.skill) {
       if (styles.skill.backgroundColor && styles.skill.backgroundColor !== 'transparent') {
         styles.skill.backgroundColor = customization.primaryColor;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import ResumeTemplate from '@/utils/resumeTemplates';
 import { templateMockData } from '@/utils/resumeTemplates';
 import { ResumeData } from '@/utils/types';
@@ -8,12 +8,32 @@ interface ResumeTemplatePreviewProps {
   className?: string;
   /** Override the default preview scale. Default 0.55 (A4@55% ≈ 437px wide). Range 0.25–0.85. */
   scale?: number;
+  primaryColor?: string;
+  customization?: Partial<ResumeData['customization']>;
 }
 
-export const ResumeTemplatePreview = ({ templateKey, className = '', scale = 0.55 }: ResumeTemplatePreviewProps) => {
+export const ResumeTemplatePreview = ({
+  templateKey,
+  className = '',
+  scale = 0.55,
+  primaryColor,
+  customization,
+}: ResumeTemplatePreviewProps) => {
   // Use the per-template mock data so each card shows representative content.
   // Fall back to clean-slate data if the template doesn't have its own entry yet.
-  const mockData = (templateMockData[templateKey] || templateMockData['clean-slate']) as ResumeData;
+  const baseMockData = (templateMockData[templateKey] || templateMockData['clean-slate']) as ResumeData;
+
+  const mockData = useMemo(() => {
+    if (!primaryColor && !customization) return baseMockData;
+    return {
+      ...baseMockData,
+      customization: {
+        ...baseMockData.customization,
+        ...(primaryColor ? { primaryColor, accentColor: primaryColor } : {}),
+        ...customization,
+      },
+    };
+  }, [baseMockData, primaryColor, customization]);
 
   // Compensation factor: expand inner div so that after scale-down it fills the outer container.
   // Formula: 100 / scale → e.g. 0.55 → 181.82%
