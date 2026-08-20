@@ -597,12 +597,20 @@ function renderDocument({ path, title, description, body, schema, image, type = 
 }
 
 function writeRoute(path, html) {
-  const output =
-    path === '/'
-      ? templatePath
-      : join(distDirectory, ...path.split('/').filter(Boolean), 'index.html');
-  mkdirSync(dirname(output), { recursive: true });
-  writeFileSync(output, html);
+  if (path === '/') {
+    writeFileSync(templatePath, html);
+    return;
+  }
+  const cleanParts = path.split('/').filter(Boolean);
+  // 1. Directory index: dist/resume-template/software-engineer/index.html
+  const dirOutput = join(distDirectory, ...cleanParts, 'index.html');
+  mkdirSync(dirname(dirOutput), { recursive: true });
+  writeFileSync(dirOutput, html);
+
+  // 2. Direct HTML: dist/resume-template/software-engineer.html
+  const fileOutput = join(distDirectory, `${cleanParts.join('/')}.html`);
+  mkdirSync(dirname(fileOutput), { recursive: true });
+  writeFileSync(fileOutput, html);
 }
 
 for (const route of PUBLIC_ROUTES) {
