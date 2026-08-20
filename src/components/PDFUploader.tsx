@@ -98,34 +98,38 @@ export const PDFUploader: React.FC<PDFUploaderProps> = ({ onDataExtracted }) => 
           },
           experience: extractedData.experience?.map((exp: any, index: number) => ({
             id: Date.now() + index,
-            title: exp.title,
-            company: exp.company,
-            location: '',
-            startDate: exp.startDate,
-            endDate: exp.endDate,
-            current: exp.current,
-            description: exp.description
+            title: exp.title || '',
+            company: exp.company || '',
+            location: exp.location || '',
+            startDate: exp.startDate || '',
+            endDate: exp.endDate || '',
+            current: Boolean(exp.current),
+            description: exp.description || '',
           })) || [],
           education: extractedData.education?.map((edu: any, index: number) => ({
             id: Date.now() + index,
-            school: edu.institution,
-            degree: edu.degree,
-            field: '',
-            startDate: edu.startDate,
-            endDate: edu.endDate,
-            description: ''
+            school: edu.institution || edu.school || '',
+            degree: edu.degree || '',
+            field: edu.field || '',
+            startDate: edu.startDate || '',
+            endDate: edu.endDate || '',
+            description: edu.description || '',
           })) || [],
           skills: Array.isArray(extractedData.skills) 
-            ? extractedData.skills 
+            ? extractedData.skills.filter((s: unknown) => typeof s === 'string' && s.trim()) 
             : (typeof extractedData.skills === 'string' 
-              ? extractedData.skills.split(',').map(s => s.trim()).filter(Boolean)
+              ? extractedData.skills.split(',').map((s: string) => s.trim()).filter(Boolean)
               : []),
           projects: extractedData.projects?.map((proj: any, index: number) => ({
             id: Date.now() + index,
-            title: proj.name,
-            description: proj.description,
-            link: proj.url,
-            technologies: proj.technologies?.split(',').map((tech: string) => tech.trim()) || []
+            title: proj.name || proj.title || '',
+            description: proj.description || '',
+            link: proj.url || proj.link || '',
+            technologies: Array.isArray(proj.technologies)
+              ? proj.technologies
+              : (typeof proj.technologies === 'string'
+                ? proj.technologies.split(',').map((tech: string) => tech.trim()).filter(Boolean)
+                : [])
           })) || []
         };
 

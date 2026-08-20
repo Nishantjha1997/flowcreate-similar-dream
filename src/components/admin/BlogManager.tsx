@@ -16,6 +16,7 @@ import {
   Link2, Image, Send, Loader2, BookOpen, Lightbulb, Wand2, BarChart3
 } from 'lucide-react';
 import { getEdgeFunctionErrorMessage } from '@/utils/edgeFunctionError';
+import { sanitizeHtml } from '@/utils/sanitizeHtml';
 
 interface BlogPost {
   id: string; slug: string; title: string; excerpt: string; description: string;
@@ -618,7 +619,7 @@ ${html.slice(0, 8000)}`, 4000);
             </TabsList>
             <TabsContent value="preview" className="mt-3">
               <div className="border rounded-lg p-6 prose prose-lg dark:prose-invert max-w-none min-h-[400px]"
-                dangerouslySetInnerHTML={{ __html: editingPost.content || '<p class="text-muted-foreground">No content yet.</p>' }} />
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(editingPost.content || '<p class="text-muted-foreground">No content yet.</p>') }} />
             </TabsContent>
             <TabsContent value="edit" className="mt-3 space-y-2">
               <div className="flex flex-wrap gap-1 p-2 border rounded-t-lg bg-muted/30">

@@ -35,7 +35,14 @@ export async function fetchGeminiSuggestions(request: SuggestionRequest): Promis
       if (!error && data?.suggestion) {
         return (data.suggestion as string).trim();
       }
+      if (error) {
+        const msg = await getEdgeFunctionErrorMessage(error, 'AI suggestion service error');
+        failures.push(msg);
+      } else if (data?.error) {
+        failures.push(String(data.error));
+      }
     } catch (efError) {
+      if (efError instanceof Error) failures.push(efError.message);
       console.warn("[Gemini] Edge function unavailable, trying direct AI generator:", efError);
     }
 

@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { SITE_URL, absoluteUrl } from '@/lib/seo';
 import { normalizeBrandText } from '@/config/brand';
 import { toast } from 'sonner';
+import { sanitizeHtml } from '@/utils/sanitizeHtml';
 
 interface BlogPost {
   id: string; slug: string; title: string; excerpt: string;
@@ -221,7 +222,7 @@ const BlogPost = () => {
             <ScrollReveal delay={50}>
             <article
               className="prose prose-lg dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground/85 prose-a:text-primary prose-strong:text-foreground prose-li:text-foreground/85 prose-img:rounded-xl prose-img:shadow-md mb-16"
-              dangerouslySetInnerHTML={{ __html: (post.content || '').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '').replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '').replace(/\s*on\w+\s*=\s*[^\s>]+/gi, '') }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content || '') }}
             />
             </ScrollReveal>
 

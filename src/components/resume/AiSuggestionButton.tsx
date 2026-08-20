@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, Lightbulb, Crown, RefreshCw, Eye, EyeOff } from "lucide-react";
+import { Sparkles, Loader2, Lightbulb, Crown, RefreshCw, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { fetchGeminiSuggestions, SuggestionType, ResumeSection } from "@/utils/ai/gemini";
 import {
@@ -21,6 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useAIQuota } from "@/hooks/useAIQuota";
+import { useNavigate } from "react-router-dom";
 
 interface AiSuggestionButtonProps {
   value: string;
@@ -64,6 +65,7 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
   additionalContext
 }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const quota = useAIQuota(user?.id);
   const [loading, setLoading] = React.useState(false);
   const [suggestions, setSuggestions] = React.useState<string[]>([]);
@@ -145,7 +147,7 @@ export const AiSuggestionButton: React.FC<AiSuggestionButtonProps> = ({
     setShowUpgradeDialog(false);
     setShowDemoPreview(false);
     if (onUpsell) onUpsell();
-    window.location.assign('/pricing');
+    navigate('/pricing');
   };
 
   const availableTypes = getSectionSpecificTypes(section);
