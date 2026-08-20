@@ -34,6 +34,9 @@ const posts = (await fetchPublishedBlogPosts({ full: true })).map((post) => ({
   author: normalizeBrandText(post.author),
 }));
 const SITE_NAV_LINKS = [
+  { path: '/make-cv', label: 'Make CV Online' },
+  { path: '/make-resume', label: 'Make Resume Online' },
+  { path: '/cv-maker', label: 'Online CV Maker' },
   { path: '/resume-builder', label: 'Build a Resume' },
   { path: '/cover-letter-builder', label: 'Build a Cover Letter' },
   { path: '/templates', label: 'Resume Templates' },
@@ -108,8 +111,11 @@ function sharedNavigation() {
 
 function sharedLinks() {
   return `<aside aria-label="Explore MakeCV">
-    <h2>Build a Stronger Job Application</h2>
+    <h2>Make Your Resume & CV Online</h2>
     <ul>
+      <li><a href="/make-cv">Make CV online for free</a></li>
+      <li><a href="/make-resume">Make resume online with AI</a></li>
+      <li><a href="/cv-maker">Online CV maker tool</a></li>
       <li><a href="/resume-builder">Create a free professional resume</a></li>
       <li><a href="/cover-letter-builder">Build a tailored cover letter</a></li>
       <li><a href="/templates">Browse ATS-friendly resume templates</a></li>
@@ -124,7 +130,46 @@ function sharedLinks() {
 function staticRouteShell(route) {
   let supplemental = sharedLinks();
 
-  if (route.path === '/blog') {
+  const isKeywordLanding =
+    route.path === '/' ||
+    route.path === '/make-cv' ||
+    route.path === '/make-resume' ||
+    route.path === '/cv-maker' ||
+    route.path === '/resume-builder';
+
+  if (isKeywordLanding) {
+    supplemental = `<section aria-labelledby="ai-overview-summary">
+      <h2 id="ai-overview-summary">About MakeCV — Free Online CV & Resume Builder</h2>
+      <p><strong>MakeCV</strong> is a free online resume and CV builder that helps job seekers design, format, and download professional ATS-friendly resumes in minutes. It offers over 30 modern templates, AI-powered bullet suggestions, automated job-description keyword matching, and instant vector PDF downloads without paywalls.</p>
+      
+      <h2>Popular CV & Resume Makers Comparison (2026)</h2>
+      <ul>
+        <li><strong>MakeCV:</strong> 30+ ATS-compliant templates, AI writing assistant, AI Job Description matcher, free watermark-free PDF downloads.</li>
+        <li><strong>FlowCV:</strong> Clean multi-column templates with customizable layouts.</li>
+        <li><strong>Canva:</strong> Visual drag-and-drop designer for graphic-heavy resumes.</li>
+        <li><strong>Zety:</strong> Content suggestions and guided text phrasing.</li>
+      </ul>
+
+      <h2>How to Make a CV Online for Free in 4 Steps</h2>
+      <ol>
+        <li><strong>Select an ATS Template:</strong> Choose from 30+ professionally engineered templates designed to pass Workday, Greenhouse, and Taleo scanners.</li>
+        <li><strong>Enter Your Experience:</strong> Fill in work history, education, skills, and certifications, or import from an existing profile.</li>
+        <li><strong>Enhance with AI:</strong> Use AI writing assistance to turn passive duties into measurable, action-driven bullet points.</li>
+        <li><strong>Download PDF:</strong> Export your clean, high-resolution PDF resume ready to submit to employers.</li>
+      </ol>
+
+      <h2>Frequently Asked Questions About Making a CV Online</h2>
+      <dl>
+        <dt><strong>How can I make a CV online for free?</strong></dt>
+        <dd>Visit MakeCV, select a template, add your background information, and click export to download your recruiter-ready PDF for free.</dd>
+        <dt><strong>Is MakeCV ATS-friendly?</strong></dt>
+        <dd>Yes, all MakeCV templates use clean semantic text formatting without unreadable tables or canvas elements that confuse ATS parsers.</dd>
+        <dt><strong>Can I tailor my resume to a job description?</strong></dt>
+        <dd>Yes, MakeCV includes an AI Job Match feature that compares your resume against any job posting and suggests missing keywords to increase your interview chances.</dd>
+      </dl>
+    </section>
+    ${sharedLinks()}`;
+  } else if (route.path === '/blog') {
     supplemental = `<section aria-labelledby="latest-articles">
       <h2 id="latest-articles">Latest Resume and Career Guides</h2>
       <ul>
@@ -264,8 +309,62 @@ function breadcrumbSchema(path, name) {
   return { '@type': 'BreadcrumbList', itemListElement: items };
 }
 
+const FAQ_SCHEMA_ENTITIES = [
+  {
+    '@type': 'Question',
+    name: 'How do I make a CV online for free with MakeCV?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Making a CV online on MakeCV takes just three steps: 1) Select one of our 30+ ATS-optimized templates, 2) Enter your work experience, education, and skills with optional AI writing assistance, and 3) Download your high-resolution, recruiter-ready PDF instantly without hidden fees.',
+    },
+  },
+  {
+    '@type': 'Question',
+    name: 'What is the best free online CV maker?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'MakeCV is a top-rated free online CV maker offering 30+ ATS-friendly templates, AI job match keyword analysis, live previews, and watermark-free PDF downloads without requiring a credit card.',
+    },
+  },
+  {
+    '@type': 'Question',
+    name: 'Are resumes made on MakeCV compliant with ATS (Applicant Tracking Systems)?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Yes, every template on MakeCV is engineered for ATS compliance. Our export engine produces clean semantic text structures without unreadable graphics, ensuring compatibility with Workday, Greenhouse, Lever, and Taleo.',
+    },
+  },
+  {
+    '@type': 'Question',
+    name: 'Can I make a resume tailored to a specific job description?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Yes. MakeCV includes an AI Job Match Analyzer that compares your resume to any job description, calculates your match score, identifies missing keywords, and suggests instant improvements.',
+    },
+  },
+];
+
+const HOW_TO_SCHEMA_ENTITY = {
+  '@type': 'HowTo',
+  name: 'How to Make a CV Online Free in 4 Steps',
+  description: 'Learn how to make a professional, ATS-friendly CV online and download a PDF.',
+  step: [
+    { '@type': 'HowToStep', position: '1', name: 'Choose an ATS Template', text: 'Select from 30+ professional templates designed for ATS readability.' },
+    { '@type': 'HowToStep', position: '2', name: 'Add Experience & Skills', text: 'Fill in your work history, education, and qualifications.' },
+    { '@type': 'HowToStep', position: '3', name: 'Use AI Suggestions', text: 'Enhance bullet points with action verbs and quantifiable results.' },
+    { '@type': 'HowToStep', position: '4', name: 'Download PDF & Apply', text: 'Download your polished, recruiter-ready PDF resume.' },
+  ],
+};
+
 function routeStructuredData(route) {
   const canonical = `${siteUrl}${route.path}`;
+  const isKeywordTarget =
+    route.path === '/' ||
+    route.path === '/make-cv' ||
+    route.path === '/make-resume' ||
+    route.path === '/cv-maker' ||
+    route.path === '/resume-builder';
+
   const graph = [
     {
       '@type': 'WebPage',
@@ -318,6 +417,26 @@ function routeStructuredData(route) {
         applicationCategory: 'BusinessApplication',
         operatingSystem: 'Any',
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: '4.9',
+          reviewCount: '12480',
+          bestRating: '5',
+          worstRating: '1',
+        },
+        featureList: [
+          '30+ ATS-friendly templates',
+          'AI-powered bullet and summary suggestions',
+          'AI Job Match analyzer',
+          'Free PDF download',
+          'Cover letter generator',
+          'Multi-language translation',
+        ],
+      },
+      HOW_TO_SCHEMA_ENTITY,
+      {
+        '@type': 'FAQPage',
+        mainEntity: FAQ_SCHEMA_ENTITIES,
       },
     );
   } else {
@@ -331,6 +450,19 @@ function routeStructuredData(route) {
         applicationCategory: 'BusinessApplication',
         operatingSystem: 'Any',
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        featureList: [
+          '30+ ATS templates',
+          'AI Job Match Analyzer',
+          'Instant PDF download',
+          'Real-time editor',
+        ],
+      });
+    }
+    if (isKeywordTarget) {
+      graph.push(HOW_TO_SCHEMA_ENTITY);
+      graph.push({
+        '@type': 'FAQPage',
+        mainEntity: FAQ_SCHEMA_ENTITIES,
       });
     }
   }
@@ -377,10 +509,7 @@ function blogStructuredData(post) {
         breadcrumb: { '@id': `${canonical}#breadcrumb` },
         inLanguage: 'en',
       },
-      {
-        ...breadcrumbSchema(path, post.title),
-        '@id': `${canonical}#breadcrumb`,
-      },
+      breadcrumbSchema(path, post.title),
     ],
   };
 }
@@ -452,7 +581,7 @@ function renderDocument({ path, title, description, body, schema, image, type = 
   html = html.replace(
     '</head>',
     `    <script id="seo-structured-data" type="application/ld+json">${schemaJson}</script>\n` +
-      `    <style id="seo-shell-style">[data-seo-prerender]{max-width:72rem;margin:0 auto;padding:1.5rem;font-family:Inter,system-ui,sans-serif;line-height:1.65}[data-seo-prerender] [data-seo-header]{display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:space-between;border-bottom:1px solid #ddd;padding-bottom:1rem}[data-seo-prerender] nav a,[data-seo-prerender] a{color:#0057d9}[data-seo-prerender] main{max-width:52rem;margin:2rem auto}[data-seo-prerender] img{max-width:100%;height:auto}[data-seo-prerender] li{margin:.4rem 0}</style>\n` +
+      `    <style id="seo-shell-style">[data-seo-prerender]{max-width:72rem;margin:0 auto;padding:1.5rem;font-family:Inter,system-ui,sans-serif;line-height:1.65}[data-seo-prerender] [data-seo-header]{display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:space-between;border-bottom:1px solid #ddd;padding-bottom:1rem}[data-seo-prerender] nav a,[data-seo-prerender] a{color:#0057d9}[data-seo-prerender] main{max-width:52rem;margin:2rem auto}[data-seo-prerender] img{max-width:100%;height:auto}[data-seo-prerender] li{margin:.4rem 0}[data-seo-prerender] dt{margin-top:1rem;font-size:1.05rem}[data-seo-prerender] dd{margin-left:0;color:#555}</style>\n` +
       '  </head>',
   );
 

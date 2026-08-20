@@ -26,6 +26,7 @@ const Register = lazy(() => import("./pages/Register"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ResumeTemplateProfession = lazy(() => import("./pages/ResumeTemplateProfession"));
+const SeoKeywordLanding = lazy(() => import("./pages/SeoKeywordLanding"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const Resources = lazy(() => import("./pages/Resources"));
@@ -85,6 +86,9 @@ const App = () => (
                         <Route path="/" element={<Index />} />
                         <Route path="/templates" element={<Templates />} />
                         <Route path="/resume-builder" element={<ResumeBuilder />} />
+                        <Route path="/make-cv" element={<SeoKeywordLanding keyword="make-cv" />} />
+                        <Route path="/make-resume" element={<SeoKeywordLanding keyword="make-resume" />} />
+                        <Route path="/cv-maker" element={<SeoKeywordLanding keyword="cv-maker" />} />
                         <Route path="/cover-letter-builder" element={<CoverLetterBuilder />} />
                         <Route path="/examples" element={<Examples />} />
                         <Route path="/features" element={<Features />} />

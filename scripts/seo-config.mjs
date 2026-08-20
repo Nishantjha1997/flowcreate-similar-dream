@@ -6,32 +6,47 @@ export function getSiteUrl() {
   return (process.env.VITE_SITE_URL || DEFAULT_SITE_URL).replace(/\/+$/, '');
 }
 
-// These are the public, canonical routes we intentionally want search engines
-// to index. Authenticated, account, admin, and user-specific routes are kept out
-// of the sitemap and receive X-Robots-Tag headers in vercel.json. The public
-// login landing page is intentionally included so returning users can find it
-// from Search; account and admin surfaces remain private.
+// Public, canonical routes intentionally indexed by search engines.
 export const PUBLIC_ROUTES = [
   {
     path: '/',
-    title: 'Free Online Resume Builder — Create Professional Resumes',
-    description: 'MakeCV helps you build ATS-friendly resumes, write cover letters, explore templates, and get career advice with free online tools and AI assistance.',
-    heading: 'Build a Professional Resume Online for Free',
+    title: 'Make CV Online Free — Make Your Resume & ATS CV Builder',
+    description: 'Make your resume online for free with MakeCV. Make a CV or resume in minutes with 30+ ATS-friendly templates, AI writing assistance, and instant PDF download. No credit card required.',
+    heading: 'Make CV & Resume Online Free with AI Assistance',
     changefreq: 'weekly',
     priority: '1.0',
     type: 'WebApplication',
   },
   {
-    path: '/login',
-    title: 'Log In to MakeCV',
-    description: 'Log in to MakeCV to build resumes, create cover letters, manage your templates, and continue your job search workspace.',
-    heading: 'Log In to MakeCV',
-    changefreq: 'yearly',
-    priority: '0.4',
+    path: '/make-cv',
+    title: 'Make CV Online Free — Fast & Professional CV Maker',
+    description: 'Make your CV online for free with MakeCV. Choose from 30+ ATS-friendly templates, customize with AI bullet point suggestions, and download your polished PDF instantly.',
+    heading: 'Make Your CV Online Free in Minutes',
+    changefreq: 'weekly',
+    priority: '0.95',
+    type: 'WebApplication',
+  },
+  {
+    path: '/make-resume',
+    title: 'Make Resume Online Free — ATS Resume Builder',
+    description: 'Make your resume online for free with MakeCV. Build an ATS-optimized resume tailored to any job description with AI suggestions and instant PDF export.',
+    heading: 'Make Your Resume Online for Free',
+    changefreq: 'weekly',
+    priority: '0.95',
+    type: 'WebApplication',
+  },
+  {
+    path: '/cv-maker',
+    title: 'Online CV Maker — Create Professional CVs for Free',
+    description: 'The #1 free online CV maker. Create a standout curriculum vitae with ATS-friendly layouts, AI writing tools, and high-resolution PDF download.',
+    heading: 'The Free Online CV Maker Built for Results',
+    changefreq: 'weekly',
+    priority: '0.95',
+    type: 'WebApplication',
   },
   {
     path: '/resume-builder',
-    title: 'Free Resume Builder — Create an ATS-Friendly Resume',
+    title: 'Make Resume Online Free — ATS-Friendly AI Resume Builder',
     description: 'Create a professional, ATS-friendly resume online for free. Choose a template, add your experience, and download a polished PDF in minutes.',
     heading: 'Free Online Resume Builder',
     changefreq: 'weekly',
@@ -40,7 +55,7 @@ export const PUBLIC_ROUTES = [
   },
   {
     path: '/templates',
-    title: 'Free ATS-Friendly Resume Templates',
+    title: '30+ Free ATS Resume & CV Templates — Make Your CV Online',
     description: 'Browse 30+ free, ATS-optimized resume templates for every industry. Customize any design and download your professional resume as a PDF.',
     heading: 'Free Resume Templates',
     changefreq: 'weekly',
@@ -48,7 +63,7 @@ export const PUBLIC_ROUTES = [
   },
   {
     path: '/cover-letter-builder',
-    title: 'Free AI Cover Letter Builder',
+    title: 'Free AI Cover Letter Builder — Make Matching Cover Letters',
     description: 'Write a tailored, professional cover letter with AI assistance. Match it to your resume, edit every detail, and download it as a PDF.',
     heading: 'Free Cover Letter Builder',
     changefreq: 'monthly',
@@ -65,7 +80,7 @@ export const PUBLIC_ROUTES = [
   },
   {
     path: '/features',
-    title: 'Resume Builder Features — ATS Templates and AI Tools',
+    title: 'Make CV Features — AI Bullet Suggestions, ATS Scoring & Templates',
     description: 'Explore MakeCV features including ATS-friendly templates, live preview, AI writing help, PDF export, cloud storage, and resume sharing.',
     heading: 'Everything You Need to Build a Better Resume',
     changefreq: 'monthly',
@@ -73,7 +88,7 @@ export const PUBLIC_ROUTES = [
   },
   {
     path: '/examples',
-    title: 'Professional Resume Examples by Industry',
+    title: 'Professional Resume & CV Examples by Industry',
     description: 'Browse professional resume examples across industries and experience levels. Use an example as inspiration and build your own resume online.',
     heading: 'Professional Resume Examples',
     changefreq: 'monthly',
@@ -102,6 +117,14 @@ export const PUBLIC_ROUTES = [
     heading: 'Career Advice and Job Search Tips',
     changefreq: 'monthly',
     priority: '0.7',
+  },
+  {
+    path: '/login',
+    title: 'Log In to MakeCV',
+    description: 'Log in to MakeCV to build resumes, create cover letters, manage your templates, and continue your job search workspace.',
+    heading: 'Log In to MakeCV',
+    changefreq: 'yearly',
+    priority: '0.4',
   },
   {
     path: '/help',

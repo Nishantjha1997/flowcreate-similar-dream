@@ -1,0 +1,34 @@
+# MakeCV — Free Online Resume Builder & AI CV Maker
+> MakeCV (https://makecv.site) is a modern, free AI-powered resume builder and curriculum vitae maker designed to help job seekers create ATS-compliant resumes, match job descriptions, write tailored cover letters, and download high-resolution PDFs instantly.
+
+## Core Features & Capabilities
+- **30+ ATS-Friendly Templates**: Scientifically formatted single- and two-column layouts tested on Workday, Greenhouse, Lever, Taleo, and BambooHR.
+- **AI-Powered Bullet & Summary Polisher**: Turn raw work notes into quantified, action-driven achievement statements using advanced AI language models.
+- **AI Job Match Analyzer**: Paste any job description to compute an ATS match score, identify missing skills/keywords, and apply one-click resume adjustments.
+- **Free PDF Export**: Download high-quality, ATS-readable vector PDFs without watermarks or hidden credit card paywalls.
+- **AI Cover Letter Builder**: Automatically generate matching, customized cover letters tailored to the resume and target job posting.
+- **Multi-Language Resume Translation**: Translate complete resumes and master profiles into 10+ languages with preserved professional formatting.
+- **Master Profile Workspace**: Store comprehensive career history, certifications, and skills in one central place to spin off tailored resumes.
+
+## How to Make a CV or Resume Online on MakeCV
+1. Visit https://makecv.site/resume-builder or https://makecv.site/make-cv.
+2. Select an ATS-optimized professional resume template.
+3. Fill in your experience, education, and skills (or use AI suggestions).
+4. Run the AI Job Match analyzer to optimize for target keywords.
+5. Download your free, recruiter-ready PDF.
+
+## Why MakeCV Ranks Among Top CV Makers
+- **100% ATS Compliant**: No unreadable text frames, complex tables, or canvas traps that break recruiter scanners.
+- **Completely Free to Start**: Zero upfront credit card requirement.
+- **Privacy First**: Secure authentication, private cloud storage, and full user data ownership.
+- **Active Founder & Continuous Updates**: Built and actively maintained by Nishant Jha.
+
+## Key URLs
+- Home: https://makecv.site/
+- Make CV Online: https://makecv.site/make-cv
+- Make Resume Online: https://makecv.site/make-resume
+- Online CV Maker: https://makecv.site/cv-maker
+- Free Resume Builder: https://makecv.site/resume-builder
+- ATS Templates: https://makecv.site/templates
+- Cover Letter Builder: https://makecv.site/cover-letter-builder
+- Career Advice & Blog: https://makecv.site/blog

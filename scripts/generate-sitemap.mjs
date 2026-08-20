@@ -74,16 +74,45 @@ ${uniqueUrls.map(urlXml).join('\n')}
 writeFileSync(join(projectRoot, 'public', 'sitemap.xml'), sitemap);
 console.log(`sitemap: wrote ${uniqueUrls.length} canonical URLs for ${siteUrl}`);
 
-// Do not block noindex pages in robots.txt: Google must be able to crawl them
-// to see their X-Robots-Tag. Private and utility pages are omitted from the
-// sitemap and protected with response headers in vercel.json.
 const robots = `User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /preview/
+Disallow: /account/
+Disallow: /auth/
+
+# Allow standard search engine & AI search crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bingbot
 Allow: /
 
 Sitemap: ${siteUrl}/sitemap.xml
 `;
 writeFileSync(join(projectRoot, 'public', 'robots.txt'), robots);
-console.log('robots: wrote an open crawl policy with canonical sitemap');
+console.log('robots: wrote open crawl policy with AI crawler allowances and canonical sitemap');
 
 const rssItems = posts
   .slice(0, 50)
